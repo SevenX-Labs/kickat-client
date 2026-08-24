@@ -1,0 +1,235 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  background-color: #FEFCF8;
+  transition: all 0.3s ease-in-out;
+}
+
+.container {
+  display: flex;
+  height: 4.5rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.logoWrapper {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.logoWrapper:hover {
+  opacity: 0.8;
+}
+
+.navLinks {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .navLinks {
+    display: flex;
+    gap: 1.75rem;
+  }
+}
+
+.navItem {
+  text-decoration: none;
+  color: #26211F;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: color 0.2s ease;
+  position: relative;
+}
+
+.dropdownTrigger {
+  background: none;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0;
+}
+
+.chevron {
+  width: 14px;
+  height: 14px;
+  color: #556066;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.dropdownWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 1rem 0; /* Creates hover bridge */
+}
+
+.dropdownWrapper:hover .navItem,
+.dropdownWrapper:hover .chevron {
+  color: #F5821F;
+}
+
+.dropdownWrapper:hover .chevron {
+  transform: rotate(180deg);
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  left: -1rem;
+  min-width: 260px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  padding: 1rem 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  z-index: 100;
+}
+
+.dropdownWrapper:hover .dropdownMenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdownLink {
+  display: block;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  color: #556066;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.dropdownLink:hover {
+  color: #F5821F;
+  background-color: #FEFCF8;
+  padding-left: 2rem;
+}
+
+.navItem:hover,
+.navItem.active {
+  color: #F5821F; /* KickAt Orange */
+}
+
+.searchContainer {
+  display: none;
+  width: 280px;
+}
+
+@media (min-width: 768px) {
+  .searchContainer {
+    display: block;
+  }
+}
+
+.searchWrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.65rem 1rem 0.65rem 2.5rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background-color: #F3EFE9;
+  font-size: 0.9rem;
+  color: #18181b;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.searchInput:focus {
+  background-color: #fff;
+  border-color: #F5821F;
+  box-shadow: 0 0 0 3px rgba(245, 130, 31, 0.15);
+}
+
+.searchInput::placeholder {
+  color: #8C8984;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 1rem;
+  color: #8C8984;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.iconBtn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: transparent;
+  color: #3f3f46;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.iconBtn:hover {
+  background-color: #fff;
+  border-color: #F5821F;
+  color: #F5821F;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 130, 31, 0.15);
+}
+
+.badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  display: flex;
+  height: 1.1rem;
+  min-width: 1.1rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background-color: #F5821F;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0 0.35rem;
+  border: 2px solid #FEFCF8;
+}
