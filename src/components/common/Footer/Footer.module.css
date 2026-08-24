@@ -45,7 +45,9 @@
 .logo {
   object-fit: contain;
   display: block;
-  filter: invert(1) hue-rotate(180deg);
+  width: 170px;
+  height: auto;
+  filter: invert(1) hue-rotate(180deg) contrast(200%) brightness(1.2);
   mix-blend-mode: screen;
 }
 
