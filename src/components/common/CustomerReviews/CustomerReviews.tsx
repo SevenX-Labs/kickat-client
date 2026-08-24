@@ -24,7 +24,7 @@ const reviews = [
 
 export function CustomerReviews() {
   return (
-    <section className={styles.section}>
+    <section id="reviews" className={styles.section}>
       <div className={styles.container}>
         <div className={styles.header}>
           <h2 className={styles.title}>Happy Pets. Happier Humans.</h2>

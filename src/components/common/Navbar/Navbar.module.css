@@ -1,16 +1,16 @@
 .header {
+  width: 100%;
+  background-color: #ffffff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   position: sticky;
   top: 0;
   z-index: 50;
-  width: 100%;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-  background-color: #FEFCF8;
-  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
 }
 
 .container {
   display: flex;
-  height: 4.5rem;
+  height: 5rem;
   align-items: center;
   justify-content: space-between;
   padding: 0 2rem;
@@ -21,7 +21,7 @@
 .leftSection {
   display: flex;
   align-items: center;
-  gap: 2.5rem;
+  gap: 3rem;
 }
 
 .rightSection {
@@ -33,23 +33,100 @@
 .logoWrapper {
   display: flex;
   align-items: center;
-  text-decoration: none;
-  transition: opacity 0.2s;
+  flex-shrink: 0;
 }
 
-.logoWrapper:hover {
-  opacity: 0.8;
-}
-
-.navLinks {
+.searchContainer {
   display: none;
 }
 
 @media (min-width: 1024px) {
-  .navLinks {
+  .searchContainer {
     display: flex;
-    gap: 1.75rem;
+    align-items: center;
   }
+}
+
+.searchWrapper {
+  position: relative;
+  width: 220px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.65rem 1rem 0.65rem 2.5rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: #FCFAF6;
+  font-size: 0.9rem;
+  color: #26211F;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.searchInput:focus {
+  border-color: #F5821F;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(245, 130, 31, 0.1);
+}
+
+.searchIcon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  color: #8C8984;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-shrink: 0;
+}
+
+.iconBtn {
+  position: relative;
+  background: none;
+  border: none;
+  color: #26211F;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.iconBtn:hover {
+  color: #F5821F;
+  transform: translateY(-2px);
+}
+
+.badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: #F5821F;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  transform: translate(25%, -25%);
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
 }
 
 .navItem {
@@ -83,7 +160,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  padding: 1rem 0; /* Creates hover bridge */
+  padding: 1rem 0;
 }
 
 .dropdownWrapper:hover .navItem,
@@ -135,91 +212,6 @@
 
 .navItem:hover,
 .navItem.active {
-  color: #F5821F; /* KickAt Orange */
-}
-
-.searchContainer {
-  display: none;
-  width: 280px;
-}
-
-@media (min-width: 768px) {
-  .searchContainer {
-    display: block;
-  }
-}
-
-.searchWrapper {
-  position: relative;
-  width: 100%;
-  display: flex;
-  align-items: center;
-}
-
-.searchInput {
-  width: 100%;
-  padding: 0.65rem 1rem 0.65rem 2.5rem;
-  border-radius: 9999px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  background-color: #F3EFE9;
-  font-size: 0.9rem;
-  color: #18181b;
-  outline: none;
-  transition: all 0.2s ease;
-}
-
-.searchInput:focus {
-  background-color: #fff;
-  border-color: #F5821F;
-  box-shadow: 0 0 0 3px rgba(245, 130, 31, 0.15);
-}
-
-.searchInput::placeholder {
-  color: #8C8984;
-}
-
-.searchIcon {
-  position: absolute;
-  left: 1rem;
-  color: #8C8984;
-  width: 16px;
-  height: 16px;
-  pointer-events: none;
-}
-
-.actions {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.iconBtn {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: 50%;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  background: transparent;
-  color: #3f3f46;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.iconBtn:hover {
-  background-color: #fff;
-  border-color: #F5821F;
-  color: #F5821F;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(245, 130, 31, 0.15);
-}
-
-.badge {
-  position: absolute;
-  top: -2px;
-  right: -2px;
   display: flex;
   height: 1.1rem;
   min-width: 1.1rem;

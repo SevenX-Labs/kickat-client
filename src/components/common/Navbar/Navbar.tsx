@@ -66,11 +66,8 @@ export function Navbar() {
               </div>
             ))}
             
-            <Link href="/brands" className={styles.navItem}>
-              Brands
-            </Link>
-            <Link href="/subscribe" className={styles.navItem}>
-              Subscribe & save
+            <Link href="#reviews" className={styles.navItem}>
+              Testimonial
             </Link>
             <Link href="/blogs" className={styles.navItem}>
               Blogs
@@ -98,7 +95,7 @@ export function Navbar() {
               </svg>
               <input
                 type="text"
-                placeholder="Search food, toys, breeds..."
+                placeholder="Search..."
                 className={styles.searchInput}
                 aria-label="Search"
               />
@@ -106,7 +103,6 @@ export function Navbar() {
           </div>
 
           <div className={styles.actions}>
-            {/* Wishlist Icon */}
             <button className={styles.iconBtn} aria-label="Wishlist">
               <svg
                 width="20"
@@ -121,8 +117,6 @@ export function Navbar() {
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
               </svg>
             </button>
-
-            {/* Account Icon */}
             <button className={styles.iconBtn} aria-label="Account">
               <svg
                 width="20"
@@ -138,8 +132,6 @@ export function Navbar() {
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
             </button>
-
-            {/* Cart Icon */}
             <button className={styles.iconBtn} aria-label="Cart">
               <svg
                 width="20"
