@@ -1,7 +1,7 @@
 import { CONFIG } from '../constants/config';
 
 interface FetchOptions extends RequestInit {
-  data?: any;
+  data?: Record<string, unknown>;
 }
 
 /**
@@ -41,7 +41,7 @@ export async function api<T>(endpoint: string, options: FetchOptions = {}): Prom
     try {
       const errorData = await response.json();
       errorMessage = errorData.message || errorMessage;
-    } catch (e) {
+    } catch {
       errorMessage = response.statusText;
     }
     throw new Error(errorMessage);

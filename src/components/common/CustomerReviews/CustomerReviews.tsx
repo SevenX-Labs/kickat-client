@@ -41,7 +41,7 @@ export function CustomerReviews() {
                   <Star key={i} className={styles.star} fill="#F5821F" color="#F5821F" />
                 ))}
               </div>
-              <p className={styles.content}>"{review.content}"</p>
+              <p className={styles.content}>&ldquo;{review.content}&rdquo;</p>
               <div className={styles.authorWrapper}>
                 <span className={styles.author}>{review.author}</span>
                 {review.verified && (

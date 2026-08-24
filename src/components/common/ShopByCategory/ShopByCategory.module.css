@@ -1,76 +1,94 @@
 .section {
   width: 100%;
   padding: 5rem 2rem;
-  background-color: #FEFCF8;
+  background-color: #ffffff;
 }
 
 .container {
-  max-width: 1440px;
+  max-width: 1200px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
+.header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
 .title {
   font-family: var(--font-lora), serif;
-  font-size: clamp(2rem, 3vw, 2.5rem);
+  font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 400;
   color: #26211F;
-  margin-bottom: 3.5rem;
-  letter-spacing: -0.01em;
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
+  gap: 2rem 1.5rem;
   width: 100%;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 480px) {
   .grid {
     grid-template-columns: repeat(4, 1fr);
-    gap: 3rem;
   }
 }
 
-.card {
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(8, 1fr);
+    gap: 2rem;
+  }
+}
+
+.cardLink {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-decoration: none;
+  gap: 1rem;
 }
 
-.imageWrapper {
-  position: relative;
+.iconWrapper {
   width: 100%;
   aspect-ratio: 1 / 1;
-  border-radius: 20px;
-  overflow: hidden;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
-  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.5s ease;
-  background: #FCFAF6;
-}
-
-.card:hover .imageWrapper {
-  transform: translateY(-8px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
-}
-
-.image {
-  transition: transform 0.7s ease;
-}
-
-.card:hover .image {
-  transform: scale(1.04);
-}
-
-.name {
-  font-size: 1.15rem;
-  font-weight: 600;
+  max-width: 140px;
+  border-radius: 50%;
+  background-color: #FEFCF8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   color: #26211F;
+}
+
+.iconWrapper svg {
+  width: 40px;
+  height: 40px;
+  transition: transform 0.3s ease;
+}
+
+.cardLink:hover .iconWrapper {
+  background-color: #F5821F;
+  border-color: #F5821F;
+  color: #ffffff;
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(245, 130, 31, 0.15);
+}
+
+.cardLink:hover .iconWrapper svg {
+  transform: scale(1.1);
+}
+
+.cardName {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #26211F;
+  text-align: center;
   transition: color 0.2s ease;
 }
 
