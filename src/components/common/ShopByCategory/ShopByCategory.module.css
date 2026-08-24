@@ -55,33 +55,31 @@
 .iconWrapper {
   width: 100%;
   aspect-ratio: 1 / 1;
-  max-width: 140px;
+  max-width: 130px;
   border-radius: 50%;
   background-color: #FEFCF8;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-  color: #26211F;
+  color: #5C5552;
 }
 
-.iconWrapper svg {
-  width: 40px;
-  height: 40px;
+.iconWrapper > svg {
   transition: transform 0.3s ease;
 }
 
 .cardLink:hover .iconWrapper {
-  background-color: #F5821F;
+  background-color: #ffffff;
   border-color: #F5821F;
-  color: #ffffff;
+  color: #F5821F;
   transform: translateY(-4px);
-  box-shadow: 0 10px 20px rgba(245, 130, 31, 0.15);
+  box-shadow: 0 10px 30px rgba(245, 130, 31, 0.12);
 }
 
-.cardLink:hover .iconWrapper svg {
-  transform: scale(1.1);
+.cardLink:hover .iconWrapper > svg {
+  transform: scale(1.15);
 }
 
 .cardName {

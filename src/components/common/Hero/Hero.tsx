@@ -9,7 +9,7 @@ export function Hero() {
         
         {/* Left Column: Typography & CTAs */}
         <div className={styles.textContent}>
-          <div className={styles.eyebrow}>FOR THE ONES WHO MEAN EVERYTHING</div>
+
           <h1 className={styles.title}>
             A bond that <br />
             <span className={styles.highlight}>never ends.</span>

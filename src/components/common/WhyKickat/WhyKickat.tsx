@@ -1,45 +1,69 @@
-import { Heart, Stethoscope, Leaf } from 'lucide-react';
+import { Stethoscope, Leaf, Heart, Truck, Shield, Award } from 'lucide-react';
 import styles from './WhyKickat.module.css';
 
-const reasons = [
+const heroStats = [
+  {
+    icon: Heart,
+    value: '25K+',
+    label: 'HAPPY PETS',
+    description: 'Trusted by pet parents across the country.',
+  },
   {
     icon: Stethoscope,
-    title: 'Vet Formulated',
-    description: 'Every recipe is developed alongside leading veterinary nutritionists to ensure optimal health and longevity for your pet.'
+    value: '50+',
+    label: 'VET PARTNERS',
+    description: 'Formulated with leading nutritionists.',
   },
   {
     icon: Leaf,
-    title: 'Premium Ingredients',
-    description: 'We source only the finest, human-grade ingredients. No fillers, no artificial preservatives, just honest nutrition.'
+    value: '100%',
+    label: 'NATURAL',
+    description: 'Human-grade, no fillers, no preservatives.',
   },
-  {
-    icon: Heart,
-    title: 'The Unbreakable Bond',
-    description: 'We believe in products that enhance the lifelong connection between you and your best friend.'
-  }
+];
+
+const secondaryStats = [
+  { icon: Truck, value: '2–3 Day', label: 'FREE DELIVERY' },
+  { icon: Shield, value: '200+', label: 'TRUSTED BRANDS' },
+  { icon: Award, value: '30 Day', label: 'EASY RETURNS' },
 ];
 
 export function WhyKickat() {
   return (
     <section className={styles.section}>
       <div className={styles.container}>
+        {/* Left-aligned header */}
         <div className={styles.header}>
+          <span className={styles.eyebrow}>Why choose us</span>
           <h2 className={styles.title}>Why KickAt?</h2>
-          <p className={styles.subtitle}>
-            We refuse to compromise when it comes to the family members who mean the most.
-          </p>
         </div>
-        
-        <div className={styles.grid}>
-          {reasons.map((reason, idx) => {
-            const Icon = reason.icon;
+
+        {/* Hero stats row — large editorial numbers */}
+        <div className={styles.heroRow}>
+          {heroStats.map((stat, idx) => {
+            const Icon = stat.icon;
             return (
-              <div key={idx} className={styles.card}>
-                <div className={styles.iconWrapper}>
-                  <Icon className={styles.icon} strokeWidth={1.5} />
+              <div key={idx} className={styles.heroCard}>
+                <Icon className={styles.heroIcon} strokeWidth={1.25} />
+                <div className={styles.heroValue}>{stat.value}</div>
+                <div className={styles.heroLabel}>{stat.label}</div>
+                <p className={styles.heroDesc}>{stat.description}</p>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Secondary stats — slim inline strip */}
+        <div className={styles.secondaryRow}>
+          {secondaryStats.map((stat, idx) => {
+            const Icon = stat.icon;
+            return (
+              <div key={idx} className={styles.secondaryItem}>
+                <Icon className={styles.secondaryIcon} strokeWidth={1.25} />
+                <div className={styles.secondaryText}>
+                  <span className={styles.secondaryValue}>{stat.value}</span>
+                  <span className={styles.secondaryLabel}>{stat.label}</span>
                 </div>
-                <h3 className={styles.cardTitle}>{reason.title}</h3>
-                <p className={styles.cardDescription}>{reason.description}</p>
               </div>
             );
           })}

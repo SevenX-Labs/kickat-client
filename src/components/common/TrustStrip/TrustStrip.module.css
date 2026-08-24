@@ -2,8 +2,9 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  padding: 1rem 2rem 3rem 2rem;
+  padding: 0 2rem 3rem 2rem;
   background: transparent;
+  margin-top: -1rem;
 }
 
 .container {
@@ -12,10 +13,11 @@
   justify-content: space-between;
   background-color: #ffffff;
   border-radius: 16px;
-  padding: 1.5rem 1rem;
+  padding: 1.75rem 1.5rem;
   width: 100%;
   max-width: 1440px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.03);
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -44,12 +46,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(245, 130, 31, 0.08), rgba(245, 130, 31, 0.04));
   color: #F5821F;
 }
 
 .icon {
-  width: 32px;
-  height: 32px;
+  width: 22px;
+  height: 22px;
 }
 
 .textContent {

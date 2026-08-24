@@ -1,29 +1,45 @@
 .hero {
   position: relative;
   width: 100%;
-  min-height: 600px; /* Constrained height */
-  height: 620px;
+  min-height: 500px;
+  height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #FCFAF6; /* Premium warm ivory */
+  background: linear-gradient(135deg, #FEFCF8 0%, #FFF8F0 50%, #FCFAF6 100%);
   overflow: hidden;
 }
 
-/* Oversized Subtle Paw Silhouette */
+/* Decorative floating shapes */
 .hero::before {
   content: '';
   position: absolute;
-  top: -10%;
-  right: -10%;
-  width: 120%;
-  height: 120%;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000000'%3E%3Cpath d='M12 8c-1.5 0-2.5-1-3-2.5 0-1.5 1-3 2.5-3 1.5 0 2.5 1.5 2.5 3 0 1.5-1 2.5-2 2.5zm-5 2c-1.5 0-2.5-1-3-2.5 0-1.5 1-3 2.5-3s2.5 1.5 2.5 3c0 1.5-1 2.5-2 2.5zm10 0c-1 0-2-1-2-2.5 0-1.5 1-3 2.5-3 1.5 0 2.5 1.5 2.5 3s-1 2.5-3 2.5zm-5 1.5c-3.5 0-5.5 3-5.5 6.5 0 2 2 3.5 4 4 1 0 2-.5 3-1 1 .5 2 1 3 1 2-.5 4-2 4-4 0-3.5-2-6.5-5.5-6.5z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: center right;
-  background-size: 800px;
-  opacity: 0.02; /* Extremely subtle */
+  top: -20%;
+  right: -5%;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 130, 31, 0.06) 0%, transparent 70%);
   pointer-events: none;
+  animation: heroGlow 8s ease-in-out infinite;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -10%;
+  left: -5%;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 130, 31, 0.04) 0%, transparent 70%);
+  pointer-events: none;
+  animation: heroGlow 10s ease-in-out infinite reverse;
+}
+
+@keyframes heroGlow {
+  0%, 100% { transform: scale(1) translate(0, 0); opacity: 1; }
+  50% { transform: scale(1.15) translate(10px, -10px); opacity: 0.7; }
 }
 
 .container {
@@ -32,7 +48,7 @@
   width: 100%;
   max-width: 1440px;
   margin: 0 auto;
-  padding: 4rem 2rem;
+  padding: 2.5rem 2rem 3rem;
   display: grid;
   grid-template-columns: 1fr;
   gap: 4rem;
@@ -83,13 +99,25 @@
   color: #F5821F;
   font-style: italic;
   font-weight: 500;
+  position: relative;
+}
+
+.highlight::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, rgba(245, 130, 31, 0.4), rgba(245, 130, 31, 0));
+  border-radius: 2px;
 }
 
 .description {
   font-size: clamp(1.05rem, 1.25vw, 1.15rem);
   color: #556066;
   max-width: 480px;
-  line-height: 1.6;
+  line-height: 1.7;
   margin-bottom: 3rem;
 }
 
@@ -105,28 +133,29 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem 2.5rem;
+  padding: 1.05rem 2.75rem;
   border-radius: 9999px;
-  background-color: #F5821F;
+  background: linear-gradient(135deg, #F5821F 0%, #E86F0A 100%);
   color: #fff;
   font-weight: 600;
   font-size: 1rem;
   text-decoration: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid #F5821F;
+  border: none;
+  box-shadow: 0 4px 14px rgba(245, 130, 31, 0.3);
 }
 
 .primaryBtn:hover {
-  background-color: #e47414;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 14px rgba(245, 130, 31, 0.25);
+  background: linear-gradient(135deg, #E86F0A 0%, #D4600A 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(245, 130, 31, 0.35);
 }
 
 .secondaryBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem 2.5rem;
+  padding: 1.05rem 2.75rem;
   border-radius: 9999px;
   background-color: transparent;
   color: #26211F;
@@ -134,12 +163,15 @@
   font-size: 1rem;
   text-decoration: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  border: 1.5px solid rgba(38, 33, 31, 0.2);
 }
 
 .secondaryBtn:hover {
-  background-color: rgba(0, 0, 0, 0.04);
-  border-color: rgba(0, 0, 0, 0.3);
+  background-color: #26211F;
+  border-color: #26211F;
+  color: #ffffff;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(38, 33, 31, 0.15);
 }
 
 .trustStatement {

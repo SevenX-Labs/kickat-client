@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
@@ -45,7 +47,9 @@ export function Navbar() {
               width={120}
               height={36}
               priority
-              style={{ objectFit: "contain" }}
+              style={{ objectFit: "contain", userSelect: "none" }}
+              draggable={false}
+              onContextMenu={(e) => e.preventDefault()}
             />
           </Link>
 

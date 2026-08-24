@@ -83,7 +83,7 @@
 .actions {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 0.5rem;
   flex-shrink: 0;
 }
 
@@ -93,34 +93,36 @@
   border: none;
   color: #26211F;
   cursor: pointer;
-  padding: 0.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition: all 0.25s ease;
 }
 
 .iconBtn:hover {
   color: #F5821F;
-  transform: translateY(-2px);
+  background-color: rgba(245, 130, 31, 0.06);
+  transform: translateY(-1px);
 }
 
 .badge {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 2px;
+  right: 2px;
   background-color: #F5821F;
   color: white;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 700;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   border: 2px solid #ffffff;
-  transform: translate(25%, -25%);
 }
 
 .navLinks {
@@ -136,6 +138,10 @@
   font-size: 0.95rem;
   transition: color 0.2s ease;
   position: relative;
+}
+
+.navItem:hover {
+  color: #F5821F;
 }
 
 .dropdownTrigger {
@@ -208,20 +214,4 @@
   color: #F5821F;
   background-color: #FEFCF8;
   padding-left: 2rem;
-}
-
-.navItem:hover,
-.navItem.active {
-  display: flex;
-  height: 1.1rem;
-  min-width: 1.1rem;
-  align-items: center;
-  justify-content: center;
-  border-radius: 9999px;
-  background-color: #F5821F;
-  color: #fff;
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 0 0.35rem;
-  border: 2px solid #FEFCF8;
 }
