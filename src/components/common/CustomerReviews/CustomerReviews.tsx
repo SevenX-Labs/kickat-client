@@ -1,60 +1,115 @@
+"use client";
+
 import { Star } from 'lucide-react';
 import styles from './CustomerReviews.module.css';
 
 const reviews = [
   {
-    author: "Sarah & Max (Golden Retriever)",
+    author: "Sarah Mitchell",
+    pet: "Max · Golden Retriever",
+    initial: "S",
+    avatarColor: "#333F2B",
     content: "KickAt completely transformed Max's digestion. The quality of the food is unmatched and the delivery is always perfectly on time.",
-    rating: 5,
-    verified: true
+    rating: 4.9,
   },
   {
-    author: "James & Luna (Bengal Cat)",
-    content: "I've never seen Luna so excited for meal time. The treats are her absolute favorite, and I love that they are made with clean ingredients.",
-    rating: 5,
-    verified: true
+    author: "Priya Sharma",
+    pet: "Luna · Bengal Cat",
+    initial: "P",
+    avatarColor: "#E7A03B",
+    content: "I've never seen Luna so excited for meal time. The treats are her absolute favorite, and I love that they are made with clean, honest ingredients.",
+    rating: 5.0,
   },
   {
-    author: "Emily & Charlie (French Bulldog)",
+    author: "James Cooper",
+    pet: "Charlie · French Bulldog",
+    initial: "J",
+    avatarColor: "#8B6F4E",
     content: "The toys are incredibly durable and beautifully designed. Finally, pet accessories that actually look good in my apartment!",
-    rating: 5,
-    verified: true
-  }
+    rating: 4.8,
+  },
+  {
+    author: "Ananya Desai",
+    pet: "Coco · Labrador",
+    initial: "A",
+    avatarColor: "#5B7553",
+    content: "We switched to KickAt six months ago and Coco's coat has never looked shinier. The subscription saves us so much time and money.",
+    rating: 4.9,
+  },
+  {
+    author: "Rohan Mehta",
+    pet: "Simba · Persian Cat",
+    initial: "R",
+    avatarColor: "#A0522D",
+    content: "Simba is the pickiest eater I've ever met, but he devours everything from KickAt. The grooming products are amazing too.",
+    rating: 5.0,
+  },
 ];
+
+function ReviewCard({ review }: { review: typeof reviews[0] }) {
+  return (
+    <div className={styles.card}>
+      <span className={styles.quoteDecor}>&ldquo;</span>
+      <blockquote className={styles.quote}>
+        {review.content}
+      </blockquote>
+      <div className={styles.cardFooter}>
+        <div className={styles.authorRow}>
+          <div
+            className={styles.avatar}
+            style={{ backgroundColor: review.avatarColor }}
+          >
+            {review.initial}
+          </div>
+          <div className={styles.authorInfo}>
+            <span className={styles.authorName}>{review.author}</span>
+            <span className={styles.authorPet}>{review.pet}</span>
+          </div>
+        </div>
+        <div className={styles.ratingBadge}>
+          <Star className={styles.starIcon} strokeWidth={1.5} />
+          <span className={styles.ratingValue}>{review.rating.toFixed(1)}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function CustomerReviews() {
   return (
     <section id="reviews" className={styles.section}>
       <div className={styles.container}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Happy Pets. Happier Humans.</h2>
-          <p className={styles.subtitle}>
-            Join thousands of pet parents who trust KickAt for their furry family members.
-          </p>
+          <span className={styles.eyebrow}>What pet parents say</span>
+          <h2 className={styles.title}>
+            Happy Pets.<br />
+            <em className={styles.titleAccent}>Happier Humans.</em>
+          </h2>
         </div>
+      </div>
 
-        <div className={styles.grid}>
+      {/* Infinite scrolling marquee */}
+      <div className={styles.marqueeWrapper}>
+        <div className={styles.marqueeTrack}>
+          {/* First set */}
           {reviews.map((review, idx) => (
-            <div key={idx} className={styles.card}>
-              <div className={styles.rating}>
-                {[...Array(review.rating)].map((_, i) => (
-                  <Star key={i} className={styles.star} fill="#F5821F" color="#F5821F" />
-                ))}
-              </div>
-              <p className={styles.content}>&ldquo;{review.content}&rdquo;</p>
-              <div className={styles.authorWrapper}>
-                <span className={styles.author}>{review.author}</span>
-                {review.verified && (
-                  <span className={styles.verified}>
-                    <svg viewBox="0 0 24 24" fill="none" className={styles.verifiedIcon}>
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#4CAF50"/>
-                    </svg>
-                    Verified Buyer
-                  </span>
-                )}
-              </div>
-            </div>
+            <ReviewCard key={`a-${idx}`} review={review} />
           ))}
+          {/* Duplicate set for seamless loop */}
+          {reviews.map((review, idx) => (
+            <ReviewCard key={`b-${idx}`} review={review} />
+          ))}
+        </div>
+      </div>
+
+      {/* Aggregate trust strip */}
+      <div className={styles.container}>
+        <div className={styles.trustStrip}>
+          <div className={styles.trustRating}>
+            <Star className={styles.trustStar} strokeWidth={1.5} fill="#E7A03B" color="#E7A03B" />
+            <span className={styles.trustScore}>4.9</span>
+            <span className={styles.trustLabel}>average from 12,300+ reviews</span>
+          </div>
         </div>
       </div>
     </section>

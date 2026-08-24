@@ -30,11 +30,23 @@
 }
 
 .logoLink {
-  margin-bottom: 1rem;
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  width: fit-content;
+  background: transparent;
+  transition: opacity 0.2s ease;
+}
+
+.logoLink:hover {
+  opacity: 0.85;
 }
 
 .logo {
-  filter: brightness(0) invert(1);
+  object-fit: contain;
+  display: block;
+  filter: invert(1) hue-rotate(180deg);
+  mix-blend-mode: screen;
 }
 
 .tagline {
