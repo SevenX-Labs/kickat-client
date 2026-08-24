@@ -1,3 +1,40 @@
+export interface SubCategory {
+  id: string;
+  name: string;
+  slug: string;
+  count: number;
+}
+
+export interface MainCategory {
+  id: string;
+  name: string;
+  slug: string;
+  count: number;
+  subcategories: SubCategory[];
+}
+
+export interface CatalogProduct {
+  id: string;
+  name: string;
+  price: number;
+  originalPrice?: number;
+  rating: number;
+  reviewsCount: number;
+  image: string;
+  mainCategory: string; // e.g. 'dogs', 'cats', 'fish', 'birds'
+  subCategory: string;  // e.g. 'dog-food-treats'
+  subcategory?: string;
+  brand: string;
+  badge?: 'Sale' | 'New' | 'Popular' | 'Organic';
+  tags: string[];
+  sizes?: string[];
+  color?: string;
+  isTopRated?: boolean;
+  inStock?: boolean;
+}
+
+export type Product = CatalogProduct;
+
 export interface CategoryInfo {
   slug: string;
   name: string;
@@ -5,8 +42,8 @@ export interface CategoryInfo {
   totalProducts: number;
   subcategories: { name: string; count: number }[];
   brands: { name: string; count: number }[];
-  bestsellers: Product[];
-  products: Product[];
+  bestsellers: CatalogProduct[];
+  products: CatalogProduct[];
   banner: {
     title: string;
     subtitle: string;
@@ -21,237 +58,367 @@ export interface CategoryInfo {
   };
 }
 
-export interface Product {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice?: number;
-  rating: number;
-  reviewsCount: number;
-  image: string;
-  badge?: 'Sale' | 'New' | 'Popular' | 'Organic';
-  subcategory: string;
-  brand: string;
-  inStock: boolean;
-}
-
-export const CATEGORY_DATA: Record<string, CategoryInfo> = {
-  birds: {
-    slug: 'birds',
-    name: 'Birds & Avian Care',
-    subcopy: 'Nutritious feeds, spacious cages, interactive toys, and grooming essentials for feathered companions.',
-    totalProducts: 142,
+export const MAIN_CATEGORIES: MainCategory[] = [
+  {
+    id: 'all',
+    name: 'All Categories',
+    slug: 'all',
+    count: 174,
+    subcategories: [],
+  },
+  {
+    id: 'dogs',
+    name: 'Dogs',
+    slug: 'dogs',
+    count: 58,
     subcategories: [
-      { name: 'Bird Food & Feeds', count: 48 },
-      { name: 'Cages & Stands', count: 32 },
-      { name: 'Toys & Perches', count: 28 },
-      { name: 'Grooming & Health', count: 18 },
-      { name: 'Feeder Accessories', count: 16 },
-    ],
-    brands: [
-      { name: 'AvianBlend', count: 42 },
-      { name: 'FeatherCare', count: 35 },
-      { name: 'NutriBird', count: 28 },
-      { name: 'WildWing', count: 21 },
-      { name: 'PetHaven', count: 16 },
-    ],
-    bestsellers: [
-      {
-        id: 'b-1',
-        name: 'AvianBlend Organic Seed & Nut Mix',
-        price: 799,
-        originalPrice: 999,
-        rating: 4.9,
-        reviewsCount: 128,
-        image: '/hero-products/dog_food.png',
-        badge: 'Popular',
-        subcategory: 'Bird Food & Feeds',
-        brand: 'AvianBlend',
-        inStock: true,
-      },
-      {
-        id: 'b-2',
-        name: 'FeatherCare Natural Wooden Perch Set',
-        price: 499,
-        rating: 4.8,
-        reviewsCount: 84,
-        image: '/hero-products/pet_toy.png',
-        badge: 'New',
-        subcategory: 'Toys & Perches',
-        brand: 'FeatherCare',
-        inStock: true,
-      },
-      {
-        id: 'b-3',
-        name: 'NutriBird Essential Multivitamin Drops',
-        price: 649,
-        originalPrice: 799,
-        rating: 5.0,
-        reviewsCount: 96,
-        image: '/hero-products/cat_treats.png',
-        badge: 'Sale',
-        subcategory: 'Grooming & Health',
-        brand: 'NutriBird',
-        inStock: true,
-      },
-    ],
-    banner: {
-      title: 'Enrich Your Feathered Companion’s World',
-      subtitle: 'Hand-picked perches, natural wood toys, and vet-approved diets designed for vibrant avian health.',
-      cta: 'Explore Avian Nutrition',
-      image: '/hero-products/pet_toy.png',
-    },
-    promo: {
-      title: 'Up to 40% Off Bird Toys',
-      subtitle: 'For a limited time on all natural wood and bell perches.',
-      code: 'FEATHER40',
-      image: '/hero-products/pet_toy.png',
-    },
-    products: [
-      {
-        id: 'p-1',
-        name: 'AvianBlend Gourmet Parrot Feast',
-        price: 899,
-        originalPrice: 1099,
-        rating: 4.9,
-        reviewsCount: 142,
-        image: '/hero-products/dog_food.png',
-        badge: 'Sale',
-        subcategory: 'Bird Food & Feeds',
-        brand: 'AvianBlend',
-        inStock: true,
-      },
-      {
-        id: 'p-2',
-        name: 'WildWing Stainless Steel Hanging Feeder',
-        price: 1299,
-        rating: 4.7,
-        reviewsCount: 56,
-        image: '/hero-products/pet_bowl.png',
-        badge: 'New',
-        subcategory: 'Feeder Accessories',
-        brand: 'WildWing',
-        inStock: true,
-      },
-      {
-        id: 'p-3',
-        name: 'FeatherCare Shredder Foraging Ball',
-        price: 349,
-        rating: 4.8,
-        reviewsCount: 92,
-        image: '/hero-products/pet_toy.png',
-        subcategory: 'Toys & Perches',
-        brand: 'FeatherCare',
-        inStock: true,
-      },
-      {
-        id: 'p-4',
-        name: 'NutriBird Calcium & Mineral Block',
-        price: 299,
-        originalPrice: 399,
-        rating: 4.9,
-        reviewsCount: 210,
-        image: '/hero-products/cat_treats.png',
-        badge: 'Organic',
-        subcategory: 'Grooming & Health',
-        brand: 'NutriBird',
-        inStock: true,
-      },
-      {
-        id: 'p-5',
-        name: 'PetHaven Spacious Flight Cage with Trays',
-        price: 4999,
-        originalPrice: 5999,
-        rating: 4.9,
-        reviewsCount: 38,
-        image: '/hero-products/pet_bowl.png',
-        badge: 'Popular',
-        subcategory: 'Cages & Stands',
-        brand: 'PetHaven',
-        inStock: true,
-      },
-      {
-        id: 'p-6',
-        name: 'AvianBlend Canary & Finch Seed Blend',
-        price: 549,
-        rating: 4.8,
-        reviewsCount: 74,
-        image: '/hero-products/dog_food.png',
-        subcategory: 'Bird Food & Feeds',
-        brand: 'AvianBlend',
-        inStock: true,
-      },
-      {
-        id: 'p-7',
-        name: 'FeatherCare Ladder & Rope Bridge',
-        price: 599,
-        originalPrice: 749,
-        rating: 4.6,
-        reviewsCount: 45,
-        image: '/hero-products/pet_toy.png',
-        badge: 'Sale',
-        subcategory: 'Toys & Perches',
-        brand: 'FeatherCare',
-        inStock: true,
-      },
-      {
-        id: 'p-8',
-        name: 'NutriBird Feather Shine Conditioning Spray',
-        price: 799,
-        rating: 4.9,
-        reviewsCount: 88,
-        image: '/hero-products/cat_treats.png',
-        subcategory: 'Grooming & Health',
-        brand: 'NutriBird',
-        inStock: true,
-      },
+      { id: 'dog-accessories', name: 'Dog Accessories', slug: 'dog-accessories', count: 18 },
+      { id: 'dog-food-treats', name: 'Dog Food & Treats', slug: 'dog-food-treats', count: 24 },
+      { id: 'dog-grooming-hygiene', name: 'Dog Grooming & Hygiene', slug: 'dog-grooming-hygiene', count: 10 },
+      { id: 'dog-feeding', name: 'Dog Feeding', slug: 'dog-feeding', count: 6 },
     ],
   },
-};
+  {
+    id: 'cats',
+    name: 'Cats',
+    slug: 'cats',
+    count: 42,
+    subcategories: [
+      { id: 'cat-accessories', name: 'Cat Accessories', slug: 'cat-accessories', count: 14 },
+      { id: 'cat-food', name: 'Cat Food', slug: 'cat-food', count: 18 },
+      { id: 'cat-grooming-hygiene', name: 'Cat Grooming & Hygiene', slug: 'cat-grooming-hygiene', count: 6 },
+      { id: 'cat-feeding', name: 'Cat Feeding', slug: 'cat-feeding', count: 4 },
+    ],
+  },
+  {
+    id: 'fish',
+    name: 'Fish',
+    slug: 'fish',
+    count: 52,
+    subcategories: [
+      { id: 'aquarium-filtration', name: 'Aquarium Filtration', slug: 'aquarium-filtration', count: 10 },
+      { id: 'aquarium-pumps', name: 'Aquarium Pumps', slug: 'aquarium-pumps', count: 8 },
+      { id: 'aquarium-heating', name: 'Aquarium Heating', slug: 'aquarium-heating', count: 6 },
+      { id: 'aquarium-lighting', name: 'Aquarium Lighting', slug: 'aquarium-lighting', count: 6 },
+      { id: 'aquarium-food', name: 'Aquarium Food', slug: 'aquarium-food', count: 12 },
+      { id: 'aquarium-care-medicine', name: 'Aquarium Care & Medicine', slug: 'aquarium-care-medicine', count: 6 },
+      { id: 'aquarium-tools', name: 'Aquarium Tools', slug: 'aquarium-tools', count: 4 },
+    ],
+  },
+  {
+    id: 'birds',
+    name: 'Birds',
+    slug: 'birds',
+    count: 22,
+    subcategories: [
+      { id: 'bird-feeding', name: 'Bird Feeding', slug: 'bird-feeding', count: 12 },
+      { id: 'bird-food', name: 'Bird Food', slug: 'bird-food', count: 10 },
+    ],
+  },
+];
 
-// Fallback generator for unconfigured category slugs
-export function getCategoryData(slug: string): CategoryInfo {
+export const CATALOG_PRODUCTS: CatalogProduct[] = [
+  // Dogs
+  {
+    id: 'd-1',
+    name: 'Premium Canine Organic Nourish Dry Kibble',
+    price: 1299,
+    originalPrice: 1599,
+    rating: 5,
+    reviewsCount: 142,
+    image: '/hero-products/dog_food.png',
+    mainCategory: 'dogs',
+    subCategory: 'dog-food-treats',
+    brand: 'NutriDog',
+    badge: 'Popular',
+    tags: ['Organic', 'High Protein', 'Grain Free'],
+    sizes: ['1kg', '3kg', '5kg'],
+    color: '#E7A03B',
+    isTopRated: true,
+  },
+  {
+    id: 'd-2',
+    name: 'Maison Petit Heavyweight Ceramic Dog Bowl',
+    price: 1499,
+    originalPrice: 1799,
+    rating: 5,
+    reviewsCount: 89,
+    image: '/hero-products/pet_bowl.png',
+    mainCategory: 'dogs',
+    subCategory: 'dog-feeding',
+    brand: 'Maison Petit',
+    badge: 'New',
+    tags: ['Ceramic', 'Non-Slip', 'Dishwasher Safe'],
+    sizes: ['M', 'L'],
+    color: '#333F2B',
+    isTopRated: true,
+  },
+  {
+    id: 'd-3',
+    name: 'Mim & Mate Natural Rubber Chew Toy',
+    price: 899,
+    rating: 4,
+    reviewsCount: 64,
+    image: '/hero-products/pet_toy.png',
+    mainCategory: 'dogs',
+    subCategory: 'dog-accessories',
+    brand: 'Mim & Mate',
+    badge: 'Sale',
+    tags: ['Durable', 'Teething', 'Eco Friendly'],
+    sizes: ['S', 'M', 'L'],
+    color: '#F5821F',
+  },
+  {
+    id: 'd-4',
+    name: 'KickAt Soft Padded Reflective Harness & Leash',
+    price: 1199,
+    originalPrice: 1499,
+    rating: 5,
+    reviewsCount: 112,
+    image: '/category-images/accessories.png',
+    mainCategory: 'dogs',
+    subCategory: 'dog-accessories',
+    brand: 'KickAt',
+    badge: 'Popular',
+    tags: ['Reflective', 'Padded', 'Adjustable'],
+    sizes: ['S', 'M', 'L', 'XL'],
+    color: '#211C15',
+  },
+  {
+    id: 'd-5',
+    name: 'De-Shedding Conditioning Dog Shampoo 500ml',
+    price: 649,
+    rating: 4,
+    reviewsCount: 48,
+    image: '/category-images/food.png',
+    mainCategory: 'dogs',
+    subCategory: 'dog-grooming-hygiene',
+    brand: 'PurePaw',
+    tags: ['Aloe Vera', 'Hypoallergenic'],
+    sizes: ['250ml', '500ml'],
+  },
+
+  // Cats
+  {
+    id: 'c-1',
+    name: 'KittyHaus Wild Salmon & Tuna Crunch Treats',
+    price: 499,
+    originalPrice: 649,
+    rating: 5,
+    reviewsCount: 198,
+    image: '/hero-products/cat_treats.png',
+    mainCategory: 'cats',
+    subCategory: 'cat-food',
+    brand: 'KittyHaus',
+    badge: 'Popular',
+    tags: ['Salmon', 'Grain Free', 'Crunchy'],
+    color: '#E7A03B',
+    isTopRated: true,
+  },
+  {
+    id: 'c-2',
+    name: 'Interactive Spinning Feather Cat Toy',
+    price: 699,
+    rating: 4,
+    reviewsCount: 76,
+    image: '/category-images/toys.png',
+    mainCategory: 'cats',
+    subCategory: 'cat-accessories',
+    brand: 'Mim & Mate',
+    badge: 'New',
+    tags: ['Feather', 'Interactive', 'USB Rechargeable'],
+    color: '#333F2B',
+  },
+  {
+    id: 'c-3',
+    name: 'Tofu Natural Clumping Cat Litter 6L',
+    price: 799,
+    originalPrice: 999,
+    rating: 5,
+    reviewsCount: 154,
+    image: '/category-images/fish.png',
+    mainCategory: 'cats',
+    subCategory: 'cat-grooming-hygiene',
+    brand: 'KickAt',
+    badge: 'Organic',
+    tags: ['Dust Free', 'Flushable', 'Odor Control'],
+    sizes: ['6L', '12L'],
+  },
+  {
+    id: 'c-4',
+    name: 'Whiskers Ceramic Shallow Whisker-Friendly Dish',
+    price: 899,
+    rating: 4,
+    reviewsCount: 52,
+    image: '/hero-products/pet_bowl.png',
+    mainCategory: 'cats',
+    subCategory: 'cat-feeding',
+    brand: 'Maison Petit',
+    tags: ['Ceramic', 'Whisker Safe'],
+    sizes: ['S'],
+  },
+
+  // Fish
+  {
+    id: 'f-1',
+    name: 'AquaPure Ultra-Quiet External Canister Filter 800L/h',
+    price: 2499,
+    originalPrice: 2999,
+    rating: 5,
+    reviewsCount: 88,
+    image: '/category-images/fish.png',
+    mainCategory: 'fish',
+    subCategory: 'aquarium-filtration',
+    brand: 'AquaPure',
+    badge: 'Popular',
+    tags: ['Filtration', 'Quiet', 'Multistage'],
+    isTopRated: true,
+  },
+  {
+    id: 'f-2',
+    name: 'AquaPump Silent Submersible Water Circulation Pump',
+    price: 1299,
+    originalPrice: 1599,
+    rating: 5,
+    reviewsCount: 74,
+    image: '/category-images/fish.png',
+    mainCategory: 'fish',
+    subCategory: 'aquarium-pumps',
+    brand: 'AquaPure',
+    badge: 'New',
+    tags: ['Submersible', 'Quiet'],
+  },
+  {
+    id: 'f-3',
+    name: 'Precision Digital Thermostat Submersible Heater 200W',
+    price: 1499,
+    rating: 4,
+    reviewsCount: 62,
+    image: '/category-images/accessories.png',
+    mainCategory: 'fish',
+    subCategory: 'aquarium-heating',
+    brand: 'AquaPure',
+    tags: ['Thermostat', 'Submersible'],
+  },
+  {
+    id: 'f-4',
+    name: 'Full Spectrum Planted LED Aquarium Light Bar 45cm',
+    price: 1899,
+    originalPrice: 2299,
+    rating: 5,
+    reviewsCount: 64,
+    image: '/category-images/accessories.png',
+    mainCategory: 'fish',
+    subCategory: 'aquarium-lighting',
+    brand: 'AquaPure',
+    tags: ['LED', 'Timer Included', 'Waterproof'],
+  },
+  {
+    id: 'f-5',
+    name: 'Tropical Flakes Color Enhancing Fish Diet 250g',
+    price: 449,
+    rating: 4,
+    reviewsCount: 110,
+    image: '/category-images/food.png',
+    mainCategory: 'fish',
+    subCategory: 'aquarium-food',
+    brand: 'AquaPure',
+    badge: 'Sale',
+    tags: ['Color Enhancing', 'Probiotic'],
+    sizes: ['100g', '250g', '500g'],
+  },
+  {
+    id: 'f-6',
+    name: 'Bio-Conditioner Water Dechlorinator & Stress Coat 500ml',
+    price: 699,
+    rating: 5,
+    reviewsCount: 92,
+    image: '/category-images/food.png',
+    mainCategory: 'fish',
+    subCategory: 'aquarium-care-medicine',
+    brand: 'AquaPure',
+    tags: ['Dechlorinator', 'Water Care'],
+  },
+  {
+    id: 'f-7',
+    name: 'Stainless Steel Aquascaping Tweezer & Scraper Set',
+    price: 899,
+    rating: 4,
+    reviewsCount: 45,
+    image: '/hero-products/pet_toy.png',
+    mainCategory: 'fish',
+    subCategory: 'aquarium-tools',
+    brand: 'AquaPure',
+    tags: ['Stainless Steel', 'Tools'],
+  },
+
+  // Birds
+  {
+    id: 'b-1',
+    name: 'WildWing Stainless Steel Hanging Feeder & Waterer',
+    price: 1299,
+    originalPrice: 1499,
+    rating: 5,
+    reviewsCount: 56,
+    image: '/hero-products/pet_bowl.png',
+    mainCategory: 'birds',
+    subCategory: 'bird-feeding',
+    brand: 'WildWing',
+    badge: 'Sale',
+    tags: ['Stainless Steel', 'Rust Proof'],
+    isTopRated: true,
+  },
+  {
+    id: 'b-2',
+    name: 'AvianBlend Organic Seed & Nut Mix 1kg',
+    price: 799,
+    originalPrice: 999,
+    rating: 5,
+    reviewsCount: 128,
+    image: '/category-images/bird.png',
+    mainCategory: 'birds',
+    subCategory: 'bird-food',
+    brand: 'AvianBlend',
+    badge: 'Popular',
+    tags: ['Organic', 'Seeds & Nuts', 'Fortified'],
+    sizes: ['1kg', '2.5kg'],
+  },
+];
+
+export function getCategoryData(slug: string) {
   const normalized = slug.toLowerCase();
-
-  if (CATEGORY_DATA[normalized]) {
-    return CATEGORY_DATA[normalized];
-  }
-
-  const formattedName = normalized
-    .split('-')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-
+  const mainCat = MAIN_CATEGORIES.find(c => c.slug === normalized) || MAIN_CATEGORIES[1];
+  
   return {
     slug: normalized,
-    name: formattedName,
-    subcopy: `Discover premium, vet-approved products, nutrition, and everyday essentials curated for ${formattedName.toLowerCase()}.`,
-    totalProducts: 142,
-    subcategories: [
-      { name: `${formattedName} Nutrition`, count: 54 },
-      { name: `${formattedName} Accessories`, count: 42 },
-      { name: `${formattedName} Care & Grooming`, count: 28 },
-      { name: `${formattedName} Toys`, count: 18 },
-    ],
+    name: mainCat.name,
+    subcopy: `Nutritious feeds, spacious accessories, toys, and grooming essentials for ${mainCat.name.toLowerCase()}.`,
+    totalProducts: mainCat.count,
+    subcategories: mainCat.subcategories.map(s => ({ name: s.name, count: s.count })),
     brands: [
-      { name: 'KickAt Select', count: 45 },
-      { name: 'PurePaw Nutrition', count: 38 },
-      { name: 'Naturals Co.', count: 32 },
-      { name: 'VetFormu', count: 27 },
+      { name: 'NutriPet', count: 24 },
+      { name: 'PurePaw', count: 18 },
+      { name: 'KickAt Select', count: 14 },
     ],
-    bestsellers: CATEGORY_DATA['birds'].bestsellers,
+    bestsellers: CATALOG_PRODUCTS.slice(0, 3).map(p => ({
+      ...p,
+      subcategory: mainCat.subcategories[0]?.name || 'General',
+    })),
     banner: {
-      title: `Crafted for ${formattedName} Wellness`,
+      title: `Crafted for ${mainCat.name} Wellness`,
       subtitle: 'Nutritional precision and premium craftsmanship for every stage of life.',
       cta: 'Explore Full Collection',
       image: '/hero-products/dog_food.png',
     },
     promo: {
-      title: `Special ${formattedName} Offer`,
+      title: `Special ${mainCat.name} Offer`,
       subtitle: 'Save up to 30% on curated bundles and subscription boxes.',
       code: 'KICKAT30',
       image: '/hero-products/cat_treats.png',
     },
-    products: CATEGORY_DATA['birds'].products,
+    products: CATALOG_PRODUCTS.map(p => ({
+      ...p,
+      subcategory: mainCat.subcategories[0]?.name || 'General',
+    })),
   };
 }

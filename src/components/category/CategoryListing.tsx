@@ -70,7 +70,7 @@ export function CategoryListing({ category }: CategoryListingProps) {
     return category.products.filter((p) => {
       if (searchQuery && !p.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
       if (p.price > maxPrice) return false;
-      if (selectedSubcategories.length > 0 && !selectedSubcategories.includes(p.subcategory)) return false;
+      if (selectedSubcategories.length > 0 && !selectedSubcategories.includes(p.subcategory || p.subCategory)) return false;
       if (selectedBrands.length > 0 && !selectedBrands.includes(p.brand)) return false;
       if (inStockOnly && !p.inStock) return false;
       if (minRating > 0 && p.rating < minRating) return false;
