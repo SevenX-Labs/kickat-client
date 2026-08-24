@@ -89,16 +89,15 @@
   align-self: start;
   max-height: calc(100vh - 6.5rem);
   overflow-y: auto;
-  scrollbar-width: thin;
+  scrollbar-width: none;
 }
 
 .sidebar::-webkit-scrollbar {
-  width: 4px;
+  display: none;
 }
 
 .sidebar::-webkit-scrollbar-thumb {
-  background: rgba(33, 28, 21, 0.15);
-  border-radius: 9999px;
+  display: none;
 }
 
 /* Back Navigation Button in Step 2 */

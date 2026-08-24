@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useMemo, useEffect } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import {
   Star,
   LayoutGrid,
@@ -65,6 +65,7 @@ export function CategoryExplorer({
   initialMainCat = 'dogs',
   initialSubCat = 'all',
 }: CategoryExplorerProps) {
+  const router = useRouter();
   // State initialized from props
   const [selectedMainCat, setSelectedMainCat] = useState<string>(initialMainCat);
   const [selectedSubCat, setSelectedSubCat] = useState<string>(initialSubCat);
@@ -75,8 +76,11 @@ export function CategoryExplorer({
   const [currentPage, setCurrentPage] = useState(1);
 
   // Sync state if props change
+  // eslint-disable-next-line react-hooks/rules-of-hooks, react-hooks/exhaustive-deps
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (initialMainCat) setSelectedMainCat(initialMainCat);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (initialSubCat) setSelectedSubCat(initialSubCat);
   }, [initialMainCat, initialSubCat]);
 
@@ -105,12 +109,7 @@ export function CategoryExplorer({
   };
 
   const handleSubCategoryClick = (subSlug: string) => {
-    setSelectedSubCat(subSlug);
-    setCurrentPage(1);
-
-    if (typeof window !== 'undefined') {
-      window.history.pushState(null, '', `/categories/${selectedMainCat}/${subSlug}`);
-    }
+    router.push(`/category/${selectedMainCat}/${subSlug}`);
   };
 
   const handleBackToSubCategories = () => {

@@ -52,29 +52,29 @@ export function Footer() {
 
           <div className={styles.linksCol}>
             <h4 className={styles.colTitle}>Dogs & Cats</h4>
-            <Link href="/category/dog-accessories" className={styles.link}>Dog Accessories</Link>
-            <Link href="/category/dog-food-treats" className={styles.link}>Dog Food & Treats</Link>
-            <Link href="/category/dog-grooming-hygiene" className={styles.link}>Dog Grooming</Link>
-            <Link href="/category/dog-feeding" className={styles.link}>Dog Feeding</Link>
+            <Link href="/category/dogs/dog-accessories" className={styles.link}>Dog Accessories</Link>
+            <Link href="/category/dogs/dog-food-treats" className={styles.link}>Dog Food & Treats</Link>
+            <Link href="/category/dogs/dog-grooming-hygiene" className={styles.link}>Dog Grooming</Link>
+            <Link href="/category/dogs/dog-feeding" className={styles.link}>Dog Feeding</Link>
             
-            <Link href="/category/cat-accessories" className={styles.link} style={{marginTop: '0.75rem'}}>Cat Accessories</Link>
-            <Link href="/category/cat-food" className={styles.link}>Cat Food</Link>
-            <Link href="/category/cat-grooming-hygiene" className={styles.link}>Cat Grooming</Link>
-            <Link href="/category/cat-feeding" className={styles.link}>Cat Feeding</Link>
+            <Link href="/category/cats/cat-accessories" className={styles.link} style={{marginTop: '0.75rem'}}>Cat Accessories</Link>
+            <Link href="/category/cats/cat-food" className={styles.link}>Cat Food</Link>
+            <Link href="/category/cats/cat-grooming-hygiene" className={styles.link}>Cat Grooming</Link>
+            <Link href="/category/cats/cat-feeding" className={styles.link}>Cat Feeding</Link>
           </div>
 
           <div className={styles.linksCol}>
             <h4 className={styles.colTitle}>Fish & Birds</h4>
-            <Link href="/category/aquarium-filtration" className={styles.link}>Aquarium Filtration</Link>
-            <Link href="/category/aquarium-pumps" className={styles.link}>Aquarium Pumps</Link>
-            <Link href="/category/aquarium-heating" className={styles.link}>Aquarium Heating</Link>
-            <Link href="/category/aquarium-lighting" className={styles.link}>Aquarium Lighting</Link>
-            <Link href="/category/aquarium-food" className={styles.link}>Aquarium Food</Link>
-            <Link href="/category/aquarium-care-medicine" className={styles.link}>Care & Medicine</Link>
-            <Link href="/category/aquarium-tools" className={styles.link}>Aquarium Tools</Link>
+            <Link href="/category/fish/aquarium-filtration" className={styles.link}>Aquarium Filtration</Link>
+            <Link href="/category/fish/aquarium-pumps" className={styles.link}>Aquarium Pumps</Link>
+            <Link href="/category/fish/aquarium-heating" className={styles.link}>Aquarium Heating</Link>
+            <Link href="/category/fish/aquarium-lighting" className={styles.link}>Aquarium Lighting</Link>
+            <Link href="/category/fish/aquarium-food" className={styles.link}>Aquarium Food</Link>
+            <Link href="/category/fish/aquarium-care-medicine" className={styles.link}>Care & Medicine</Link>
+            <Link href="/category/fish/aquarium-tools" className={styles.link}>Aquarium Tools</Link>
             
-            <Link href="/category/bird-feeding" className={styles.link} style={{marginTop: '0.75rem'}}>Bird Feeding</Link>
-            <Link href="/category/bird-food" className={styles.link}>Bird Food</Link>
+            <Link href="/category/birds/bird-feeding" className={styles.link} style={{marginTop: '0.75rem'}}>Bird Feeding</Link>
+            <Link href="/category/birds/bird-food" className={styles.link}>Bird Food</Link>
           </div>
 
           <div className={styles.linksCol}>

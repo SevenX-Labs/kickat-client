@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import {
   Search,
   Star,
@@ -12,11 +13,9 @@ import {
   Grid3X3,
   Grid2X2,
   X,
-  ChevronRight,
-  ArrowRight,
   RotateCcw,
 } from 'lucide-react';
-import { CategoryInfo, Product } from '@/data/categoryData';
+import { CategoryInfo } from '@/data/categoryData';
 import styles from './CategoryListing.module.css';
 
 interface CategoryListingProps {
@@ -24,10 +23,14 @@ interface CategoryListingProps {
 }
 
 export function CategoryListing({ category }: CategoryListingProps) {
+  const router = useRouter();
+
   // State
   const [searchQuery, setSearchQuery] = useState('');
   const [maxPrice, setMaxPrice] = useState(6000);
-  const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
+  const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>(
+    category.subcategoryName ? [category.subcategoryName] : []
+  );
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [inStockOnly, setInStockOnly] = useState(false);
   const [minRating, setMinRating] = useState<number>(0);
@@ -35,17 +38,14 @@ export function CategoryListing({ category }: CategoryListingProps) {
   const [gridCols, setGridCols] = useState<2 | 3 | 4>(3);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
-  // Toggle helpers
-  const toggleSubcategory = (name: string) => {
-    setSelectedSubcategories((prev) =>
-      prev.includes(name) ? prev.filter((item) => item !== name) : [...prev, name]
-    );
-  };
-
-  const toggleBrand = (name: string) => {
-    setSelectedBrands((prev) =>
-      prev.includes(name) ? prev.filter((item) => item !== name) : [...prev, name]
-    );
+  // Handlers
+  const toggleSubcategory = (name: string, slug: string) => {
+    setSelectedSubcategories((prev) => {
+      const next = prev.includes(name) ? prev.filter((item) => item !== name) : [...prev, name];
+      return next;
+    });
+    // Navigate laterally
+    router.push(`/category/${category.categorySlug}/${slug}`);
   };
 
   const clearAllFilters = () => {
@@ -70,7 +70,16 @@ export function CategoryListing({ category }: CategoryListingProps) {
     return category.products.filter((p) => {
       if (searchQuery && !p.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
       if (p.price > maxPrice) return false;
-      if (selectedSubcategories.length > 0 && !selectedSubcategories.includes(p.subcategory || p.subCategory)) return false;
+      if (
+        selectedSubcategories.length > 0 &&
+        !selectedSubcategories.some(
+          (subName) =>
+            p.subcategory?.toLowerCase() === subName.toLowerCase() ||
+            category.subcategories.find((s) => s.name === subName)?.slug === p.subCategory
+        )
+      ) {
+        return false;
+      }
       if (selectedBrands.length > 0 && !selectedBrands.includes(p.brand)) return false;
       if (inStockOnly && !p.inStock) return false;
       if (minRating > 0 && p.rating < minRating) return false;
@@ -81,7 +90,7 @@ export function CategoryListing({ category }: CategoryListingProps) {
       if (sortBy === 'rating') return b.rating - a.rating;
       return 0;
     });
-  }, [category.products, searchQuery, maxPrice, selectedSubcategories, selectedBrands, inStockOnly, minRating, sortBy]);
+  }, [category.products, category.subcategories, searchQuery, maxPrice, selectedSubcategories, selectedBrands, inStockOnly, minRating, sortBy]);
 
   return (
     <div className={styles.pageWrapper}>
@@ -90,28 +99,22 @@ export function CategoryListing({ category }: CategoryListingProps) {
         <nav className={styles.breadcrumb} aria-label="Breadcrumb">
           <Link href="/" className={styles.breadcrumbLink}>Home</Link>
           <span className={styles.breadcrumbSep}>/</span>
-          <Link href="/categories" className={styles.breadcrumbLink}>Shop by Category</Link>
-          <span className={styles.breadcrumbSep}>/</span>
-          <span className={styles.breadcrumbCurrent}>{category.name}</span>
+          <Link href={`/category/${category.categorySlug}`} className={styles.breadcrumbLink}>
+            {category.mainCategoryName}
+          </Link>
+          {category.subcategoryName && (
+            <>
+              <span className={styles.breadcrumbSep}>/</span>
+              <span className={styles.breadcrumbCurrent}>{category.subcategoryName}</span>
+            </>
+          )}
         </nav>
-
-        <div className={styles.pageHeader}>
-          <div className={styles.headerTitleRow}>
-            <div>
-              <span className={styles.eyebrow}>CATEGORY</span>
-              <h1 className={styles.pageTitle}>{category.name}</h1>
-            </div>
-            <span className={styles.countBadge}>
-              {filteredProducts.length} products
-            </span>
-          </div>
-          <p className={styles.subcopy}>{category.subcopy}</p>
-        </div>
       </div>
 
       {/* Main Layout: Sidebar Filters + Main Content */}
       <div className={styles.mainLayout}>
-        {/* 3. Sidebar Filters Column */}
+        
+        {/* 3. Sidebar Filters Column (Sticky) */}
         <aside className={`${styles.sidebar} ${mobileFilterOpen ? styles.sidebarMobileOpen : ''}`}>
           <div className={styles.sidebarHeader}>
             <div className={styles.sidebarTitleRow}>
@@ -182,13 +185,13 @@ export function CategoryListing({ category }: CategoryListingProps) {
             </div>
             <div className={styles.checkList}>
               {category.subcategories.map((sub) => {
-                const checked = selectedSubcategories.includes(sub.name);
+                const checked = selectedSubcategories.includes(sub.name) || category.subcategorySlug === sub.slug;
                 return (
-                  <label key={sub.name} className={styles.checkLabel}>
+                  <label key={sub.slug} className={styles.checkLabel}>
                     <input
                       type="checkbox"
                       checked={checked}
-                      onChange={() => toggleSubcategory(sub.name)}
+                      onChange={() => toggleSubcategory(sub.name, sub.slug)}
                       className={styles.checkbox}
                     />
                     <span className={styles.checkText}>{sub.name}</span>
@@ -199,31 +202,7 @@ export function CategoryListing({ category }: CategoryListingProps) {
             </div>
           </div>
 
-          {/* Brands Filter */}
-          <div className={styles.filterGroup}>
-            <div className={styles.groupHeader}>
-              <span className={styles.groupTitle}>Brand</span>
-            </div>
-            <div className={styles.checkList}>
-              {category.brands.map((b) => {
-                const checked = selectedBrands.includes(b.name);
-                return (
-                  <label key={b.name} className={styles.checkLabel}>
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={() => toggleBrand(b.name)}
-                      className={styles.checkbox}
-                    />
-                    <span className={styles.checkText}>{b.name}</span>
-                    <span className={styles.checkCountBadge}>{b.count}</span>
-                  </label>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Availability & Rating Filter */}
+          {/* Options Filter */}
           <div className={styles.filterGroup}>
             <div className={styles.groupHeader}>
               <span className={styles.groupTitle}>Options</span>
@@ -247,70 +226,73 @@ export function CategoryListing({ category }: CategoryListingProps) {
               <span className={styles.checkText}>4.5★ & Above</span>
             </label>
           </div>
-
-          {/* 8. Sidebar Promo Tile */}
-          <div className={styles.promoTile}>
-            <div className={styles.promoImageWrap}>
-              <Image
-                src={category.promo.image}
-                alt={category.promo.title}
-                fill
-                style={{ objectFit: 'cover' }}
-              />
-            </div>
-            <div className={styles.promoContent}>
-              <span className={styles.promoBadge}>LIMITED OFFER</span>
-              <h4 className={styles.promoTitle}>{category.promo.title}</h4>
-              <p className={styles.promoSubtitle}>{category.promo.subtitle}</p>
-              <button className={styles.promoBtn}>
-                Use code {category.promo.code} &rarr;
-              </button>
-            </div>
-          </div>
         </aside>
 
         {/* Content Area */}
         <div className={styles.contentArea}>
-          {/* 4. Bestsellers Strip at Top of Results */}
-          <div className={styles.bestsellersSection}>
-            <div className={styles.bestsellersHeader}>
-              <span className={styles.sectionEyebrow}>TOP RATED IN CATEGORY</span>
-              <h3 className={styles.bestsellersTitle}>Category Bestsellers</h3>
-            </div>
-            <div className={styles.bestsellersGrid}>
-              {category.bestsellers.map((item) => (
-                <div key={item.id} className={styles.bestsellerCard}>
-                  <div className={styles.bestsellerImgWrap}>
-                    <Image
-                      src={item.image}
-                      alt={item.name}
-                      fill
-                      style={{ objectFit: 'contain' }}
-                      className={styles.bestsellerImg}
-                    />
-                    {item.badge && (
-                      <span className={styles.cardBadge}>{item.badge}</span>
-                    )}
-                  </div>
-                  <div className={styles.bestsellerInfo}>
-                    <span className={styles.brandTag}>{item.brand}</span>
-                    <h4 className={styles.bestsellerName}>{item.name}</h4>
-                    <div className={styles.ratingRow}>
-                      <Star className={styles.starIcon} size={14} fill="#E7A03B" color="#E7A03B" />
-                      <span className={styles.ratingNum}>{item.rating}</span>
-                      <span className={styles.reviewCount}>({item.reviewsCount})</span>
+          
+          {/* Bestsellers Strip at Top of Results */}
+          {category.bestsellers.length > 0 && (
+            <div className={styles.bestsellersSection}>
+              <div className={styles.bestsellersHeader}>
+                <span className={styles.sectionEyebrow}>TOP RATED IN CATEGORY</span>
+                <h3 className={styles.bestsellersTitle}>Category Bestsellers</h3>
+              </div>
+              <div className={styles.bestsellersGrid}>
+                {category.bestsellers.map((item) => (
+                  <div key={item.id} className={styles.bestsellerCard}>
+                    <div className={styles.bestsellerImgWrap}>
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        style={{ objectFit: 'contain' }}
+                        className={styles.bestsellerImg}
+                      />
+                      {item.badge && (
+                        <span
+                          className={`${styles.cardBadge} ${
+                            item.badge === 'New'
+                              ? styles.badgeInk
+                              : item.badge === 'Organic'
+                              ? styles.badgeForest
+                              : styles.badgeAmber
+                          }`}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
                     </div>
-                    <div className={styles.bestsellerFooter}>
-                      <span className={styles.bestsellerPrice}>₹{item.price.toLocaleString()}</span>
-                      <button className={styles.addCartBtn}>Add to Cart</button>
+                    <div className={styles.bestsellerInfo}>
+                      <span className={styles.brandTag}>{item.brand}</span>
+                      <h4 className={styles.bestsellerName}>{item.name}</h4>
+                      <div className={styles.ratingRow}>
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            size={12}
+                            fill={i < item.rating ? '#E7A03B' : 'none'}
+                            color={i < item.rating ? '#E7A03B' : '#dcdcdc'}
+                          />
+                        ))}
+                      </div>
+                      <div className={styles.bestsellerFooter}>
+                        <span className={styles.bestsellerPrice}>₹{item.price.toLocaleString()}</span>
+                        <button
+                          className={styles.addCartBtn}
+                          onClick={() => alert(`Added ${item.name} to cart!`)}
+                        >
+                          Add to Cart
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* 6. Toolbar Row */}
+          {/* Toolbar Row */}
           <div className={styles.toolbar}>
             <div className={styles.toolbarLeft}>
               <button
@@ -325,11 +307,11 @@ export function CategoryListing({ category }: CategoryListingProps) {
               </button>
 
               <div className={styles.sortWrapper}>
-                <label htmlFor="sortSelect" className={styles.sortLabel}>Sort by:</label>
+                <label htmlFor="sortSelect" className={styles.sortLabel}>SORT BY:</label>
                 <select
                   id="sortSelect"
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
+                  onChange={(e) => setSortBy(e.target.value as 'featured' | 'price-low' | 'price-high' | 'rating')}
                   className={styles.sortSelect}
                 >
                   <option value="featured">Featured & Popular</option>
@@ -370,120 +352,76 @@ export function CategoryListing({ category }: CategoryListingProps) {
             </div>
           </div>
 
-          {/* 7. Product Grid */}
+          {/* Product Grid */}
           {filteredProducts.length === 0 ? (
             <div className={styles.emptyState}>
-              <Search size={40} className={styles.emptyIcon} />
-              <h3 className={styles.emptyTitle}>No matching products found</h3>
-              <p className={styles.emptyDesc}>Try adjusting your price range or clearing your subcategory/brand filters.</p>
+              <RotateCcw size={40} className={styles.emptyIcon} />
+              <h3 className={styles.emptyTitle}>No products match your filters</h3>
+              <p className={styles.emptySubtitle}>Try adjusting your price range, search query, or brand selections.</p>
               <button onClick={clearAllFilters} className={styles.resetBtn}>
-                <RotateCcw size={16} /> Reset Filters
+                Clear All Filters
               </button>
             </div>
           ) : (
-            <>
-              <div
-                className={styles.productGrid}
-                style={{
-                  gridTemplateColumns: `repeat(${gridCols}, 1fr)`,
-                }}
-              >
-                {filteredProducts.slice(0, 4).map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
+            <div className={`${styles.productGrid} ${styles[`gridCols${gridCols}`]}`}>
+              {filteredProducts.map((product) => (
+                <div key={product.id} className={styles.productCard}>
+                  <div className={styles.cardImgContainer}>
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fill
+                      style={{ objectFit: 'contain' }}
+                      className={styles.productImg}
+                    />
+                    {product.badge && (
+                      <span
+                        className={`${styles.cardBadge} ${
+                          product.badge === 'New'
+                            ? styles.badgeInk
+                            : product.badge === 'Organic'
+                            ? styles.badgeForest
+                            : styles.badgeAmber
+                        }`}
+                      >
+                        {product.badge}
+                      </span>
+                    )}
+                    <button
+                      className={styles.quickAddBtn}
+                      onClick={() => alert(`Added ${product.name} to cart!`)}
+                      title="Add to Cart"
+                    >
+                      <ShoppingBag size={16} />
+                    </button>
+                  </div>
 
-              {/* 5. Mid-page Category Banner */}
-              <div className={styles.midBanner}>
-                <div className={styles.bannerImageWrap}>
-                  <Image
-                    src={category.banner.image}
-                    alt={category.banner.title}
-                    fill
-                    style={{ objectFit: 'cover' }}
-                  />
-                  <div className={styles.bannerOverlay} />
-                </div>
-                <div className={styles.bannerContent}>
-                  <span className={styles.bannerEyebrow}>KICKAT EDITORIAL</span>
-                  <h3 className={styles.bannerTitle}>{category.banner.title}</h3>
-                  <p className={styles.bannerSubtitle}>{category.banner.subtitle}</p>
-                  <button className={styles.bannerCta}>{category.banner.cta} &rarr;</button>
-                </div>
-              </div>
+                  <div className={styles.cardContent}>
+                    <div className={styles.ratingRow}>
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          size={13}
+                          fill={i < product.rating ? '#E7A03B' : 'none'}
+                          color={i < product.rating ? '#E7A03B' : '#dcdcdc'}
+                        />
+                      ))}
+                    </div>
 
-              {/* Remaining Product Grid */}
-              {filteredProducts.length > 4 && (
-                <div
-                  className={styles.productGrid}
-                  style={{
-                    gridTemplateColumns: `repeat(${gridCols}, 1fr)`,
-                  }}
-                >
-                  {filteredProducts.slice(4).map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
-                </div>
-              )}
+                    <h3 className={styles.productTitle}>{product.name}</h3>
 
-              {/* 9. Pagination / Load More */}
-              <div className={styles.paginationArea}>
-                <button className={styles.loadMoreBtn}>
-                  Load More Products &darr;
-                </button>
-              </div>
-            </>
+                    <div className={styles.priceRow}>
+                      <span className={styles.price}>₹{product.price.toLocaleString()}</span>
+                      {product.originalPrice && (
+                        <span className={styles.originalPrice}>₹{product.originalPrice.toLocaleString()}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
-        </div>
-      </div>
-    </div>
-  );
-}
 
-function ProductCard({ product }: { product: Product }) {
-  return (
-    <div className={styles.productCard}>
-      <div className={styles.cardImageWrap}>
-        <Image
-          src={product.image}
-          alt={product.name}
-          fill
-          style={{ objectFit: 'contain' }}
-          className={styles.cardImg}
-        />
-        {product.badge && (
-          <span className={styles.pillBadge}>{product.badge}</span>
-        )}
-        {/* Quick Add to Cart Icon on Hover */}
-        <button
-          className={styles.quickAddBtn}
-          title="Quick add to cart"
-          onClick={(e) => {
-            e.preventDefault();
-            alert(`Added ${product.name} to cart!`);
-          }}
-        >
-          <ShoppingBag size={18} />
-        </button>
-      </div>
-
-      <div className={styles.cardBody}>
-        <span className={styles.cardBrand}>{product.brand}</span>
-        <h3 className={styles.cardName}>{product.name}</h3>
-
-        <div className={styles.cardRatingRow}>
-          <Star size={14} fill="#E7A03B" color="#E7A03B" />
-          <span className={styles.cardRatingVal}>{product.rating}</span>
-          <span className={styles.cardReviews}>({product.reviewsCount})</span>
-        </div>
-
-        <div className={styles.cardPriceRow}>
-          <span className={styles.cardPrice}>₹{product.price.toLocaleString()}</span>
-          {product.originalPrice && (
-            <span className={styles.cardOriginalPrice}>
-              ₹{product.originalPrice.toLocaleString()}
-            </span>
-          )}
         </div>
       </div>
     </div>

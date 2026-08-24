@@ -4,13 +4,13 @@ import { Metadata } from 'next';
 
 interface PageProps {
   params: Promise<{
-    slug: string;
+    categorySlug: string;
   }>;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const category = getCategoryData(slug);
+  const { categorySlug } = await params;
+  const category = getCategoryData(categorySlug);
   return {
     title: `${category.name} | KickAt`,
     description: category.subcopy,
@@ -18,8 +18,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function CategoryPage({ params }: PageProps) {
-  const { slug } = await params;
-  const category = getCategoryData(slug);
+  const { categorySlug } = await params;
+  const category = getCategoryData(categorySlug);
 
   return <CategoryListing category={category} />;
 }

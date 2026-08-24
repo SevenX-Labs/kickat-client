@@ -36,26 +36,17 @@ export interface CatalogProduct {
 export type Product = CatalogProduct;
 
 export interface CategoryInfo {
-  slug: string;
+  categorySlug: string;
+  subcategorySlug?: string;
+  mainCategoryName: string;
+  subcategoryName?: string;
   name: string;
   subcopy: string;
   totalProducts: number;
-  subcategories: { name: string; count: number }[];
+  subcategories: { name: string; slug: string; count: number }[];
   brands: { name: string; count: number }[];
   bestsellers: CatalogProduct[];
   products: CatalogProduct[];
-  banner: {
-    title: string;
-    subtitle: string;
-    cta: string;
-    image: string;
-  };
-  promo: {
-    title: string;
-    subtitle: string;
-    code: string;
-    image: string;
-  };
 }
 
 export const MAIN_CATEGORIES: MainCategory[] = [
@@ -385,40 +376,58 @@ export const CATALOG_PRODUCTS: CatalogProduct[] = [
   },
 ];
 
-export function getCategoryData(slug: string) {
-  const normalized = slug.toLowerCase();
-  const mainCat = MAIN_CATEGORIES.find(c => c.slug === normalized) || MAIN_CATEGORIES[1];
-  
+export function getCategoryData(categorySlug: string, subcategorySlug?: string): CategoryInfo {
+  const normCat = (categorySlug || 'dogs').toLowerCase();
+  const normSub = subcategorySlug?.toLowerCase();
+
+  // Find main category
+  let mainCat = MAIN_CATEGORIES.find((c) => c.slug === normCat);
+
+  // Fallback: If categorySlug was a subcategory slug directly (e.g. 'dog-food-treats')
+  if (!mainCat) {
+    mainCat = MAIN_CATEGORIES.find((c) =>
+      c.subcategories.some((s) => s.slug === normCat)
+    ) || MAIN_CATEGORIES[1];
+  }
+
+  // Find active subcategory object
+  const activeSubObj = mainCat.subcategories.find(
+    (s) => s.slug === normSub || s.slug === normCat
+  );
+
+  // Filter products
+  const matchingProducts = CATALOG_PRODUCTS.filter((p) => {
+    if (p.mainCategory !== mainCat!.slug) return false;
+    if (activeSubObj && p.subCategory !== activeSubObj.slug) return false;
+    return true;
+  });
+
+  const bestsellers = CATALOG_PRODUCTS.filter(
+    (p) => p.mainCategory === mainCat!.slug && p.isTopRated
+  ).slice(0, 3);
+
   return {
-    slug: normalized,
-    name: mainCat.name,
-    subcopy: `Nutritious feeds, spacious accessories, toys, and grooming essentials for ${mainCat.name.toLowerCase()}.`,
-    totalProducts: mainCat.count,
-    subcategories: mainCat.subcategories.map(s => ({ name: s.name, count: s.count })),
+    categorySlug: mainCat.slug,
+    subcategorySlug: activeSubObj ? activeSubObj.slug : undefined,
+    mainCategoryName: mainCat.name,
+    subcategoryName: activeSubObj ? activeSubObj.name : undefined,
+    name: activeSubObj ? activeSubObj.name : mainCat.name,
+    subcopy: activeSubObj
+      ? `Discover premium ${activeSubObj.name.toLowerCase()} curated for ${mainCat.name.toLowerCase()}.`
+      : `Nutritious feeds, spacious accessories, toys, and grooming essentials for ${mainCat.name.toLowerCase()}.`,
+    totalProducts: matchingProducts.length,
+    subcategories: mainCat.subcategories.map((s) => ({
+      name: s.name,
+      slug: s.slug,
+      count: s.count,
+    })),
     brands: [
-      { name: 'NutriPet', count: 24 },
-      { name: 'PurePaw', count: 18 },
-      { name: 'KickAt Select', count: 14 },
+      { name: 'NutriDog', count: 12 },
+      { name: 'PurePaw', count: 10 },
+      { name: 'KickAt', count: 8 },
+      { name: 'Maison Petit', count: 6 },
     ],
-    bestsellers: CATALOG_PRODUCTS.slice(0, 3).map(p => ({
-      ...p,
-      subcategory: mainCat.subcategories[0]?.name || 'General',
-    })),
-    banner: {
-      title: `Crafted for ${mainCat.name} Wellness`,
-      subtitle: 'Nutritional precision and premium craftsmanship for every stage of life.',
-      cta: 'Explore Full Collection',
-      image: '/hero-products/dog_food.png',
-    },
-    promo: {
-      title: `Special ${mainCat.name} Offer`,
-      subtitle: 'Save up to 30% on curated bundles and subscription boxes.',
-      code: 'KICKAT30',
-      image: '/hero-products/cat_treats.png',
-    },
-    products: CATALOG_PRODUCTS.map(p => ({
-      ...p,
-      subcategory: mainCat.subcategories[0]?.name || 'General',
-    })),
+    bestsellers: bestsellers.length > 0 ? bestsellers : CATALOG_PRODUCTS.slice(0, 3),
+    products: matchingProducts.length > 0 ? matchingProducts : CATALOG_PRODUCTS.filter((p) => p.mainCategory === mainCat!.slug),
   };
 }
