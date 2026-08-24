@@ -85,7 +85,20 @@
   flex-direction: column;
   gap: 1.25rem;
   position: sticky;
-  top: 6rem;
+  top: 5.5rem;
+  align-self: start;
+  max-height: calc(100vh - 6.5rem);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(33, 28, 21, 0.15);
+  border-radius: 9999px;
 }
 
 /* Back Navigation Button in Step 2 */
