@@ -1,9 +1,9 @@
 /* ── Page Wrapper & Container ──────────────────────────── */
 .pageWrapper {
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100vh - 5rem);
   background-color: #FBF7EE;
-  padding: 2.5rem 2rem 6rem;
+  padding: 1rem 2rem 2rem;
 }
 
 .container {
@@ -11,14 +11,9 @@
   margin: 0 auto;
 }
 
-/* ── Top Bar (Breadcrumb + Search) ─────────────────────── */
+/* ── Top Bar & Breadcrumb ──────────────────────────────── */
 .topBar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .breadcrumb {
@@ -40,6 +35,21 @@
   color: #E7A03B;
 }
 
+.crumbBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+  color: rgba(33, 28, 21, 0.55);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.crumbBtn:hover {
+  color: #E7A03B;
+}
+
 .crumbSep {
   color: rgba(33, 28, 21, 0.25);
 }
@@ -54,81 +64,57 @@
   font-weight: 600;
 }
 
-/* Search Box on Top Right */
-.topRightSearchBox {
-  position: relative;
-  width: 260px;
-}
-
-.topRightSearchInput {
-  width: 100%;
-  padding: 0.55rem 2rem 0.55rem 2.25rem;
-  border-radius: 9999px;
-  border: 1.5px solid rgba(33, 28, 21, 0.12);
-  background: #ffffff;
-  font-family: var(--font-ibm-plex-mono), monospace;
-  font-size: 0.8rem;
-  color: #211C15;
-  outline: none;
-  transition: all 0.2s ease;
-}
-
-.topRightSearchInput:focus {
-  border-color: #E7A03B;
-  box-shadow: 0 0 0 3px rgba(231, 160, 59, 0.12);
-}
-
-.topRightSearchIcon {
-  position: absolute;
-  left: 0.85rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: rgba(33, 28, 21, 0.45);
-}
-
-.topRightClearBtn {
-  position: absolute;
-  right: 0.65rem;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: rgba(33, 28, 21, 0.4);
-  display: flex;
-  align-items: center;
-}
-
 /* ── Master Layout ─────────────────────────────────────── */
 .masterLayout {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2rem;
+  gap: 2.25rem;
   align-items: start;
 }
 
 @media (min-width: 900px) {
   .masterLayout {
-    grid-template-columns: 180px 1fr;
-    gap: 2.25rem;
+    grid-template-columns: 200px 1fr;
+    gap: 2.5rem;
   }
 }
 
 /* ── 1. Left Vertical Category Rail ─────────────────────── */
-.categoryRail {
-  background: #ffffff;
-  border-radius: 16px;
-  border: 1px solid rgba(33, 28, 21, 0.06);
-  padding: 1.25rem 0.75rem;
-  box-shadow: 0 4px 20px rgba(33, 28, 21, 0.02);
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
   position: sticky;
   top: 6rem;
 }
 
+/* Back Navigation Button in Step 2 */
+.backNavBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #ffffff;
+  border: 1px solid rgba(33, 28, 21, 0.1);
+  padding: 0.6rem 0.85rem;
+  border-radius: 10px;
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-size: 0.725rem;
+  font-weight: 500;
+  color: #211C15;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.backNavBtn:hover {
+  background: #E7A03B;
+  border-color: #E7A03B;
+  color: #ffffff;
+}
+
 .railHeader {
-  padding: 0 0.5rem 0.85rem 0.5rem;
+  padding: 0 0.5rem 0.65rem 0.5rem;
   border-bottom: 1px solid rgba(33, 28, 21, 0.06);
-  margin-bottom: 0.75rem;
 }
 
 .railTitle {
@@ -143,6 +129,11 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid rgba(33, 28, 21, 0.06);
+  padding: 0.85rem 0.6rem;
+  box-shadow: 0 4px 20px rgba(33, 28, 21, 0.02);
 }
 
 .railItem {
@@ -170,22 +161,22 @@
 }
 
 .railAvatarWrap {
-  width: 46px;
-  height: 46px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: #FBF7EE;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border: 1px solid rgba(33, 28, 21, 0.08);
-  transition: transform 0.2s ease;
+  border: 2px solid transparent;
+  transition: all 0.25s ease;
 }
 
 .railItemActive .railAvatarWrap {
   background: #ffffff;
   border-color: #E7A03B;
-  box-shadow: 0 4px 12px rgba(231, 160, 59, 0.15);
+  box-shadow: 0 4px 14px rgba(231, 160, 59, 0.2);
   transform: scale(1.08);
 }
 
@@ -204,27 +195,135 @@
 
 .activeBar {
   position: absolute;
-  left: -0.75rem;
+  left: -0.6rem;
   top: 50%;
   transform: translateY(-50%);
   width: 4px;
-  height: 28px;
+  height: 30px;
   background: #E7A03B;
   border-radius: 0 4px 4px 0;
+}
+
+/* Sidebar Active Filter Group in Step 2 */
+.filtersBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.25rem;
+  border: 1px solid rgba(33, 28, 21, 0.06);
+}
+
+.filterActivePill {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #333F2B;
+  background: rgba(51, 63, 43, 0.08);
+  padding: 0.4rem 0.75rem;
+  border-radius: 9999px;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.filterGroupTitle {
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(33, 28, 21, 0.5);
+}
+
+.sizePillsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.sizeBtn {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 0.4rem;
+  border-radius: 6px;
+  border: 1px solid rgba(33, 28, 21, 0.1);
+  background: #FBF7EE;
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #211C15;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sizeBtn:hover,
+.sizeActive {
+  background: #E7A03B;
+  border-color: #E7A03B;
+  color: #ffffff;
+}
+
+.colorRow {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.colorSwatch {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 1px rgba(33, 28, 21, 0.15);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.colorSwatch:hover,
+.colorActive {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 2px #E7A03B;
 }
 
 /* ── 2. Right Main Panel ────────────────────────────────── */
 .mainPanel {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.75rem;
 }
 
-/* Sub-Categories Section (Step A) */
+/* Smooth Page View Transitions */
+@keyframes viewFadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.viewTransition {
+  animation: viewFadeSlide 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* ── STEP 1: SUBCATEGORIES TILES VIEW ────────────────────── */
 .subCategoriesSection {
   background: #ffffff;
   border-radius: 20px;
-  padding: 2rem;
+  padding: 2.25rem;
   border: 1px solid rgba(33, 28, 21, 0.06);
   box-shadow: 0 4px 20px rgba(33, 28, 21, 0.02);
 }
@@ -233,8 +332,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.25rem;
   border-bottom: 1px solid rgba(33, 28, 21, 0.06);
 }
 
@@ -242,7 +341,7 @@
   font-family: var(--font-ibm-plex-mono), monospace;
   font-size: 0.65rem;
   font-weight: 600;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.18em;
   color: #E7A03B;
   display: block;
   margin-bottom: 0.25rem;
@@ -250,18 +349,18 @@
 
 .subCatMainTitle {
   font-family: var(--font-fraunces), serif;
-  font-size: 1.5rem;
-  font-weight: 500;
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-weight: 400;
   color: #211C15;
 }
 
 .subCatCountBadge {
   font-family: var(--font-ibm-plex-mono), monospace;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: #333F2B;
   background: rgba(51, 63, 43, 0.08);
-  padding: 0.35rem 0.85rem;
+  padding: 0.4rem 1rem;
   border-radius: 9999px;
 }
 
@@ -269,7 +368,7 @@
 .subCategoriesGrid {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
-  gap: 1.25rem;
+  gap: 1.5rem;
 }
 
 @media (min-width: 540px) {
@@ -286,55 +385,64 @@
 
 .subCategoryCard {
   background: #FBF7EE;
-  border-radius: 16px;
-  padding: 1.5rem 1rem;
+  border-radius: 20px;
+  padding: 1.75rem 1.25rem;
   border: 1px solid rgba(33, 28, 21, 0.06);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   cursor: pointer;
-  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease, border-color 0.35s ease, background-color 0.35s ease;
 }
 
 .subCategoryCard:hover {
   transform: translateY(-6px);
   background: #FFFBF4;
   border-color: #E7A03B;
-  box-shadow: 0 16px 32px rgba(231, 160, 59, 0.12);
+  box-shadow: 0 16px 36px rgba(231, 160, 59, 0.14);
 }
 
 .subCardImgWrap {
   position: relative;
-  width: 90px;
-  height: 90px;
-  margin-bottom: 1rem;
+  width: 100px;
+  height: 100px;
+  margin-bottom: 1.25rem;
+}
+
+.subCardImg {
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.subCategoryCard:hover .subCardImg {
+  transform: scale(1.06);
 }
 
 .subCardInfo {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.subCardCount {
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-size: 0.7rem;
+  color: rgba(33, 28, 21, 0.45);
 }
 
 .subCardTitle {
   font-family: var(--font-fraunces), serif;
-  font-size: 1rem;
+  font-size: 1.15rem;
   font-weight: 500;
   color: #211C15;
   line-height: 1.3;
 }
 
-.subCardCount {
-  font-family: var(--font-ibm-plex-mono), monospace;
-  font-size: 0.68rem;
-  color: rgba(33, 28, 21, 0.45);
-}
-
 .subCardLink {
-  margin-top: 0.5rem;
-  font-size: 0.8rem;
+  margin-top: 0.65rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: #E7A03B;
   display: inline-flex;
@@ -343,39 +451,38 @@
   transition: gap 0.2s ease;
 }
 
-.subCategoryCard:hover .subCardLink {
-  gap: 0.45rem;
+.linkArrow {
+  transition: transform 0.2s ease;
 }
 
-/* Step B: Active Subcategory Filter Header & Pills */
-.subCatActiveHeader {
+.subCategoryCard:hover .linkArrow {
+  transform: translateX(4px);
+}
+
+/* ── STEP 2: PRODUCT LISTING VIEW ────────────────────────── */
+.productListingSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.subPillsBar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.backBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
   background: #ffffff;
-  border: 1px solid rgba(33, 28, 21, 0.1);
-  padding: 0.5rem 1rem;
-  border-radius: 9999px;
-  font-family: var(--font-ibm-plex-mono), monospace;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: #211C15;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgba(33, 28, 21, 0.06);
 }
 
-.backBtn:hover {
-  background: #E7A03B;
-  border-color: #E7A03B;
-  color: #ffffff;
+.subBarLabel {
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: rgba(33, 28, 21, 0.5);
+  white-space: nowrap;
 }
 
 .subPillsScroll {
@@ -392,8 +499,8 @@
 .subPill {
   padding: 0.4rem 0.85rem;
   border-radius: 9999px;
-  background: #ffffff;
-  border: 1px solid rgba(33, 28, 21, 0.1);
+  background: #FBF7EE;
+  border: 1px solid rgba(33, 28, 21, 0.08);
   font-size: 0.8rem;
   color: #211C15;
   cursor: pointer;
@@ -408,7 +515,7 @@
   color: #ffffff;
 }
 
-/* Toolbar Row */
+/* Toolbar */
 .toolbar {
   display: flex;
   align-items: center;
@@ -493,7 +600,7 @@
   border-color: #E7A03B;
 }
 
-/* ── Product Grid ────────────────────────────────────────── */
+/* Product Grid */
 .productGrid {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
