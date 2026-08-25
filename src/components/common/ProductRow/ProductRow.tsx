@@ -2,13 +2,12 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Heart, ArrowRight, Star } from 'lucide-react';
+import { Heart, ArrowRight, Star, ShoppingCart } from 'lucide-react';
 import styles from './ProductRow.module.css';
 
 import { CatalogProduct } from '@/data/categoryData';
 
 type Product = CatalogProduct;
-
 
 export interface ProductRowProps {
   eyebrow: string;
@@ -18,8 +17,23 @@ export interface ProductRowProps {
   backgroundColor?: 'cream' | 'white';
 }
 
+// Short description map for products
+const productDescriptions: Record<string, string> = {
+  'd-1': 'Grain-free organic kibble for a healthier, happier pup.',
+  'd-2': 'Heavy ceramic bowl with non-slip grip, dishwasher safe.',
+  'd-3': 'Durable natural rubber toy perfect for teething puppies.',
+  'd-4': 'Reflective padded harness for safe nighttime walks.',
+  'c-1': 'Wild salmon & tuna treats cats go crazy for.',
+  'c-2': 'Spinning feather toy with USB rechargeable motor.',
+  'c-3': 'Natural tofu clumping litter, dust-free & flushable.',
+  'c-4': 'Whisker-friendly shallow dish for comfortable feeding.',
+};
+
+function getDescription(product: Product): string {
+  return productDescriptions[product.id] || product.tags?.slice(0, 2).join(' · ') || 'Premium quality pet essential.';
+}
+
 export function ProductRow({ eyebrow, title, products, viewAllLink = '/shop', backgroundColor = 'cream' }: ProductRowProps) {
-  // Take up to 4 products
   const displayProducts = products.slice(0, 4);
   const bgClass = backgroundColor === 'white' ? styles.bgWhite : styles.bgCream;
 
@@ -40,10 +54,27 @@ export function ProductRow({ eyebrow, title, products, viewAllLink = '/shop', ba
           {displayProducts.map(product => {
             const rating = product.rating || 4.8;
             const reviewsCount = product.reviewsCount || 128;
+            const description = getDescription(product);
             return (
-            <Link href={`/product/${product.id}`} key={product.id} className={styles.productCardLink}>
-              <div className={styles.productCard}>
-                <div className={styles.cardImageWrapper}>
+            <div key={product.id} className={styles.productCard}>
+              {/* Image area */}
+              <div className={styles.cardImageArea}>
+                {product.badge && (
+                  <span className={styles.cardBadge}>
+                    {product.badge === 'Popular' ? 'Best Seller' : product.badge}
+                  </span>
+                )}
+                <button 
+                  className={styles.cardWishlistBtn} 
+                  aria-label="Add to wishlist"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                >
+                  <Heart size={18} color="#8C8984" strokeWidth={1.5} />
+                </button>
+                <Link href={`/product/${product.id}`} className={styles.cardImageLink}>
                   <Image
                     src={product.image}
                     alt={product.name}
@@ -51,40 +82,40 @@ export function ProductRow({ eyebrow, title, products, viewAllLink = '/shop', ba
                     className={styles.cardImage}
                     style={{ objectFit: 'contain' }}
                   />
-                  {product.badge && (
-                    <span
-                      className={`${styles.cardBadge} ${
-                        product.badge === 'New'
-                          ? styles.badgeInk
-                          : product.badge === 'Organic'
-                          ? styles.badgeForest
-                          : styles.badgeAmber
-                      }`}
-                    >
-                      {product.badge}
-                    </span>
-                  )}
+                </Link>
+                {/* Dot indicators */}
+                <div className={styles.cardDots}>
+                  <span className={`${styles.dot} ${styles.dotActive}`} />
+                  <span className={styles.dot} />
+                  <span className={styles.dot} />
+                </div>
+              </div>
+
+              {/* Info area */}
+              <div className={styles.cardInfo}>
+                <Link href={`/product/${product.id}`} className={styles.cardTitleLink}>
+                  <h3 className={styles.cardTitle}>{product.name}</h3>
+                </Link>
+                <p className={styles.cardDescription}>{description}</p>
+                <div className={styles.cardRatingRow}>
+                  <Star size={13} fill="#E7A03B" color="#E7A03B" strokeWidth={0} />
+                  <span className={styles.cardRatingText}>{rating} ({reviewsCount})</span>
+                </div>
+                <div className={styles.cardBottom}>
+                  <span className={styles.cardPrice}>₹{product.price.toLocaleString()}</span>
                   <button 
-                    className={styles.cardWishlistBtn} 
-                    aria-label="Add to wishlist"
+                    className={styles.addToCartBtn}
+                    aria-label="Add to cart"
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
                     }}
                   >
-                    <Heart size={18} color="#111" className={styles.wishlistIcon} />
+                    <ShoppingCart size={16} strokeWidth={1.5} />
                   </button>
                 </div>
-                <div className={styles.cardInfo}>
-                  <h3 className={styles.cardTitle}>{product.name}</h3>
-                  <div className={styles.cardRatingRow}>
-                    <Star size={14} fill="#E7A03B" color="#E7A03B" strokeWidth={1} />
-                    <span className={styles.cardRatingText}>{rating} ({reviewsCount})</span>
-                  </div>
-                  <span className={styles.cardPrice}>₹{product.price.toLocaleString()}</span>
-                </div>
               </div>
-            </Link>
+            </div>
             );
           })}
         </div>
