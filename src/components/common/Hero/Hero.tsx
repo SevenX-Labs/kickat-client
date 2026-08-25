@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Star } from 'lucide-react';
 import { ProductShowcase } from './ProductShowcase';
 import styles from './Hero.module.css';
 
@@ -27,8 +28,19 @@ export function Hero() {
             </Link>
           </div>
           
-          <div className={styles.trustStatement}>
-            Carefully curated &bull; Quality-first &bull; Made for happier pets
+          <div className={styles.trustBar}>
+            <div className={styles.trustItem}>
+              <Star size={14} fill="#E7A03B" color="#E7A03B" strokeWidth={1} />
+              <span>4.9 rated</span>
+            </div>
+            <span className={styles.trustDot}>&bull;</span>
+            <div className={styles.trustItem}>
+              <span>25K+ happy pets</span>
+            </div>
+            <span className={styles.trustDot}>&bull;</span>
+            <div className={styles.trustItem}>
+              <span>Free shipping over ₹999</span>
+            </div>
           </div>
         </div>
 

@@ -5,20 +5,10 @@ import Link from 'next/link';
 import { Heart, ArrowRight, Star } from 'lucide-react';
 import styles from './ProductRow.module.css';
 
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice?: number;
-  image: string;
-  images?: string[];
-  mainCategory: string;
-  subCategory: string;
-  badge?: 'New' | 'Organic' | 'Best Seller';
-  rating?: number;
-  reviewsCount?: number;
-  isPopular?: boolean;
-}
+import { CatalogProduct } from '@/data/categoryData';
+
+type Product = CatalogProduct;
+
 
 export interface ProductRowProps {
   eyebrow: string;
