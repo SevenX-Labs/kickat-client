@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { Package, User, MapPin, Heart, LogOut, CheckCircle2, Clock, Search, XCircle } from 'lucide-react';
 import styles from './Account.module.css';
 

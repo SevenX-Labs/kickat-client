@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Check, Truck, ArrowRight, Store, ArrowLeft, ChevronLeft, ChevronRight, CreditCard, Smartphone, Calendar, Clock, ChevronDown, CheckCircle2, User, MapPin, Lock, Edit3, X } from 'lucide-react';
+import { Check, Truck, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, CreditCard, Smartphone, ChevronDown, User, MapPin, Lock, Edit3, X } from 'lucide-react';
 import styles from './Checkout.module.css';
 
 // Mock Cart Data for Checkout
@@ -45,24 +45,25 @@ export default function CheckoutPage() {
   const shipping = subtotal >= 2000 ? 0 : 150;
   const total = subtotal + tax + shipping;
 
+  const [orderNumber, setOrderNumber] = useState(0);
+  const [particles, setParticles] = useState<{id: number, tx: string, ty: string, color: string}[]>([]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitted(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  if (isSubmitted) {
-    const orderNumber = Math.floor(100000 + Math.random() * 900000);
-    
-    // Generate some random confetti particles
-    const particles = Array.from({ length: 24 }).map((_, i) => {
+    setOrderNumber(Math.floor(100000 + Math.random() * 900000));
+    setParticles(Array.from({ length: 24 }).map((_, i) => {
       const angle = (i * 15) * (Math.PI / 180);
       const velocity = 50 + Math.random() * 40;
       const tx = Math.cos(angle) * velocity;
       const ty = Math.sin(angle) * velocity;
       const colors = ['#E7A03B', '#1B3C35', '#FBF7EE', '#4CAF50'];
       return { id: i, tx: `${tx}px`, ty: `${ty}px`, color: colors[i % colors.length] };
-    });
+    }));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  if (isSubmitted) {
 
     return (
       <main className={styles.container}>
@@ -90,7 +91,7 @@ export default function CheckoutPage() {
           
           <h1 className={styles.successTitle}>Order Placed Successfully</h1>
           <p className={styles.successSubtitle}>
-            Thank you for shopping with KickAt. We've sent a confirmation email with tracking details to your inbox.
+            Thank you for shopping with KickAt. We&apos;ve sent a confirmation email with tracking details to your inbox.
           </p>
 
           <div className={styles.successCard}>

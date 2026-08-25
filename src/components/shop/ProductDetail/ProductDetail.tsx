@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from 'react';
 import styles from './ProductDetail.module.css';
 import { ProductGallery } from './ProductGallery';
 import { ProductInfo } from './ProductInfo';

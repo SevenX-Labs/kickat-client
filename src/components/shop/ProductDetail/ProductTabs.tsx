@@ -21,9 +21,9 @@ export function ProductTabs({ product }: ProductTabsProps) {
         return (
           <div className={styles.detailsGrid}>
             <div className={styles.detailsTextCol}>
-              <h3 className={styles.detailsHeading}>Why you'll love it</h3>
+              <h3 className={styles.detailsHeading}>Why you&apos;ll love it</h3>
               <p className={styles.tabText}>
-                Crafted from high-quality, pet-safe materials, this product delivers unmatched durability and comfort. The optimized design makes it a versatile staple for your pet's daily routine.
+                Crafted from high-quality, pet-safe materials, this product delivers unmatched durability and comfort. The optimized design makes it a versatile staple for your pet&apos;s daily routine.
               </p>
               <div className={styles.featureCards}>
                 <div className={styles.featureCard}>
@@ -59,7 +59,7 @@ export function ProductTabs({ product }: ProductTabsProps) {
       case 'Materials':
         return (
           <p className={styles.tabText}>
-            Made from durable, non-toxic materials. We source our components ethically to ensure the highest quality while keeping your pet's health and safety as our top priority.
+            Made from durable, non-toxic materials. We source our components ethically to ensure the highest quality while keeping your pet&apos;s health and safety as our top priority.
           </p>
         );
       case 'Size & Fit':
@@ -71,7 +71,7 @@ export function ProductTabs({ product }: ProductTabsProps) {
       case 'Shipping & Returns':
         return (
           <p className={styles.tabText}>
-            We offer free standard shipping on all orders over ₹999. Standard delivery takes 3-5 business days. If you're not completely satisfied, you can return your items within 30 days of delivery for a full refund.
+            We offer free standard shipping on all orders over ₹999. Standard delivery takes 3-5 business days. If you&apos;re not completely satisfied, you can return your items within 30 days of delivery for a full refund.
           </p>
         );
       default:

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { Star, Heart, ShoppingBag, Truck, RefreshCcw, ShieldCheck, Ruler, Share2 } from 'lucide-react';
+import { Star, Heart, Truck, RefreshCcw, ShieldCheck, Ruler, Share2 } from 'lucide-react';
 import styles from './ProductDetail.module.css';
 import { Product } from './ProductDetail';
 

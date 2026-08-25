@@ -106,7 +106,7 @@ export default function CartPage() {
             <div className={styles.shippingTracker}>
               {isFreeShipping ? (
                 <p className={styles.trackerText}>
-                  You've unlocked <span className={styles.trackerHighlight}>Free Shipping</span>
+                  You&apos;ve unlocked <span className={styles.trackerHighlight}>Free Shipping</span>
                 </p>
               ) : (
                 <p className={styles.trackerText}>

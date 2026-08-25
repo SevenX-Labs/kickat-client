@@ -77,7 +77,6 @@ export function CategoryExplorer({
   const [currentPage, setCurrentPage] = useState(1);
 
   // Sync state if props change
-  // eslint-disable-next-line react-hooks/rules-of-hooks, react-hooks/exhaustive-deps
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (initialMainCat) setSelectedMainCat(initialMainCat);
