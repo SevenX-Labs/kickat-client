@@ -240,7 +240,12 @@ export function CategoryListing({ category }: CategoryListingProps) {
               </div>
               <div className={styles.bestsellersGrid}>
                 {category.bestsellers.map((item) => (
-                  <div key={item.id} className={styles.bestsellerCard}>
+                  <Link 
+                    href={`/product/${item.id}`} 
+                    key={item.id} 
+                    className={styles.bestsellerCard}
+                    style={{ textDecoration: 'none', color: 'inherit' }}
+                  >
                     <div className={styles.bestsellerImgWrap}>
                       <Image
                         src={item.image}
@@ -280,13 +285,17 @@ export function CategoryListing({ category }: CategoryListingProps) {
                         <span className={styles.bestsellerPrice}>₹{item.price.toLocaleString()}</span>
                         <button
                           className={styles.addCartBtn}
-                          onClick={() => alert(`Added ${item.name} to cart!`)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            alert(`Added ${item.name} to cart!`);
+                          }}
                         >
                           Add to Cart
                         </button>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -365,7 +374,12 @@ export function CategoryListing({ category }: CategoryListingProps) {
           ) : (
             <div className={`${styles.productGrid} ${styles[`gridCols${gridCols}`]}`}>
               {filteredProducts.map((product) => (
-                <div key={product.id} className={styles.productCard}>
+                <Link 
+                  href={`/product/${product.id}`} 
+                  key={product.id} 
+                  className={styles.productCard}
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                >
                   <div className={styles.cardImgContainer}>
                     <Image
                       src={product.image}
@@ -389,7 +403,11 @@ export function CategoryListing({ category }: CategoryListingProps) {
                     )}
                     <button
                       className={styles.quickAddBtn}
-                      onClick={() => alert(`Added ${product.name} to cart!`)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        alert(`Added ${product.name} to cart!`);
+                      }}
                       title="Add to Cart"
                     >
                       <ShoppingBag size={16} />
@@ -417,7 +435,7 @@ export function CategoryListing({ category }: CategoryListingProps) {
                       )}
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}

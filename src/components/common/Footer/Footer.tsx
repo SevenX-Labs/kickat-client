@@ -35,8 +35,8 @@ export function Footer() {
               <Image 
                 src="/logo.png" 
                 alt="KickAt Logo" 
-                width={180} 
-                height={54} 
+                width={220} 
+                height={66} 
                 className={styles.logo}
                 draggable={false}
                 onContextMenu={(e) => e.preventDefault()}

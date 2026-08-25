@@ -56,10 +56,10 @@ export function Navbar() {
             <Image
               src="/logo.png"
               alt="KickAt Logo"
-              width={160}
-              height={48}
+              width={200}
+              height={64}
               priority
-              style={{ objectFit: "contain", userSelect: "none", width: "auto", height: "48px" }}
+              style={{ objectFit: "contain", userSelect: "none", width: "auto", height: "64px" }}
               draggable={false}
               onContextMenu={(e) => e.preventDefault()}
             />
@@ -109,14 +109,14 @@ export function Navbar() {
               <Heart size={20} strokeWidth={1.75} />
             </button>
 
-            <button className={styles.iconBtn} aria-label="User Account" title="Account">
+            <Link href="/account" className={styles.iconBtn} aria-label="User Account" title="Account">
               <User size={20} strokeWidth={1.75} />
-            </button>
+            </Link>
 
-            <button className={styles.cartBtn} aria-label="Shopping Cart" title="Cart">
+            <Link href="/cart" className={styles.cartBtn} aria-label="Shopping Cart" title="Cart">
               <ShoppingBag size={20} strokeWidth={1.75} />
               <span className={styles.badge}>2</span>
-            </button>
+            </Link>
           </div>
         </div>
 

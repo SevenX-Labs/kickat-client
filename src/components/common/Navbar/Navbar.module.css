@@ -101,6 +101,7 @@
   justify-content: center;
   transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
   outline: none;
+  text-decoration: none;
 }
 
 .iconBtn:hover,

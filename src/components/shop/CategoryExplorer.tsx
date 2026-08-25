@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   Star,
@@ -397,7 +398,12 @@ export function CategoryExplorer({
                     }
                   >
                     {paginatedProducts.map((product) => (
-                      <div key={product.id} className={styles.productCard}>
+                      <Link 
+                        href={`/product/${product.id}`} 
+                        key={product.id} 
+                        className={styles.productCard}
+                        style={{ textDecoration: 'none', color: 'inherit' }}
+                      >
                         <div className={styles.cardImageContainer}>
                           <Image
                             src={product.image}
@@ -422,6 +428,7 @@ export function CategoryExplorer({
                           <button
                             className={styles.quickAddBtn}
                             onClick={(e) => {
+                              e.preventDefault();
                               e.stopPropagation();
                               alert(`Added ${product.name} to cart!`);
                             }}
@@ -452,7 +459,7 @@ export function CategoryExplorer({
                             )}
                           </div>
                         </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 )}
