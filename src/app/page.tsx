@@ -2,6 +2,7 @@ import { Hero } from "@/components/common/Hero";
 import { TrustStrip } from "@/components/common/TrustStrip";
 import { PetCategories } from "@/components/common/PetCategories";
 import { ShopByCategory } from "@/components/common/ShopByCategory";
+import { BestSellers } from "@/components/common/BestSellers";
 import { WhyKickat } from "@/components/common/WhyKickat";
 import { CustomerReviews } from "@/components/common/CustomerReviews";
 import { InstagramFeed } from "@/components/common/InstagramFeed";
@@ -15,6 +16,7 @@ export default function Home() {
         <TrustStrip />
         <PetCategories />
         <ShopByCategory />
+        <BestSellers />
         <WhyKickat />
         <CustomerReviews />
         <InstagramFeed />

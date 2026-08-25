@@ -1,0 +1,217 @@
+.sectionWrapper {
+  width: 100%;
+  background-color: #FDFBF7;
+  padding: 5rem 2rem;
+  border-top: 1px solid rgba(224, 220, 210, 0.4);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 3rem;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.eyebrow {
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #E7A03B;
+  font-weight: 600;
+}
+
+.title {
+  font-family: var(--font-fraunces), serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #111;
+  line-height: 1.1;
+}
+
+.viewAllLink {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: #111;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.viewAllLink:hover {
+  color: #E7A03B;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+}
+
+.productCardLink {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.productCard {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  transition: transform 0.3s ease;
+  height: 100%;
+}
+
+.productCard:hover {
+  transform: translateY(-4px);
+}
+
+.cardImageWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(224, 220, 210, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardImage {
+  padding: 1.5rem;
+  transition: transform 0.4s ease;
+}
+
+.productCard:hover .cardImage {
+  transform: scale(1.05);
+}
+
+.cardBadge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 0.35rem 0.85rem;
+  border-radius: 50px;
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  z-index: 2;
+}
+
+.badgeInk { background-color: #111; color: white; }
+.badgeForest { background-color: #1B3C35; color: white; }
+.badgeAmber { background-color: #E7A03B; color: white; }
+
+.cardWishlistBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: white;
+  border: 1px solid #e0dcd2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.cardWishlistBtn:hover {
+  border-color: #111;
+  transform: scale(1.05);
+}
+
+.cardInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0 0.5rem;
+}
+
+.cardTitle {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #111;
+  line-height: 1.4;
+}
+
+.cardRatingRow {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.cardRatingText {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.cardPrice {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #111;
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .sectionWrapper {
+    padding: 4rem 1rem;
+  }
+  
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  .grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    /* Hide scrollbar */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .grid::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .productCardLink {
+    min-width: 280px;
+    scroll-snap-align: start;
+  }
+}

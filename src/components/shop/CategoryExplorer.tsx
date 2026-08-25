@@ -80,7 +80,6 @@ export function CategoryExplorer({
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (initialMainCat) setSelectedMainCat(initialMainCat);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (initialSubCat) setSelectedSubCat(initialSubCat);
   }, [initialMainCat, initialSubCat]);
 
