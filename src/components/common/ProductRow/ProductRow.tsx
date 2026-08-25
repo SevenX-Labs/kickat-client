@@ -3,28 +3,51 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Heart, ArrowRight, Star } from 'lucide-react';
-import styles from './BestSellers.module.css';
-import { CATALOG_PRODUCTS } from '@/data/categoryData';
+import styles from './ProductRow.module.css';
 
-export function BestSellers() {
-  // Take 4 products that might be considered "best sellers"
-  const bestSellers = CATALOG_PRODUCTS.slice(0, 4);
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  originalPrice?: number;
+  image: string;
+  images?: string[];
+  mainCategory: string;
+  subCategory: string;
+  badge?: 'New' | 'Organic' | 'Best Seller';
+  rating?: number;
+  reviewsCount?: number;
+  isPopular?: boolean;
+}
+
+export interface ProductRowProps {
+  eyebrow: string;
+  title: string;
+  products: Product[];
+  viewAllLink?: string;
+  backgroundColor?: 'cream' | 'white';
+}
+
+export function ProductRow({ eyebrow, title, products, viewAllLink = '/shop', backgroundColor = 'cream' }: ProductRowProps) {
+  // Take up to 4 products
+  const displayProducts = products.slice(0, 4);
+  const bgClass = backgroundColor === 'white' ? styles.bgWhite : styles.bgCream;
 
   return (
-    <section className={styles.sectionWrapper}>
+    <section className={`${styles.sectionWrapper} ${bgClass}`}>
       <div className={styles.container}>
         <div className={styles.header}>
           <div className={styles.headerLeft}>
-            <span className={styles.eyebrow}>Crowd Favorites</span>
-            <h2 className={styles.title}>Best Sellers</h2>
+            <span className={styles.eyebrow}>{eyebrow}</span>
+            <h2 className={styles.title}>{title}</h2>
           </div>
-          <Link href="/shop" className={styles.viewAllLink}>
+          <Link href={viewAllLink} className={styles.viewAllLink}>
             View All <ArrowRight size={18} />
           </Link>
         </div>
 
         <div className={styles.grid}>
-          {bestSellers.map(product => {
+          {displayProducts.map(product => {
             const rating = product.rating || 4.8;
             const reviewsCount = product.reviewsCount || 128;
             return (

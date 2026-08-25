@@ -1,8 +1,15 @@
 .sectionWrapper {
   width: 100%;
-  background-color: #FDFBF7;
   padding: 5rem 2rem;
   border-top: 1px solid rgba(224, 220, 210, 0.4);
+}
+
+.bgCream {
+  background-color: #FDFBF7;
+}
+
+.bgWhite {
+  background-color: #FFFFFF;
 }
 
 .container {
