@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Check, Truck, ArrowRight, Store, ArrowLeft, ChevronLeft, ChevronRight, CreditCard, Smartphone, Calendar, Clock, ChevronDown, CheckCircle2, User, MapPin, Lock, Edit3 } from 'lucide-react';
+import { Check, Truck, ArrowRight, Store, ArrowLeft, ChevronLeft, ChevronRight, CreditCard, Smartphone, Calendar, Clock, ChevronDown, CheckCircle2, User, MapPin, Lock, Edit3, X } from 'lucide-react';
 import styles from './Checkout.module.css';
 
 // Mock Cart Data for Checkout
@@ -33,9 +33,12 @@ export default function CheckoutPage() {
   const [email, setEmail] = useState('');
   const [zipCode, setZipCode] = useState('');
 
-  const isValidPhone = phone.length >= 10;
+  const phoneDigits = phone.replace(/\D/g, '').length;
+  const isValidPhone = phoneDigits === 10;
+  const isInvalidPhone = phoneDigits > 10;
+  
   const isValidEmail = email.includes('@') && email.includes('.');
-  const isValidZip = zipCode.length >= 5;
+  const isValidZip = zipCode.trim().length >= 5;
 
   const subtotal = checkoutItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
   const tax = subtotal * 0.18; // 18% GST mock
@@ -200,14 +203,15 @@ export default function CheckoutPage() {
                       <ChevronDown size={14} />
                     </div>
                     <div className={styles.verticalDivider}></div>
-                    <input type="tel" required className={`${styles.input} ${styles.inputWithPrefix}`} placeholder="98765 43210" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                    <input type="tel" required className={`${styles.input} ${styles.inputWithPrefix} ${isValidPhone ? styles.inputValid : ''} ${isInvalidPhone ? styles.inputInvalid : ''}`} placeholder="98765 43210" value={phone} onChange={(e) => setPhone(e.target.value)} />
                     {isValidPhone && <Check size={18} color="#4CAF50" className={styles.inputIconRight} />}
+                    {isInvalidPhone && <X size={18} color="#F44336" className={styles.inputIconRight} />}
                   </div>
                 </div>
                 <div className={styles.inputGroup}>
                   <label className={styles.label}>E-mail</label>
                   <div className={styles.inputWrapper}>
-                    <input type="email" required className={styles.input} placeholder="e.g. email@domain.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    <input type="email" required className={`${styles.input} ${isValidEmail ? styles.inputValid : ''}`} placeholder="e.g. email@domain.com" value={email} onChange={(e) => setEmail(e.target.value)} />
                     {isValidEmail && <Check size={18} color="#4CAF50" className={styles.inputIconRight} />}
                   </div>
                 </div>
@@ -252,7 +256,7 @@ export default function CheckoutPage() {
                 <div className={styles.inputGroup}>
                   <label className={styles.label}>Zip Code</label>
                   <div className={styles.inputWrapper}>
-                    <input type="text" required className={styles.input} placeholder="400001" value={zipCode} onChange={(e) => setZipCode(e.target.value)} />
+                    <input type="text" required className={`${styles.input} ${isValidZip ? styles.inputValid : ''}`} placeholder="400001" value={zipCode} onChange={(e) => setZipCode(e.target.value)} />
                     {isValidZip && <Check size={18} color="#4CAF50" className={styles.inputIconRight} />}
                   </div>
                 </div>

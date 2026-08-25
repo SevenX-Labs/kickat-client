@@ -148,7 +148,7 @@
   font-size: 0.95rem;
   color: #111;
   background-color: transparent;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
 
 .input:focus {
@@ -156,6 +156,24 @@
   border-color: #E7A03B;
   box-shadow: 0 0 0 3px rgba(231, 160, 59, 0.15);
   background-color: white;
+}
+
+.inputValid {
+  border-color: #4CAF50 !important;
+  background-color: rgba(76, 175, 80, 0.02) !important;
+}
+
+.inputValid:focus {
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15) !important;
+}
+
+.inputInvalid {
+  border-color: #F44336 !important;
+  background-color: rgba(244, 67, 54, 0.02) !important;
+}
+
+.inputInvalid:focus {
+  box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.15) !important;
 }
 
 .inputIconRight {
