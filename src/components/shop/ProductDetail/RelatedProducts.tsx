@@ -8,14 +8,14 @@ import { Product } from './ProductDetail';
 import { CATALOG_PRODUCTS } from '@/data/categoryData';
 
 interface RelatedProductsProps {
-  currentProduct: Product;
+  currentProduct?: Product;
 }
 
 export function RelatedProducts({ currentProduct }: RelatedProductsProps) {
-  // Get up to 4 products from the same main category, excluding current
-  const related = CATALOG_PRODUCTS
-    .filter(p => p.mainCategory === currentProduct.mainCategory && p.id !== currentProduct.id)
-    .slice(0, 4);
+  // If currentProduct is provided, filter by category. Otherwise just show first 4 products.
+  const related = currentProduct 
+    ? CATALOG_PRODUCTS.filter(p => p.mainCategory === currentProduct.mainCategory && p.id !== currentProduct.id).slice(0, 4)
+    : CATALOG_PRODUCTS.slice(0, 4);
 
   const productsToDisplay = related;
 

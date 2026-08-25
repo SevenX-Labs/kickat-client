@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ShieldCheck, ArrowRight } from 'lucide-react';
 import styles from './Cart.module.css';
 import { RelatedProducts } from '@/components/shop/ProductDetail/RelatedProducts';
 import { TrustStrip } from '@/components/common/TrustStrip/TrustStrip';
@@ -16,7 +15,7 @@ const initialCart = [
     variant: '200W',
     price: 1499,
     quantity: 1,
-    image: '/hero-products/fish_aquarium.png'
+    image: '/hero-products/pet_bowl.png'
   },
   {
     id: '2',
@@ -107,7 +106,7 @@ export default function CartPage() {
             <div className={styles.shippingTracker}>
               {isFreeShipping ? (
                 <p className={styles.trackerText}>
-                  🎉 You've unlocked <span className={styles.trackerHighlight}>Free Shipping!</span>
+                  You've unlocked <span className={styles.trackerHighlight}>Free Shipping</span>
                 </p>
               ) : (
                 <p className={styles.trackerText}>
@@ -138,11 +137,11 @@ export default function CartPage() {
             </div>
             
             <Link href="/checkout" className={styles.checkoutBtn}>
-              Proceed to Checkout <ArrowRight size={20} />
+              Proceed to Checkout
             </Link>
             
-            <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', color: '#666', fontSize: '0.85rem' }}>
-              <ShieldCheck size={16} /> Secure Encrypted Checkout
+            <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666', fontSize: '0.85rem' }}>
+              Secure Encrypted Checkout
             </div>
           </div>
         </div>

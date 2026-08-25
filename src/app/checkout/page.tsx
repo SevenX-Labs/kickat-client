@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ShieldCheck, Lock, CreditCard, Banknote } from 'lucide-react';
 import styles from './Checkout.module.css';
 
 // Mock Cart Data for Checkout
@@ -13,7 +12,7 @@ const checkoutItems = [
     name: 'Precision Digital Thermostat Submersible Heater 200W',
     price: 1499,
     quantity: 1,
-    image: '/hero-products/fish_aquarium.png'
+    image: '/hero-products/pet_bowl.png'
   },
   {
     id: '2',
@@ -26,6 +25,7 @@ const checkoutItems = [
 
 export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState('card');
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const subtotal = checkoutItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
   const tax = subtotal * 0.18; // 18% GST mock
@@ -34,8 +34,44 @@ export default function CheckoutPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Order placed successfully! This is a mock checkout.');
+    setIsSubmitted(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  if (isSubmitted) {
+    return (
+      <main className={styles.container}>
+        <div className={styles.successWrapper}>
+          <div className={styles.successIconCircle}>
+            <svg className={styles.checkmark} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+              <circle className={styles.checkmarkCircle} cx="26" cy="26" r="25" fill="none" />
+              <path className={styles.checkmarkCheck} fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+            </svg>
+          </div>
+          <h1 className={styles.successTitle}>Order Placed Successfully</h1>
+          <p className={styles.successSubtitle}>
+            Thank you for shopping with KickAt. We've sent a confirmation email to your inbox.
+          </p>
+          <div className={styles.successOrderInfo}>
+            <div className={styles.successRow}>
+              <span>Order Number</span>
+              <strong>#ORD-{Math.floor(100000 + Math.random() * 900000)}</strong>
+            </div>
+            <div className={styles.successRow}>
+              <span>Total Amount</span>
+              <strong>₹{total.toLocaleString()}</strong>
+            </div>
+          </div>
+          <Link href="/account" className={styles.successBtn}>
+            View Order Status
+          </Link>
+          <Link href="/shop" className={styles.successSecondaryBtn}>
+            Continue Shopping
+          </Link>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className={styles.container}>
@@ -109,7 +145,7 @@ export default function CheckoutPage() {
                   onChange={(e) => setPaymentMethod(e.target.value)}
                   className={styles.paymentRadio} 
                 />
-                <span className={styles.paymentLabel}><CreditCard size={20} color="#111" /> Credit / Debit Card</span>
+                <span className={styles.paymentLabel}>Credit / Debit Card</span>
               </label>
               
               <label className={`${styles.paymentOption} ${paymentMethod === 'upi' ? styles.selected : ''}`}>
@@ -121,7 +157,7 @@ export default function CheckoutPage() {
                   onChange={(e) => setPaymentMethod(e.target.value)}
                   className={styles.paymentRadio} 
                 />
-                <span className={styles.paymentLabel}><Banknote size={20} color="#111" /> UPI / Net Banking</span>
+                <span className={styles.paymentLabel}>UPI / Net Banking</span>
               </label>
             </div>
           </div>
@@ -166,11 +202,11 @@ export default function CheckoutPage() {
           </div>
           
           <button type="submit" className={styles.placeOrderBtn}>
-            <Lock size={18} /> Place Order - ₹{total.toLocaleString()}
+            Place Order - ₹{total.toLocaleString()}
           </button>
           
-          <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', color: '#666', fontSize: '0.85rem' }}>
-            <ShieldCheck size={16} color="#4CAF50" /> 100% Secure & Encrypted Payment
+          <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666', fontSize: '0.85rem' }}>
+            100% Secure & Encrypted Payment
           </div>
         </div>
       </form>
