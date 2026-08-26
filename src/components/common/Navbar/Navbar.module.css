@@ -276,3 +276,81 @@
     transform: translateX(-100%);
   }
 }
+
+.accountWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.accountWrapper::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: -20px;
+  right: -20px;
+  height: 20px;
+  background: transparent;
+}
+
+.accountDropdown {
+  position: absolute;
+  top: calc(100% + 15px);
+  right: -10px;
+  width: 250px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  border: 1px solid rgba(0,0,0,0.06);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+
+.accountWrapper:hover .accountDropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.accountDropdownHeader {
+  padding: 1.15rem 1.25rem 0.75rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #211C15;
+}
+
+.accountDropdownList {
+  display: flex;
+  flex-direction: column;
+  padding: 0 0 0.5rem 0;
+}
+
+.accountDropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.9rem;
+  color: #4A453E;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.accountDropdownItem:hover {
+  background-color: #FBF7EE;
+  color: #E7A03B;
+}
+
+.accountDropdownItem svg {
+  color: rgba(33, 28, 21, 0.6);
+  transition: color 0.2s ease;
+}
+
+.accountDropdownItem:hover svg {
+  color: #E7A03B;
+}

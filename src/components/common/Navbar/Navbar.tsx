@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronDown, Search, Heart, User, ShoppingBag } from "lucide-react";
+import { ChevronDown, Search, Heart, User, ShoppingBag, Package, Tag, Coins, Sparkles, CreditCard, MapPin, Gift, Bell, LogOut } from "lucide-react";
 import styles from "./Navbar.module.css";
 
 const taxonomy = {
@@ -138,9 +138,43 @@ export function Navbar() {
               <Heart size={20} strokeWidth={1.75} />
             </button>
 
-            <Link href="/account" className={styles.iconBtn} aria-label="User Account" title="Account">
-              <User size={20} strokeWidth={1.75} />
-            </Link>
+            <div className={styles.accountWrapper}>
+              <Link href="/account" className={styles.iconBtn} aria-label="User Account" title="Account">
+                <User size={20} strokeWidth={1.75} />
+              </Link>
+              
+              <div className={styles.accountDropdown}>
+                <div className={styles.accountDropdownHeader}>
+                  Your Account
+                </div>
+                <div className={styles.accountDropdownList}>
+                  <Link href="/account" className={styles.accountDropdownItem}>
+                    <User size={16} strokeWidth={1.5} /> My Profile
+                  </Link>
+                  <Link href="/account" className={styles.accountDropdownItem}>
+                    <Package size={16} strokeWidth={1.5} /> Orders
+                  </Link>
+                  <Link href="/coupons" className={styles.accountDropdownItem}>
+                    <Tag size={16} strokeWidth={1.5} /> Coupons
+                  </Link>
+                  <Link href="/wallet" className={styles.accountDropdownItem}>
+                    <CreditCard size={16} strokeWidth={1.5} /> Saved Cards & Wallet
+                  </Link>
+                  <Link href="/addresses" className={styles.accountDropdownItem}>
+                    <MapPin size={16} strokeWidth={1.5} /> Saved Addresses
+                  </Link>
+                  <Link href="/wishlist" className={styles.accountDropdownItem}>
+                    <Heart size={16} strokeWidth={1.5} /> Wishlist
+                  </Link>
+                  <Link href="/notifications" className={styles.accountDropdownItem}>
+                    <Bell size={16} strokeWidth={1.5} /> Notifications
+                  </Link>
+                  <button className={styles.accountDropdownItem} style={{ width: '100%', border: 'none', background: 'none', fontFamily: 'inherit', textAlign: 'left', cursor: 'pointer' }}>
+                    <LogOut size={16} strokeWidth={1.5} /> Logout
+                  </button>
+                </div>
+              </div>
+            </div>
 
             <Link href="/cart" className={styles.cartBtn} aria-label="Shopping Cart" title="Cart">
               <ShoppingBag size={20} strokeWidth={1.75} />
