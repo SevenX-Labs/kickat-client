@@ -12,16 +12,8 @@ export function BottleModel() {
   const { scene } = useGLTF("/cat shampoo bottle 3d model.glb");
   const modelRef = useRef<THREE.Group>(null);
 
-  // Slowly rotate the model over time for a premium showcase feel
-  useFrame((state, delta) => {
-    if (modelRef.current) {
-      modelRef.current.rotation.y += delta * 0.15;
-    }
-  });
-
   return (
     <PresentationControls
-      global
       config={{ mass: 1, tension: 170, friction: 26 }}
       snap={{ mass: 2, tension: 300 }} // Snap back to center
       rotation={[0, -0.3, 0]} // Initial rotation
@@ -32,14 +24,15 @@ export function BottleModel() {
         <primitive 
           ref={modelRef}
           object={scene} 
-          position={[0, -0.6, 0]} // Adjusted Y position to match new scale
-          scale={4.5} // Reduced scale significantly to fit properly in the hero section
+          position={[0, -2.3, 0]} 
+          scale={5.5} 
+          rotation={[0, 0, 0]} // Reset rotation to show the actual front
         />
       </Float>
       
       {/* Realistic contact shadow under the bottle */}
       <ContactShadows 
-        position={[0, -0.9, 0]} 
+        position={[0, -2.6, 0]} 
         opacity={0.3} 
         scale={10} 
         blur={2} 
