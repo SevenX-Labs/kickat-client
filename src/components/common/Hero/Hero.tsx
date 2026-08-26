@@ -9,6 +9,11 @@ import styles from './Hero.module.css';
 export function Hero() {
   return (
     <section className={styles.hero}>
+      {/* Wavy Fluid Background Animations */}
+      <div className={styles.blob1} />
+      <div className={styles.blob2} />
+      <div className={styles.blob3} />
+
       {/* Decorative Glassmorphism Background */}
       <div className={styles.glassCircle} />
       

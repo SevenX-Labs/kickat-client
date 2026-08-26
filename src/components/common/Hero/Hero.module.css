@@ -10,36 +10,57 @@
   overflow: hidden;
 }
 
-/* Decorative floating shapes */
-.hero::before {
-  content: '';
+/* Wavy Fluid Morphing Background Blobs */
+.blob1, .blob2, .blob3 {
   position: absolute;
-  top: -20%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(40px);
+}
+
+.blob1 {
+  top: -15%;
   right: -5%;
+  width: 700px;
+  height: 700px;
+  background: linear-gradient(135deg, rgba(245, 130, 31, 0.12) 0%, rgba(245, 130, 31, 0.02) 100%);
+  animation: morphWavy 14s ease-in-out infinite, spinBlob 25s linear infinite;
+}
+
+.blob2 {
+  bottom: -25%;
+  left: -10%;
   width: 600px;
   height: 600px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(245, 130, 31, 0.06) 0%, transparent 70%);
-  pointer-events: none;
-  animation: heroGlow 8s ease-in-out infinite;
+  background: linear-gradient(135deg, rgba(245, 130, 31, 0.08) 0%, rgba(255, 170, 80, 0.02) 100%);
+  animation: morphWavy 18s ease-in-out infinite reverse, spinBlob 30s linear infinite reverse;
 }
 
-.hero::after {
-  content: '';
-  position: absolute;
-  bottom: -10%;
-  left: -5%;
-  width: 400px;
-  height: 400px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(245, 130, 31, 0.04) 0%, transparent 70%);
-  pointer-events: none;
-  animation: heroGlow 10s ease-in-out infinite reverse;
+.blob3 {
+  top: 30%;
+  left: 30%;
+  width: 350px;
+  height: 350px;
+  background: linear-gradient(135deg, rgba(255, 180, 100, 0.1) 0%, rgba(245, 130, 31, 0.01) 100%);
+  animation: morphWavy 12s ease-in-out infinite, floatBlob 16s ease-in-out infinite;
 }
 
-@keyframes heroGlow {
-  0%, 100% { transform: scale(1) translate(0, 0); opacity: 1; }
-  50% { transform: scale(1.15) translate(10px, -10px); opacity: 0.7; }
+@keyframes morphWavy {
+  0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  33% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+  66% { border-radius: 70% 30% 50% 50% / 30% 40% 50% 60%; }
+  100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+}
+
+@keyframes spinBlob {
+  from { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.1); }
+  to { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes floatBlob {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-30px, -50px) rotate(30deg); }
 }
 
 .container {
