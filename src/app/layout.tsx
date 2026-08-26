@@ -39,6 +39,7 @@ export const metadata: Metadata = {
 };
 
 import { Navbar } from "@/components/common/Navbar";
+import { SmoothScrollProvider } from "@/components/common/SmoothScrollProvider";
 
 export default function RootLayout({
   children,
@@ -51,8 +52,10 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} ${fraunces.variable} ${ibmPlexMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Navbar />
-        {children}
+        <SmoothScrollProvider>
+          <Navbar />
+          {children}
+        </SmoothScrollProvider>
       </body>
     </html>
   );

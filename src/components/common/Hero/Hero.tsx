@@ -1,6 +1,9 @@
+"use client";
+
 import Link from 'next/link';
 import { Star } from 'lucide-react';
-import { ProductShowcase } from './ProductShowcase';
+import { Canvas } from '@react-three/fiber';
+import { BottleModel } from './BottleModel';
 import styles from './Hero.module.css';
 
 export function Hero() {
@@ -44,9 +47,15 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Right Column: Animated Product Showcase */}
-        <div className={styles.visualContent}>
-          <ProductShowcase />
+        {/* Right Column: Interactive 3D Model */}
+        <div className={styles.visualContent} style={{ cursor: 'grab', height: '100%', minHeight: '500px' }}>
+          <Canvas 
+            camera={{ position: [0, 0, 8], fov: 45 }}
+            style={{ width: '100%', height: '100%' }}
+            gl={{ alpha: true, antialias: true }}
+          >
+            <BottleModel />
+          </Canvas>
         </div>
 
       </div>
