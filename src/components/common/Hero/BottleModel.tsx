@@ -26,40 +26,51 @@ function AnimatedBottle({
 }) {
   const modelRef = useRef<THREE.Group>(null);
 
+  // Compute targets based on current state
+  let targetScale = baseScale;
+  let targetPosition = new THREE.Vector3(0, baseY, 0);
+  let targetRotation = 0;
+
+  if (state === 'active') {
+    targetScale = baseScale;
+    targetPosition.set(0, baseY, 0);
+    targetRotation = 0;
+  } else if (state === 'next') {
+    targetScale = baseScale * 0.7; // Slightly smaller for depth
+    targetPosition.set(3.5, baseY, -2.5); // Right and pushed back
+    targetRotation = -0.2; // Slightly angled inward
+  } else {
+    // prev (shrinking rapidly to avoid canvas clipping)
+    targetScale = 0; // Shrink to nothing
+    targetPosition.set(-1.5, baseY, -2); // Move only slightly left
+    targetRotation = 0.5; // Turn away
+  }
+
+  // Set initial position exactly once on mount to avoid popping
+  const [initial] = useState(() => ({
+    scale: targetScale,
+    position: targetPosition.clone(),
+    rotation: targetRotation
+  }));
+
   useFrame((_, delta) => {
     if (!modelRef.current) return;
     
-    let targetScale = baseScale;
-    const targetPosition = new THREE.Vector3(0, baseY, 0);
-    let targetRotation = 0;
-
-    if (state === 'active') {
-      targetScale = baseScale;
-      targetPosition.set(0, baseY, 0);
-      targetRotation = 0;
-    } else if (state === 'next') {
-      targetScale = baseScale * 0.7; // Slightly smaller for depth
-      targetPosition.set(3.5, baseY, -2.5); // Right and pushed back
-      targetRotation = -0.2; // Slightly angled inward
-    } else {
-      // prev (sliding out to the left but shrinking rapidly to avoid canvas clipping)
-      targetScale = 0; // Shrink to nothing
-      targetPosition.set(-1.5, baseY, -2); // Move only slightly left
-      targetRotation = 0.5; // Turn away
-    }
+    // Clamp delta to strictly prevent massive overshoots on first load or lag spikes
+    const alpha = Math.min(delta * 5, 1);
 
     // Smooth interpolations
-    modelRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), delta * 4);
-    modelRef.current.position.lerp(targetPosition, delta * 4);
-    modelRef.current.rotation.y = THREE.MathUtils.lerp(modelRef.current.rotation.y, targetRotation, delta * 4);
+    modelRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), alpha);
+    modelRef.current.position.lerp(targetPosition, alpha);
+    modelRef.current.rotation.y = THREE.MathUtils.lerp(modelRef.current.rotation.y, targetRotation, alpha);
   });
 
   return (
     <group 
       ref={modelRef}
-      scale={0} // Start scaled down so it pops in on initial load
-      position={[5, baseY, -5]} 
-      rotation={[0, 0, 0]} 
+      scale={initial.scale} 
+      position={initial.position} 
+      rotation={[0, initial.rotation, 0]} 
     >
       <primitive object={scene} rotation={[0, modelRotationOffset, 0]} />
     </group>
