@@ -11,31 +11,55 @@ useGLTF.preload("/dog shampoo bottle 3d model.glb");
 useGLTF.preload("/red seed feeder 3d model.glb");
 
 // Animated wrapper for a single bottle
-function AnimatedBottle({ scene, isActive, targetScale, targetPosition, modelRotationOffset = 0 }: { scene: THREE.Group, isActive: boolean, targetScale: number, targetPosition: [number, number, number], modelRotationOffset?: number }) {
+function AnimatedBottle({ 
+  scene, 
+  state, 
+  baseScale, 
+  baseY, 
+  modelRotationOffset = 0 
+}: { 
+  scene: THREE.Group, 
+  state: 'active' | 'next' | 'prev', 
+  baseScale: number, 
+  baseY: number, 
+  modelRotationOffset?: number 
+}) {
   const modelRef = useRef<THREE.Group>(null);
 
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     if (!modelRef.current) return;
     
-    // Always interpolate towards the full targetScale (no shrinking)
+    let targetScale = baseScale;
+    let targetPosition = new THREE.Vector3(0, baseY, 0);
+    let targetRotation = 0;
+
+    if (state === 'active') {
+      targetScale = baseScale;
+      targetPosition.set(0, baseY, 0);
+      targetRotation = 0;
+    } else if (state === 'next') {
+      targetScale = baseScale * 0.7; // Slightly smaller for depth
+      targetPosition.set(3.5, baseY, -2.5); // Right and pushed back
+      targetRotation = -0.2; // Slightly angled inward
+    } else {
+      // prev (sliding out to the left but shrinking rapidly to avoid canvas clipping)
+      targetScale = 0; // Shrink to nothing
+      targetPosition.set(-1.5, baseY, -2); // Move only slightly left
+      targetRotation = 0.5; // Turn away
+    }
+
+    // Smooth interpolations
     modelRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), delta * 4);
-    
-    // When inactive, face away (Math.PI). When active, face front (0).
-    const targetRotation = isActive ? 0 : Math.PI; 
-    modelRef.current.rotation.y = THREE.MathUtils.lerp(modelRef.current.rotation.y, targetRotation, delta * 5);
-    
-    // Only show the bottle when it is facing the front (rotation < 90 degrees)
-    // This creates a perfect card-flip transition without overlapping!
-    const isFacingFront = Math.abs(modelRef.current.rotation.y) < Math.PI / 2;
-    modelRef.current.visible = isFacingFront;
+    modelRef.current.position.lerp(targetPosition, delta * 4);
+    modelRef.current.rotation.y = THREE.MathUtils.lerp(modelRef.current.rotation.y, targetRotation, delta * 4);
   });
 
   return (
     <group 
       ref={modelRef}
-      position={targetPosition} 
-      scale={0} // Start at 0 so it pops in on initial mount
-      rotation={[0, Math.PI, 0]} // Start facing away
+      scale={0} // Start scaled down so it pops in on initial load
+      position={[5, baseY, -5]} 
+      rotation={[0, 0, 0]} 
     >
       <primitive object={scene} rotation={[0, modelRotationOffset, 0]} />
     </group>
@@ -48,6 +72,7 @@ export function BottleModel() {
   const { scene: birdScene } = useGLTF("/red seed feeder 3d model.glb");
   
   const [activeModel, setActiveModel] = useState<'cat' | 'dog' | 'bird'>('cat');
+  const models = ['cat', 'dog', 'bird'];
 
   // Auto-switch models every 6 seconds
   useEffect(() => {
@@ -57,9 +82,17 @@ export function BottleModel() {
         if (prev === 'dog') return 'bird';
         return 'cat';
       });
-    }, 6000);
+    }, 5000); // 5 seconds for snappier experience
     return () => clearInterval(interval);
   }, []);
+
+  function getState(modelName: string): 'active' | 'next' | 'prev' {
+    const activeIdx = models.indexOf(activeModel);
+    const modelIdx = models.indexOf(modelName);
+    if (activeIdx === modelIdx) return 'active';
+    if ((activeIdx + 1) % models.length === modelIdx) return 'next';
+    return 'prev';
+  }
 
   return (
     <PresentationControls
@@ -70,9 +103,9 @@ export function BottleModel() {
     >
       <Float speed={1.5} rotationIntensity={0.1} floatIntensity={0.5} floatingRange={[-0.05, 0.05]}>
         {/* Render models simultaneously to allow for cross-animations */}
-        <AnimatedBottle scene={catScene} isActive={activeModel === 'cat'} targetScale={5.5} targetPosition={[0, -2.3, 0]} />
-        <AnimatedBottle scene={dogScene} isActive={activeModel === 'dog'} targetScale={5.5} targetPosition={[0, -2.3, 0]} />
-        <AnimatedBottle scene={birdScene} isActive={activeModel === 'bird'} targetScale={5.5} targetPosition={[0, -2.3, 0]} modelRotationOffset={Math.PI} />
+        <AnimatedBottle scene={catScene} state={getState('cat')} baseScale={5.7} baseY={-3.2} />
+        <AnimatedBottle scene={dogScene} state={getState('dog')} baseScale={6.2} baseY={-3.2} />
+        <AnimatedBottle scene={birdScene} state={getState('bird')} baseScale={5.5} baseY={-2.6} modelRotationOffset={Math.PI} />
       </Float>
         
       {/* Realistic contact shadow under the bottle - baked for performance */}
