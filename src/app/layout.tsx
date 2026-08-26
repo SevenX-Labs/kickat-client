@@ -40,6 +40,7 @@ export const metadata: Metadata = {
 
 import { Navbar } from "@/components/common/Navbar";
 import { SmoothScrollProvider } from "@/components/common/SmoothScrollProvider";
+import { SplashScreen } from "@/components/common/SplashScreen";
 
 export default function RootLayout({
   children,
@@ -52,6 +53,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} ${fraunces.variable} ${ibmPlexMono.variable} antialiased`}
     >
       <body className="flex flex-col">
+        <SplashScreen />
         <SmoothScrollProvider>
           <Navbar />
           {children}

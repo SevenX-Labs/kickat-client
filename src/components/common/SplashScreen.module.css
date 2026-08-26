@@ -1,0 +1,38 @@
+.splashContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #FEFCF8; /* KickAt off-white brand background */
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.4s;
+  opacity: 1;
+  visibility: visible;
+}
+
+.splashContainer.fadeOut {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.videoWrapper {
+  width: 100%;
+  max-width: 600px; /* Adjust based on video aspect ratio */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.video {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+  mix-blend-mode: multiply; /* Seamlessly blends the video's white background with our cream background */
+}
