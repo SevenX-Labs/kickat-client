@@ -9,6 +9,9 @@ import styles from './Hero.module.css';
 export function Hero() {
   return (
     <section className={styles.hero}>
+      {/* Decorative Glassmorphism Background */}
+      <div className={styles.glassCircle} />
+      
       <div className={styles.container}>
         
         {/* Left Column: Typography & CTAs */}

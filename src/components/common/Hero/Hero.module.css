@@ -197,3 +197,27 @@
   font-size: 0.7rem;
   user-select: none;
 }
+
+/* Glassmorphism Background Circle */
+.glassCircle {
+  position: absolute;
+  top: 50%;
+  right: 8%;
+  transform: translateY(-50%);
+  width: 550px;
+  height: 550px;
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 16px 40px -10px rgba(245, 130, 31, 0.15), inset 0 0 20px rgba(255, 255, 255, 0.8);
+  z-index: 1; /* Sits above the gradient glows, but below the 3D container which is z-index 10 */
+  pointer-events: none;
+  animation: floatCircle 10s ease-in-out infinite;
+}
+
+@keyframes floatCircle {
+  0%, 100% { transform: translateY(-50%) rotate(0deg); }
+  50% { transform: translateY(-45%) rotate(5deg); }
+}
