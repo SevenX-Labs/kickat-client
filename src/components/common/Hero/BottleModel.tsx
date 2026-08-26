@@ -14,8 +14,7 @@ export function BottleModel() {
 
   return (
     <PresentationControls
-      config={{ mass: 1, tension: 170, friction: 26 }}
-      snap={{ mass: 2, tension: 300 }} // Snap back to center
+      snap={true} // Snap back to center
       rotation={[0, -0.3, 0]} // Initial rotation
       polar={[-0.1, 0.1]} // Restrict vertical rotation
       azimuth={[-Math.PI / 2, Math.PI / 2]} // Restrict horizontal rotation
