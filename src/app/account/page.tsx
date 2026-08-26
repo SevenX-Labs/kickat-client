@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Package, User, MapPin, Heart, LogOut, CheckCircle2, Clock, Search, XCircle } from 'lucide-react';

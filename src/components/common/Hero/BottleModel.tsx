@@ -30,7 +30,7 @@ function AnimatedBottle({
     if (!modelRef.current) return;
     
     let targetScale = baseScale;
-    let targetPosition = new THREE.Vector3(0, baseY, 0);
+    const targetPosition = new THREE.Vector3(0, baseY, 0);
     let targetRotation = 0;
 
     if (state === 'active') {
