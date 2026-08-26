@@ -16,22 +16,17 @@ function AnimatedBottle({ scene, isActive, targetScale, targetPosition }: { scen
   useFrame((state, delta) => {
     if (!modelRef.current) return;
     
-    // Target scale and rotation based on active state
-    // When active, it scales to its specific targetScale. When inactive, it shrinks to 0.
-    const currentTargetScale = isActive ? targetScale : 0;
-    // When inactive, spin it backwards by Math.PI. When active, face front (0).
+    // Always interpolate towards the full targetScale (no shrinking)
+    modelRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), delta * 4);
+    
+    // When inactive, face away (Math.PI). When active, face front (0).
     const targetRotation = isActive ? 0 : Math.PI; 
+    modelRef.current.rotation.y = THREE.MathUtils.lerp(modelRef.current.rotation.y, targetRotation, delta * 5);
     
-    // Smoothly interpolate current values towards target values using lerp
-    modelRef.current.scale.lerp(new THREE.Vector3(currentTargetScale, currentTargetScale, currentTargetScale), delta * 4);
-    modelRef.current.rotation.y = THREE.MathUtils.lerp(modelRef.current.rotation.y, targetRotation, delta * 4);
-    
-    // Hide completely if scale is very small to avoid visual glitches (like sticking out at bottom)
-    if (!isActive && modelRef.current.scale.x < 0.01) {
-      modelRef.current.visible = false;
-    } else {
-      modelRef.current.visible = true;
-    }
+    // Only show the bottle when it is facing the front (rotation < 90 degrees)
+    // This creates a perfect card-flip transition without overlapping!
+    const isFacingFront = Math.abs(modelRef.current.rotation.y) < Math.PI / 2;
+    modelRef.current.visible = isFacingFront;
   });
 
   return (
@@ -39,8 +34,8 @@ function AnimatedBottle({ scene, isActive, targetScale, targetPosition }: { scen
       ref={modelRef}
       object={scene} 
       position={targetPosition} 
-      scale={0} // Start at 0 so it animates in on mount rather than popping in
-      rotation={[0, Math.PI, 0]} // Start rotated away
+      scale={0} // Start at 0 so it pops in on initial mount
+      rotation={[0, Math.PI, 0]} // Start facing away
     />
   );
 }
