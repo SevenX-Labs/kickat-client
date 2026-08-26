@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Package, User, MapPin, Heart, LogOut, CheckCircle2, Clock, Search, XCircle } from 'lucide-react';
 import styles from './Account.module.css';
@@ -47,10 +48,26 @@ const orders = [
   }
 ];
 
-export default function AccountPage() {
-  const [activeTab, setActiveTab] = useState('orders');
+function AccountContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const tabFromUrl = searchParams.get('tab') || 'orders';
+  
+  const [activeTab, setActiveTab] = useState(tabFromUrl);
   const [orderFilter, setOrderFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab && tab !== activeTab) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    router.push(`/account?tab=${tab}`);
+  };
 
   const filteredOrders = orders.filter(order => {
     if (orderFilter !== 'All' && order.status !== orderFilter) return false;
@@ -114,25 +131,29 @@ export default function AccountPage() {
             <nav className={styles.navMenu}>
               <a 
                 className={`${styles.navLink} ${activeTab === 'orders' ? styles.active : ''}`}
-                onClick={() => setActiveTab('orders')}
+                onClick={() => handleTabChange('orders')}
+                style={{ cursor: 'pointer' }}
               >
                 <Package size={20} strokeWidth={2} /> My Orders
               </a>
               <a 
                 className={`${styles.navLink} ${activeTab === 'profile' ? styles.active : ''}`}
-                onClick={() => setActiveTab('profile')}
+                onClick={() => handleTabChange('profile')}
+                style={{ cursor: 'pointer' }}
               >
                 <User size={20} strokeWidth={2} /> Profile Details
               </a>
               <a 
                 className={`${styles.navLink} ${activeTab === 'addresses' ? styles.active : ''}`}
-                onClick={() => setActiveTab('addresses')}
+                onClick={() => handleTabChange('addresses')}
+                style={{ cursor: 'pointer' }}
               >
                 <MapPin size={20} strokeWidth={2} /> Saved Addresses
               </a>
               <a 
                 className={`${styles.navLink} ${activeTab === 'wishlist' ? styles.active : ''}`}
-                onClick={() => setActiveTab('wishlist')}
+                onClick={() => handleTabChange('wishlist')}
+                style={{ cursor: 'pointer' }}
               >
                 <Heart size={20} strokeWidth={2} /> Wishlist
               </a>
@@ -271,5 +292,13 @@ export default function AccountPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function AccountPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: '100px', textAlign: 'center' }}>Loading account details...</div>}>
+      <AccountContent />
+    </Suspense>
   );
 }

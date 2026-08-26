@@ -1,0 +1,301 @@
+.pageWrapper {
+  background-color: #f1f3f6;
+  min-height: calc(100vh - 80px);
+  padding: 1.5rem 2rem;
+  font-family: inherit;
+}
+
+.container {
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.breadcrumbs {
+  font-size: 0.85rem;
+  color: #878787;
+  margin-bottom: 1rem;
+}
+
+.breadcrumbs span {
+  margin: 0 0.5rem;
+}
+
+.breadcrumbs a {
+  color: #878787;
+  text-decoration: none;
+}
+
+.breadcrumbs a:hover {
+  color: #E7A03B;
+}
+
+.layout {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+/* --- LEFT COLUMN --- */
+.leftColumn {
+  flex: 7;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.box {
+  background: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.headerRow {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #212121;
+}
+
+.productRow {
+  padding: 1.5rem;
+  display: flex;
+  gap: 2rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.productInfo {
+  flex: 1;
+}
+
+.productTitle {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #212121;
+  margin-bottom: 0.5rem;
+}
+
+.productMeta {
+  font-size: 0.85rem;
+  color: #878787;
+  margin-bottom: 0.25rem;
+}
+
+.priceBlock {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.price {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #212121;
+}
+
+.offerText {
+  color: #26a541;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.productImageWrapper {
+  width: 100px;
+  height: 100px;
+  position: relative;
+  background: #f9f9f9;
+  border-radius: 4px;
+  padding: 0.5rem;
+}
+
+/* --- TRACKING TIMELINE --- */
+.trackingSection {
+  padding: 2rem 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.timeline {
+  position: relative;
+  padding-left: 1.5rem;
+  margin: 0;
+  list-style: none;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 7px;
+  width: 2px;
+  background: #e0e0e0;
+}
+
+.timelineItem {
+  position: relative;
+  padding-bottom: 2rem;
+}
+
+.timelineItem:last-child {
+  padding-bottom: 0;
+}
+
+.timelineDot {
+  position: absolute;
+  left: -1.5rem;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  border: 3px solid #ffffff;
+  box-shadow: 0 0 0 1px #e0e0e0;
+  z-index: 2;
+}
+
+.timelineDot.completed {
+  background: #26a541;
+  box-shadow: 0 0 0 1px #26a541;
+}
+
+.timelineDot.active {
+  background: #26a541;
+  box-shadow: 0 0 0 3px rgba(38, 165, 65, 0.2);
+}
+
+.timelineContent {
+  padding-left: 1rem;
+}
+
+.timelineTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #212121;
+  margin-bottom: 0.25rem;
+}
+
+.timelineTitle.muted {
+  color: #878787;
+  font-weight: 500;
+}
+
+.timelineSub {
+  font-size: 0.85rem;
+  color: #878787;
+}
+
+.activeBackground {
+  background: rgba(38, 165, 65, 0.08);
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  margin-left: -1rem;
+  margin-top: -0.5rem;
+}
+
+/* --- RIGHT COLUMN --- */
+.rightColumn {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #212121;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.addressContent {
+  padding: 1.25rem 1.5rem;
+}
+
+.addressRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.addressRow:last-child {
+  margin-bottom: 0;
+}
+
+.addressText {
+  font-size: 0.9rem;
+  color: #212121;
+  line-height: 1.4;
+}
+
+.addressName {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+/* --- PRICE DETAILS --- */
+.priceTable {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.priceRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #212121;
+}
+
+.priceRow.discount .value {
+  color: #26a541;
+}
+
+.priceTotal {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #212121;
+  padding: 1rem 1.5rem;
+  border-top: 1px dashed #e0e0e0;
+  border-bottom: 1px dashed #e0e0e0;
+}
+
+.paidBy {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.downloadBtn {
+  margin: 1.5rem;
+  width: calc(100% - 3rem);
+  padding: 0.85rem;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #212121;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.downloadBtn:hover {
+  background: #f9f9f9;
+  border-color: #d0d0d0;
+}

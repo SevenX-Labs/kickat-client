@@ -148,22 +148,22 @@ export function Navbar() {
                   Your Account
                 </div>
                 <div className={styles.accountDropdownList}>
-                  <Link href="/account" className={styles.accountDropdownItem}>
+                  <Link href="/account?tab=profile" className={styles.accountDropdownItem}>
                     <User size={16} strokeWidth={1.5} /> My Profile
                   </Link>
-                  <Link href="/account" className={styles.accountDropdownItem}>
+                  <Link href="/orders" className={styles.accountDropdownItem}>
                     <Package size={16} strokeWidth={1.5} /> Orders
                   </Link>
-                  <Link href="/coupons" className={styles.accountDropdownItem}>
+                  <Link href="/account?tab=coupons" className={styles.accountDropdownItem}>
                     <Tag size={16} strokeWidth={1.5} /> Coupons
                   </Link>
-                  <Link href="/wallet" className={styles.accountDropdownItem}>
+                  <Link href="/account?tab=wallet" className={styles.accountDropdownItem}>
                     <CreditCard size={16} strokeWidth={1.5} /> Saved Cards & Wallet
                   </Link>
-                  <Link href="/addresses" className={styles.accountDropdownItem}>
+                  <Link href="/account?tab=addresses" className={styles.accountDropdownItem}>
                     <MapPin size={16} strokeWidth={1.5} /> Saved Addresses
                   </Link>
-                  <Link href="/wishlist" className={styles.accountDropdownItem}>
+                  <Link href="/account?tab=wishlist" className={styles.accountDropdownItem}>
                     <Heart size={16} strokeWidth={1.5} /> Wishlist
                   </Link>
                   <Link href="/notifications" className={styles.accountDropdownItem}>

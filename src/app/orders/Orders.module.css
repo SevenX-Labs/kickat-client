@@ -1,0 +1,254 @@
+.pageWrapper {
+  background-color: #f1f3f6; /* Soft gray like Flipkart */
+  min-height: calc(100vh - 80px); /* Assuming navbar is ~80px */
+  padding: 1.5rem 2rem;
+  font-family: inherit;
+}
+
+.container {
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.breadcrumbs {
+  font-size: 0.85rem;
+  color: #878787;
+  margin-bottom: 1rem;
+}
+
+.breadcrumbs span {
+  margin: 0 0.5rem;
+}
+
+.breadcrumbs a {
+  color: #878787;
+  text-decoration: none;
+}
+
+.breadcrumbs a:hover {
+  color: #2874f0;
+}
+
+.layout {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+/* --- SIDEBAR --- */
+.sidebar {
+  width: 250px;
+  background-color: #ffffff;
+  border-radius: 2px;
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+  flex-shrink: 0;
+}
+
+.sidebarHeader {
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #212121;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.filterSection {
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.filterSection:last-child {
+  border-bottom: none;
+}
+
+.filterTitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #212121;
+  margin-bottom: 0.85rem;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: #212121;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+}
+
+.checkboxLabel:last-child {
+  margin-bottom: 0;
+}
+
+.checkboxInput {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #E7A03B;
+}
+
+/* --- MAIN CONTENT --- */
+.mainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.searchBarWrapper {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 2px;
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+}
+
+.searchInput {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  border: none;
+  font-size: 0.9rem;
+  outline: none;
+  border-radius: 2px 0 0 2px;
+  color: #212121;
+}
+
+.searchInput::placeholder {
+  color: #878787;
+}
+
+.searchButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #E7A03B;
+  color: #ffffff;
+  border: none;
+  padding: 0 2rem;
+  height: 100%;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 0 2px 2px 0;
+  transition: background-color 0.2s;
+  align-self: stretch;
+}
+
+.searchButton:hover {
+  background-color: #D6902A;
+}
+
+/* --- ORDER CARDS --- */
+.orderCard {
+  background: #ffffff;
+  border-radius: 2px;
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  transition: box-shadow 0.2s;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.orderCard:hover {
+  box-shadow: 0 3px 8px 0 rgba(0,0,0,0.15);
+}
+
+.productImageWrapper {
+  width: 80px;
+  height: 80px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.productImage {
+  object-fit: contain;
+}
+
+.productInfo {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.productTitle {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #212121;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.productVariant {
+  font-size: 0.85rem;
+  color: #878787;
+}
+
+.productPrice {
+  flex: 1;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #212121;
+}
+
+.statusSection {
+  flex: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.statusTop {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #212121;
+}
+
+.statusDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.statusDot.green { background-color: #26a541; }
+.statusDot.red { background-color: #ff6161; }
+
+.statusSubtext {
+  font-size: 0.8rem;
+  color: #212121;
+}
+
+.actionLink {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #2874f0;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 500;
+}
+
+.actionLink:hover {
+  text-decoration: underline;
+}
+
+.sharedBanner {
+  background-color: #fff8e1;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  color: #212121;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  display: inline-block;
+}
