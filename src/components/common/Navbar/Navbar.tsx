@@ -139,31 +139,31 @@ export function Navbar() {
             </button>
 
             <div className={styles.accountWrapper}>
-              <Link href="/account" className={styles.iconBtn} aria-label="User Account" title="Account">
+              <div className={styles.iconBtn} aria-label="User Account" title="Account" style={{ cursor: 'pointer' }}>
                 <User size={20} strokeWidth={1.75} />
-              </Link>
+              </div>
               
               <div className={styles.accountDropdown}>
                 <div className={styles.accountDropdownHeader}>
                   Your Account
                 </div>
                 <div className={styles.accountDropdownList}>
-                  <Link href="/account?tab=profile" className={styles.accountDropdownItem}>
+                  <Link href="/profile" className={styles.accountDropdownItem}>
                     <User size={16} strokeWidth={1.5} /> My Profile
                   </Link>
                   <Link href="/orders" className={styles.accountDropdownItem}>
                     <Package size={16} strokeWidth={1.5} /> Orders
                   </Link>
-                  <Link href="/account?tab=coupons" className={styles.accountDropdownItem}>
+                  <Link href="/coupons" className={styles.accountDropdownItem}>
                     <Tag size={16} strokeWidth={1.5} /> Coupons
                   </Link>
-                  <Link href="/account?tab=wallet" className={styles.accountDropdownItem}>
+                  <Link href="/wallet" className={styles.accountDropdownItem}>
                     <CreditCard size={16} strokeWidth={1.5} /> Saved Cards & Wallet
                   </Link>
-                  <Link href="/account?tab=addresses" className={styles.accountDropdownItem}>
+                  <Link href="/addresses" className={styles.accountDropdownItem}>
                     <MapPin size={16} strokeWidth={1.5} /> Saved Addresses
                   </Link>
-                  <Link href="/account?tab=wishlist" className={styles.accountDropdownItem}>
+                  <Link href="/wishlist" className={styles.accountDropdownItem}>
                     <Heart size={16} strokeWidth={1.5} /> Wishlist
                   </Link>
                   <Link href="/notifications" className={styles.accountDropdownItem}>

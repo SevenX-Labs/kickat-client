@@ -2,11 +2,11 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronRight, MapPin, User, Download, Phone } from 'lucide-react';
+import { ChevronRight, MapPin, User, Download, Phone, Truck, HelpCircle } from 'lucide-react';
 import styles from './OrderDetails.module.css';
 
 export default function OrderDetailsPage({ params }: { params: { id: string } }) {
-  const orderId = params.id;
+  const orderId = params.id || "ORD-89241";
   
   return (
     <div className={styles.pageWrapper}>
@@ -25,9 +25,20 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
 
         {/* HERO HEADER */}
         <header className={styles.heroHeader}>
-          <div className={styles.statusBadge}>Arriving Tomorrow</div>
-          <h1 className={styles.heroTitle}>Your order is on track.</h1>
-          <p className={styles.heroSubtitle}>Shipment has reached the hub nearest to you, Mumbai.</p>
+          <div className={styles.headerTop}>
+            <div className={styles.orderReference}>Order #{orderId}</div>
+            <Link href="/support" className={styles.supportLink}>
+              <HelpCircle size={16} /> Need help with this order?
+            </Link>
+          </div>
+          <div className={styles.statusGroup}>
+            <div className={styles.statusBadge}>
+              <Truck size={16} strokeWidth={2.5} />
+              Arriving Tomorrow
+            </div>
+            <h1 className={styles.heroTitle}>Your order is on track.</h1>
+            <p className={styles.heroSubtitle}>Shipment has reached the hub nearest to you, Mumbai.</p>
+          </div>
         </header>
 
         {/* PRODUCT CARD */}
@@ -51,15 +62,20 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
               <span className={styles.offerBadge}>2 Offers Applied</span>
             </div>
           </div>
+          
+          <div className={styles.productActions}>
+            <button className={styles.trackButton}>Track Shipment</button>
+          </div>
         </div>
 
         {/* HORIZONTAL TRACKER */}
         <section className={styles.trackerSection}>
           <h3 className={styles.trackerSectionTitle}>Tracking History</h3>
           <div className={styles.trackerContainer}>
+            <div className={styles.trackerProgress} style={{ width: '40%' }}></div>
             
             <div className={`${styles.trackerStep} ${styles.completed}`}>
-              <div className={styles.trackerDot}></div>
+              <div className={styles.trackerDot}>✓</div>
               <div className={styles.trackerStepTitle}>Confirmed</div>
               <div className={styles.trackerStepDate}>Mon, Aug 24</div>
             </div>
@@ -73,13 +89,13 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
             <div className={`${styles.trackerStep} ${styles.muted}`}>
               <div className={styles.trackerDot}></div>
               <div className={styles.trackerStepTitle}>Out for Delivery</div>
-              <div className={styles.trackerStepDate}>Pending</div>
+              <div className={styles.trackerStepDate}>Estimated Tomorrow</div>
             </div>
             
             <div className={`${styles.trackerStep} ${styles.muted}`}>
               <div className={styles.trackerDot}></div>
               <div className={styles.trackerStepTitle}>Delivered</div>
-              <div className={styles.trackerStepDate}>Expected Tomorrow</div>
+              <div className={styles.trackerStepDate}>By 9:00 PM Tomorrow</div>
             </div>
             
           </div>
@@ -93,7 +109,7 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
             <h3 className={styles.sectionTitle}>Delivery Details</h3>
             
             <div className={styles.infoRow}>
-              <MapPin size={20} className={styles.infoIcon} />
+              <MapPin size={18} className={styles.infoIcon} />
               <div className={styles.infoContent}>
                 <div className={styles.infoName}>Home</div>
                 <div className={styles.infoText}>123 Pet Lover Lane, Block B, Near Park, Mumbai, 400001</div>
@@ -101,14 +117,14 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
             </div>
             
             <div className={styles.infoRow}>
-              <User size={20} className={styles.infoIcon} />
+              <User size={18} className={styles.infoIcon} />
               <div className={styles.infoContent}>
                 <div className={styles.infoName}>Sarah Jenkins</div>
               </div>
             </div>
             
             <div className={styles.infoRow}>
-              <Phone size={20} className={styles.infoIcon} />
+              <Phone size={18} className={styles.infoIcon} />
               <div className={styles.infoContent}>
                 <div className={styles.infoText}>+91 98765 43210</div>
               </div>
@@ -128,9 +144,9 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                 <span>Special price</span>
                 <span>₹1,599</span>
               </div>
-              <div className={styles.priceRow}>
+              <div className={`${styles.priceRow} ${styles.fees}`}>
                 <span>Total fees</span>
-                <span>₹50</span>
+                <span className={styles.value}>₹50</span>
               </div>
               <div className={`${styles.priceRow} ${styles.discount}`}>
                 <span>Other discount</span>
@@ -142,7 +158,7 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
               <span>Total amount paid</span>
               <span>₹1,499</span>
             </div>
-            <div className={styles.infoText} style={{ textAlign: 'right', marginTop: '-0.5rem' }}>
+            <div className={styles.infoText} style={{ textAlign: 'right', marginTop: '-0.75rem', fontSize: '0.85rem' }}>
               Paid via UPI
             </div>
             
