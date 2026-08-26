@@ -10,20 +10,20 @@ useGLTF.preload("/cat shampoo bottle 3d model.glb");
 useGLTF.preload("/dog shampoo bottle 3d model.glb");
 
 // Animated wrapper for a single bottle
-function AnimatedBottle({ scene, isActive }: { scene: THREE.Group, isActive: boolean }) {
+function AnimatedBottle({ scene, isActive, targetScale, targetPosition }: { scene: THREE.Group, isActive: boolean, targetScale: number, targetPosition: [number, number, number] }) {
   const modelRef = useRef<THREE.Group>(null);
 
   useFrame((state, delta) => {
     if (!modelRef.current) return;
     
     // Target scale and rotation based on active state
-    // When active, it scales to full size (5.5). When inactive, it shrinks to 0.
-    const targetScale = isActive ? 5.5 : 0;
+    // When active, it scales to its specific targetScale. When inactive, it shrinks to 0.
+    const currentTargetScale = isActive ? targetScale : 0;
     // When inactive, spin it backwards by Math.PI. When active, face front (0).
     const targetRotation = isActive ? 0 : Math.PI; 
     
     // Smoothly interpolate current values towards target values using lerp
-    modelRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), delta * 4);
+    modelRef.current.scale.lerp(new THREE.Vector3(currentTargetScale, currentTargetScale, currentTargetScale), delta * 4);
     modelRef.current.rotation.y = THREE.MathUtils.lerp(modelRef.current.rotation.y, targetRotation, delta * 4);
   });
 
@@ -31,7 +31,7 @@ function AnimatedBottle({ scene, isActive }: { scene: THREE.Group, isActive: boo
     <primitive 
       ref={modelRef}
       object={scene} 
-      position={[0, -2.3, 0]} 
+      position={targetPosition} 
       scale={0} // Start at 0 so it animates in on mount rather than popping in
       rotation={[0, Math.PI, 0]} // Start rotated away
     />
@@ -61,8 +61,9 @@ export function BottleModel() {
     >
       <Float speed={1.5} rotationIntensity={0.1} floatIntensity={0.5} floatingRange={[-0.05, 0.05]}>
         {/* Render both models simultaneously to allow for cross-animations */}
-        <AnimatedBottle scene={catScene} isActive={activeModel === 'cat'} />
-        <AnimatedBottle scene={dogScene} isActive={activeModel === 'dog'} />
+        <AnimatedBottle scene={catScene} isActive={activeModel === 'cat'} targetScale={5.5} targetPosition={[0, -2.3, 0]} />
+        {/* Dog bottle requires a much smaller scale natively */}
+        <AnimatedBottle scene={dogScene} isActive={activeModel === 'dog'} targetScale={1.2} targetPosition={[0, -0.6, 0]} />
       </Float>
         
       {/* Realistic contact shadow under the bottle */}

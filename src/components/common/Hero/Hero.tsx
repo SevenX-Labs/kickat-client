@@ -3,8 +3,22 @@
 import Link from 'next/link';
 import { Star } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
+import { Html, useProgress } from '@react-three/drei';
+import { Suspense } from 'react';
 import { BottleModel } from './BottleModel';
 import styles from './Hero.module.css';
+
+function CanvasLoader() {
+  const { progress } = useProgress();
+  return (
+    <Html center>
+      <div className="flex flex-col items-center justify-center">
+        <div className="w-10 h-10 border-4 border-[#F5821F] border-t-transparent rounded-full animate-spin"></div>
+        <p className="mt-2 text-[#F5821F] font-semibold text-sm whitespace-nowrap">{progress.toFixed(0)}% Loading</p>
+      </div>
+    </Html>
+  );
+}
 
 export function Hero() {
   return (
@@ -62,7 +76,9 @@ export function Hero() {
             style={{ width: '100%', height: '100%' }}
             gl={{ alpha: true, antialias: true }}
           >
-            <BottleModel />
+            <Suspense fallback={<CanvasLoader />}>
+              <BottleModel />
+            </Suspense>
           </Canvas>
         </div>
 
