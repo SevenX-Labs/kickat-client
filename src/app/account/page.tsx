@@ -3,7 +3,7 @@
 import { useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Package, User, MapPin, Heart, LogOut, CheckCircle2, Clock, Search, XCircle, ClipboardList, ClipboardCheck, Truck, PackageCheck, CheckCircle } from 'lucide-react';
+import { Package, User, MapPin, Heart, LogOut, CheckCircle2, Clock, Search, XCircle, ClipboardList, ClipboardCheck, Truck, PackageCheck, Check } from 'lucide-react';
 import styles from './Account.module.css';
 
 // Mock Data
@@ -86,47 +86,44 @@ function AccountContent() {
 
   const renderProgressTracker = (progress: number, orderDate: string) => {
     const steps = [
-      { label: 'Confirmed', time: `${orderDate}` },
-      { label: 'Shipped', time: `Wed, Aug 26` },
-      { label: 'Out for Delivery', time: `Estimated Tomorrow` },
-      { label: 'Delivered', time: `By 9:00 PM Tomorrow` }
+      { label: 'Order Placed', time: `${orderDate}\n11:00 AM`, Icon: ClipboardList },
+      { label: 'Accepted', time: `${orderDate}\n11:15 AM`, Icon: ClipboardCheck },
+      { label: 'In Progress', time: `Expected\nTomorrow`, Icon: Package },
+      { label: 'On the Way', time: `Expected\nIn 2 Days`, Icon: Truck },
+      { label: 'Delivered', time: `Expected\nIn 3 Days`, Icon: PackageCheck }
     ];
     
-    // Normalize progress to fit 4-step timeline (0 to 3)
-    const activeIndex = progress === undefined ? 0 : progress;
+    // Normalize progress to fit new 5-step timeline (0 to 4)
+    const activeIndex = progress === 1 ? 2 : progress === 2 ? 3 : progress === 3 ? 4 : 1; // Default to Accepted for visuals if 0
 
     return (
-      <div className={styles.trackingHistoryContainer}>
-        <h3 className={styles.trackingTitle}>Tracking History</h3>
+      <div className={styles.progressTrackerCard}>
+        <div className={styles.progressLineBg}></div>
+        <div className={styles.progressLineFill} style={{ width: `${(activeIndex / (steps.length - 1)) * 100}%` }}></div>
         
-        <div className={styles.progressTrackerPremium}>
-          <div className={styles.premiumLineBg}></div>
-          <div className={styles.premiumLineFill} style={{ width: `${(activeIndex / (steps.length - 1)) * 100}%` }}></div>
-          
-          <div className={styles.premiumStepsWrapper}>
-            {steps.map((step, idx) => (
-              <div key={idx} className={`${styles.premiumStep} ${idx < activeIndex ? styles.completed : ''} ${idx === activeIndex ? styles.active : ''}`}>
-                <div className={styles.premiumDotContainer}>
-                  {idx < activeIndex ? (
-                    <div className={styles.premiumCheck}><CheckCircle2 size={24} fill="#22c55e" color="white" strokeWidth={2} /></div>
-                  ) : idx === activeIndex ? (
-                    <div className={styles.premiumActiveHalo}>
-                      <div className={styles.premiumActiveDot}></div>
-                    </div>
-                  ) : (
-                    <div className={styles.premiumEmptyDot}></div>
-                  )}
-                </div>
-                
-                <div className={styles.premiumStepInfo}>
-                  <div className={`${styles.premiumLabel} ${idx === activeIndex ? styles.premiumLabelPill : ''}`}>
-                    {step.label}
-                  </div>
-                  <div className={styles.premiumTime}>{step.time}</div>
-                </div>
+        <div className={styles.stepsWrapper}>
+          {steps.map((step, idx) => (
+            <div key={idx} className={`${styles.stepContainer} ${idx <= activeIndex ? styles.completed : ''}`}>
+              <div className={styles.stepTopIcon}>
+                <step.Icon size={24} strokeWidth={2} className={idx <= activeIndex ? styles.iconActive : styles.iconInactive} />
+                {idx <= activeIndex && <div className={styles.iconYellowAccent}></div>}
               </div>
-            ))}
-          </div>
+              
+              <span className={styles.stepLabel}>{step.label}</span>
+              
+              <div className={styles.stepCheckWrapper}>
+                {idx <= activeIndex ? (
+                  <div className={styles.checkSquareFilled}><Check size={16} color="white" strokeWidth={4} /></div>
+                ) : (
+                  <div className={styles.checkSquareEmpty}><Check size={16} color="white" strokeWidth={4} /></div>
+                )}
+              </div>
+              
+              <div className={styles.stepTime}>
+                {step.time.split('\n').map((line, i) => <div key={i}>{line}</div>)}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );
