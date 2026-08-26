@@ -222,3 +222,57 @@
   background-color: #FBF7EE;
   padding-left: 1.65rem;
 }
+
+.announcementBar {
+  background-color: #E7A03B;
+  color: #211C15;
+  padding: 0.75rem 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(33, 28, 21, 0.1);
+}
+
+.marquee {
+  display: flex;
+  overflow: hidden;
+  user-select: none;
+  width: 100%;
+}
+
+.marquee:hover .marqueeContent {
+  animation-play-state: paused;
+}
+
+.marqueeContent {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  animation: scroll 35s linear infinite;
+}
+
+.marqueeItem {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.dot {
+  color: rgba(33, 28, 21, 0.4);
+  margin: 0 4rem;
+  font-size: 1.2rem;
+  line-height: 0;
+}
+
+@keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}

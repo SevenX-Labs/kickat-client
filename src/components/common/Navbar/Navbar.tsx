@@ -1,5 +1,4 @@
 "use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown, Search, Heart, User, ShoppingBag } from "lucide-react";
@@ -46,20 +45,50 @@ const taxonomy = {
 };
 
 export function Navbar() {
+  const items = [
+    "Free Delivery on orders over $50",
+    "Get 20% off your first purchase",
+    "Premium pet accessories",
+  ];
+  // Duplicate to ensure the marquee fills wide screens
+  const duplicatedItems = [...items, ...items, ...items, ...items];
+
   return (
     <header className={styles.header}>
+      {/* Announcement Bar */}
+      <div className={styles.announcementBar}>
+        <div className={styles.marquee}>
+          <div className={styles.marqueeContent}>
+            {duplicatedItems.map((text, idx) => (
+              <span key={`first-${idx}`} className={styles.marqueeItem}>
+                {text}
+                <span className={styles.dot}>•</span>
+              </span>
+            ))}
+          </div>
+          <div aria-hidden="true" className={styles.marqueeContent}>
+            {duplicatedItems.map((text, idx) => (
+              <span key={`second-${idx}`} className={styles.marqueeItem}>
+                {text}
+                <span className={styles.dot}>•</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <div className={styles.container}>
         
         {/* Left Section: Logo + Nav Links */}
         <div className={styles.leftSection}>
           <Link href="/" className={styles.logoWrapper}>
             <Image
-              src="/logo.png"
+              src="/logo-clean.png"
               alt="KickAt Logo"
-              width={200}
-              height={64}
+              width={240}
+              height={100}
               priority
-              style={{ objectFit: "contain", userSelect: "none", width: "auto", height: "64px" }}
+              style={{ objectFit: "contain", userSelect: "none", width: "auto", height: "100px" }}
               draggable={false}
               onContextMenu={(e) => e.preventDefault()}
             />
