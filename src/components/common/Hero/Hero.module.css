@@ -240,5 +240,35 @@
 
 @keyframes floatCircle {
   0%, 100% { transform: translateY(-50%) rotate(0deg); }
-  50% { transform: translateY(-45%) rotate(5deg); }
+}
+
+/* Floating Pet Icons */
+.floatingIcons {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.floatIcon {
+  position: absolute;
+  color: #26211F;
+  opacity: 0.15;
+  animation: floatRandom 15s ease-in-out infinite;
+}
+
+/* Base transforms are applied via animation, but we can set initial positions */
+.icon1 { top: 15%; left: 8%; animation-delay: 0s; }
+.icon2 { top: 60%; left: 12%; animation-delay: -3s; }
+.icon3 { top: 80%; left: 45%; animation-delay: -6s; }
+.icon4 { top: 10%; right: 40%; animation-delay: -9s; }
+.icon5 { top: 30%; right: 10%; animation-delay: -2s; }
+.icon6 { top: 75%; right: 15%; animation-delay: -5s; }
+
+@keyframes floatRandom {
+  0% { transform: translateY(0) rotate(0deg); }
+  33% { transform: translateY(-25px) rotate(15deg); }
+  66% { transform: translateY(-10px) rotate(-10deg); }
+  100% { transform: translateY(0) rotate(0deg); }
 }

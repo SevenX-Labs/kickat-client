@@ -25,6 +25,13 @@ function AnimatedBottle({ scene, isActive, targetScale, targetPosition }: { scen
     // Smoothly interpolate current values towards target values using lerp
     modelRef.current.scale.lerp(new THREE.Vector3(currentTargetScale, currentTargetScale, currentTargetScale), delta * 4);
     modelRef.current.rotation.y = THREE.MathUtils.lerp(modelRef.current.rotation.y, targetRotation, delta * 4);
+    
+    // Hide completely if scale is very small to avoid visual glitches (like sticking out at bottom)
+    if (!isActive && modelRef.current.scale.x < 0.01) {
+      modelRef.current.visible = false;
+    } else {
+      modelRef.current.visible = true;
+    }
   });
 
   return (
@@ -62,8 +69,7 @@ export function BottleModel() {
       <Float speed={1.5} rotationIntensity={0.1} floatIntensity={0.5} floatingRange={[-0.05, 0.05]}>
         {/* Render both models simultaneously to allow for cross-animations */}
         <AnimatedBottle scene={catScene} isActive={activeModel === 'cat'} targetScale={5.5} targetPosition={[0, -2.3, 0]} />
-        {/* Dog bottle requires a much smaller scale natively */}
-        <AnimatedBottle scene={dogScene} isActive={activeModel === 'dog'} targetScale={1.2} targetPosition={[0, -0.6, 0]} />
+        <AnimatedBottle scene={dogScene} isActive={activeModel === 'dog'} targetScale={5.5} targetPosition={[0, -2.3, 0]} />
       </Float>
         
       {/* Realistic contact shadow under the bottle */}
