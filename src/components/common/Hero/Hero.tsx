@@ -50,7 +50,7 @@ export function Hero() {
         {/* Right Column: Interactive 3D Model */}
         <div className={styles.visualContent} style={{ cursor: 'grab', height: '100%', minHeight: '500px' }}>
           <Canvas 
-            camera={{ position: [0, 0, 8], fov: 45 }}
+            camera={{ position: [-1.5, 0, 8], fov: 45 }}
             style={{ width: '100%', height: '100%' }}
             gl={{ alpha: true, antialias: true }}
           >
