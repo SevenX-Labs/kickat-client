@@ -3,7 +3,7 @@
 import { useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Package, User, MapPin, Heart, LogOut, CheckCircle2, Clock, Search, XCircle } from 'lucide-react';
+import { Package, User, MapPin, Heart, LogOut, CheckCircle2, Clock, Search, XCircle, ClipboardList, ClipboardCheck, Truck, PackageCheck, CheckCircle } from 'lucide-react';
 import styles from './Account.module.css';
 
 // Mock Data
@@ -84,20 +84,50 @@ function AccountContent() {
     }
   };
 
-  const renderProgressTracker = (progress: number) => {
-    const steps = ['Placed', 'Packed', 'Shipped', 'Delivered'];
-    const activeIndex = progress;
+  const renderProgressTracker = (progress: number, orderDate: string) => {
+    const steps = [
+      { label: 'Confirmed', time: `${orderDate}` },
+      { label: 'Shipped', time: `Wed, Aug 26` },
+      { label: 'Out for Delivery', time: `Estimated Tomorrow` },
+      { label: 'Delivered', time: `By 9:00 PM Tomorrow` }
+    ];
+    
+    // Normalize progress to fit 4-step timeline (0 to 3)
+    const activeIndex = progress === undefined ? 0 : progress;
 
     return (
-      <div className={styles.progressTracker}>
-        <div className={styles.progressLine}></div>
-        <div className={styles.progressLineActive} style={{ width: `${(activeIndex / (steps.length - 1)) * 100}%` }}></div>
-        {steps.map((step, idx) => (
-          <div key={idx} className={`${styles.progressStep} ${idx < activeIndex ? styles.completed : ''} ${idx === activeIndex ? styles.active : ''}`}>
-            <div className={styles.stepDot}></div>
-            <span className={styles.stepLabel}>{step}</span>
+      <div className={styles.trackingHistoryContainer}>
+        <h3 className={styles.trackingTitle}>Tracking History</h3>
+        
+        <div className={styles.progressTrackerPremium}>
+          <div className={styles.premiumLineBg}></div>
+          <div className={styles.premiumLineFill} style={{ width: `${(activeIndex / (steps.length - 1)) * 100}%` }}></div>
+          
+          <div className={styles.premiumStepsWrapper}>
+            {steps.map((step, idx) => (
+              <div key={idx} className={`${styles.premiumStep} ${idx < activeIndex ? styles.completed : ''} ${idx === activeIndex ? styles.active : ''}`}>
+                <div className={styles.premiumDotContainer}>
+                  {idx < activeIndex ? (
+                    <div className={styles.premiumCheck}><CheckCircle2 size={24} fill="#22c55e" color="white" strokeWidth={2} /></div>
+                  ) : idx === activeIndex ? (
+                    <div className={styles.premiumActiveHalo}>
+                      <div className={styles.premiumActiveDot}></div>
+                    </div>
+                  ) : (
+                    <div className={styles.premiumEmptyDot}></div>
+                  )}
+                </div>
+                
+                <div className={styles.premiumStepInfo}>
+                  <div className={`${styles.premiumLabel} ${idx === activeIndex ? styles.premiumLabelPill : ''}`}>
+                    {step.label}
+                  </div>
+                  <div className={styles.premiumTime}>{step.time}</div>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     );
   };
@@ -219,7 +249,7 @@ function AccountContent() {
 
                       {order.status === 'Processing' && order.progress !== undefined && (
                         <div style={{ marginBottom: '2.5rem', padding: '0 1rem' }}>
-                          {renderProgressTracker(order.progress)}
+                          {renderProgressTracker(order.progress, order.date)}
                         </div>
                       )}
                       

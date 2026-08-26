@@ -316,73 +316,136 @@
   color: #666;
 }
 
-/* Progress Tracker */
-.progressTracker {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 1.5rem;
+/* Premium Tracking History */
+.trackingHistoryContainer {
+  margin-top: 1rem;
+  margin-bottom: 3rem;
+  padding: 0 1rem;
+}
+
+.trackingTitle {
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 2.5rem;
+}
+
+.progressTrackerPremium {
   position: relative;
   width: 100%;
-  max-width: 400px;
+  margin: 0 auto;
 }
 
-.progressLine {
+.premiumLineBg {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  right: 10px;
-  height: 2px;
-  background-color: #e0dcd2;
+  top: 16px;
+  left: 5%;
+  right: 5%;
+  height: 4px;
+  background-color: #e5e7eb;
   z-index: 0;
+  border-radius: 4px;
 }
 
-.progressLineActive {
+.premiumLineFill {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  height: 2px;
-  background-color: #E7A03B;
+  top: 16px;
+  left: 5%;
+  height: 4px;
+  background-color: #22c55e;
   z-index: 1;
+  border-radius: 4px;
+  transition: width 0.5s ease;
 }
 
-.progressStep {
+.premiumStepsWrapper {
   position: relative;
   z-index: 2;
   display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.premiumStep {
+  display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  flex: 1;
+  text-align: center;
 }
 
-.stepDot {
-  width: 20px;
-  height: 20px;
+.premiumDotContainer {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.premiumCheck {
+  display: flex;
+  background: white;
   border-radius: 50%;
-  background-color: white;
-  border: 2px solid #e0dcd2;
+  padding: 2px;
 }
 
-.progressStep.active .stepDot {
-  border-color: #E7A03B;
-  background-color: #E7A03B;
-  box-shadow: 0 0 0 4px rgba(231, 160, 59, 0.2);
+.premiumActiveHalo {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: rgba(34, 197, 94, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.progressStep.completed .stepDot {
-  border-color: #E7A03B;
-  background-color: white;
+.premiumActiveDot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #22c55e;
 }
 
-.stepLabel {
-  font-size: 0.7rem;
+.premiumEmptyDot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #e5e7eb;
+}
+
+.premiumStepInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.premiumLabel {
+  font-size: 0.85rem;
   font-weight: 600;
-  text-transform: uppercase;
-  color: #888;
+  color: #9ca3af;
 }
 
-.progressStep.active .stepLabel {
+.premiumStep.completed .premiumLabel {
   color: #111;
+}
+
+.premiumLabelPill {
+  background-color: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+}
+
+.premiumTime {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.premiumStep.completed .premiumTime,
+.premiumStep.active .premiumTime {
+  color: #6b7280;
 }
 
 /* Order Items */
