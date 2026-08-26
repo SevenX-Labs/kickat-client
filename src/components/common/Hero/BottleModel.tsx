@@ -8,9 +8,10 @@ import * as THREE from 'three';
 // Preload both models for faster rendering
 useGLTF.preload("/cat shampoo bottle 3d model.glb");
 useGLTF.preload("/dog shampoo bottle 3d model.glb");
+useGLTF.preload("/red seed feeder 3d model.glb");
 
 // Animated wrapper for a single bottle
-function AnimatedBottle({ scene, isActive, targetScale, targetPosition }: { scene: THREE.Group, isActive: boolean, targetScale: number, targetPosition: [number, number, number] }) {
+function AnimatedBottle({ scene, isActive, targetScale, targetPosition, modelRotationOffset = 0 }: { scene: THREE.Group, isActive: boolean, targetScale: number, targetPosition: [number, number, number], modelRotationOffset?: number }) {
   const modelRef = useRef<THREE.Group>(null);
 
   useFrame((state, delta) => {
@@ -30,26 +31,32 @@ function AnimatedBottle({ scene, isActive, targetScale, targetPosition }: { scen
   });
 
   return (
-    <primitive 
+    <group 
       ref={modelRef}
-      object={scene} 
       position={targetPosition} 
       scale={0} // Start at 0 so it pops in on initial mount
       rotation={[0, Math.PI, 0]} // Start facing away
-    />
+    >
+      <primitive object={scene} rotation={[0, modelRotationOffset, 0]} />
+    </group>
   );
 }
 
 export function BottleModel() {
   const { scene: catScene } = useGLTF("/cat shampoo bottle 3d model.glb");
   const { scene: dogScene } = useGLTF("/dog shampoo bottle 3d model.glb");
+  const { scene: birdScene } = useGLTF("/red seed feeder 3d model.glb");
   
-  const [activeModel, setActiveModel] = useState<'cat' | 'dog'>('cat');
+  const [activeModel, setActiveModel] = useState<'cat' | 'dog' | 'bird'>('cat');
 
   // Auto-switch models every 6 seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      setActiveModel(prev => prev === 'cat' ? 'dog' : 'cat');
+      setActiveModel(prev => {
+        if (prev === 'cat') return 'dog';
+        if (prev === 'dog') return 'bird';
+        return 'cat';
+      });
     }, 6000);
     return () => clearInterval(interval);
   }, []);
@@ -62,12 +69,13 @@ export function BottleModel() {
       azimuth={[-Math.PI / 2, Math.PI / 2]} // Restrict horizontal rotation
     >
       <Float speed={1.5} rotationIntensity={0.1} floatIntensity={0.5} floatingRange={[-0.05, 0.05]}>
-        {/* Render both models simultaneously to allow for cross-animations */}
+        {/* Render models simultaneously to allow for cross-animations */}
         <AnimatedBottle scene={catScene} isActive={activeModel === 'cat'} targetScale={5.5} targetPosition={[0, -2.3, 0]} />
         <AnimatedBottle scene={dogScene} isActive={activeModel === 'dog'} targetScale={5.5} targetPosition={[0, -2.3, 0]} />
+        <AnimatedBottle scene={birdScene} isActive={activeModel === 'bird'} targetScale={5.5} targetPosition={[0, -2.3, 0]} modelRotationOffset={Math.PI} />
       </Float>
         
-      {/* Realistic contact shadow under the bottle */}
+      {/* Realistic contact shadow under the bottle - baked for performance */}
       <ContactShadows 
         position={[0, -2.6, 0]} 
         opacity={0.3} 
@@ -75,6 +83,7 @@ export function BottleModel() {
         blur={2} 
         far={2} 
         color="#000000"
+        frames={1}
       />
       
       {/* High-end studio lighting */}

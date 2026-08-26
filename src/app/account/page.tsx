@@ -51,21 +51,12 @@ const orders = [
 function AccountContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const tabFromUrl = searchParams.get('tab') || 'orders';
+  const activeTab = searchParams.get('tab') || 'orders';
   
-  const [activeTab, setActiveTab] = useState(tabFromUrl);
   const [orderFilter, setOrderFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => {
-    const tab = searchParams.get('tab');
-    if (tab && tab !== activeTab) {
-      setActiveTab(tab);
-    }
-  }, [searchParams]);
-
   const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
     router.push(`/account?tab=${tab}`);
   };
 

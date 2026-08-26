@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronDown, Search, Heart, User, ShoppingBag, Package, Tag, Coins, Sparkles, CreditCard, MapPin, Gift, Bell, LogOut } from "lucide-react";
+import { ChevronDown, Search, Heart, User, ShoppingBag, Package, Tag, CreditCard, MapPin, Bell, LogOut } from "lucide-react";
 import styles from "./Navbar.module.css";
 
 const taxonomy = {

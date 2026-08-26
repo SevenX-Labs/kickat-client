@@ -74,7 +74,9 @@ export function Hero() {
           <Canvas 
             camera={{ position: [-1.5, 0, 8], fov: 45 }}
             style={{ width: '100%', height: '100%' }}
-            gl={{ alpha: true, antialias: true }}
+            gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
+            dpr={[1, 1.5]}
+            performance={{ min: 0.5 }}
           >
             <Suspense fallback={null}>
               <BottleModel />

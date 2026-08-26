@@ -6,7 +6,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #FEFCF8 0%, #FFF8F0 50%, #FCFAF6 100%);
+  /* Premium noise texture + soft mesh base */
+  background: 
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E"),
+    linear-gradient(135deg, #FEFCF8 0%, #FFF5E8 50%, #FCFAF6 100%);
   overflow: hidden;
 }
 
@@ -15,7 +18,7 @@
   position: absolute;
   pointer-events: none;
   z-index: 0;
-  filter: blur(40px);
+  filter: blur(90px);
 }
 
 .blob1 {
@@ -23,7 +26,7 @@
   right: -5%;
   width: 700px;
   height: 700px;
-  background: linear-gradient(135deg, rgba(245, 130, 31, 0.12) 0%, rgba(245, 130, 31, 0.02) 100%);
+  background: radial-gradient(circle, rgba(245, 130, 31, 0.15) 0%, rgba(245, 130, 31, 0) 70%);
   animation: morphWavy 14s ease-in-out infinite, spinBlob 25s linear infinite;
 }
 
@@ -32,7 +35,7 @@
   left: -10%;
   width: 600px;
   height: 600px;
-  background: linear-gradient(135deg, rgba(245, 130, 31, 0.08) 0%, rgba(255, 170, 80, 0.02) 100%);
+  background: radial-gradient(circle, rgba(255, 170, 80, 0.12) 0%, rgba(255, 170, 80, 0) 70%);
   animation: morphWavy 18s ease-in-out infinite reverse, spinBlob 30s linear infinite reverse;
 }
 
@@ -41,7 +44,7 @@
   left: 30%;
   width: 350px;
   height: 350px;
-  background: linear-gradient(135deg, rgba(255, 180, 100, 0.1) 0%, rgba(245, 130, 31, 0.01) 100%);
+  background: radial-gradient(circle, rgba(255, 200, 120, 0.15) 0%, rgba(255, 200, 120, 0) 70%);
   animation: morphWavy 12s ease-in-out infinite, floatBlob 16s ease-in-out infinite;
 }
 
@@ -227,12 +230,12 @@
   transform: translateY(-50%);
   width: 550px;
   height: 550px;
-  background: rgba(255, 255, 255, 0.35);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.1) 100%);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
   border-radius: 50%;
-  border: 1.5px solid rgba(255, 255, 255, 0.7);
-  box-shadow: 0 16px 40px -10px rgba(245, 130, 31, 0.15), inset 0 0 20px rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 32px 0 rgba(245, 130, 31, 0.1), inset 0 0 20px rgba(255, 255, 255, 0.5);
   z-index: 1; /* Sits above the gradient glows, but below the 3D container which is z-index 10 */
   pointer-events: none;
   animation: floatCircle 10s ease-in-out infinite;
