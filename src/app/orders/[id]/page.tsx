@@ -2,11 +2,10 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronRight, Home, User, Download, CheckCircle2, ChevronRight as ChevronRightIcon } from 'lucide-react';
+import { ChevronRight, MapPin, User, Download, Phone } from 'lucide-react';
 import styles from './OrderDetails.module.css';
 
 export default function OrderDetailsPage({ params }: { params: { id: string } }) {
-  // Mock Data for demonstration
   const orderId = params.id;
   
   return (
@@ -21,163 +20,140 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
           <ChevronRight size={12} strokeWidth={2} style={{ display: 'inline', margin: '0 4px', position: 'relative', top: '1px' }} />
           <Link href="/orders">My Orders</Link>
           <ChevronRight size={12} strokeWidth={2} style={{ display: 'inline', margin: '0 4px', position: 'relative', top: '1px' }} />
-          <span style={{ color: '#212121', fontWeight: 500 }}>{orderId}</span>
+          <span style={{ color: '#211C15', fontWeight: 500 }}>{orderId}</span>
         </div>
 
-        <div className={styles.layout}>
+        {/* HERO HEADER */}
+        <header className={styles.heroHeader}>
+          <div className={styles.statusBadge}>Arriving Tomorrow</div>
+          <h1 className={styles.heroTitle}>Your order is on track.</h1>
+          <p className={styles.heroSubtitle}>Shipment has reached the hub nearest to you, Mumbai.</p>
+        </header>
+
+        {/* PRODUCT CARD */}
+        <div className={styles.productCard}>
+          <div className={styles.productImageWrapper}>
+            <Image 
+              src="/hero-products/pet_bowl.png" 
+              alt="Pet Bowl" 
+              fill 
+              style={{ objectFit: 'contain', padding: '0.5rem' }}
+            />
+          </div>
           
-          {/* LEFT COLUMN */}
-          <div className={styles.leftColumn}>
+          <div className={styles.productInfo}>
+            <h2 className={styles.productTitle}>Ceramic Anti-Slip Pet Bowl</h2>
+            <div className={styles.productMeta}>Color: Matte White</div>
+            <div className={styles.productMeta}>Seller: KickAt Official</div>
             
-            <div className={styles.box}>
-              <div className={styles.headerRow}>
-                <span>Manage who can access</span>
-                <ChevronRightIcon size={18} color="#878787" />
-              </div>
-              
-              <div className={styles.productRow}>
-                <div className={styles.productInfo}>
-                  <div className={styles.productTitle}>Ceramic Anti-Slip Pet Bowl</div>
-                  <div className={styles.productMeta}>Color: Matte White</div>
-                  <div className={styles.productMeta}>Seller: KickAt Official</div>
-                  
-                  <div className={styles.priceBlock}>
-                    <span className={styles.price}>₹1,499</span>
-                    <span className={styles.offerText}>2 Offers Applied</span>
-                  </div>
-                </div>
-                
-                <div className={styles.productImageWrapper}>
-                  <Image 
-                    src="/hero-products/pet_bowl.png" 
-                    alt="Pet Bowl" 
-                    fill 
-                    style={{ objectFit: 'contain' }}
-                  />
-                </div>
-              </div>
-
-              <div className={styles.trackingSection}>
-                <ul className={styles.timeline}>
-                  <li className={styles.timelineItem}>
-                    <div className={`${styles.timelineDot} ${styles.completed}`}></div>
-                    <div className={styles.timelineContent}>
-                      <div className={styles.timelineTitle}>Order Confirmed, Mon Aug 24</div>
-                    </div>
-                  </li>
-                  
-                  <li className={styles.timelineItem}>
-                    <div className={`${styles.timelineDot} ${styles.active}`}></div>
-                    <div className={styles.timelineContent}>
-                      <div className={styles.activeBackground}>
-                        <div className={styles.timelineTitle}>Shipped</div>
-                        <div className={styles.timelineSub}>Shipment has reached the hub nearest to you, MUMBAI, Wed 26th Aug</div>
-                      </div>
-                    </div>
-                  </li>
-                  
-                  <li className={styles.timelineItem}>
-                    <div className={styles.timelineDot}></div>
-                    <div className={styles.timelineContent}>
-                      <div className={`${styles.timelineTitle} ${styles.muted}`}>Out For Delivery</div>
-                    </div>
-                  </li>
-                  
-                  <li className={styles.timelineItem}>
-                    <div className={styles.timelineDot}></div>
-                    <div className={styles.timelineContent}>
-                      <div className={`${styles.timelineTitle} ${styles.muted}`}>Delivery, Today By 11 PM</div>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-              
-              <div style={{ padding: '1.5rem', background: '#f8fbff', borderTop: '1px solid #f0f0f0' }}>
-                <div style={{ color: '#2874f0', fontWeight: 500, fontSize: '0.9rem', marginBottom: '0.5rem' }}>See All Updates &gt;</div>
-                <div style={{ background: '#ffffff', border: '1px solid #a3c4f9', borderRadius: '4px', padding: '1rem', fontSize: '0.9rem', color: '#212121' }}>
-                  Your order is on track to reach you by 11 pm today.
-                </div>
-              </div>
+            <div className={styles.priceBlock}>
+              <span className={styles.price}>₹1,499</span>
+              <span className={styles.offerBadge}>2 Offers Applied</span>
             </div>
-            
           </div>
-
-          {/* RIGHT COLUMN */}
-          <div className={styles.rightColumn}>
-            
-            {/* Delivery Details */}
-            <div className={styles.box}>
-              <div className={styles.sectionTitle}>Delivery details</div>
-              <div className={styles.addressContent}>
-                <div className={styles.addressRow}>
-                  <Home size={18} color="#878787" style={{ marginTop: '2px' }} />
-                  <div>
-                    <div className={styles.addressName}>Home</div>
-                    <div className={styles.addressText}>123 Pet Lover Lane, Block B, Near Park, Mumbai, 400001</div>
-                  </div>
-                </div>
-                <div className={styles.addressRow}>
-                  <User size={18} color="#878787" style={{ marginTop: '2px' }} />
-                  <div>
-                    <div className={styles.addressName}>Sarah Jenkins</div>
-                    <div className={styles.addressText}>+91 98765 43210</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Price Details */}
-            <div className={styles.box}>
-              <div className={styles.sectionTitle}>Price details</div>
-              <div className={styles.priceTable}>
-                <div className={styles.priceRow}>
-                  <span>Listing price</span>
-                  <span>₹2,499</span>
-                </div>
-                <div className={styles.priceRow}>
-                  <span>Special price</span>
-                  <span>₹1,599</span>
-                </div>
-                <div className={styles.priceRow}>
-                  <span>Total fees</span>
-                  <span>₹50</span>
-                </div>
-                <div className={`${styles.priceRow} ${styles.discount}`}>
-                  <span>Other discount</span>
-                  <span className={styles.value}>-₹150</span>
-                </div>
-              </div>
-              
-              <div className={styles.priceTotal}>
-                <span>Total amount</span>
-                <span>₹1,499</span>
-              </div>
-              
-              <div className={styles.paidBy}>
-                <span>Paid By</span>
-                <span style={{ fontWeight: 600, border: '1px solid #e0e0e0', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem' }}>UPI</span>
-              </div>
-              
-              <button className={styles.downloadBtn}>
-                <Download size={18} />
-                Download Invoice
-              </button>
-            </div>
-
-            {/* Offers */}
-            <div className={styles.box}>
-              <div className={styles.sectionTitle} style={{ borderBottom: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <div style={{ width: 24, height: 24, background: '#f1f3f6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🏆</div>
-                  Offers earned
-                </div>
-                <ChevronRightIcon size={18} color="#878787" />
-              </div>
-            </div>
-
-          </div>
-
         </div>
+
+        {/* HORIZONTAL TRACKER */}
+        <section className={styles.trackerSection}>
+          <h3 className={styles.trackerSectionTitle}>Tracking History</h3>
+          <div className={styles.trackerContainer}>
+            
+            <div className={`${styles.trackerStep} ${styles.completed}`}>
+              <div className={styles.trackerDot}></div>
+              <div className={styles.trackerStepTitle}>Confirmed</div>
+              <div className={styles.trackerStepDate}>Mon, Aug 24</div>
+            </div>
+            
+            <div className={`${styles.trackerStep} ${styles.active}`}>
+              <div className={styles.trackerDot}></div>
+              <div className={styles.trackerStepTitle}>Shipped</div>
+              <div className={styles.trackerStepDate}>Wed, Aug 26</div>
+            </div>
+            
+            <div className={`${styles.trackerStep} ${styles.muted}`}>
+              <div className={styles.trackerDot}></div>
+              <div className={styles.trackerStepTitle}>Out for Delivery</div>
+              <div className={styles.trackerStepDate}>Pending</div>
+            </div>
+            
+            <div className={`${styles.trackerStep} ${styles.muted}`}>
+              <div className={styles.trackerDot}></div>
+              <div className={styles.trackerStepTitle}>Delivered</div>
+              <div className={styles.trackerStepDate}>Expected Tomorrow</div>
+            </div>
+            
+          </div>
+        </section>
+
+        {/* DETAILS GRID */}
+        <section className={styles.detailsGrid}>
+          
+          {/* Left: Address */}
+          <div className={styles.detailsSection}>
+            <h3 className={styles.sectionTitle}>Delivery Details</h3>
+            
+            <div className={styles.infoRow}>
+              <MapPin size={20} className={styles.infoIcon} />
+              <div className={styles.infoContent}>
+                <div className={styles.infoName}>Home</div>
+                <div className={styles.infoText}>123 Pet Lover Lane, Block B, Near Park, Mumbai, 400001</div>
+              </div>
+            </div>
+            
+            <div className={styles.infoRow}>
+              <User size={20} className={styles.infoIcon} />
+              <div className={styles.infoContent}>
+                <div className={styles.infoName}>Sarah Jenkins</div>
+              </div>
+            </div>
+            
+            <div className={styles.infoRow}>
+              <Phone size={20} className={styles.infoIcon} />
+              <div className={styles.infoContent}>
+                <div className={styles.infoText}>+91 98765 43210</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Price */}
+          <div className={styles.detailsSection}>
+            <h3 className={styles.sectionTitle}>Financial Summary</h3>
+            
+            <div className={styles.priceTable}>
+              <div className={styles.priceRow}>
+                <span>Listing price</span>
+                <span>₹2,499</span>
+              </div>
+              <div className={styles.priceRow}>
+                <span>Special price</span>
+                <span>₹1,599</span>
+              </div>
+              <div className={styles.priceRow}>
+                <span>Total fees</span>
+                <span>₹50</span>
+              </div>
+              <div className={`${styles.priceRow} ${styles.discount}`}>
+                <span>Other discount</span>
+                <span className={styles.value}>-₹150</span>
+              </div>
+            </div>
+            
+            <div className={styles.priceTotal}>
+              <span>Total amount paid</span>
+              <span>₹1,499</span>
+            </div>
+            <div className={styles.infoText} style={{ textAlign: 'right', marginTop: '-0.5rem' }}>
+              Paid via UPI
+            </div>
+            
+            <button className={styles.ghostButton}>
+              <Download size={18} />
+              Download Invoice
+            </button>
+          </div>
+
+        </section>
+
       </div>
     </div>
   );

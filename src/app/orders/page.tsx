@@ -108,20 +108,20 @@ export default function OrdersPage() {
             
             {/* Search Bar */}
             <div className={styles.searchBarWrapper}>
+              <div className={styles.searchIconWrapper}>
+                <Search size={18} strokeWidth={2} />
+              </div>
               <input 
                 type="text" 
                 className={styles.searchInput} 
                 placeholder="Search your orders here" 
               />
-              <button className={styles.searchButton}>
-                <Search size={18} strokeWidth={2} />
-                Search Orders
-              </button>
             </div>
 
             {/* Orders List */}
-            {orders.map(order => (
-              <Link key={order.id} href={`/orders/${order.id}`} className={styles.orderCard}>
+            <div className={styles.ordersList}>
+              {orders.map(order => (
+                <Link key={order.id} href={`/orders/${order.id}`} className={styles.orderCard}>
                 
                 <div className={styles.productImageWrapper}>
                   <Image 
@@ -158,8 +158,9 @@ export default function OrdersPage() {
                     </div>
                   )}
                 </div>
-              </Link>
-            ))}
+                </Link>
+              ))}
+            </div>
 
           </main>
         </div>
