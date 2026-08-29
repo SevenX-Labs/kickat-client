@@ -24,7 +24,7 @@ export default function WishlistPage() {
     e.preventDefault();
     e.stopPropagation();
     // Simulate add to cart
-    alert('Added to cart!');
+    alert(`Added product ${id} to cart!`);
   };
 
   return (
@@ -95,7 +95,7 @@ export default function WishlistPage() {
             </div>
             <h2 className={styles.emptyTitle}>Your wishlist is empty</h2>
             <p className={styles.emptyDesc}>
-              Looks like you haven't saved any items yet. Explore our premium collection and save your favorites!
+              Looks like you haven&apos;t saved any items yet. Explore our premium collection and save your favorites!
             </p>
             <Link href="/shop" className={styles.shopBtn}>
               Start Shopping

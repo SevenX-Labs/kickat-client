@@ -69,9 +69,9 @@ export function ProductRow({ eyebrow, title, subtitle, products, viewAllLink = '
               <div className={styles.cardImageArea}>
                 {product.badge && (
                   <span className={`${styles.cardBadge} ${
-                    product.badge === 'Popular' || product.badge === 'Best Seller' ? styles.badgeGreen : 
+                    product.badge === 'Popular' || product.badge === 'Organic' ? styles.badgeGreen : 
                     product.badge === 'New' ? styles.badgeBrown : 
-                    product.badge === 'Sale' || product.badge.includes('%') ? styles.badgeRed : styles.badgeGreen
+                    product.badge === 'Sale' ? styles.badgeRed : styles.badgeGreen
                   }`}>
                     {product.badge === 'Popular' ? 'BEST SELLER' : product.badge === 'New' ? 'NEW ARRIVAL' : product.badge === 'Sale' ? 'SALE 15% OFF' : product.badge.toUpperCase()}
                   </span>
@@ -92,7 +92,7 @@ export function ProductRow({ eyebrow, title, subtitle, products, viewAllLink = '
                     alt={product.name}
                     fill
                     className={styles.cardImage}
-                    style={{ objectFit: 'contain' }}
+                    style={{ objectFit: 'cover' }}
                   />
                 </Link>
               </div>
@@ -124,7 +124,7 @@ export function ProductRow({ eyebrow, title, subtitle, products, viewAllLink = '
                   
                   <button 
                     className={`${styles.addToCartBtn} ${
-                      product.badge === 'Popular' || product.badge === 'Best Seller' ? styles.cartBtnGreen : 
+                      product.badge === 'Popular' || product.badge === 'Organic' ? styles.cartBtnGreen : 
                       product.badge === 'New' ? styles.cartBtnBrown : 
                       product.badge === 'Sale' ? styles.cartBtnRed : styles.cartBtnGreen
                     }`}

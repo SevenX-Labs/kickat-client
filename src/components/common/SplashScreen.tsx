@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import styles from "./SplashScreen.module.css";
 
 export function SplashScreen() {
@@ -12,9 +12,20 @@ export function SplashScreen() {
     // Check if the splash screen has already been shown in this session
     const hasShown = sessionStorage.getItem("splashShown");
     if (hasShown) {
-      setShowSplash(false);
+      setTimeout(() => setShowSplash(false), 0);
     }
   }, []);
+
+  const handleVideoEnd = useCallback(() => {
+    if (isFading) return;
+    setIsFading(true);
+    
+    // Wait for fade out animation before completely hiding
+    setTimeout(() => {
+      setShowSplash(false);
+      sessionStorage.setItem("splashShown", "true");
+    }, 400); // matches the transition duration in css
+  }, [isFading]);
 
   useEffect(() => {
     // Ultimate fallback in case the video fails to load or play
@@ -25,18 +36,7 @@ export function SplashScreen() {
       }, 15000); // 15 seconds absolute max (video is 10.3s long)
     }
     return () => clearTimeout(timeout);
-  }, [showSplash, isFading]);
-
-  const handleVideoEnd = () => {
-    if (isFading) return;
-    setIsFading(true);
-    
-    // Wait for fade out animation before completely hiding
-    setTimeout(() => {
-      setShowSplash(false);
-      sessionStorage.setItem("splashShown", "true");
-    }, 400); // matches the transition duration in css
-  };
+  }, [showSplash, isFading, handleVideoEnd]);
 
   if (!showSplash) return null;
 

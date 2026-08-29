@@ -115,7 +115,8 @@
   align-items: center;
   justify-content: center;
   background-color: #F8F5F0;
-  padding: 1.5rem;
+  padding: 0;
+  overflow: hidden;
 }
 
 .cardImageLink {
