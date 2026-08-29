@@ -5,6 +5,7 @@ import { ShopByCategory } from "@/components/common/ShopByCategory";
 import { ProductRow } from "@/components/common/ProductRow";
 import { CATALOG_PRODUCTS } from '@/data/categoryData';
 import { CustomerReviews } from "@/components/common/CustomerReviews";
+import { FAQ } from "@/components/common/FAQ";
 import { InstagramFeed } from "@/components/common/InstagramFeed";
 import { Footer } from "@/components/common/Footer";
 
@@ -33,6 +34,7 @@ export default function Home() {
           backgroundColor="white" 
         />
         <CustomerReviews />
+        <FAQ />
         <InstagramFeed />
       </main>
       <Footer />

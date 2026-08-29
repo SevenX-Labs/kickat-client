@@ -1,0 +1,122 @@
+.section {
+  padding: 6rem 2rem;
+  background-color: #FDFBF7;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  max-width: 760px; /* Slightly narrower for better reading length */
+  width: 100%;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 5rem;
+}
+
+.eyebrow {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #E7A03B;
+  margin-bottom: 1rem;
+}
+
+.title {
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-weight: 800;
+  color: #211C15;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.titleAccent {
+  font-style: italic;
+  font-weight: 600;
+  color: #E7A03B;
+}
+
+.accordion {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid rgba(33, 28, 21, 0.08);
+}
+
+.faqItem {
+  border-bottom: 1px solid rgba(33, 28, 21, 0.08);
+  overflow: hidden;
+}
+
+.questionBtn {
+  width: 100%;
+  text-align: left;
+  padding: 1.75rem 0;
+  background: transparent;
+  border: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #211C15;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.faqItem:hover .questionBtn {
+  color: #E7A03B;
+  padding-left: 0.5rem; /* Subtle indent on hover */
+}
+
+.faqItem.active .questionBtn {
+  color: #E7A03B;
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8C867F;
+  flex-shrink: 0;
+  margin-left: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.faqItem:hover .iconWrapper {
+  color: #E7A03B;
+}
+
+.faqItem.active .iconWrapper {
+  color: #E7A03B;
+  transform: rotate(45deg);
+}
+
+.answerWrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.faqItem.active .answerWrapper {
+  grid-template-rows: 1fr;
+}
+
+.answerInner {
+  overflow: hidden;
+}
+
+.answer {
+  padding: 0 0 2rem 0;
+  color: #6B655C;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.answer p {
+  margin: 0;
+}
+

@@ -118,7 +118,7 @@ export function Navbar() {
               </div>
             ))}
             
-            <Link href="/#reviews" className={styles.navItem}>
+            <Link href="/testimonials" className={styles.navItem}>
               Testimonial
             </Link>
             <Link href="/blogs" className={styles.navItem}>
