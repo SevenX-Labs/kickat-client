@@ -81,7 +81,7 @@ export function Footer() {
             <h4 className={styles.colTitle}>Support</h4>
             <Link href="/faq" className={styles.link}>FAQ</Link>
             <Link href="/shipping" className={styles.link}>Shipping & Returns</Link>
-            <Link href="/track" className={styles.link}>Track Order</Link>
+            <Link href="/orders" className={styles.link}>Track Order</Link>
             <Link href="/contact" className={styles.link}>Contact Us</Link>
           </div>
 
