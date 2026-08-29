@@ -1,0 +1,246 @@
+.main {
+  min-height: 80vh;
+  padding: 4rem 2rem 6rem;
+  background-color: #FDFBF7;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.titleWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.title {
+  font-family: var(--font-fraunces), serif;
+  font-size: 3rem;
+  font-weight: 700;
+  color: #111;
+  line-height: 1.1;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: #8C8984;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 2rem;
+}
+
+.productCard {
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #F8F5EF 0%, #FAF8F4 100%);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(224, 220, 210, 0.5);
+  height: 100%;
+}
+
+.productCard:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+}
+
+.cardImageArea {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 0.8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  background-color: #fff;
+}
+
+.cardImageLink {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.cardImage {
+  padding: 1rem;
+  transition: transform 0.4s ease;
+}
+
+.productCard:hover .cardImage {
+  transform: scale(1.06);
+}
+
+.cardRemoveBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: all 0.2s ease;
+  color: #D32F2F;
+}
+
+.cardRemoveBtn:hover {
+  background-color: #FEEEEE;
+  color: #B71C1C;
+  transform: scale(1.1);
+}
+
+.cardInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1.25rem;
+  background-color: #fff;
+  flex: 1;
+  border-top: 1px solid rgba(224, 220, 210, 0.3);
+}
+
+.cardTitleLink {
+  text-decoration: none;
+  color: inherit;
+}
+
+.cardTitle {
+  font-family: var(--font-fraunces), serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cardRatingRow {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.15rem;
+}
+
+.cardRatingText {
+  font-size: 0.8rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.cardBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+
+.cardPrice {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.addToCartBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  background-color: #26211F;
+  color: #fff;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.addToCartBtn:hover {
+  background-color: #E7A03B;
+  box-shadow: 0 4px 14px rgba(231, 160, 59, 0.35);
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 2rem;
+  text-align: center;
+  background-color: #fff;
+  border-radius: 24px;
+  border: 1px dashed rgba(224, 220, 210, 1);
+}
+
+.emptyIcon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #FBF7EE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #E7A03B;
+  margin-bottom: 1.5rem;
+}
+
+.emptyTitle {
+  font-family: var(--font-fraunces), serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 1rem;
+}
+
+.emptyDesc {
+  color: #8C8984;
+  margin-bottom: 2rem;
+  max-width: 400px;
+  line-height: 1.6;
+}
+
+.shopBtn {
+  padding: 0.8rem 2rem;
+  background-color: #26211F;
+  color: #fff;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.shopBtn:hover {
+  background-color: #E7A03B;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(231, 160, 59, 0.25);
+}
+
+@media (max-width: 768px) {
+  .title { font-size: 2.2rem; }
+  .grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+}
+
+@media (max-width: 480px) {
+  .grid { grid-template-columns: 1fr; }
+}

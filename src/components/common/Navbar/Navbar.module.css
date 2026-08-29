@@ -262,15 +262,28 @@
   text-shadow: 0 1px 4px rgba(0,0,0,0.5);
 }
 
-.sparkle {
+.itemContent {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.itemIcon {
+  color: #E7A03B;
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
+.separatorIcon {
   color: #E7A03B;
   margin: 0 4.5rem;
   opacity: 0.9;
   filter: drop-shadow(0 0 6px rgba(231, 160, 59, 0.4));
-  animation: pulseSparkle 2s ease-in-out infinite;
+  animation: pulseStar 2s ease-in-out infinite;
+  flex-shrink: 0;
 }
 
-@keyframes pulseSparkle {
+@keyframes pulseStar {
   0%, 100% { opacity: 0.6; transform: scale(0.9); }
   50% { opacity: 1; transform: scale(1.15); filter: drop-shadow(0 0 10px rgba(231, 160, 59, 0.7)); }
 }

@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronDown, Search, Heart, User, ShoppingBag, Package, Tag, CreditCard, MapPin, Bell, LogOut, Sparkles } from "lucide-react";
+import { ChevronDown, Search, Heart, User, ShoppingBag, Package, Tag, CreditCard, MapPin, Bell, LogOut, Star, Truck, Percent, Crown } from "lucide-react";
 import styles from "./Navbar.module.css";
 
 const taxonomy = {
@@ -46,9 +46,9 @@ const taxonomy = {
 
 export function Navbar() {
   const items = [
-    "Free Delivery on orders over $50",
-    "Get 20% off your first purchase",
-    "Premium pet accessories",
+    { text: "Free Delivery on orders over $50", Icon: Truck },
+    { text: "Get 20% off your first purchase", Icon: Percent },
+    { text: "Premium pet accessories", Icon: Crown },
   ];
   // Duplicate to ensure the marquee fills wide screens
   const duplicatedItems = [...items, ...items, ...items, ...items];
@@ -59,18 +59,24 @@ export function Navbar() {
       <div className={styles.announcementBar}>
         <div className={styles.marquee}>
           <div className={styles.marqueeContent}>
-            {duplicatedItems.map((text, idx) => (
+            {duplicatedItems.map((item, idx) => (
               <span key={`first-${idx}`} className={styles.marqueeItem}>
-                {text}
-                <Sparkles className={styles.sparkle} size={14} strokeWidth={1.5} />
+                <span className={styles.itemContent}>
+                  <item.Icon className={styles.itemIcon} size={15} strokeWidth={2} />
+                  {item.text}
+                </span>
+                <Star className={styles.separatorIcon} size={14} strokeWidth={1.5} />
               </span>
             ))}
           </div>
           <div aria-hidden="true" className={styles.marqueeContent}>
-            {duplicatedItems.map((text, idx) => (
+            {duplicatedItems.map((item, idx) => (
               <span key={`second-${idx}`} className={styles.marqueeItem}>
-                {text}
-                <Sparkles className={styles.sparkle} size={14} strokeWidth={1.5} />
+                <span className={styles.itemContent}>
+                  <item.Icon className={styles.itemIcon} size={15} strokeWidth={2} />
+                  {item.text}
+                </span>
+                <Star className={styles.separatorIcon} size={14} strokeWidth={1.5} />
               </span>
             ))}
           </div>
