@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { Star, Bone, PawPrint, Fish } from 'lucide-react';
+import { Star, Bone, PawPrint, Fish, ArrowRight } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
 
 import { Suspense } from 'react';
@@ -46,10 +46,12 @@ export function Hero() {
           
           <div className={styles.actions}>
             <Link href="/shop/dogs" className={styles.primaryBtn}>
-              Shop Dog
+              <span className={styles.btnText}>Shop Dog</span>
+              <ArrowRight className={styles.btnIcon} size={18} />
             </Link>
             <Link href="/shop/cats" className={styles.secondaryBtn}>
-              Shop Cat
+              <span className={styles.btnText}>Shop Cat</span>
+              <ArrowRight className={styles.btnIcon} size={18} />
             </Link>
           </div>
           

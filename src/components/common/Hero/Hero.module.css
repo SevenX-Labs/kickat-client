@@ -148,55 +148,139 @@
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 1.5rem;
   align-items: center;
   margin-bottom: 2.5rem;
 }
 
-.primaryBtn {
+.primaryBtn, .secondaryBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 1.05rem 2.75rem;
+  gap: 0.6rem;
+  padding: 1.125rem 2.5rem;
   border-radius: 9999px;
-  background: linear-gradient(135deg, #F5821F 0%, #E86F0A 100%);
-  color: #fff;
   font-weight: 600;
   font-size: 1rem;
   text-decoration: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: none;
-  box-shadow: 0 4px 14px rgba(245, 130, 31, 0.3);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.primaryBtn {
+  background: linear-gradient(45deg, #F5821F, #E86F0A, #F5821F, #FF9A44);
+  background-size: 300% 300%;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 14px rgba(245, 130, 31, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+  animation: gradientLiquid 6s ease infinite;
+}
+
+@keyframes gradientLiquid {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.primaryBtn::after, .secondaryBtn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 50%;
+  height: 100%;
+  transform: skewX(-25deg);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.primaryBtn::after {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0) 100%);
+  animation: shimmerSweep 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: 1s;
+}
+
+.secondaryBtn::after {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0) 100%);
+  animation: shimmerSweep 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: 2.5s;
+}
+
+@keyframes shimmerSweep {
+  0% { left: -150%; }
+  30% { left: 200%; }
+  100% { left: 200%; }
+}
+
+.primaryBtn::before, .secondaryBtn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.primaryBtn::before {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%);
+}
+
+.secondaryBtn::before {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
+}
+
+.primaryBtn:hover, .secondaryBtn:hover {
+  transform: translateY(-4px) scale(1.02);
 }
 
 .primaryBtn:hover {
-  background: linear-gradient(135deg, #E86F0A 0%, #D4600A 100%);
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(245, 130, 31, 0.35);
+  box-shadow: 0 15px 30px rgba(245, 130, 31, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.6);
+}
+
+.primaryBtn:hover::before, .secondaryBtn:hover::before {
+  opacity: 1;
+}
+
+.primaryBtn:active, .secondaryBtn:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+.primaryBtn:active {
+  box-shadow: 0 6px 12px rgba(245, 130, 31, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 .secondaryBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.05rem 2.75rem;
-  border-radius: 9999px;
   background-color: #26211F;
   color: #ffffff;
-  font-weight: 600;
-  font-size: 1rem;
-  text-decoration: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1.5px solid #26211F;
-  box-shadow: 0 4px 14px rgba(38, 33, 31, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 14px rgba(38, 33, 31, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.15);
 }
 
 .secondaryBtn:hover {
-  background-color: #3a3330;
-  border-color: #3a3330;
-  color: #ffffff;
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(38, 33, 31, 0.25);
+  background-color: #1a1615;
+  box-shadow: 0 15px 30px rgba(38, 33, 31, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.secondaryBtn:active {
+  box-shadow: 0 6px 12px rgba(38, 33, 31, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.btnText {
+  position: relative;
+  z-index: 1;
+}
+
+.btnIcon {
+  position: relative;
+  z-index: 1;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.primaryBtn:hover .btnIcon,
+.secondaryBtn:hover .btnIcon {
+  transform: translateX(4px);
 }
 
 .trustBar {
