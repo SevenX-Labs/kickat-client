@@ -6,9 +6,10 @@ import { useGLTF, PresentationControls, Environment, Float, ContactShadows } fro
 import * as THREE from 'three';
 
 // Preload both models for faster rendering
-useGLTF.preload("/cat shampoo bottle 3d model.glb");
-useGLTF.preload("/dog shampoo bottle 3d model.glb");
-useGLTF.preload("/red seed feeder 3d model.glb");
+useGLTF.preload("/cat-shampoo-bottle-3d-model.glb");
+useGLTF.preload("/dog-shampoo-bottle-3d-model.glb");
+useGLTF.preload("/red-seed-feeder-3d-model.glb");
+useGLTF.preload("/aquarium-filter-3d-model.glb");
 
 // Animated wrapper for a single bottle
 function AnimatedBottle({ 
@@ -78,12 +79,13 @@ function AnimatedBottle({
 }
 
 export function BottleModel() {
-  const { scene: catScene } = useGLTF("/cat shampoo bottle 3d model.glb");
-  const { scene: dogScene } = useGLTF("/dog shampoo bottle 3d model.glb");
-  const { scene: birdScene } = useGLTF("/red seed feeder 3d model.glb");
+  const { scene: catScene } = useGLTF("/cat-shampoo-bottle-3d-model.glb");
+  const { scene: dogScene } = useGLTF("/dog-shampoo-bottle-3d-model.glb");
+  const { scene: birdScene } = useGLTF("/red-seed-feeder-3d-model.glb");
+  const { scene: filterScene } = useGLTF("/aquarium-filter-3d-model.glb");
   
-  const [activeModel, setActiveModel] = useState<'cat' | 'dog' | 'bird'>('cat');
-  const models = ['cat', 'dog', 'bird'];
+  const [activeModel, setActiveModel] = useState<'cat' | 'dog' | 'bird' | 'filter'>('cat');
+  const models = ['cat', 'dog', 'bird', 'filter'];
 
   // Auto-switch models every 6 seconds
   useEffect(() => {
@@ -91,6 +93,7 @@ export function BottleModel() {
       setActiveModel(prev => {
         if (prev === 'cat') return 'dog';
         if (prev === 'dog') return 'bird';
+        if (prev === 'bird') return 'filter';
         return 'cat';
       });
     }, 5000); // 5 seconds for snappier experience
@@ -117,6 +120,7 @@ export function BottleModel() {
         <AnimatedBottle scene={catScene} state={getState('cat')} baseScale={5.7} baseY={-3.2} />
         <AnimatedBottle scene={dogScene} state={getState('dog')} baseScale={6.2} baseY={-3.2} />
         <AnimatedBottle scene={birdScene} state={getState('bird')} baseScale={5.5} baseY={-2.6} modelRotationOffset={Math.PI} />
+        <AnimatedBottle scene={filterScene} state={getState('filter')} baseScale={5.0} baseY={-2.6} />
       </Float>
         
       {/* Realistic contact shadow under the bottle - baked for performance */}

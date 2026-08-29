@@ -224,17 +224,17 @@
 }
 
 .announcementBar {
-  background-color: #E7A03B;
-  color: #211C15;
-  padding: 0.75rem 0;
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
+  background: linear-gradient(90deg, #111111, #1a1a1a, #111111);
+  color: #F8F5F0;
+  padding: 0.65rem 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   overflow: hidden;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid rgba(33, 28, 21, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .marquee {
@@ -259,13 +259,20 @@
   display: flex;
   align-items: center;
   white-space: nowrap;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
 }
 
-.dot {
-  color: rgba(33, 28, 21, 0.4);
-  margin: 0 4rem;
-  font-size: 1.2rem;
-  line-height: 0;
+.sparkle {
+  color: #E7A03B;
+  margin: 0 4.5rem;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 6px rgba(231, 160, 59, 0.4));
+  animation: pulseSparkle 2s ease-in-out infinite;
+}
+
+@keyframes pulseSparkle {
+  0%, 100% { opacity: 0.6; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.15); filter: drop-shadow(0 0 10px rgba(231, 160, 59, 0.7)); }
 }
 
 @keyframes scroll {

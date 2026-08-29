@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronDown, Search, Heart, User, ShoppingBag, Package, Tag, CreditCard, MapPin, Bell, LogOut } from "lucide-react";
+import { ChevronDown, Search, Heart, User, ShoppingBag, Package, Tag, CreditCard, MapPin, Bell, LogOut, Sparkles } from "lucide-react";
 import styles from "./Navbar.module.css";
 
 const taxonomy = {
@@ -62,7 +62,7 @@ export function Navbar() {
             {duplicatedItems.map((text, idx) => (
               <span key={`first-${idx}`} className={styles.marqueeItem}>
                 {text}
-                <span className={styles.dot}>•</span>
+                <Sparkles className={styles.sparkle} size={14} strokeWidth={1.5} />
               </span>
             ))}
           </div>
@@ -70,7 +70,7 @@ export function Navbar() {
             {duplicatedItems.map((text, idx) => (
               <span key={`second-${idx}`} className={styles.marqueeItem}>
                 {text}
-                <span className={styles.dot}>•</span>
+                <Sparkles className={styles.sparkle} size={14} strokeWidth={1.5} />
               </span>
             ))}
           </div>
