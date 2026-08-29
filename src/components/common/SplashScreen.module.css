@@ -1,15 +1,12 @@
 .splashContainer {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: #FEFCF8; /* KickAt off-white brand background */
+  inset: 0;
+  background-color: #FEFCF8;
   z-index: 99999;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.4s;
+  transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.6s;
   opacity: 1;
   visibility: visible;
 }
@@ -20,19 +17,69 @@
   pointer-events: none;
 }
 
-.videoWrapper {
-  width: 100%;
-  max-width: 600px; /* Adjust based on video aspect ratio */
+.loaderContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.logoWrapper {
+  position: relative;
+  width: 240px;
+  height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  animation: logoFloat 2.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
 }
 
-.video {
+.actualLogo {
   width: 100%;
   height: auto;
   object-fit: contain;
-  pointer-events: none;
-  mix-blend-mode: multiply; /* Seamlessly blends the video's white background with our cream background */
+  filter: drop-shadow(0px 10px 20px rgba(245, 130, 31, 0.25));
+  animation: logoReveal 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  opacity: 0;
+  transform: scale(0.9) translateY(10px);
+}
+
+@keyframes logoReveal {
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes logoFloat {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+
+.iconRow {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.petIcon {
+  color: #1A2E26;
+  width: 28px;
+  height: 28px;
+  animation: bounceWave 1.5s ease-in-out infinite;
+  opacity: 0.8;
+}
+
+.petIcon:nth-child(1) { animation-delay: 0s; color: #F5821F; }
+.petIcon:nth-child(2) { animation-delay: 0.15s; color: #E7A03B; }
+.petIcon:nth-child(3) { animation-delay: 0.3s; color: #333F2B; }
+.petIcon:nth-child(4) { animation-delay: 0.45s; color: #1A2E26; }
+.petIcon:nth-child(5) { animation-delay: 0.6s; color: #F5821F; }
+
+@keyframes bounceWave {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.7; }
+  50% { transform: translateY(-12px) scale(1.15); opacity: 1; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1)); }
 }

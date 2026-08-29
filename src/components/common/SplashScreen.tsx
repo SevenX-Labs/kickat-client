@@ -1,58 +1,48 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { Dog, Cat, Bone, Fish, Bird } from "lucide-react";
 import styles from "./SplashScreen.module.css";
 
 export function SplashScreen() {
   const [showSplash, setShowSplash] = useState(true);
   const [isFading, setIsFading] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    // Check if the splash screen has already been shown in this session
-    const hasShown = sessionStorage.getItem("splashShown");
-    if (hasShown) {
-      setTimeout(() => setShowSplash(false), 0);
-    }
+    // Show the premium loader on every refresh for a brief, satisfying moment
+    const timer = setTimeout(() => {
+      setIsFading(true);
+      setTimeout(() => setShowSplash(false), 600); // Matches CSS transition duration
+    }, 2500); // 2.5s loading animation to appreciate the icons
+
+    return () => clearTimeout(timer);
   }, []);
-
-  const handleVideoEnd = useCallback(() => {
-    if (isFading) return;
-    setIsFading(true);
-    
-    // Wait for fade out animation before completely hiding
-    setTimeout(() => {
-      setShowSplash(false);
-      sessionStorage.setItem("splashShown", "true");
-    }, 400); // matches the transition duration in css
-  }, [isFading]);
-
-  useEffect(() => {
-    // Ultimate fallback in case the video fails to load or play
-    let timeout: NodeJS.Timeout;
-    if (showSplash && !isFading) {
-      timeout = setTimeout(() => {
-        handleVideoEnd();
-      }, 15000); // 15 seconds absolute max (video is 10.3s long)
-    }
-    return () => clearTimeout(timeout);
-  }, [showSplash, isFading, handleVideoEnd]);
 
   if (!showSplash) return null;
 
   return (
     <div className={`${styles.splashContainer} ${isFading ? styles.fadeOut : ''}`}>
-      <div className={styles.videoWrapper}>
-        <video
-          ref={videoRef}
-          src="/kickat-logo-animation.mp4"
-          autoPlay
-          muted
-          playsInline
-          onEnded={handleVideoEnd}
-          onError={handleVideoEnd}
-          className={styles.video}
-        />
+      <div className={styles.loaderContent}>
+        <div className={styles.logoWrapper}>
+          <Image
+            src="/logo-clean.png"
+            alt="KickAt Logo"
+            width={240}
+            height={240}
+            className={styles.actualLogo}
+            priority
+          />
+        </div>
+        
+        {/* Premium Pet Icons Wave */}
+        <div className={styles.iconRow}>
+          <Dog strokeWidth={1.5} className={styles.petIcon} />
+          <Cat strokeWidth={1.5} className={styles.petIcon} />
+          <Bone strokeWidth={1.5} className={styles.petIcon} />
+          <Fish strokeWidth={1.5} className={styles.petIcon} />
+          <Bird strokeWidth={1.5} className={styles.petIcon} />
+        </div>
       </div>
     </div>
   );
