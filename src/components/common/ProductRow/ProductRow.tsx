@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Heart, ArrowRight, Star, ShoppingCart } from 'lucide-react';
+import { Heart, ArrowRight, Star, ShoppingCart, PawPrint } from 'lucide-react';
 import styles from './ProductRow.module.css';
 
 import { CatalogProduct } from '@/data/categoryData';
@@ -12,6 +12,7 @@ type Product = CatalogProduct;
 export interface ProductRowProps {
   eyebrow: string;
   title: string;
+  subtitle?: string;
   products: Product[];
   viewAllLink?: string;
   backgroundColor?: 'cream' | 'white';
@@ -33,7 +34,7 @@ function getDescription(product: Product): string {
   return productDescriptions[product.id] || product.tags?.slice(0, 2).join(' · ') || 'Premium quality pet essential.';
 }
 
-export function ProductRow({ eyebrow, title, products, viewAllLink = '/shop', backgroundColor = 'cream' }: ProductRowProps) {
+export function ProductRow({ eyebrow, title, subtitle, products, viewAllLink = '/shop', backgroundColor = 'cream' }: ProductRowProps) {
   const displayProducts = products.slice(0, 4);
   const bgClass = backgroundColor === 'white' ? styles.bgWhite : styles.bgCream;
 
@@ -42,11 +43,18 @@ export function ProductRow({ eyebrow, title, products, viewAllLink = '/shop', ba
       <div className={styles.container}>
         <div className={styles.header}>
           <div className={styles.headerLeft}>
-            <span className={styles.eyebrow}>{eyebrow}</span>
+            <div className={styles.eyebrowWrapper}>
+              {eyebrow.toUpperCase().includes('CROWD') && <PawPrint size={14} fill="currentColor" strokeWidth={0} />}
+              <span className={styles.eyebrow}>{eyebrow}</span>
+            </div>
             <h2 className={styles.title}>{title}</h2>
+            {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+            {!subtitle && eyebrow.toUpperCase().includes('CROWD') && (
+              <p className={styles.subtitle}>Handpicked essentials that pets love and pet parents trust.</p>
+            )}
           </div>
-          <Link href={viewAllLink} className={styles.viewAllLink}>
-            View All <ArrowRight size={18} />
+          <Link href={viewAllLink} className={styles.viewAllBtn}>
+            View All Products <ArrowRight size={16} />
           </Link>
         </div>
 
@@ -60,8 +68,12 @@ export function ProductRow({ eyebrow, title, products, viewAllLink = '/shop', ba
               {/* Image area */}
               <div className={styles.cardImageArea}>
                 {product.badge && (
-                  <span className={styles.cardBadge}>
-                    {product.badge === 'Popular' ? 'Best Seller' : product.badge}
+                  <span className={`${styles.cardBadge} ${
+                    product.badge === 'Popular' || product.badge === 'Best Seller' ? styles.badgeGreen : 
+                    product.badge === 'New' ? styles.badgeBrown : 
+                    product.badge === 'Sale' || product.badge.includes('%') ? styles.badgeRed : styles.badgeGreen
+                  }`}>
+                    {product.badge === 'Popular' ? 'BEST SELLER' : product.badge === 'New' ? 'NEW ARRIVAL' : product.badge === 'Sale' ? 'SALE 15% OFF' : product.badge.toUpperCase()}
                   </span>
                 )}
                 <button 
@@ -72,7 +84,7 @@ export function ProductRow({ eyebrow, title, products, viewAllLink = '/shop', ba
                     e.stopPropagation();
                   }}
                 >
-                  <Heart size={18} color="#8C8984" strokeWidth={1.5} />
+                  <Heart size={16} color="#666" strokeWidth={1.5} />
                 </button>
                 <Link href={`/product/${product.id}`} className={styles.cardImageLink}>
                   <Image
@@ -83,12 +95,6 @@ export function ProductRow({ eyebrow, title, products, viewAllLink = '/shop', ba
                     style={{ objectFit: 'contain' }}
                   />
                 </Link>
-                {/* Dot indicators */}
-                <div className={styles.cardDots}>
-                  <span className={`${styles.dot} ${styles.dotActive}`} />
-                  <span className={styles.dot} />
-                  <span className={styles.dot} />
-                </div>
               </div>
 
               {/* Info area */}
@@ -97,21 +103,38 @@ export function ProductRow({ eyebrow, title, products, viewAllLink = '/shop', ba
                   <h3 className={styles.cardTitle}>{product.name}</h3>
                 </Link>
                 <p className={styles.cardDescription}>{description}</p>
+                
                 <div className={styles.cardRatingRow}>
                   <Star size={13} fill="#E7A03B" color="#E7A03B" strokeWidth={0} />
                   <span className={styles.cardRatingText}>{rating} ({reviewsCount})</span>
+                  <span className={styles.ratingDivider}>|</span>
+                  <span className={styles.happyParentsText}>2.2K+ Happy Parents</span>
                 </div>
+                
                 <div className={styles.cardBottom}>
-                  <span className={styles.cardPrice}>₹{product.price.toLocaleString()}</span>
+                  <div className={styles.priceContainer}>
+                    <span className={styles.cardPrice}>₹{product.price.toLocaleString()}</span>
+                    {product.originalPrice && (
+                      <>
+                        <span className={styles.originalPrice}>₹{product.originalPrice.toLocaleString()}</span>
+                        {product.badge === 'Sale' && <span className={styles.discountTag}>15% OFF</span>}
+                      </>
+                    )}
+                  </div>
+                  
                   <button 
-                    className={styles.addToCartBtn}
+                    className={`${styles.addToCartBtn} ${
+                      product.badge === 'Popular' || product.badge === 'Best Seller' ? styles.cartBtnGreen : 
+                      product.badge === 'New' ? styles.cartBtnBrown : 
+                      product.badge === 'Sale' ? styles.cartBtnRed : styles.cartBtnGreen
+                    }`}
                     aria-label="Add to cart"
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
                     }}
                   >
-                    <ShoppingCart size={16} strokeWidth={1.5} />
+                    <ShoppingCart size={16} color="#fff" strokeWidth={1.5} />
                   </button>
                 </div>
               </div>

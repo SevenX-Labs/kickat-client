@@ -24,37 +24,57 @@
 .headerLeft {
   display: flex;
   flex-direction: column;
+  gap: 0.8rem;
+}
+
+.eyebrowWrapper {
+  display: flex;
+  align-items: center;
   gap: 0.5rem;
+  color: #927038;
 }
 
 .eyebrow {
   font-family: var(--font-ibm-plex-mono), monospace;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #E7A03B;
-  font-weight: 600;
+  letter-spacing: 0.1em;
+  font-weight: 700;
 }
 
 .title {
   font-family: var(--font-fraunces), serif;
-  font-size: 2.5rem;
+  font-size: 3.5rem;
   font-weight: 700;
-  color: #111;
+  color: #1A2E26;
   line-height: 1.1;
+  letter-spacing: -0.02em;
 }
 
-.viewAllLink {
+.subtitle {
+  font-size: 1rem;
+  color: #555;
+  margin-top: 0.2rem;
+}
+
+.viewAllBtn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-weight: 600;
-  color: #111;
+  color: #B55F37;
   text-decoration: none;
-  transition: color 0.2s ease;
+  border: 1px solid rgba(181, 95, 55, 0.3);
+  padding: 0.6rem 1.25rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
 }
 
-.viewAllLink:hover { color: #E7A03B; }
+.viewAllBtn:hover { 
+  background-color: rgba(181, 95, 55, 0.05);
+  border-color: #B55F37;
+}
 
 /* ── Grid ── */
 .grid {
@@ -69,31 +89,33 @@
 .productCard {
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, #F8F5EF 0%, #FAF8F4 100%);
-  border-radius: 16px;
+  background: #fff;
+  border-radius: 20px;
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border: 1px solid rgba(224, 220, 210, 0.5);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+  border: none;
   height: 100%;
-  max-width: 260px;
+  max-width: 270px;
   margin: 0 auto;
   width: 100%;
 }
 
 .productCard:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
 }
 
 /* ── Image area ── */
 .cardImageArea {
   position: relative;
   width: 100%;
-  aspect-ratio: 1 / 0.75;
+  aspect-ratio: 1 / 0.8;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.75rem;
+  background-color: #F8F5F0;
+  padding: 1.5rem;
 }
 
 .cardImageLink {
@@ -104,7 +126,7 @@
 }
 
 .cardImage {
-  padding: 1rem;
+  padding: 0;
   transition: transform 0.4s ease;
 }
 
@@ -117,40 +139,41 @@
   position: absolute;
   top: 16px;
   left: 16px;
-  padding: 0.3rem 0.8rem;
-  border-radius: 6px;
-  background-color: #4A6741;
+  padding: 0.35rem 0.65rem;
+  border-radius: 4px;
   color: white;
-  font-family: var(--font-ibm-plex-mono), monospace;
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.05em;
   z-index: 2;
 }
+
+.badgeGreen { background-color: #2D4C3A; }
+.badgeBrown { background-color: #A37E3B; }
+.badgeRed { background-color: #C34A42; }
 
 /* ── Wishlist button ── */
 .cardWishlistBtn {
   position: absolute;
   top: 16px;
   right: 16px;
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(4px);
-  border: none;
+  background-color: #fff;
+  border: 1px solid rgba(0,0,0,0.05);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   z-index: 2;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 .cardWishlistBtn:hover {
-  background-color: #fff;
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
 .cardWishlistBtn:hover svg {
@@ -158,35 +181,11 @@
   fill: #E7A03B;
 }
 
-/* ── Dot indicators ── */
-.cardDots {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 6px;
-  z-index: 2;
-}
-
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: rgba(140, 137, 132, 0.3);
-  transition: background-color 0.2s ease;
-}
-
-.dotActive {
-  background-color: #8C8984;
-}
-
 /* ── Info area ── */
 .cardInfo {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
-  padding: 1rem 1.15rem 1.25rem;
+  padding: 1.25rem;
   background-color: #fff;
   flex: 1;
 }
@@ -198,10 +197,10 @@
 
 .cardTitle {
   font-family: var(--font-fraunces), serif;
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   font-weight: 600;
-  color: #1a1a1a;
-  line-height: 1.35;
+  color: #1A2E26;
+  line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
@@ -209,27 +208,36 @@
 }
 
 .cardDescription {
-  font-size: 0.82rem;
-  color: #8C8984;
-  line-height: 1.5;
+  font-size: 0.8rem;
+  color: #666;
+  margin: 0.4rem 0 0.8rem;
+  line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  margin: 0;
 }
 
 .cardRatingRow {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  margin-top: 0.15rem;
+  gap: 0.4rem;
 }
 
 .cardRatingText {
-  font-size: 0.8rem;
-  color: #666;
+  font-size: 0.75rem;
+  color: #555;
   font-weight: 500;
+}
+
+.ratingDivider {
+  color: #ddd;
+  font-size: 0.75rem;
+}
+
+.happyParentsText {
+  font-size: 0.75rem;
+  color: #888;
 }
 
 /* ── Bottom: price + add to cart ── */
@@ -237,22 +245,41 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 0.5rem;
+  margin-top: 1rem;
+}
+
+.priceContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .cardPrice {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #111;
   letter-spacing: -0.01em;
 }
 
+.originalPrice {
+  font-size: 0.85rem;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.discountTag {
+  background-color: rgba(195, 74, 66, 0.1);
+  color: #C34A42;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+}
+
 .addToCartBtn {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  background-color: #26211F;
-  color: #fff;
   border: none;
   display: flex;
   align-items: center;
@@ -263,10 +290,12 @@
 }
 
 .addToCartBtn:hover {
-  background-color: #E7A03B;
-  transform: scale(1.1);
-  box-shadow: 0 4px 14px rgba(231, 160, 59, 0.35);
+  transform: scale(1.08);
 }
+
+.cartBtnGreen { background-color: #1A2E26; }
+.cartBtnBrown { background-color: #9B7640; }
+.cartBtnRed { background-color: #B23D35; }
 
 /* ── Responsive ── */
 @media (max-width: 1024px) {
