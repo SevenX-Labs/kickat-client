@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import styles from './Cart.module.css';
 import { RelatedProducts } from '@/components/shop/ProductDetail/RelatedProducts';
 import { TrustStrip } from '@/components/common/TrustStrip/TrustStrip';
@@ -28,6 +28,7 @@ const initialCart = [
 ];
 
 export default function CartPage() {
+  const router = useRouter();
   const [cartItems, setCartItems] = useState(initialCart);
 
   const updateQuantity = (id: string, delta: number) => {
@@ -60,9 +61,9 @@ export default function CartPage() {
       {cartItems.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '4rem 0' }}>
           <p style={{ fontSize: '1.2rem', color: '#666', marginBottom: '2rem' }}>Your cart is empty.</p>
-          <Link href="/shop" className={styles.checkoutBtn} style={{ maxWidth: '250px', margin: '0 auto' }}>
+          <button onClick={() => router.push('/shop')} className={styles.checkoutBtn} style={{ maxWidth: '250px', margin: '0 auto', display: 'block' }}>
             Continue Shopping
-          </Link>
+          </button>
         </div>
       ) : (
         <div className={styles.cartLayout}>
@@ -76,9 +77,9 @@ export default function CartPage() {
                 
                 <div className={styles.itemDetails}>
                   <div className={styles.itemHeader}>
-                    <Link href={`/product/${item.id}`} className={styles.itemName}>
+                    <button onClick={() => router.push(`/product/${item.id}`)} className={styles.itemName} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left', font: 'inherit' }}>
                       {item.name}
-                    </Link>
+                    </button>
                     <span className={styles.itemPrice}>₹{(item.price * item.quantity).toLocaleString()}</span>
                   </div>
                   
@@ -136,9 +137,20 @@ export default function CartPage() {
               <span>₹{(subtotal + tax + (isFreeShipping ? 0 : 150)).toLocaleString()}</span>
             </div>
             
-            <Link href="/checkout" className={styles.checkoutBtn}>
+            <button 
+              onClick={() => {
+                const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+                if (!isLoggedIn) {
+                  router.push('/login?redirect=/checkout');
+                } else {
+                  router.push('/checkout');
+                }
+              }} 
+              className={styles.checkoutBtn}
+              style={{ width: '100%' }}
+            >
               Proceed to Checkout
-            </Link>
+            </button>
             
             <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666', fontSize: '0.85rem' }}>
               Secure Encrypted Checkout

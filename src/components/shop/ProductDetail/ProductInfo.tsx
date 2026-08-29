@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Star, Heart, Truck, RefreshCcw, ShieldCheck, Ruler, Share2 } from 'lucide-react';
 import styles from './ProductDetail.module.css';
 import { Product } from './ProductDetail';
@@ -10,6 +11,7 @@ interface ProductInfoProps {
 }
 
 export function ProductInfo({ product }: ProductInfoProps) {
+  const router = useRouter();
   const [selectedColor, setSelectedColor] = useState(product.colors?.[0]?.name || 'Default');
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || 'M');
   const [isAdding, setIsAdding] = useState(false);
@@ -108,6 +110,11 @@ export function ProductInfo({ product }: ProductInfoProps) {
           className={`${styles.addToCartBtn} ${isAdding ? styles.addedToCart : ''}`} 
           onClick={() => {
             if (isAdding) return;
+            const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+            if (!isLoggedIn) {
+              router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+              return;
+            }
             setIsAdding(true);
             setTimeout(() => setIsAdding(false), 2000);
           }}

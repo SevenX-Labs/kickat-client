@@ -1,6 +1,8 @@
 "use client";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ChevronDown, Search, Heart, User, ShoppingBag, Package, Tag, CreditCard, MapPin, Bell, LogOut, Star, Truck, Percent, Crown } from "lucide-react";
 import styles from "./Navbar.module.css";
 
@@ -45,6 +47,25 @@ const taxonomy = {
 };
 
 export function Navbar() {
+  const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    setIsLoggedIn(localStorage.getItem("isLoggedIn") === "true");
+  }, []);
+
+  const handleAccountClick = () => {
+    if (!isLoggedIn) {
+      router.push('/login');
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn");
+    setIsLoggedIn(false);
+    router.push('/');
+  };
+
   const items = [
     { text: "Free Delivery on orders over $50", Icon: Truck },
     { text: "Available on Amazon, Flipkart & Blinkit", Icon: ShoppingBag },
@@ -146,39 +167,41 @@ export function Navbar() {
             </button>
 
             <div className={styles.accountWrapper}>
-              <div className={styles.iconBtn} aria-label="User Account" title="Account" style={{ cursor: 'pointer' }}>
+              <div 
+                className={styles.iconBtn} 
+                aria-label="User Account" 
+                title={isLoggedIn ? "Account" : "Sign In"} 
+                style={{ cursor: 'pointer' }}
+                onClick={handleAccountClick}
+              >
                 <User size={20} strokeWidth={1.75} />
               </div>
               
-              <div className={styles.accountDropdown}>
-                <div className={styles.accountDropdownHeader}>
-                  My Account
+              {isLoggedIn && (
+                <div className={styles.accountDropdown}>
+                  <div className={styles.accountDropdownHeader}>
+                    My Account
+                  </div>
+                  <div className={styles.accountDropdownList}>
+                    <Link href="/account?tab=profile" className={styles.accountDropdownItem}>
+                      <User size={18} strokeWidth={1.5} /> My Profile
+                    </Link>
+                    <Link href="/account?tab=orders" className={styles.accountDropdownItem}>
+                      <Package size={18} strokeWidth={1.5} /> Orders
+                    </Link>
+                    <Link href="/account?tab=addresses" className={styles.accountDropdownItem}>
+                      <MapPin size={18} strokeWidth={1.5} /> Saved Addresses
+                    </Link>
+                    <Link href="/account?tab=wishlist" className={styles.accountDropdownItem}>
+                      <Heart size={18} strokeWidth={1.5} /> Wishlist
+                    </Link>
+                    <div className={styles.divider} />
+                    <button className={`${styles.accountDropdownItem} ${styles.logoutItem}`} onClick={handleLogout}>
+                      <LogOut size={18} strokeWidth={1.5} /> Logout
+                    </button>
+                  </div>
                 </div>
-                <div className={styles.accountDropdownList}>
-                  <Link href="/profile" className={styles.accountDropdownItem}>
-                    <User size={18} strokeWidth={1.5} /> My Profile
-                  </Link>
-                  <Link href="/orders" className={styles.accountDropdownItem}>
-                    <Package size={18} strokeWidth={1.5} /> Orders
-                  </Link>
-                  <Link href="/wallet" className={styles.accountDropdownItem}>
-                    <CreditCard size={18} strokeWidth={1.5} /> Saved Cards & Wallet
-                  </Link>
-                  <Link href="/addresses" className={styles.accountDropdownItem}>
-                    <MapPin size={18} strokeWidth={1.5} /> Saved Addresses
-                  </Link>
-                  <Link href="/wishlist" className={styles.accountDropdownItem}>
-                    <Heart size={18} strokeWidth={1.5} /> Wishlist
-                  </Link>
-                  <Link href="/notifications" className={styles.accountDropdownItem}>
-                    <Bell size={18} strokeWidth={1.5} /> Notifications
-                  </Link>
-                  <div className={styles.divider} />
-                  <button className={`${styles.accountDropdownItem} ${styles.logoutItem}`}>
-                    <LogOut size={18} strokeWidth={1.5} /> Logout
-                  </button>
-                </div>
-              </div>
+              )}
             </div>
 
             <Link href="/cart" className={styles.cartBtn} aria-label="Shopping Cart" title="Cart">

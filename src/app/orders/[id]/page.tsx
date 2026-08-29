@@ -1,12 +1,14 @@
 "use client";
 
+import { use } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronRight, MapPin, User, Download, Phone, Truck, HelpCircle } from 'lucide-react';
 import styles from './OrderDetails.module.css';
 
-export default function OrderDetailsPage({ params }: { params: { id: string } }) {
-  const orderId = params.id || "ORD-89241";
+export default function OrderDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params);
+  const orderId = resolvedParams.id || "ORD-89241";
   
   return (
     <div className={styles.pageWrapper}>

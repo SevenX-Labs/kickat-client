@@ -10,10 +10,19 @@ export function SplashScreen() {
   const [isFading, setIsFading] = useState(false);
 
   useEffect(() => {
+    // Only show splash screen once per session
+    if (sessionStorage.getItem("splashShown")) {
+      setShowSplash(false);
+      return;
+    }
+
     // 2.8s loading animation for a more cinematic, unhurried premium feel
     const timer = setTimeout(() => {
       setIsFading(true);
-      setTimeout(() => setShowSplash(false), 800); // Smoother, longer fade transition
+      setTimeout(() => {
+        setShowSplash(false);
+        sessionStorage.setItem("splashShown", "true");
+      }, 800); // Smoother, longer fade transition
     }, 2800); 
 
     return () => clearTimeout(timer);
