@@ -187,19 +187,48 @@
 
 .dropdownMenu {
   position: absolute;
-  top: 100%;
-  left: -1rem;
-  min-width: 250px;
-  background: #ffffff;
+  top: calc(100% + 15px);
+  left: -1.5rem;
+  min-width: 260px;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
   border-radius: 16px;
-  box-shadow: 0 12px 36px rgba(33, 28, 21, 0.08);
-  border: 1px solid rgba(33, 28, 21, 0.06);
-  padding: 0.75rem 0;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
+  border: 1px solid rgba(0,0,0,0.06);
+  padding: 0.5rem 0;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(10px);
-  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform: translateY(12px);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Arrow pointing up for category dropdowns */
+.dropdownMenu::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 2.5rem; /* Align roughly with the nav item text */
+  width: 12px;
+  height: 12px;
+  background: #ffffff;
+  transform: rotate(45deg);
+  border-left: 1px solid rgba(0,0,0,0.06);
+  border-top: 1px solid rgba(0,0,0,0.06);
+  border-top-left-radius: 2px;
+}
+
+/* Add a transparent bridge so hovering off the word doesn't instantly close the menu */
+.dropdownMenu::after {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background: transparent;
 }
 
 .dropdownWrapper:hover .dropdownMenu {
@@ -210,17 +239,20 @@
 
 .dropdownLink {
   display: block;
-  padding: 0.65rem 1.35rem;
-  font-size: 0.9rem;
-  color: rgba(33, 28, 21, 0.75);
+  padding: 0.7rem 1rem;
+  margin: 2px 10px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #38342E;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .dropdownLink:hover {
+  background-color: #FEF7EE;
   color: #E7A03B;
-  background-color: #FBF7EE;
-  padding-left: 1.65rem;
+  transform: translateX(4px);
 }
 
 .announcementBar {
@@ -315,20 +347,37 @@
 
 .accountDropdown {
   position: absolute;
-  top: calc(100% + 15px);
+  top: calc(100% + 20px);
   right: -10px;
-  width: 250px;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  width: 260px;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
   border: 1px solid rgba(0,0,0,0.06);
   opacity: 0;
   visibility: hidden;
-  transform: translateY(10px);
-  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform: translateY(12px);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   z-index: 100;
   display: flex;
   flex-direction: column;
+  padding: 8px 0;
+}
+
+/* Arrow pointing up towards the avatar */
+.accountDropdown::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  right: 28px;
+  width: 12px;
+  height: 12px;
+  background: #ffffff;
+  transform: rotate(45deg);
+  border-left: 1px solid rgba(0,0,0,0.06);
+  border-top: 1px solid rgba(0,0,0,0.06);
+  border-top-left-radius: 2px;
 }
 
 .accountWrapper:hover .accountDropdown {
@@ -338,39 +387,65 @@
 }
 
 .accountDropdownHeader {
-  padding: 1.15rem 1.25rem 0.75rem;
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: #211C15;
+  padding: 0.75rem 1.25rem 0.5rem;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8C877D;
 }
 
 .accountDropdownList {
   display: flex;
   flex-direction: column;
-  padding: 0 0 0.5rem 0;
 }
 
 .accountDropdownItem {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 0.65rem 1.25rem;
-  font-size: 0.9rem;
-  color: #4A453E;
+  gap: 0.85rem;
+  padding: 0.7rem 1rem;
+  margin: 2px 10px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #38342E;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
 .accountDropdownItem:hover {
-  background-color: #FBF7EE;
+  background-color: #FEF7EE;
   color: #E7A03B;
+  transform: translateX(4px);
 }
 
 .accountDropdownItem svg {
-  color: rgba(33, 28, 21, 0.6);
-  transition: color 0.2s ease;
+  color: #A39E94;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .accountDropdownItem:hover svg {
   color: #E7A03B;
+  transform: scale(1.1);
+}
+
+.divider {
+  height: 1px;
+  background-color: rgba(0,0,0,0.06);
+  margin: 6px 16px;
+}
+
+.logoutItem:hover {
+  background-color: #FEF2F2;
+  color: #DC2626;
+}
+
+.logoutItem:hover svg {
+  color: #DC2626;
 }

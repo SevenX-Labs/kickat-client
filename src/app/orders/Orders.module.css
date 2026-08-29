@@ -34,7 +34,7 @@
 
 .layout {
   display: flex;
-  gap: 3rem;
+  gap: 3.5rem; /* Increased gap for breathing room */
   align-items: flex-start;
 }
 
@@ -42,19 +42,21 @@
 .sidebar {
   width: 250px;
   flex-shrink: 0;
+  position: sticky;
+  top: 6rem; /* Sticky sidebar */
 }
 
 .sidebarHeader {
   font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #211C15;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .filterSection {
   padding-bottom: 1.5rem;
   margin-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(33, 28, 21, 0.06);
+  border-bottom: 1px solid rgba(33, 28, 21, 0.04);
 }
 
 .filterSection:last-child {
@@ -62,12 +64,12 @@
 }
 
 .filterTitle {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em; /* Wider spacing */
   text-transform: uppercase;
-  color: rgba(33, 28, 21, 0.5);
-  margin-bottom: 1rem;
+  color: #8C867F; /* Muted color */
+  margin-bottom: 1.25rem;
 }
 
 .checkboxLabel {
@@ -75,10 +77,11 @@
   align-items: center;
   gap: 0.75rem;
   font-size: 0.95rem;
+  font-weight: 500;
   color: #4A453E;
-  margin-bottom: 0.85rem;
+  margin-bottom: 1rem;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: all 0.2s;
 }
 
 .checkboxLabel:hover {
@@ -89,28 +92,35 @@
   margin-bottom: 0;
 }
 
+/* Custom Checkbox */
 .checkboxInput {
   appearance: none;
-  width: 18px;
-  height: 18px;
-  border: 1px solid rgba(33, 28, 21, 0.2);
-  border-radius: 4px;
+  width: 20px;
+  height: 20px;
+  border: 1px solid rgba(33, 28, 21, 0.15);
+  border-radius: 6px;
   cursor: pointer;
   position: relative;
-  transition: all 0.2s;
-  background: transparent;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  background: #ffffff;
+}
+
+.checkboxLabel:hover .checkboxInput {
+  border-color: rgba(33, 28, 21, 0.3);
+  transform: scale(1.05);
 }
 
 .checkboxInput:checked {
   background-color: #E7A03B;
   border-color: #E7A03B;
+  transform: scale(1);
 }
 
 .checkboxInput:checked::after {
   content: '';
   position: absolute;
-  top: 2px;
-  left: 6px;
+  top: 3px;
+  left: 7px;
   width: 4px;
   height: 9px;
   border: solid white;
@@ -123,27 +133,30 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 2.5rem; /* Increased gap */
 }
 
 .searchBarWrapper {
   position: relative;
   display: flex;
   align-items: center;
-  background: #ffffff;
-  border-radius: 12px;
-  border: 1px solid rgba(33, 28, 21, 0.08);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
-  transition: border-color 0.2s;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid rgba(33, 28, 21, 0.05);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.03);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .searchBarWrapper:focus-within {
   border-color: #E7A03B;
+  box-shadow: 0 8px 32px rgba(231, 160, 59, 0.1);
+  transform: translateY(-1px);
 }
 
 .searchIconWrapper {
   position: absolute;
-  left: 1.25rem;
+  left: 1.5rem;
   color: #8C867F;
   pointer-events: none;
   display: flex;
@@ -152,53 +165,116 @@
 
 .searchInput {
   flex: 1;
-  padding: 1.1rem 1.25rem 1.1rem 3.25rem;
+  padding: 1.25rem 1.5rem 1.25rem 3.5rem;
   border: none;
-  font-size: 0.95rem;
+  font-size: 1rem;
   outline: none;
-  border-radius: 12px;
+  border-radius: 16px;
   color: #211C15;
   background: transparent;
 }
 
 .searchInput::placeholder {
-  color: #8C867F;
+  color: #A39E94;
+  font-weight: 500;
 }
 
 .ordersList {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 2rem; /* Wider gap between cards */
 }
 
 /* --- ORDER CARDS --- */
 .orderCard {
   background: #ffffff;
-  border-radius: 16px;
-  padding: 1.5rem;
+  border-radius: 20px; /* More rounded */
   display: flex;
-  align-items: stretch;
-  gap: 2rem;
-  border: 1px solid rgba(33, 28, 21, 0.05);
+  flex-direction: column;
+  border: 1px solid rgba(33, 28, 21, 0.04);
   transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   text-decoration: none;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.02);
+  overflow: hidden; /* For header separation */
 }
 
 .orderCard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.06);
-  border-color: rgba(231, 160, 59, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.05);
+  border-color: rgba(33, 28, 21, 0.08);
+}
+
+/* Order Header inside Card */
+.orderHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 2rem;
+  background-color: #FAFAFA;
+  border-bottom: 1px solid rgba(33, 28, 21, 0.04);
+}
+
+.orderMeta {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.metaBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.metaLabel {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #8C867F;
+  font-weight: 600;
+}
+
+.metaValue {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #211C15;
+}
+
+.orderActionBtn {
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  border: 1px solid rgba(33, 28, 21, 0.1);
+  background: transparent;
+  color: #211C15;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.orderCard:hover .orderActionBtn {
+  background: #E7A03B;
+  color: #ffffff;
+  border-color: #E7A03B;
+}
+
+/* Order Content inside Card */
+.orderContent {
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
 }
 
 .productImageWrapper {
-  width: 90px;
-  height: 90px;
+  width: 100px; /* Slightly larger */
+  height: 100px;
   position: relative;
   flex-shrink: 0;
-  background-color: #FBF7EE;
-  border-radius: 10px;
+  background-color: #FDFBF7;
+  border-radius: 12px;
   padding: 0.5rem;
+  border: 1px solid rgba(33, 28, 21, 0.03);
 }
 
 .productImage {
@@ -210,32 +286,24 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
 }
 
 .productTitle {
-  font-size: 1.05rem;
-  font-weight: 500;
+  font-size: 1.15rem;
+  font-weight: 600;
   color: #211C15;
   display: -webkit-box;
-  -webkit-line-clamp: 1;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   line-height: 1.4;
 }
 
 .productVariant {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: #8C867F;
-}
-
-.productPrice {
-  flex: 1;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #211C15;
-  display: flex;
-  align-items: center;
+  font-weight: 500;
 }
 
 .statusSection {
@@ -243,51 +311,69 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 0.4rem;
+  gap: 0.6rem;
 }
 
 .statusTop {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.75rem;
+}
+
+/* Pill Badges */
+.statusBadge {
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.statusBadge.green { 
+  background-color: #EEF8F1;
+  color: #1A7B31;
+}
+
+.statusBadge.orange { 
+  background-color: #FFF6EC;
+  color: #B56700;
+}
+
+.statusBadge.red { 
+  background-color: #FDF2F2;
+  color: #C53030;
+}
+
+.statusDate {
   font-weight: 600;
   font-size: 0.95rem;
   color: #211C15;
 }
 
-.statusDot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-.statusDot.green { 
-  background-color: #26a541; 
-  box-shadow: 0 0 0 3px rgba(38, 165, 65, 0.2);
-}
-.statusDot.red { 
-  background-color: #e74c3c; 
-  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2);
-}
-
 .statusSubtext {
   font-size: 0.85rem;
   color: #8C867F;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .actionLink {
-  margin-top: 0.5rem;
-  font-size: 0.85rem;
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
   color: #E7A03B;
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  font-weight: 500;
-  transition: color 0.2s;
+  gap: 0.35rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+  align-self: flex-start;
 }
 
 .actionLink:hover {
   color: #D6902A;
-  text-decoration: underline;
+  border-bottom-color: #D6902A;
 }

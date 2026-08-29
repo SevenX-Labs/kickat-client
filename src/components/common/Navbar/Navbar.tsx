@@ -47,6 +47,7 @@ const taxonomy = {
 export function Navbar() {
   const items = [
     { text: "Free Delivery on orders over $50", Icon: Truck },
+    { text: "Available on Amazon, Flipkart & Blinkit", Icon: ShoppingBag },
     { text: "Get 20% off your first purchase", Icon: Percent },
     { text: "Premium pet accessories", Icon: Crown },
   ];
@@ -151,32 +152,30 @@ export function Navbar() {
               
               <div className={styles.accountDropdown}>
                 <div className={styles.accountDropdownHeader}>
-                  Your Account
+                  My Account
                 </div>
                 <div className={styles.accountDropdownList}>
                   <Link href="/profile" className={styles.accountDropdownItem}>
-                    <User size={16} strokeWidth={1.5} /> My Profile
+                    <User size={18} strokeWidth={1.5} /> My Profile
                   </Link>
                   <Link href="/orders" className={styles.accountDropdownItem}>
-                    <Package size={16} strokeWidth={1.5} /> Orders
-                  </Link>
-                  <Link href="/coupons" className={styles.accountDropdownItem}>
-                    <Tag size={16} strokeWidth={1.5} /> Coupons
+                    <Package size={18} strokeWidth={1.5} /> Orders
                   </Link>
                   <Link href="/wallet" className={styles.accountDropdownItem}>
-                    <CreditCard size={16} strokeWidth={1.5} /> Saved Cards & Wallet
+                    <CreditCard size={18} strokeWidth={1.5} /> Saved Cards & Wallet
                   </Link>
                   <Link href="/addresses" className={styles.accountDropdownItem}>
-                    <MapPin size={16} strokeWidth={1.5} /> Saved Addresses
+                    <MapPin size={18} strokeWidth={1.5} /> Saved Addresses
                   </Link>
                   <Link href="/wishlist" className={styles.accountDropdownItem}>
-                    <Heart size={16} strokeWidth={1.5} /> Wishlist
+                    <Heart size={18} strokeWidth={1.5} /> Wishlist
                   </Link>
                   <Link href="/notifications" className={styles.accountDropdownItem}>
-                    <Bell size={16} strokeWidth={1.5} /> Notifications
+                    <Bell size={18} strokeWidth={1.5} /> Notifications
                   </Link>
-                  <button className={styles.accountDropdownItem} style={{ width: '100%', border: 'none', background: 'none', fontFamily: 'inherit', textAlign: 'left', cursor: 'pointer' }}>
-                    <LogOut size={16} strokeWidth={1.5} /> Logout
+                  <div className={styles.divider} />
+                  <button className={`${styles.accountDropdownItem} ${styles.logoutItem}`}>
+                    <LogOut size={18} strokeWidth={1.5} /> Logout
                   </button>
                 </div>
               </div>
