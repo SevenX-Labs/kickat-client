@@ -169,10 +169,10 @@
 }
 
 .primaryBtn {
-  background: #E7A03B;
+  background: #F5821F;
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 6px 20px rgba(231, 160, 59, 0.35);
+  box-shadow: 0 6px 20px rgba(245, 130, 31, 0.35);
 }
 
 @keyframes gradientLiquid {
@@ -233,8 +233,8 @@
 }
 
 .primaryBtn:hover {
-  background: #D4900A;
-  box-shadow: 0 12px 28px rgba(231, 160, 59, 0.45);
+  background: #E06D0C;
+  box-shadow: 0 12px 28px rgba(245, 130, 31, 0.45);
 }
 
 .primaryBtn:hover::before, .secondaryBtn:hover::before {
@@ -246,7 +246,7 @@
 }
 
 .primaryBtn:active {
-  box-shadow: 0 6px 12px rgba(231, 160, 59, 0.3);
+  box-shadow: 0 6px 12px rgba(245, 130, 31, 0.3);
 }
 
 .secondaryBtn {

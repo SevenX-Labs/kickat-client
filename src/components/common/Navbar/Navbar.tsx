@@ -113,10 +113,10 @@ export function Navbar() {
             <Image
               src="/logo-clean.png"
               alt="KickAt Logo"
-              width={240}
+              width={300}
               height={100}
               priority
-              style={{ objectFit: "contain", userSelect: "none", width: "auto", height: "100px" }}
+              style={{ objectFit: "contain", userSelect: "none", width: "auto", height: "95px", mixBlendMode: "multiply", transform: "scale(1.25)", transformOrigin: "left center" }}
               draggable={false}
               onContextMenu={(e) => e.preventDefault()}
             />

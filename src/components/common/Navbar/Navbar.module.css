@@ -10,10 +10,10 @@
 
 .container {
   display: flex;
-  height: 5rem;
+  height: 6.5rem;
   align-items: center;
   justify-content: space-between;
-  padding: 0 2rem;
+  padding: 0 2.25rem;
   max-width: 1440px;
   margin: 0 auto;
 }
@@ -21,7 +21,7 @@
 .leftSection {
   display: flex;
   align-items: center;
-  gap: 2.75rem;
+  gap: 3.5rem;
 }
 
 .rightSection {
@@ -34,6 +34,8 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  height: 95px;
+  overflow: visible;
 }
 
 .searchContainer {
@@ -416,21 +418,21 @@
   justify-content: center;
   width: 100%;
   padding: 0.65rem 1rem;
-  background: #E7A03B;
+  background: #F5821F;
   color: #ffffff;
   font-weight: 600;
   font-size: 0.88rem;
   border-radius: 10px;
   text-decoration: none;
   transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-  box-shadow: 0 4px 14px rgba(231, 160, 59, 0.35);
+  box-shadow: 0 4px 14px rgba(245, 130, 31, 0.35);
 }
 
 .signInBtn:hover {
-  background: #D4900A;
+  background: #E06D0C;
   color: #ffffff;
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(231, 160, 59, 0.45);
+  box-shadow: 0 6px 18px rgba(245, 130, 31, 0.45);
 }
 
 .accountDropdownList {
@@ -458,8 +460,8 @@
 }
 
 .accountDropdownItem:hover {
-  background-color: #FEF7EE;
-  color: #E7A03B;
+  background-color: #FFF7F0;
+  color: #F5821F;
   transform: translateX(4px);
 }
 
@@ -469,7 +471,7 @@
 }
 
 .accountDropdownItem:hover svg {
-  color: #E7A03B;
+  color: #F5821F;
   transform: scale(1.1);
 }
 
