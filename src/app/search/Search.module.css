@@ -1,0 +1,151 @@
+.main {
+  min-height: 100vh;
+  background: white;
+}
+
+.header {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #fafafa;
+  color: #111;
+  border: 1px solid #eaeaea;
+  transition: all 0.2s;
+}
+.backBtn:hover {
+  background: #f0f0f0;
+}
+
+.searchBar {
+  flex: 1;
+  position: relative;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 1rem 1rem 1rem 3rem;
+  border-radius: 24px;
+  border: 1.5px solid #eaeaea;
+  background: #fafafa;
+  font-size: 1rem;
+  color: #111;
+  outline: none;
+  transition: all 0.2s;
+}
+.searchInput:focus {
+  border-color: #E7A03B;
+  background: white;
+  box-shadow: 0 4px 12px rgba(231, 160, 59, 0.1);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.section {
+  margin-bottom: 3rem;
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pillContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.pill {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  background: #f8f9fa;
+  border: 1px solid #eaeaea;
+  font-size: 0.9rem;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+.pill:hover {
+  background: white;
+  border-color: #111;
+  color: #111;
+}
+
+.resultsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 2rem;
+}
+
+.productCard {
+  border: 1px solid #eaeaea;
+  border-radius: 16px;
+  padding: 1rem;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.productCard:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  border-color: #ddd;
+}
+
+.imageWrapper {
+  width: 100%;
+  aspect-ratio: 1;
+  position: relative;
+  background: #fafafa;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.productTitle {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #111;
+  margin-bottom: 0.25rem;
+}
+.productMeta {
+  color: #888;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+.productPrice {
+  font-weight: 700;
+  color: #111;
+  font-size: 1.1rem;
+}

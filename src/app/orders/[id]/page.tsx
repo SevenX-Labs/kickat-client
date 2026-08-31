@@ -64,10 +64,14 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
               <span className={styles.offerBadge}>2 Offers Applied</span>
             </div>
           </div>
-          
-          <div className={styles.productActions}>
-            <Link href={`/orders/${orderId}/return`} style={{ textDecoration: 'none' }}>
-              <button className={styles.trackButton} style={{ backgroundColor: '#fff', color: '#111', border: '1px solid #ddd' }}>
+          <div className={styles.productActions} style={{ display: 'flex', gap: '1rem' }}>
+            <Link href={`/orders/${orderId}/tracking`} style={{ textDecoration: 'none', flex: 1 }}>
+              <button className={styles.trackButton} style={{ width: '100%', backgroundColor: '#111', color: 'white', border: 'none' }}>
+                Track Shipment
+              </button>
+            </Link>
+            <Link href={`/orders/${orderId}/return`} style={{ textDecoration: 'none', flex: 1 }}>
+              <button className={styles.trackButton} style={{ width: '100%', backgroundColor: '#fff', color: '#111', border: '1px solid #ddd' }}>
                 Return Item
               </button>
             </Link>
@@ -168,10 +172,12 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
               Paid via UPI
             </div>
             
-            <button className={styles.ghostButton}>
-              <Download size={18} />
-              Download Invoice
-            </button>
+            <Link href={`/orders/${orderId}/invoice`} style={{ textDecoration: 'none' }}>
+              <button className={styles.ghostButton} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', background: '#fafafa', border: '1px solid #eaeaea', padding: '0.75rem', borderRadius: '8px', cursor: 'pointer', color: '#111', fontWeight: 600 }}>
+                <Download size={18} />
+                View Invoice
+              </button>
+            </Link>
           </div>
 
         </section>
