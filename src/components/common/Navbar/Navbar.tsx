@@ -169,39 +169,69 @@ export function Navbar() {
             <div className={styles.accountWrapper}>
               <div 
                 className={styles.iconBtn} 
-                aria-label="User Account" 
-                title={isLoggedIn ? "Account" : "Sign In"} 
+                aria-label="User Account"
                 style={{ cursor: 'pointer' }}
                 onClick={handleAccountClick}
               >
                 <User size={20} strokeWidth={1.75} />
               </div>
-              
-              {isLoggedIn && (
-                <div className={styles.accountDropdown}>
-                  <div className={styles.accountDropdownHeader}>
-                    My Account
-                  </div>
-                  <div className={styles.accountDropdownList}>
-                    <Link href="/account?tab=profile" className={styles.accountDropdownItem}>
-                      <User size={18} strokeWidth={1.5} /> My Profile
-                    </Link>
-                    <Link href="/account?tab=orders" className={styles.accountDropdownItem}>
-                      <Package size={18} strokeWidth={1.5} /> Orders
-                    </Link>
-                    <Link href="/account?tab=addresses" className={styles.accountDropdownItem}>
-                      <MapPin size={18} strokeWidth={1.5} /> Saved Addresses
-                    </Link>
-                    <Link href="/account?tab=wishlist" className={styles.accountDropdownItem}>
-                      <Heart size={18} strokeWidth={1.5} /> Wishlist
-                    </Link>
+
+              <div className={styles.accountDropdown}>
+                {isLoggedIn ? (
+                  <>
+                    <div className={styles.accountDropdownHeader}>
+                      <span className={styles.greetingTitle}>Welcome Back!</span>
+                      <span className={styles.greetingSub}>Manage your account & orders</span>
+                    </div>
                     <div className={styles.divider} />
-                    <button className={`${styles.accountDropdownItem} ${styles.logoutItem}`} onClick={handleLogout}>
-                      <LogOut size={18} strokeWidth={1.5} /> Logout
-                    </button>
-                  </div>
-                </div>
-              )}
+                    <div className={styles.accountDropdownList}>
+                      <Link href="/account?tab=profile" className={styles.accountDropdownItem}>
+                        <User size={18} strokeWidth={1.5} /> My Profile
+                      </Link>
+                      <Link href="/account?tab=orders" className={styles.accountDropdownItem}>
+                        <Package size={18} strokeWidth={1.5} /> Orders & Tracking
+                      </Link>
+                      <Link href="/account?tab=addresses" className={styles.accountDropdownItem}>
+                        <MapPin size={18} strokeWidth={1.5} /> Saved Addresses
+                      </Link>
+                      <Link href="/account?tab=wishlist" className={styles.accountDropdownItem}>
+                        <Heart size={18} strokeWidth={1.5} /> Wishlist
+                      </Link>
+                      <Link href="/notifications" className={styles.accountDropdownItem}>
+                        <Bell size={18} strokeWidth={1.5} /> Notifications
+                      </Link>
+                      <div className={styles.divider} />
+                      <button className={`${styles.accountDropdownItem} ${styles.logoutItem}`} onClick={handleLogout}>
+                        <LogOut size={18} strokeWidth={1.5} /> Logout
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className={styles.accountDropdownHeader}>
+                      <span className={styles.greetingTitle}>Welcome to KickAt</span>
+                      <span className={styles.greetingSub}>Access account & track orders</span>
+                    </div>
+                    <div className={styles.authBox}>
+                      <Link href="/login" className={styles.signInBtn}>
+                        Sign In / Register
+                      </Link>
+                    </div>
+                    <div className={styles.divider} />
+                    <div className={styles.accountDropdownList}>
+                      <Link href="/orders" className={styles.accountDropdownItem}>
+                        <Package size={18} strokeWidth={1.5} /> Track Orders
+                      </Link>
+                      <Link href="/wishlist" className={styles.accountDropdownItem}>
+                        <Heart size={18} strokeWidth={1.5} /> Wishlist
+                      </Link>
+                      <Link href="/contact" className={styles.accountDropdownItem}>
+                        <Tag size={18} strokeWidth={1.5} /> Help & Support
+                      </Link>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
 
             <Link href="/cart" className={styles.cartBtn} aria-label="Shopping Cart" title="Cart">

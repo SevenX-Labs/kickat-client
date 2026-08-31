@@ -387,12 +387,50 @@
 }
 
 .accountDropdownHeader {
-  padding: 0.75rem 1.25rem 0.5rem;
+  padding: 0.85rem 1.25rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.greetingTitle {
   font-weight: 700;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #8C877D;
+  font-size: 0.95rem;
+  color: #111111;
+  letter-spacing: -0.01em;
+}
+
+.greetingSub {
+  font-size: 0.78rem;
+  color: #777777;
+  font-weight: 400;
+}
+
+.authBox {
+  padding: 0.4rem 1.25rem 0.6rem;
+}
+
+.signInBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.65rem 1rem;
+  background: #111111;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.88rem;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.signInBtn:hover {
+  background: #E7A03B;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(231, 160, 59, 0.3);
 }
 
 .accountDropdownList {
