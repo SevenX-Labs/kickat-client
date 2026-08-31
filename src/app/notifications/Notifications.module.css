@@ -39,8 +39,9 @@
   transition: all 0.2s;
 }
 .markReadBtn:hover {
-  background: #f0f0f0;
-  color: #111;
+  background: #FEF7EE;
+  color: #E7A03B;
+  border-color: #E7A03B;
 }
 
 .list {

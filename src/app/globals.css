@@ -3,6 +3,9 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --brand-orange: #E7A03B;
+  --brand-orange-hover: #D4900A;
+  --brand-orange-light: #FEF7EE;
 }
 
 @theme inline {
