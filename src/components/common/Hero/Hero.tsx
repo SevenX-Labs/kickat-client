@@ -45,12 +45,12 @@ export function Hero() {
           </p>
           
           <div className={styles.actions}>
-            <Link href="/shop/dogs" className={styles.primaryBtn}>
-              <span className={styles.btnText}>Shop Dog</span>
+            <Link href="/shop" className={styles.primaryBtn}>
+              <span className={styles.btnText}>Shop Now</span>
               <ArrowRight className={styles.btnIcon} size={18} />
             </Link>
-            <Link href="/shop/cats" className={styles.secondaryBtn}>
-              <span className={styles.btnText}>Shop Cat</span>
+            <Link href="/categories" className={styles.secondaryBtn}>
+              <span className={styles.btnText}>Explore Categories</span>
               <ArrowRight className={styles.btnIcon} size={18} />
             </Link>
           </div>
