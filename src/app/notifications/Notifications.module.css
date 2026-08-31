@@ -39,8 +39,8 @@
   transition: all 0.2s;
 }
 .markReadBtn:hover {
-  background: #FEF7EE;
-  color: #E7A03B;
+  background: #E7A03B;
+  color: #ffffff;
   border-color: #E7A03B;
 }
 
@@ -66,8 +66,8 @@
 }
 
 .card.unread {
-  background: #fffbfa;
-  border-color: #f7e6d2;
+  background: #ffffff;
+  border-color: #E7A03B;
 }
 
 .unreadDot {
@@ -90,7 +90,7 @@
   flex-shrink: 0;
 }
 .iconWrapper.order { background: rgba(76, 175, 80, 0.1); color: #2e7d32; }
-.iconWrapper.promo { background: rgba(231, 160, 59, 0.1); color: #b77a25; }
+.iconWrapper.promo { background: rgba(231, 160, 59, 0.15); color: #E7A03B; }
 .iconWrapper.system { background: #f0f0f0; color: #555; }
 
 .content {
