@@ -1,0 +1,236 @@
+.pageWrapper {
+  background: #f8f9fa;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+
+.container {
+  max-width: 1024px;
+  margin: 0 auto;
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+}
+.breadcrumbs a {
+  text-decoration: none;
+  color: inherit;
+}
+.breadcrumbs a:hover {
+  text-decoration: underline;
+  color: #E7A03B;
+}
+
+/* Page Header */
+.pageHeader {
+  margin-bottom: 2.5rem;
+}
+.pageTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111;
+  letter-spacing: -0.02em;
+}
+.pageSubtitle {
+  color: #666;
+  margin-top: 0.5rem;
+}
+
+/* Return Card */
+.returnCard {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #eaeaea;
+  transition: all 0.2s ease;
+}
+.returnCard:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  border-color: #ddd;
+}
+
+.returnInfo {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.itemImageWrapper {
+  width: 80px;
+  height: 80px;
+  background: #fcfcfc;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #eee;
+}
+
+.itemDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.itemName {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111;
+}
+.returnId {
+  font-size: 0.85rem;
+  color: #888;
+  font-family: monospace;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.statusProcessing { background: rgba(231, 160, 59, 0.1); color: #b77a25; }
+.statusCompleted { background: rgba(76, 175, 80, 0.1); color: #2e7d32; }
+
+.actionBtn {
+  background: white;
+  border: 1.5px solid #eaeaea;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #111;
+  text-decoration: none;
+}
+.actionBtn:hover {
+  border-color: #111;
+  background: #fafafa;
+}
+
+/* Detail View Layout */
+.detailGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+}
+
+.sectionCard {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  border: 1px solid #eaeaea;
+  margin-bottom: 2rem;
+}
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #111;
+}
+
+/* Vertical Timeline */
+.timeline {
+  position: relative;
+  padding-left: 2rem;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 11px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #eee;
+}
+
+.timelineStep {
+  position: relative;
+  margin-bottom: 2.5rem;
+}
+.timelineStep:last-child {
+  margin-bottom: 0;
+}
+
+.timelineDot {
+  position: absolute;
+  left: -2rem;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  z-index: 1;
+}
+.timelineStep.completed .timelineDot {
+  background: #2e7d32;
+  border-color: #2e7d32;
+}
+.timelineStep.active .timelineDot {
+  border-color: #E7A03B;
+  background: #E7A03B;
+}
+
+.timelineTitle {
+  font-weight: 600;
+  color: #111;
+  font-size: 1rem;
+}
+.timelineDesc {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+}
+.timelineDate {
+  font-size: 0.8rem;
+  color: #aaa;
+  margin-top: 0.25rem;
+}
+
+/* Summary Grid */
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  color: #555;
+}
+.summaryRow:last-child {
+  margin-bottom: 0;
+}
+.summaryTotal {
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+  margin-top: 1rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #111;
+}
+
+@media (max-width: 768px) {
+  .detailGrid {
+    grid-template-columns: 1fr;
+  }
+  .returnCard {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+}

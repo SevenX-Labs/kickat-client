@@ -3,7 +3,7 @@
 import { use } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronRight, MapPin, User, Download, Phone, Truck, HelpCircle } from 'lucide-react';
+import { ChevronRight, MapPin, User, Download, Phone, Truck, HelpCircle, CheckCircle, Package } from 'lucide-react';
 import styles from './OrderDetails.module.css';
 
 export default function OrderDetailsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -34,12 +34,12 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
             </Link>
           </div>
           <div className={styles.statusGroup}>
-            <div className={styles.statusBadge}>
-              <Truck size={16} strokeWidth={2.5} />
-              Arriving Tomorrow
+            <div className={styles.statusBadge} style={{ backgroundColor: 'rgba(76, 175, 80, 0.1)', color: '#2E7D32' }}>
+              <CheckCircle size={16} strokeWidth={2.5} />
+              Delivered
             </div>
-            <h1 className={styles.heroTitle}>Your order is on track.</h1>
-            <p className={styles.heroSubtitle}>Shipment has reached the hub nearest to you, Mumbai.</p>
+            <h1 className={styles.heroTitle}>Your order has been delivered.</h1>
+            <p className={styles.heroSubtitle}>Delivered on August 27, 2026. Handed directly to a resident.</p>
           </div>
         </header>
 
@@ -66,7 +66,11 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
           </div>
           
           <div className={styles.productActions}>
-            <button className={styles.trackButton}>Track Shipment</button>
+            <Link href={`/orders/${orderId}/return`} style={{ textDecoration: 'none' }}>
+              <button className={styles.trackButton} style={{ backgroundColor: '#fff', color: '#111', border: '1px solid #ddd' }}>
+                Return Item
+              </button>
+            </Link>
           </div>
         </div>
 
@@ -74,7 +78,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
         <section className={styles.trackerSection}>
           <h3 className={styles.trackerSectionTitle}>Tracking History</h3>
           <div className={styles.trackerContainer}>
-            <div className={styles.trackerProgress} style={{ width: '40%' }}></div>
+            <div className={styles.trackerProgress} style={{ width: '100%' }}></div>
             
             <div className={`${styles.trackerStep} ${styles.completed}`}>
               <div className={styles.trackerDot}>✓</div>
@@ -82,22 +86,22 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
               <div className={styles.trackerStepDate}>Mon, Aug 24</div>
             </div>
             
-            <div className={`${styles.trackerStep} ${styles.active}`}>
-              <div className={styles.trackerDot}></div>
+            <div className={`${styles.trackerStep} ${styles.completed}`}>
+              <div className={styles.trackerDot}>✓</div>
               <div className={styles.trackerStepTitle}>Shipped</div>
               <div className={styles.trackerStepDate}>Wed, Aug 26</div>
             </div>
             
-            <div className={`${styles.trackerStep} ${styles.muted}`}>
-              <div className={styles.trackerDot}></div>
+            <div className={`${styles.trackerStep} ${styles.completed}`}>
+              <div className={styles.trackerDot}>✓</div>
               <div className={styles.trackerStepTitle}>Out for Delivery</div>
-              <div className={styles.trackerStepDate}>Estimated Tomorrow</div>
+              <div className={styles.trackerStepDate}>Thu, Aug 27</div>
             </div>
             
-            <div className={`${styles.trackerStep} ${styles.muted}`}>
-              <div className={styles.trackerDot}></div>
+            <div className={`${styles.trackerStep} ${styles.completed}`}>
+              <div className={styles.trackerDot}>✓</div>
               <div className={styles.trackerStepTitle}>Delivered</div>
-              <div className={styles.trackerStepDate}>By 9:00 PM Tomorrow</div>
+              <div className={styles.trackerStepDate}>August 27, 2026</div>
             </div>
             
           </div>
