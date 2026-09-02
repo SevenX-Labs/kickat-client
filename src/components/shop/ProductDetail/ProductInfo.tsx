@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Star, Heart, Truck, RefreshCcw, ShieldCheck, Ruler, Share2 } from 'lucide-react';
+import { Star, Heart, Truck, RefreshCcw, ShieldCheck, Ruler, Share2, Check } from 'lucide-react';
 import styles from './ProductDetail.module.css';
 import { Product } from './ProductDetail';
 
@@ -15,6 +15,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
   const [selectedColor, setSelectedColor] = useState(product.colors?.[0]?.name || 'Default');
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || 'M');
   const [isAdding, setIsAdding] = useState(false);
+  const [hasAdded, setHasAdded] = useState(false);
 
   // Fallback values for layout since mock data might be missing some
   const sizes = product.sizes || ['S', 'M', 'L', 'XL', 'XXL'];
@@ -107,8 +108,12 @@ export function ProductInfo({ product }: ProductInfoProps) {
       {/* Actions */}
       <div className={styles.actionsWrapper}>
         <button 
-          className={`${styles.addToCartBtn} ${isAdding ? styles.addedToCart : ''}`} 
+          className={`${styles.addToCartBtn} ${isAdding || hasAdded ? styles.addedToCart : ''}`} 
           onClick={() => {
+            if (hasAdded) {
+              router.push('/cart');
+              return;
+            }
             if (isAdding) return;
             const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
             if (!isLoggedIn) {
@@ -116,16 +121,22 @@ export function ProductInfo({ product }: ProductInfoProps) {
               return;
             }
             setIsAdding(true);
-            setTimeout(() => setIsAdding(false), 2000);
+            setTimeout(() => {
+              setIsAdding(false);
+              setHasAdded(true);
+            }, 1200);
           }}
         >
-          {isAdding ? (
-            <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
-              Added to Cart <span style={{ fontSize: '1.2rem' }}>✓</span>
-            </span>
-          ) : (
-            "Add to Cart"
-          )}
+          <span className={styles.btnContent}>
+            {isAdding || hasAdded ? (
+              <>
+                {isAdding ? <Check className={styles.checkIcon} size={20} strokeWidth={3} /> : <span style={{ paddingLeft: '0.25rem' }}>→</span>}
+                <span className={styles.addedText}>{isAdding ? 'Added to Cart' : 'Go to Cart'}</span>
+              </>
+            ) : (
+              <span className={styles.addText}>Add to Cart</span>
+            )}
+          </span>
         </button>
         <button className={styles.wishlistBtn} aria-label="Add to wishlist">
           <Heart size={24} color="#111" />

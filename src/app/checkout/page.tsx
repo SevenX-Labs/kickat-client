@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from 'react';
+import { useToast } from "@/components/ui/use-toast";
+import { AnimatedOrderButton } from './AnimatedOrderButton';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Check, Truck, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, CreditCard, Smartphone, ChevronDown, User, MapPin, Lock, Edit3, X } from 'lucide-react';
@@ -25,10 +27,15 @@ const checkoutItems = [
 ];
 
 export default function CheckoutPage() {
+  const [currentStep, setCurrentStep] = useState<1 | 2>(1);
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   // Form states for validation checkmarks
+  const [firstName, setFirstName] = useState('');
+  const [flat, setFlat] = useState('');
+  const [street, setStreet] = useState('');
+  const [city, setCity] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [zipCode, setZipCode] = useState('');
@@ -50,6 +57,7 @@ export default function CheckoutPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateForm()) return;
     setIsSubmitted(true);
     setOrderNumber(Math.floor(100000 + Math.random() * 900000));
     setParticles(Array.from({ length: 24 }).map((_, i) => {
@@ -61,6 +69,14 @@ export default function CheckoutPage() {
       return { id: i, tx: `${tx}px`, ty: `${ty}px`, color: colors[i % colors.length] };
     }));
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const validateStep1 = () => {
+    return isValidPhone && isValidEmail && isValidZip;
+  };
+
+  const validateForm = () => {
+    return validateStep1() && paymentMethod !== '';
   };
 
   if (isSubmitted) {
@@ -158,20 +174,16 @@ export default function CheckoutPage() {
         </div>
 
         <div className={styles.stepperContainer}>
-          <div className={`${styles.stepItem} ${styles.completed}`}>
-            <span className={styles.stepIcon}><Check size={12} strokeWidth={3} /></span> Cart
+          <div className={`${styles.stepItem} ${currentStep >= 1 ? styles.active : ''}`}>
+            <span className={styles.stepIcon}>1</span> Shipping
           </div>
           <div className={styles.stepDivider}></div>
-          <div className={`${styles.stepItem} ${styles.active}`}>
-            <span className={styles.stepIcon}>2</span> Address
-          </div>
-          <div className={styles.stepDivider}></div>
-          <div className={styles.stepItem}>
-            <span>3</span> Payment
+          <div className={`${styles.stepItem} ${currentStep === 2 ? styles.active : ''}`}>
+            <span className={styles.stepIconOutline}>2</span> Payment
           </div>
           <div className={styles.stepDivider}></div>
           <div className={styles.stepItem}>
-            <span>4</span> Confirm
+            <span className={styles.stepIconOutline}>3</span> Review
           </div>
         </div>
         
@@ -179,112 +191,171 @@ export default function CheckoutPage() {
           {/* Left Column: Forms */}
           <div className={styles.formsColumn}>
             
-            {/* Step 1: Contact Info */}
-            <div className={styles.formSection}>
-              <h2 className={styles.sectionTitle}><User size={20} color="#111" /> 1. Contact Information</h2>
-              <div className={styles.formGrid}>
-                <div className={styles.inputGroup}>
-                  <label className={styles.label}>First Name</label>
-                  <div className={styles.inputWrapper}>
-                    <input type="text" required className={styles.input} placeholder="e.g. Eduard" />
-                  </div>
+            <div className={styles.mainCard}>
+              <div className={styles.mainCardHeader}>
+                <div className={styles.mainCardIcon}>
+                  <MapPin size={24} color="#f97316" />
                 </div>
-                <div className={styles.inputGroup}>
-                  <label className={styles.label}>Last Name</label>
-                  <div className={styles.inputWrapper}>
-                    <input type="text" required className={styles.input} placeholder="e.g. Franz" />
-                  </div>
-                </div>
-                <div className={styles.inputGroup}>
-                  <label className={styles.label}>Phone</label>
-                  <div className={styles.inputWrapper}>
-                    <div className={styles.phonePrefix}>
-                      <span>🇮🇳</span>
-                      <span>+91</span>
-                      <ChevronDown size={14} />
-                    </div>
-                    <div className={styles.verticalDivider}></div>
-                    <input type="tel" required className={`${styles.input} ${styles.inputWithPrefix} ${isValidPhone ? styles.inputValid : ''} ${isInvalidPhone ? styles.inputInvalid : ''}`} placeholder="98765 43210" value={phone} onChange={(e) => setPhone(e.target.value)} />
-                    {isValidPhone && <Check size={18} color="#4CAF50" className={styles.inputIconRight} />}
-                    {isInvalidPhone && <X size={18} color="#F44336" className={styles.inputIconRight} />}
-                  </div>
-                </div>
-                <div className={styles.inputGroup}>
-                  <label className={styles.label}>E-mail</label>
-                  <div className={styles.inputWrapper}>
-                    <input type="email" required className={`${styles.input} ${isValidEmail ? styles.inputValid : ''}`} placeholder="e.g. email@domain.com" value={email} onChange={(e) => setEmail(e.target.value)} />
-                    {isValidEmail && <Check size={18} color="#4CAF50" className={styles.inputIconRight} />}
-                  </div>
+                <div>
+                  <h2 className={styles.mainCardTitle}>Shipping Address</h2>
+                  <p className={styles.mainCardSubtitle}>Enter your details to get your order delivered</p>
                 </div>
               </div>
+
+              {/* Step 1: Address Container */}
+              <div className={styles.stepContainerAlt}>
+                {currentStep > 1 && (
+                <div className={styles.collapsedSummary}>
+                  <div className={styles.summaryName}>
+                    {firstName || 'Customer'}
+                  </div>
+                  <div className={styles.summaryAddress}>
+                    {[flat, street, city, zipCode].filter(Boolean).join(', ') || 'Address not filled'}
+                  </div>
+                  <div className={styles.summaryPhone}>{phone}</div>
+                </div>
+              )}
+              
+                {currentStep === 1 && (
+                  <div className={styles.stepBodyAlt}>
+                    {/* Contact Info */}
+                    <div className={styles.formSectionAlt}>
+                      <h3 className={styles.sectionTitleAlt}><User size={18} strokeWidth={1.5} /> Contact Information</h3>
+                      <div className={styles.formGrid}>
+                      <div className={styles.inputGroup}>
+                        <label className={styles.label}>First Name</label>
+                        <div className={styles.inputWrapper}>
+                          <input type="text" required className={styles.input} placeholder="e.g. Eduard" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+                        </div>
+                      </div>
+                      <div className={styles.inputGroup}>
+                        <label className={styles.label}>Last Name</label>
+                        <div className={styles.inputWrapper}>
+                          <input type="text" required className={styles.input} placeholder="e.g. Franz" />
+                        </div>
+                      </div>
+                      <div className={styles.inputGroup}>
+                        <label className={styles.labelAlt}>Phone Number</label>
+                        <div className={`${styles.inputWrapper} ${styles.phoneInputWrapper}`}>
+                          <div className={styles.phonePrefixAlt}>
+                            <span>🇮🇳</span>
+                            <span>+91</span>
+                            <ChevronDown size={14} color="#888" />
+                          </div>
+                          <div className={styles.verticalDividerAlt}></div>
+                          <input type="tel" required className={`${styles.inputAlt} ${styles.inputWithPrefixAlt} ${isValidPhone ? styles.inputValid : ''} ${isInvalidPhone ? styles.inputInvalid : ''}`} placeholder="98765 43210" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                        </div>
+                      </div>
+                      <div className={styles.inputGroup}>
+                        <label className={styles.labelAlt}>Email Address</label>
+                        <div className={styles.inputWrapper}>
+                          <input type="email" required className={`${styles.inputAlt} ${isValidEmail ? styles.inputValid : ''}`} placeholder="e.g. email@domain.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                    {/* Home Address */}
+                    <div className={styles.formSectionAlt} style={{ marginTop: '2rem' }}>
+                      <h3 className={styles.sectionTitleAlt}><MapPin size={18} strokeWidth={1.5} /> Shipping Address</h3>
+                      <div className={styles.formGrid}>
+                      <div className={styles.inputGroup}>
+                        <label className={styles.label}>Flat, House no.</label>
+                        <div className={styles.inputWrapper}>
+                          <input type="text" required className={styles.input} placeholder="e.g. Flat 101" value={flat} onChange={(e) => setFlat(e.target.value)} />
+                        </div>
+                      </div>
+                      <div className={styles.inputGroup}>
+                        <label className={styles.label}>Building, Company</label>
+                        <div className={styles.inputWrapper}>
+                          <input type="text" className={styles.input} placeholder="e.g. Sunshine Apartments" />
+                        </div>
+                      </div>
+                      <div className={styles.inputGroup}>
+                        <label className={styles.label}>Street, Sector</label>
+                        <div className={styles.inputWrapper}>
+                          <input type="text" required className={styles.input} placeholder="Street Address" value={street} onChange={(e) => setStreet(e.target.value)} />
+                        </div>
+                      </div>
+                      <div className={styles.inputGroup}>
+                        <label className={styles.label}>City</label>
+                        <div className={styles.inputWrapper}>
+                          <input type="text" required className={styles.input} placeholder="Mumbai" value={city} onChange={(e) => setCity(e.target.value)} />
+                        </div>
+                      </div>
+                      <div className={styles.inputGroup}>
+                        <label className={styles.labelAlt}>State</label>
+                        <div className={styles.inputWrapper}>
+                          <input type="text" required className={styles.inputAlt} placeholder="Maharashtra" value={city} onChange={(e) => setCity(e.target.value)} />
+                        </div>
+                      </div>
+                      <div className={styles.inputGroup}>
+                        <label className={styles.labelAlt}>PIN Code</label>
+                        <div className={styles.inputWrapper}>
+                          <input type="text" required className={`${styles.inputAlt} ${isValidZip ? styles.inputValid : ''}`} placeholder="400001" value={zipCode} onChange={(e) => setZipCode(e.target.value)} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className={styles.saveAddressToggle}>
+                    <label className={styles.customCheckboxContainer}>
+                      <input type="checkbox" defaultChecked />
+                      <span className={styles.checkmark}></span>
+                      Save this address for future orders
+                    </label>
+                  </div>
+
+                  <button 
+                    type="button" 
+                    className={styles.nextStepBtnAlt}
+                    onClick={() => {
+                      if (validateStep1()) {
+                        setCurrentStep(2);
+                      } else {
+                        // Triggers HTML5 validation
+                        (document.querySelector('form') as HTMLFormElement)?.reportValidity();
+                      }
+                    }}
+                  >
+                    Proceed to Payment <ChevronRight size={18} />
+                  </button>
+                </div>
+              )}
             </div>
 
-            {/* Step 2: Home Address */}
-            <div className={styles.formSection}>
-              <h2 className={styles.sectionTitle}><MapPin size={20} color="#111" /> 2. Home Address</h2>
-
-              <div className={styles.formGrid}>
-                <div className={styles.inputGroup}>
-                  <label className={styles.label}>Flat, House no.</label>
-                  <div className={styles.inputWrapper}>
-                    <input type="text" required className={styles.input} placeholder="e.g. Flat 101" />
+            {/* Step 2: Payment Container */}
+            {currentStep === 2 && (
+              <div className={styles.stepContainerAlt}>
+                <div className={`${styles.stepHeader} ${styles.activeStepHeader}`}>
+                  <div className={styles.stepHeaderTitle}>
+                    <span className={styles.stepNumberBadge}>2</span>
+                    Payment Method
                   </div>
                 </div>
-                <div className={styles.inputGroup}>
-                  <label className={styles.label}>Building, Company, Apartment</label>
-                  <div className={styles.inputWrapper}>
-                    <input type="text" className={styles.input} placeholder="e.g. Sunshine Apartments" />
-                  </div>
-                </div>
-                <div className={styles.inputGroup}>
-                  <label className={styles.label}>Area, Street, Sector, Village</label>
-                  <div className={styles.inputWrapper}>
-                    <input type="text" required className={styles.input} placeholder="Street Address" />
-                  </div>
-                </div>
-                <div className={styles.inputGroup}>
-                  <label className={styles.label}>City</label>
-                  <div className={styles.inputWrapper}>
-                    <input type="text" required className={styles.input} placeholder="Mumbai" />
-                  </div>
-                </div>
-                <div className={styles.inputGroup}>
-                  <label className={styles.label}>State</label>
-                  <div className={styles.inputWrapper}>
-                    <input type="text" required className={styles.input} placeholder="e.g. Maharashtra" />
-                  </div>
-                </div>
-                <div className={styles.inputGroup}>
-                  <label className={styles.label}>Zip Code</label>
-                  <div className={styles.inputWrapper}>
-                    <input type="text" required className={`${styles.input} ${isValidZip ? styles.inputValid : ''}`} placeholder="400001" value={zipCode} onChange={(e) => setZipCode(e.target.value)} />
-                    {isValidZip && <Check size={18} color="#4CAF50" className={styles.inputIconRight} />}
+                
+                <div className={styles.stepBodyAlt}>
+                  <div className={styles.methodGrid}>
+                    <label className={`${styles.methodPill} ${paymentMethod === 'card' ? styles.selected : ''}`}>
+                      <input type="radio" name="payment" value="card" checked={paymentMethod === 'card'} onChange={(e) => setPaymentMethod(e.target.value)} className={styles.methodRadio} />
+                      <CreditCard size={20} color={paymentMethod === 'card' ? '#E7A03B' : '#666'} />
+                      <span className={styles.methodPillLabel}>Card</span>
+                    </label>
+                    <label className={`${styles.methodPill} ${paymentMethod === 'upi' ? styles.selected : ''}`}>
+                      <input type="radio" name="payment" value="upi" checked={paymentMethod === 'upi'} onChange={(e) => setPaymentMethod(e.target.value)} className={styles.methodRadio} />
+                      <Smartphone size={20} color={paymentMethod === 'upi' ? '#E7A03B' : '#666'} />
+                      <span className={styles.methodPillLabel}>UPI</span>
+                    </label>
+                    <label className={`${styles.methodPill} ${paymentMethod === 'cod' ? styles.selected : ''}`}>
+                      <input type="radio" name="payment" value="cod" checked={paymentMethod === 'cod'} onChange={(e) => setPaymentMethod(e.target.value)} className={styles.methodRadio} />
+                      <Truck size={20} color={paymentMethod === 'cod' ? '#E7A03B' : '#666'} />
+                      <span className={styles.methodPillLabel}>Cash on Delivery</span>
+                    </label>
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Step 3: Payment */}
-            <div className={styles.formSection}>
-              <h2 className={styles.sectionTitle}><CreditCard size={20} color="#111" /> 3. Payment method</h2>
-              <div className={styles.methodGrid}>
-                <label className={`${styles.methodPill} ${paymentMethod === 'card' ? styles.selected : ''}`}>
-                  <input type="radio" name="payment" value="card" checked={paymentMethod === 'card'} onChange={(e) => setPaymentMethod(e.target.value)} className={styles.methodRadio} />
-                  <CreditCard size={20} color={paymentMethod === 'card' ? '#E7A03B' : '#666'} />
-                  <span className={styles.methodPillLabel}>Card</span>
-                  {paymentMethod === 'card' && (
-                    <div className={styles.paymentLogos} style={{ marginLeft: 'auto' }}>
-                      <svg viewBox="0 0 36 24" width="36" height="24" fill="none"><rect width="36" height="24" rx="4" fill="#E8E8E8"/><path d="M14.654 16.5H12.01l1.658-9h2.643l-1.657 9zm7.042-8.795c-.83-.418-2.215-.658-3.414-.658-3.663 0-6.242 1.83-6.257 4.453-.014 1.94 1.84 3.02 3.25 3.67 1.437.662 1.92.109 1.92 1.706 0 2.502-3.053 1.054-4.32.483l-.6 2.625c1.135.498 2.97.915 4.9.932 4.025 0 6.637-1.854 6.657-4.717.01-1.573-.97-2.766-3.13-3.72-1.284-.6-2.073-1.002-2.07-1.614.004-.57.653-1.156 2.025-1.156 1.137-.02 1.956.234 2.56.513l.434-2.523zm8.397 5.67L27.653 7.5h-2.51c-.605 0-1.056.173-1.32.8l-4.5 9.2h2.783l.553-1.442h3.39l.322 1.442h2.457c.002.002 1.266-4.125 1.266-4.125zm-2.827-2.6l1.012-2.617c-.015.025.21.577.21.577l.583 2.765h-1.805zM9.467 7.5H6.55L4.475 14.39 3.6 8.358C3.473 7.747 3.01 7.5 2.52 7.5H.115l-.06.273c.48.1 1.026.315 1.37.525.438.267.562.5.66.974l2.218 10.603h2.8l4.364-12.375z" fill="#333"/></svg>
-                      <svg viewBox="0 0 36 24" width="36" height="24" fill="none"><rect width="36" height="24" rx="4" fill="#E8E8E8"/><circle cx="13" cy="12" r="7" fill="#333"/><circle cx="23" cy="12" r="7" fill="#666"/><path d="M18 17.143A6.976 6.976 0 0115.857 12 6.976 6.976 0 0118 6.857 6.976 6.976 0 0120.143 12 6.976 6.976 0 0118 17.143z" fill="#999"/></svg>
-                    </div>
-                  )}
-                </label>
-                <label className={`${styles.methodPill} ${paymentMethod === 'upi' ? styles.selected : ''}`}>
-                  <input type="radio" name="payment" value="upi" checked={paymentMethod === 'upi'} onChange={(e) => setPaymentMethod(e.target.value)} className={styles.methodRadio} />
-                  <Smartphone size={20} color={paymentMethod === 'upi' ? '#E7A03B' : '#666'} />
-                  <span className={styles.methodPillLabel}>UPI</span>
-                </label>
-              </div>
+            )}
+            
             </div>
             
           </div>
@@ -341,31 +412,69 @@ export default function CheckoutPage() {
                 <span>{shipping === 0 ? 'Free' : `₹${shipping}`}</span>
               </div>
               
-              <div className={styles.promoContainer}>
-                <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111' }}>Have a promo code?</div>
-                <div className={styles.promoInputWrapper}>
-                  <input type="text" className={styles.promoInput} placeholder="Enter code" />
-                  <button type="button" className={styles.promoBtn}>Apply</button>
+              <div className={styles.promoContainerAlt}>
+                <div className={styles.promoHeaderAlt}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                    Have a promo code?
+                  </div>
+                  <ChevronDown size={16} color="#888" />
+                </div>
+                <div className={styles.promoInputWrapperAlt}>
+                  <input type="text" className={styles.promoInputAlt} placeholder="Enter code" />
+                  <button type="button" className={styles.promoBtnAlt}>Apply</button>
                 </div>
               </div>
               
-              <div className={styles.totalRow}>
-                <span className={styles.totalLabel}>Total</span>
+              <div className={styles.totalRowAlt}>
+                <span className={styles.totalLabelAlt}>Total <span style={{fontSize:'0.75rem', fontWeight:'normal', color:'#888'}}>(incl. taxes)</span></span>
                 <span>₹{total.toLocaleString()}</span>
               </div>
               
-              <button type="submit" className={styles.placeOrderBtn}>
-                Checkout <ArrowRight size={18} />
-              </button>
-              <span className={styles.microTrustMessage}>
-                <Lock size={12} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />
-                Your payment info is encrypted and secure
-              </span>
-              
-              <div className={styles.trustStrip}>
-                <div className={styles.trustText}>
-                  <Lock size={14} color="#666" /> Secure SSL Checkout
-                </div>
+              <div style={{ marginTop: '1.5rem', marginBottom: '1rem', width: '100%' }}>
+                <AnimatedOrderButton 
+                  className={styles.placeOrderBtn} 
+                  onValidate={() => {
+                    if (!validateForm()) {
+                      (document.querySelector('form') as HTMLFormElement)?.reportValidity();
+                      if (currentStep === 2 && !validateStep1()) {
+                        setCurrentStep(1); // Go back to step 1 if invalid there
+                      }
+                      return false; // Prevents animation
+                    }
+                    return true;
+                  }}
+                  onComplete={() => {
+                    // This fires after the 8.5s animation completes successfully
+                    router.push('/checkout/success');
+                  }} 
+                />
+              </div>
+              <div className={styles.sslFooter}>
+                <Lock size={12} /> Secure 256-bit SSL checkout
+              </div>
+            </div>
+
+            <div className={styles.trustBadgesRow}>
+              <div className={styles.trustBadgeItem}>
+                <div className={styles.trustIconWrapper}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0110 0v4"></path></svg></div>
+                <div className={styles.trustBadgeTitle}>Safe & Secure</div>
+                <div className={styles.trustBadgeDesc}>Payments</div>
+              </div>
+              <div className={styles.trustBadgeItem}>
+                <div className={styles.trustIconWrapper}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"></path></svg></div>
+                <div className={styles.trustBadgeTitle}>Easy Returns</div>
+                <div className={styles.trustBadgeDesc}>7 Days</div>
+              </div>
+              <div className={styles.trustBadgeItem}>
+                <div className={styles.trustIconWrapper}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+                <div className={styles.trustBadgeTitle}>Original Products</div>
+                <div className={styles.trustBadgeDesc}>100% Authentic</div>
+              </div>
+              <div className={styles.trustBadgeItem}>
+                <div className={styles.trustIconWrapper}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
+                <div className={styles.trustBadgeTitle}>Customer Support</div>
+                <div className={styles.trustBadgeDesc}>24/7</div>
               </div>
             </div>
           </div>

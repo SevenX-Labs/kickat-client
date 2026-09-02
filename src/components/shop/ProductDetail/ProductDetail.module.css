@@ -333,6 +333,8 @@
 
 .addToCartBtn {
   flex: 1;
+  position: relative;
+  overflow: hidden;
   background: #111;
   color: white;
   border: none;
@@ -343,19 +345,68 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+  z-index: 1;
 }
 
-.addToCartBtn:hover {
-  background: #333;
+.addToCartBtn::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300%;
+  height: 300%;
+  background: #333F2B; /* Premium forest green */
+  transform: translate(-50%, -50%) scale(0);
+  border-radius: 50%;
+  z-index: -1;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.addToCartBtn:hover:not(.addedToCart) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(17, 17, 17, 0.15);
 }
 
 .addToCartBtn.addedToCart {
-  background: #4caf50;
-  border-color: #4caf50;
   transform: scale(1.02);
+  box-shadow: 0 8px 24px rgba(51, 63, 43, 0.25);
+}
+
+.addToCartBtn.addedToCart::before {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.btnContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.addText {
+  animation: slideUpIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.addedText {
+  animation: slideUpIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.checkIcon {
+  animation: popBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes slideUpIn {
+  0% { transform: translateY(15px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes popBounce {
+  0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+  50% { transform: scale(1.2) rotate(10deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
 
 .wishlistBtn, .shareBtn {

@@ -40,45 +40,55 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: 1.5rem;
   margin-bottom: 3rem;
-  font-family: var(--font-ibm-plex-mono), monospace;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #888;
+  font-family: var(--font-ibm-plex-sans), sans-serif;
+  font-size: 0.9rem;
+  color: #666;
 }
 
 .stepItem {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
+  font-weight: 500;
 }
 
 .stepItem.active {
   color: #111;
-  font-weight: 600;
-}
-
-.stepItem.completed {
-  color: #111;
+  font-weight: 700;
 }
 
 .stepIcon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  height: 16px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  background-color: #E7A03B;
+  background-color: #f97316;
   color: white;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.stepIconOutline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid #d1d5db;
+  color: #9ca3af;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
 .stepDivider {
-  width: 40px;
+  width: 60px;
   height: 1px;
-  background-color: #e0dcd2;
+  background-color: #e5e7eb;
 }
 
 .checkoutLayout {
@@ -184,31 +194,195 @@
   pointer-events: none;
 }
 
-.inputWithPrefix {
-  padding-left: 5rem;
+/* Premium Layout CSS */
+.mainCard {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.03);
 }
 
-.phonePrefix {
+.mainCardHeader {
+  padding: 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.mainCardIcon {
+  width: 48px;
+  height: 48px;
+  background: #fff7ed;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mainCardTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 0.25rem;
+}
+
+.mainCardSubtitle {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.stepContainerAlt {
+  border-bottom: 1px solid #f0f0f0;
+}
+.stepContainerAlt:last-child {
+  border-bottom: none;
+}
+
+.stepBodyAlt {
+  padding: 1.5rem;
+}
+
+.formSectionAlt {
+  margin-bottom: 1.5rem;
+}
+
+.sectionTitleAlt {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #111;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.labelAlt {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #4b5563;
+  margin-bottom: 0.2rem;
+  margin-left: 0.25rem;
+}
+
+.inputAlt {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: #111;
+  background-color: transparent;
+  transition: all 0.2s;
+}
+
+.inputAlt:focus {
+  outline: none;
+  border-color: #f97316;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+}
+
+.phoneInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.phonePrefixAlt {
   position: absolute;
-  left: 1rem;
+  left: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.5rem;
   font-size: 0.9rem;
-  color: #111;
-  font-weight: 500;
-  cursor: pointer;
+  background: transparent;
+  padding-right: 0.75rem;
 }
 
-.verticalDivider {
+.verticalDividerAlt {
   position: absolute;
-  left: 4.2rem;
+  left: 5rem;
   top: 25%;
   height: 50%;
   width: 1px;
-  background-color: #e0dcd2;
+  background: #e5e7eb;
+}
+
+.inputWithPrefixAlt {
+  padding-left: 6rem;
+}
+
+.saveAddressToggle {
+  margin: 1.5rem 0 2rem 0;
+}
+
+.customCheckboxContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: #374151;
+  cursor: pointer;
+  position: relative;
+}
+
+.customCheckboxContainer input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  width: 20px;
+  height: 20px;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.customCheckboxContainer input:checked ~ .checkmark {
+  background-color: #f97316;
+  border-color: #f97316;
+}
+
+.customCheckboxContainer input:checked ~ .checkmark:after {
+  content: '';
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  margin-bottom: 2px;
+}
+
+.nextStepBtnAlt {
+  width: 100%;
+  padding: 1.25rem;
+  background-color: #111;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background 0.2s;
+}
+
+.nextStepBtnAlt:hover {
+  background: #000;
 }
 
 .methodGrid {
@@ -504,21 +678,135 @@
 
 .placeOrderBtn {
   width: 100%;
-  background: #E7A03B;
-  color: white;
+  padding: 1.25rem;
   border: none;
-  padding: 1.1rem;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+/* Wizard Styles */
+.stepContainer {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.stepHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
   cursor: pointer;
+  background: white;
+  transition: background 0.2s ease;
+}
+
+.activeStepHeader {
+  background: white;
+}
+
+.activeStepHeader .stepHeaderTitle {
+  color: #111;
+}
+
+.stepHeader:hover:not(.activeStepHeader) {
+  background: #f8f8f8;
+}
+
+.stepHeaderTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111;
+  text-transform: uppercase;
+}
+
+.stepNumberBadge {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-  margin-bottom: 0.5rem;
-  box-shadow: 0 4px 14px rgba(231, 160, 59, 0.2);
+  width: 24px;
+  height: 24px;
+  background: #f0f0f0;
+  color: #2874f0;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.activeStepHeader .stepNumberBadge {
+  background: #2874f0;
+  color: white;
+}
+
+.changeBtn {
+  background: transparent;
+  border: 1px solid #e0e0e0;
+  color: #2874f0;
+  font-weight: 600;
+  padding: 0.5rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.changeBtn:hover {
+  background: #f8f8f8;
+}
+
+.collapsedSummary {
+  padding: 0 1.5rem 1.5rem 1.5rem;
+  background: white;
+  color: #111;
+}
+
+.summaryName {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.summaryAddress, .summaryPhone {
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.summaryPhone {
+  margin-top: 0.25rem;
+  font-weight: 600;
+}
+
+.stepBody {
+  padding: 1.5rem;
+  border-top: 1px solid #e0e0e0;
+  background: white;
+}
+
+.nextStepBtn {
+  margin-top: 1.5rem;
+  width: 100%;
+  padding: 1rem;
+  background-color: #111;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.nextStepBtn:hover {
+  background: #333;
 }
 
 .placeOrderBtn:hover {
@@ -582,6 +870,125 @@
   border: 2px solid rgba(27, 60, 53, 0.3);
   opacity: 0;
   animation: pulseRing 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+}
+
+/* Right Column Premium Styles */
+.summaryColumn {
+  position: relative;
+}
+
+.floatingSummaryCard {
+  position: sticky;
+  top: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  padding: 2rem;
+  border: 1px solid rgba(0,0,0,0.03);
+}
+
+.promoContainerAlt {
+  border-top: 1px dashed #e5e7eb;
+  border-bottom: 1px dashed #e5e7eb;
+  padding: 1.5rem 0;
+  margin: 1.5rem 0;
+}
+
+.promoHeaderAlt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+
+.promoInputWrapperAlt {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.promoInputAlt {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fdfdfd;
+}
+
+.promoBtnAlt {
+  padding: 0.75rem 1.5rem;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+}
+
+.totalRowAlt {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #111;
+  margin-top: 1rem;
+}
+
+.totalLabelAlt {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sslFooter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 1.5rem;
+}
+
+.trustBadgesRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  padding: 1.5rem;
+  border: 1px solid rgba(0,0,0,0.03);
+  margin-top: 1.5rem;
+  gap: 1rem;
+  text-align: center;
+}
+
+.trustIconWrapper {
+  width: 40px;
+  height: 40px;
+  background: #f9fafb;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.5rem auto;
+  color: #374151;
+}
+
+.trustBadgeTitle {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 0.15rem;
+}
+
+.trustBadgeDesc {
+  font-size: 0.65rem;
+  color: #6b7280;
 }
 
 .animatedCheck {
