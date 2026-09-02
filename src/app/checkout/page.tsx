@@ -116,14 +116,7 @@ export default function CheckoutPage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-    
-    setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsSubmitting(false);
-    
+  const handleAnimatedComplete = () => {
     setIsSubmitted(true);
     setOrderNumber(Math.floor(100000 + Math.random() * 900000));
     setParticles(Array.from({ length: 24 }).map((_, i) => {
@@ -259,7 +252,7 @@ export default function CheckoutPage() {
           </div>
         </div>
         
-        <form onSubmit={handleSubmit} className={styles.checkoutLayout}>
+        <form className={styles.checkoutLayout}>
           {/* Left Column: Forms */}
           <div className={styles.formsColumn}>
             
@@ -525,22 +518,12 @@ export default function CheckoutPage() {
 
                   </div>
                   
-                  <button 
-                    type="submit" 
-                    className={styles.nextStepBtnAlt}
-                    style={{ marginTop: '2rem' }}
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? (
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
-                        <Loader2 className={styles.spinnerIcon} size={18} /> Processing Order...
-                      </span>
-                    ) : (
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
-                        <Lock size={18} /> Place Order Securely
-                      </span>
-                    )}
-                  </button>
+                  <div style={{ marginTop: '2rem' }}>
+                    <AnimatedOrderButton 
+                      onValidate={validateForm} 
+                      onComplete={handleAnimatedComplete}
+                    />
+                  </div>
                 </div>
               </div>
             )}
