@@ -9,7 +9,6 @@ import { BottleModel } from './BottleModel';
 import styles from './Hero.module.css';
 
 
-
 export function Hero() {
   return (
     <section className={styles.hero}>
@@ -35,6 +34,15 @@ export function Hero() {
         
         {/* Left Column: Typography & CTAs */}
         <div className={styles.textContent}>
+          <div className={styles.badge}>
+            <div className={styles.badgeAvatars} aria-hidden="true">
+              <span>🐾</span>
+              <span>🐶</span>
+              <span>🐱</span>
+            </div>
+            <span className={styles.badgeText}>Trusted by 25K+ pet parents</span>
+            <span className={styles.badgeHeart}>♡</span>
+          </div>
 
           <h1 className={styles.title}>
             A bond that <br />
@@ -57,22 +65,27 @@ export function Hero() {
           
           <div className={styles.trustBar}>
             <div className={styles.trustItem}>
-              <Star size={14} fill="#E7A03B" color="#E7A03B" strokeWidth={1} />
-              <span>4.9 rated</span>
-            </div>
-            <span className={styles.trustDot}>&bull;</span>
-            <div className={styles.trustItem}>
-              <span>25K+ happy pets</span>
-            </div>
-            <span className={styles.trustDot}>&bull;</span>
-            <div className={styles.trustItem}>
-              <span>Free shipping over ₹999</span>
+              <div className={styles.avatarStack} aria-hidden="true">
+                <span>🐶</span>
+                <span>🐱</span>
+                <span>🐰</span>
+              </div>
+              <div className={styles.ratingGroup}>
+                <div className={styles.stars} aria-hidden="true">
+                  <Star size={14} fill="#F5821F" color="#F5821F" strokeWidth={1} />
+                  <Star size={14} fill="#F5821F" color="#F5821F" strokeWidth={1} />
+                  <Star size={14} fill="#F5821F" color="#F5821F" strokeWidth={1} />
+                  <Star size={14} fill="#F5821F" color="#F5821F" strokeWidth={1} />
+                  <Star size={14} fill="#E7A03B" color="#E7A03B" strokeWidth={1} opacity={0.45} />
+                </div>
+                <span>4.9/5 from 25K+ happy pet parents</span>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Right Column: Interactive 3D Model */}
-        <div className={styles.visualContent} style={{ cursor: 'grab', height: '100%', minHeight: '500px' }}>
+        <div className={styles.visualContent} style={{ cursor: 'grab' }}>
           <Canvas 
             camera={{ position: [-1.5, 0, 8], fov: 45 }}
             style={{ width: '100%', height: '100%' }}

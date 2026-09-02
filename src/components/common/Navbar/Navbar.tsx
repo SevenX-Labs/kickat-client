@@ -1,14 +1,15 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronDown, Search, Heart, User, ShoppingBag, Package, Tag, CreditCard, MapPin, Bell, LogOut, Star, Truck, Percent, Crown } from "lucide-react";
+import { ChevronDown, Search, Heart, User, ShoppingBag, Package, Tag, MapPin, Bell, LogOut, Star, Truck, Percent, Crown, Menu, X, Dog, Cat, Fish, Bird, MessageCircle, BookOpen, Phone, ShieldQuestion, Headset } from "lucide-react";
 import styles from "./Navbar.module.css";
 
 const taxonomy = {
   Dogs: {
     categoryHref: "/categories/dogs",
+    Icon: Dog,
     items: [
       { name: "Dog Accessories", href: "/category/dogs/dog-accessories" },
       { name: "Dog Food & Treats", href: "/category/dogs/dog-food-treats" },
@@ -18,6 +19,7 @@ const taxonomy = {
   },
   Cats: {
     categoryHref: "/categories/cats",
+    Icon: Cat,
     items: [
       { name: "Cat Accessories", href: "/category/cats/cat-accessories" },
       { name: "Cat Food", href: "/category/cats/cat-food" },
@@ -27,6 +29,7 @@ const taxonomy = {
   },
   Fish: {
     categoryHref: "/categories/fish",
+    Icon: Fish,
     items: [
       { name: "Aquarium Filtration", href: "/category/fish/aquarium-filtration" },
       { name: "Aquarium Pumps", href: "/category/fish/aquarium-pumps" },
@@ -39,6 +42,7 @@ const taxonomy = {
   },
   Birds: {
     categoryHref: "/categories/birds",
+    Icon: Bird,
     items: [
       { name: "Bird Feeding", href: "/category/birds/bird-feeding" },
       { name: "Bird Food", href: "/category/birds/bird-food" },
@@ -46,13 +50,24 @@ const taxonomy = {
   },
 };
 
+const mobileLinks = [
+  { label: "Track Orders", href: "/orders", Icon: Package },
+  { label: "Profile", href: "/account?tab=profile", Icon: User },
+  { label: "Testimonials", href: "/testimonials", Icon: MessageCircle },
+  { label: "Blogs", href: "/blogs", Icon: BookOpen },
+  { label: "Contact", href: "/contact", Icon: Phone },
+  { label: "Privacy Policy", href: "/privacy-policy", Icon: ShieldQuestion },
+  { label: "Help & Support", href: "/contact", Icon: Headset },
+];
+
 export function Navbar() {
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    setIsLoggedIn(localStorage.getItem("isLoggedIn") === "true");
-  }, []);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [openMobileCategory, setOpenMobileCategory] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("isLoggedIn") === "true";
+  });
 
   const handleAccountClick = () => {
     if (!isLoggedIn) {
@@ -64,6 +79,11 @@ export function Navbar() {
     localStorage.removeItem("isLoggedIn");
     setIsLoggedIn(false);
     router.push('/');
+  };
+
+  const closeMobileMenu = () => {
+    setIsMenuOpen(false);
+    setOpenMobileCategory(null);
   };
 
   const items = [
@@ -109,6 +129,16 @@ export function Navbar() {
         
         {/* Left Section: Logo + Nav Links */}
         <div className={styles.leftSection}>
+          <button
+            className={styles.mobileMenuBtn}
+            type="button"
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMenuOpen}
+            onClick={() => setIsMenuOpen((open) => !open)}
+          >
+            {isMenuOpen ? <X size={22} strokeWidth={1.8} /> : <Menu size={22} strokeWidth={1.8} />}
+          </button>
+
           <Link href="/" className={styles.logoWrapper}>
             <Image
               src="/logo-clean.png"
@@ -116,7 +146,7 @@ export function Navbar() {
               width={300}
               height={100}
               priority
-              style={{ objectFit: "contain", userSelect: "none", width: "auto", height: "95px", mixBlendMode: "multiply", transform: "scale(1.25)", transformOrigin: "left center" }}
+              className={styles.logoImage}
               draggable={false}
               onContextMenu={(e) => e.preventDefault()}
             />
@@ -150,19 +180,10 @@ export function Navbar() {
 
         {/* Right Section: Search + Premium Actions */}
         <div className={styles.rightSection}>
-          <div className={styles.searchContainer}>
-            <div className={styles.searchWrapper}>
-              <Search className={styles.searchIcon} size={16} strokeWidth={1.8} />
-              <input
-                type="text"
-                placeholder="Search products..."
-                className={styles.searchInput}
-              />
-            </div>
-          </div>
+
 
           <div className={styles.actions}>
-            <button className={styles.iconBtn} aria-label="Wishlist" title="Wishlist">
+            <button className={`${styles.iconBtn} ${styles.wishlistBtn}`} aria-label="Wishlist" title="Wishlist">
               <Heart size={20} strokeWidth={1.75} />
             </button>
 
@@ -240,7 +261,50 @@ export function Navbar() {
             </Link>
           </div>
         </div>
+      </div>
 
+      <div className={`${styles.mobilePanel} ${isMenuOpen ? styles.mobilePanelOpen : ''}`}>
+
+
+        <nav className={styles.mobileNav}>
+          {Object.entries(taxonomy).map(([category, data]) => {
+            const Icon = data.Icon;
+            return (
+              <div key={category} className={styles.mobileCategory}>
+                <button
+                  type="button"
+                  className={styles.mobileCategoryTitle}
+                  aria-expanded={openMobileCategory === category}
+                  onClick={() => setOpenMobileCategory((current) => current === category ? null : category)}
+                >
+                  <span className={styles.mobileLinkLabel}>
+                    <Icon size={18} strokeWidth={1.8} />
+                    {category}
+                  </span>
+                  <ChevronDown className={`${styles.chevron} ${openMobileCategory === category ? styles.mobileChevronOpen : ''}`} strokeWidth={2} />
+                </button>
+                <div className={`${styles.mobileSubLinks} ${openMobileCategory === category ? styles.mobileSubLinksOpen : ''}`}>
+                  <Link href={data.categoryHref} className={styles.mobileSubLink} onClick={closeMobileMenu}>
+                    View All {category}
+                  </Link>
+                  {data.items.map((sub, idx) => (
+                    <Link key={idx} href={sub.href} className={styles.mobileSubLink} onClick={closeMobileMenu}>
+                      {sub.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+          {mobileLinks.map(({ label, href, Icon }) => (
+            <Link key={label} href={href} className={styles.mobileTopLink} onClick={closeMobileMenu}>
+              <span className={styles.mobileLinkLabel}>
+                <Icon size={18} strokeWidth={1.8} />
+                {label}
+              </span>
+            </Link>
+          ))}
+        </nav>
       </div>
     </header>
   );
