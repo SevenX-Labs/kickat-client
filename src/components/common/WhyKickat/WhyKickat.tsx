@@ -132,17 +132,17 @@ export function WhyKickat() {
           </div>
         </div>
 
-        {/* Right visual anchor — pull-quote */}
+        {/* Right visual anchor — Founder's Message */}
         <div className={`${styles.quoteCard} ${isVisible ? styles.quoteVisible : ''}`}>
           <Quote className={styles.quoteIcon} strokeWidth={1} />
           <blockquote className={styles.quoteText}>
-            KickAt completely changed how I feed my dog. The quality is unmatched and Max has never been healthier.
+            "We started KickAt with a simple promise: to provide our pets with the same high-quality, honest nutrition we demand for ourselves. No shortcuts, just love."
           </blockquote>
           <div className={styles.quoteAuthor}>
-            <div className={styles.authorAvatar}>P</div>
+            <div className={styles.authorAvatar} style={{ background: 'linear-gradient(135deg, #211C15, #38342E)' }}>F</div>
             <div className={styles.authorInfo}>
-              <span className={styles.authorName}>Priya Sharma</span>
-              <span className={styles.authorRole}>Pet parent · Golden Retriever</span>
+              <span className={styles.authorName}>The Founder</span>
+              <span className={styles.authorRole}>KickAt Pets</span>
             </div>
           </div>
         </div>
