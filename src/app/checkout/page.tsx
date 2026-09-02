@@ -497,52 +497,11 @@ export default function CheckoutPage() {
                 <span>₹{total.toLocaleString()}</span>
               </div>
               
-              <div style={{ marginTop: '1.5rem', marginBottom: '1rem', width: '100%' }}>
-                <AnimatedOrderButton 
-                  className={styles.placeOrderBtn} 
-                  onValidate={() => {
-                    if (!validateForm()) {
-                      (document.querySelector('form') as HTMLFormElement)?.reportValidity();
-                      if (currentStep === 2 && !validateStep1()) {
-                        setCurrentStep(1); // Go back to step 1 if invalid there
-                      }
-                      return false; // Prevents animation
-                    }
-                    return true;
-                  }}
-                  onComplete={() => {
-                    // This fires after the 8.5s animation completes successfully
-                    router.push('/checkout/success');
-                  }} 
-                />
-              </div>
               <div className={styles.sslFooter}>
                 <Lock size={12} /> Secure 256-bit SSL checkout
               </div>
             </div>
 
-            <div className={styles.trustBadgesRow}>
-              <div className={styles.trustBadgeItem}>
-                <div className={styles.trustIconWrapper}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0110 0v4"></path></svg></div>
-                <div className={styles.trustBadgeTitle}>Safe & Secure</div>
-                <div className={styles.trustBadgeDesc}>Payments</div>
-              </div>
-              <div className={styles.trustBadgeItem}>
-                <div className={styles.trustIconWrapper}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"></path></svg></div>
-                <div className={styles.trustBadgeTitle}>Easy Returns</div>
-                <div className={styles.trustBadgeDesc}>7 Days</div>
-              </div>
-              <div className={styles.trustBadgeItem}>
-                <div className={styles.trustIconWrapper}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
-                <div className={styles.trustBadgeTitle}>Original Products</div>
-                <div className={styles.trustBadgeDesc}>100% Authentic</div>
-              </div>
-              <div className={styles.trustBadgeItem}>
-                <div className={styles.trustIconWrapper}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
-                <div className={styles.trustBadgeTitle}>Customer Support</div>
-                <div className={styles.trustBadgeDesc}>24/7</div>
-              </div>
-            </div>
           </div>
         </form>
       </main>

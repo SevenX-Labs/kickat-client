@@ -1,15 +1,15 @@
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 4rem 2rem;
+  padding: 1.5rem 2rem;
 }
 
 .title {
   font-family: var(--font-fraunces), serif;
-  font-size: 3rem;
+  font-size: 2.5rem;
   font-weight: 700;
   color: #111;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .cartLayout {
@@ -143,9 +143,9 @@
 /* Right Column: Summary */
 .summaryColumn {
   position: sticky;
-  top: 100px;
+  top: 1.5rem;
   background-color: #FBF7EE;
-  padding: 2.5rem;
+  padding: 1.5rem 2rem 2rem 2rem;
   border-radius: 16px;
 }
 
