@@ -5,7 +5,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { AnimatedOrderButton } from './AnimatedOrderButton';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Check, Truck, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, CreditCard, Smartphone, ChevronDown, User, MapPin, Lock, Edit3, X, Home, Shield, Plus, Loader2 } from 'lucide-react';
+import { Check, Truck, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, CreditCard, Smartphone, ChevronDown, User, MapPin, Lock, Edit3, X, Home, Shield, Plus, Loader2, Calendar, Mail, Package, ShoppingBag, Download, Heart, RotateCcw, Headphones } from 'lucide-react';
 import styles from './Checkout.module.css';
 
 // Mock Cart Data for Checkout
@@ -164,20 +164,28 @@ export default function CheckoutPage() {
             </svg>
           </div>
           
-          <h1 className={styles.successTitle}>Order Placed Successfully</h1>
+          <h1 className={styles.successTitle}>Order Placed <span className={styles.successTitleOrange}>Successfully!</span></h1>
           <p className={styles.successSubtitle}>
-            Thank you for shopping with KickAt. We&apos;ve sent a confirmation email with tracking details to your inbox.
+            Thank you for shopping with KickAt. We&apos;ve sent a confirmation email<br/>with tracking details to your inbox.
           </p>
+          
+          <div className={styles.confirmationPill}>
+            <Mail size={16} /> Confirmation sent to <strong>{email || 'sahil.hode@gmail.com'}</strong>
+          </div>
 
           <div className={styles.successCard}>
             <div className={styles.successCardHeader}>
               <div className={styles.cardHeaderItem}>
-                <span className={styles.cardHeaderLabel}>Order Number</span>
-                <span className={styles.cardHeaderValueMono}>#ORD-{orderNumber}</span>
+                <span className={styles.cardHeaderLabel}>ORDER NUMBER</span>
+                <span className={styles.cardHeaderValueMono}>#KCK-{orderNumber}</span>
               </div>
-              <div className={styles.cardHeaderItem} style={{ alignItems: 'flex-end' }}>
-                <span className={styles.cardHeaderLabel}>Total Amount</span>
-                <span className={styles.cardHeaderValue}>₹{total.toLocaleString()}</span>
+              <div className={styles.cardHeaderItem} style={{ paddingLeft: '2rem', borderLeft: '1px solid #e0dcd2' }}>
+                <span className={styles.cardHeaderLabel}>ORDER DATE</span>
+                <span className={styles.cardHeaderValue}><Calendar size={14}/> 26 May, 2025 • 10:24 AM</span>
+              </div>
+              <div className={styles.cardHeaderItem} style={{ alignItems: 'flex-end', borderLeft: '1px solid #e0dcd2' }}>
+                <span className={styles.cardHeaderLabel}>TOTAL AMOUNT</span>
+                <span className={styles.cardHeaderValueOrange}>₹{total.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
               </div>
             </div>
 
@@ -192,28 +200,71 @@ export default function CheckoutPage() {
                     <div className={styles.successItemMeta}>Qty: {item.quantity}</div>
                   </div>
                   <div className={styles.successItemPrice}>
-                    ₹{(item.price * item.quantity).toLocaleString()}
+                    ₹{(item.price * item.quantity).toLocaleString(undefined, {minimumFractionDigits: 2})}
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className={styles.deliveryEstimate}>
-              <Truck size={20} color="#111" strokeWidth={1.5} />
-              <span>Arriving Aug 28 – Aug 30</span>
+            <div className={styles.deliveryEstimateCard}>
+              <div className={styles.deliveryIconWrapper}>
+                <Truck size={18} color="#ea580c" />
+              </div>
+              <div className={styles.deliveryText}>
+                <div className={styles.deliveryTitle}>Estimated Delivery</div>
+                <div className={styles.deliveryDate}>Arriving <strong>Aug 28 – Aug 30</strong></div>
+              </div>
+            </div>
+          </div>
+          
+          <div className={styles.featuresRow}>
+            <div className={styles.featureBox}>
+              <div className={styles.featureIconCircle}><Truck size={20} /></div>
+              <div>
+                <div className={styles.featureBoxTitle}>Fast Delivery</div>
+                <div className={styles.featureBoxDesc}>On-time delivery<br/>guaranteed</div>
+              </div>
+            </div>
+            <div className={styles.featureBox}>
+              <div className={styles.featureIconCircle}><Shield size={20} /></div>
+              <div>
+                <div className={styles.featureBoxTitle}>Secure Payment</div>
+                <div className={styles.featureBoxDesc}>100% safe & secure<br/>transactions</div>
+              </div>
+            </div>
+            <div className={styles.featureBox}>
+              <div className={styles.featureIconCircle}><RotateCcw size={20} /></div>
+              <div>
+                <div className={styles.featureBoxTitle}>Easy Returns</div>
+                <div className={styles.featureBoxDesc}>Hassle-free returns<br/>within 7 days</div>
+              </div>
+            </div>
+            <div className={styles.featureBox}>
+              <div className={styles.featureIconCircle}><Headphones size={20} /></div>
+              <div>
+                <div className={styles.featureBoxTitle}>Customer Support</div>
+                <div className={styles.featureBoxDesc}>We're here to help<br/>24/7</div>
+              </div>
             </div>
           </div>
 
           <div className={styles.successCtaGroup}>
-            <Link href="/account" className={styles.successBtn}>
-              View Order Status
+            <Link href="/account" className={styles.primarySuccessBtn}>
+              <Package size={20} /> View Order Status <ArrowRight size={20} />
             </Link>
-            <div className={styles.secondaryActions}>
-              <Link href="/shop" className={styles.textLink}>
-                Continue Shopping <ArrowRight size={16} />
+            <div className={styles.secondaryActionsRow}>
+              <Link href="/shop" className={styles.outlineBtnAlt}>
+                <ShoppingBag size={16} /> Continue Shopping
               </Link>
-              <button className={styles.outlineBtn}>Download Invoice</button>
+              <button className={styles.outlineBtnAlt}>
+                <Download size={16} /> Download Invoice
+              </button>
             </div>
+          </div>
+          
+          <div className={styles.successFooter}>
+             <Heart size={14} fill="#ea580c" color="#ea580c" style={{ display: 'inline', verticalAlign: 'middle' }} /> Thanks for choosing KickAt!<br/>
+             <span style={{color: '#666'}}>Your pet's happiness is our priority.</span>
           </div>
           
         </div>

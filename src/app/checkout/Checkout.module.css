@@ -1585,58 +1585,58 @@
   font-weight: 600;
   text-decoration: none;
   transition: all 0.2s ease;
-  display: inline-block;
-}
-
-.successBtn:hover {
-  background-color: #d8912a;
-  transform: translateY(-1px);
-}
-
-.secondaryActions {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-}
-
-.textLink {
-  color: rgba(33, 28, 21, 0.8);
+  padding: 1.15rem;
+  border-radius: 8px;
   font-weight: 600;
-  text-decoration: none;
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  transition: color 0.2s;
+  justify-content: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: none;
 }
 
-.textLink svg {
-  transition: transform 0.2s;
+.primarySuccessBtn:hover {
+  background: #c2410c;
 }
 
-.textLink:hover {
-  color: #E7A03B;
+.secondaryActionsRow {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
 }
 
-.textLink:hover svg {
-  transform: translateX(4px);
-}
-
-.outlineBtn {
-  border: 1px solid rgba(33, 28, 21, 0.2);
-  color: #111;
-  padding: 0.6rem 1.25rem;
-  border-radius: 50px;
+.outlineBtnAlt {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.9rem;
+  border: 1px solid #e0dcd2;
+  border-radius: 8px;
+  background: white;
+  color: #444;
+  font-weight: 500;
   font-size: 0.9rem;
-  font-weight: 600;
   text-decoration: none;
-  background: transparent;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
+  cursor: pointer;
 }
 
-.outlineBtn:hover {
-  border-color: #111;
+.outlineBtnAlt:hover {
   background: #f9f9f9;
+  border-color: #bbb;
+}
+
+.successFooter {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #444;
+  font-weight: 500;
+  line-height: 1.6;
 }
 
 /* Animations */
