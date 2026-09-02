@@ -5,7 +5,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { AnimatedOrderButton } from './AnimatedOrderButton';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Check, Truck, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, CreditCard, Smartphone, ChevronDown, User, MapPin, Lock, Edit3, X, Home, Shield, Plus } from 'lucide-react';
+import { Check, Truck, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, CreditCard, Smartphone, ChevronDown, User, MapPin, Lock, Edit3, X, Home, Shield, Plus, Loader2 } from 'lucide-react';
 import styles from './Checkout.module.css';
 
 // Mock Cart Data for Checkout
@@ -58,6 +58,7 @@ export default function CheckoutPage() {
   const [currentStep, setCurrentStep] = useState<1 | 2>(1);
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form states for validation checkmarks (pre-filled with dummy data)
   const [firstName, setFirstName] = useState('Eduard');
@@ -115,9 +116,14 @@ export default function CheckoutPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
+    
+    setIsSubmitting(true);
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    setIsSubmitting(false);
+    
     setIsSubmitted(true);
     setOrderNumber(Math.floor(100000 + Math.random() * 900000));
     setParticles(Array.from({ length: 24 }).map((_, i) => {
@@ -445,23 +451,90 @@ export default function CheckoutPage() {
                 </div>
                 
                 <div className={styles.stepBodyAlt}>
-                  <div className={styles.methodGrid}>
-                    <label className={`${styles.methodPill} ${paymentMethod === 'card' ? styles.selected : ''}`}>
-                      <input type="radio" name="payment" value="card" checked={paymentMethod === 'card'} onChange={(e) => setPaymentMethod(e.target.value)} className={styles.methodRadio} />
-                      <CreditCard size={20} color={paymentMethod === 'card' ? '#E7A03B' : '#666'} />
-                      <span className={styles.methodPillLabel}>Card</span>
-                    </label>
-                    <label className={`${styles.methodPill} ${paymentMethod === 'upi' ? styles.selected : ''}`}>
-                      <input type="radio" name="payment" value="upi" checked={paymentMethod === 'upi'} onChange={(e) => setPaymentMethod(e.target.value)} className={styles.methodRadio} />
-                      <Smartphone size={20} color={paymentMethod === 'upi' ? '#E7A03B' : '#666'} />
-                      <span className={styles.methodPillLabel}>UPI</span>
-                    </label>
-                    <label className={`${styles.methodPill} ${paymentMethod === 'cod' ? styles.selected : ''}`}>
-                      <input type="radio" name="payment" value="cod" checked={paymentMethod === 'cod'} onChange={(e) => setPaymentMethod(e.target.value)} className={styles.methodRadio} />
-                      <Truck size={20} color={paymentMethod === 'cod' ? '#E7A03B' : '#666'} />
-                      <span className={styles.methodPillLabel}>Cash on Delivery</span>
-                    </label>
+                  <div className={styles.paymentMethodsList}>
+                    
+                    {/* Card Option */}
+                    <div className={`${styles.paymentOptionCard} ${paymentMethod === 'card' ? styles.selected : ''}`}>
+                      <div className={styles.paymentOptionHeader} onClick={() => setPaymentMethod('card')}>
+                        <div className={styles.paymentOptionIcon}>
+                          <CreditCard size={20} />
+                        </div>
+                        <div className={styles.paymentOptionDetails}>
+                          <p className={styles.paymentOptionTitle}>Credit or Debit Card</p>
+                          <p className={styles.paymentOptionSubtitle}>Pay securely with your bank card</p>
+                        </div>
+                        <div className={styles.paymentRadioCircle}>
+                          <div className={styles.paymentRadioDot}></div>
+                        </div>
+                      </div>
+                      
+                      {paymentMethod === 'card' && (
+                        <div className={styles.paymentOptionBody}>
+                          <input type="text" className={styles.dummyInput} placeholder="Card Number (e.g. 4242 4242 4242 4242)" />
+                          <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                            <input type="text" className={styles.dummyInput} placeholder="MM/YY" style={{ marginTop: 0 }} />
+                            <input type="text" className={styles.dummyInput} placeholder="CVC" style={{ marginTop: 0 }} />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* UPI Option */}
+                    <div className={`${styles.paymentOptionCard} ${paymentMethod === 'upi' ? styles.selected : ''}`}>
+                      <div className={styles.paymentOptionHeader} onClick={() => setPaymentMethod('upi')}>
+                        <div className={styles.paymentOptionIcon}>
+                          <Smartphone size={20} />
+                        </div>
+                        <div className={styles.paymentOptionDetails}>
+                          <p className={styles.paymentOptionTitle}>UPI ID / QR</p>
+                          <p className={styles.paymentOptionSubtitle}>Google Pay, PhonePe, Paytm, etc.</p>
+                        </div>
+                        <div className={styles.paymentRadioCircle}>
+                          <div className={styles.paymentRadioDot}></div>
+                        </div>
+                      </div>
+                      
+                      {paymentMethod === 'upi' && (
+                        <div className={styles.paymentOptionBody}>
+                          <input type="text" className={styles.dummyInput} placeholder="Enter your UPI ID (e.g. name@okhdfcbank)" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* COD Option */}
+                    <div className={`${styles.paymentOptionCard} ${paymentMethod === 'cod' ? styles.selected : ''}`}>
+                      <div className={styles.paymentOptionHeader} onClick={() => setPaymentMethod('cod')}>
+                        <div className={styles.paymentOptionIcon}>
+                          <Truck size={20} />
+                        </div>
+                        <div className={styles.paymentOptionDetails}>
+                          <p className={styles.paymentOptionTitle}>Cash on Delivery</p>
+                          <p className={styles.paymentOptionSubtitle}>Pay with cash when your order arrives</p>
+                        </div>
+                        <div className={styles.paymentRadioCircle}>
+                          <div className={styles.paymentRadioDot}></div>
+                        </div>
+                      </div>
+                    </div>
+
                   </div>
+                  
+                  <button 
+                    type="submit" 
+                    className={styles.nextStepBtnAlt}
+                    style={{ marginTop: '2rem' }}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
+                        <Loader2 className={styles.spinnerIcon} size={18} /> Processing Order...
+                      </span>
+                    ) : (
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
+                        <Lock size={18} /> Place Order Securely
+                      </span>
+                    )}
+                  </button>
                 </div>
               </div>
             )}

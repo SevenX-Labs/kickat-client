@@ -532,44 +532,123 @@
   text-decoration: underline;
 }
 
-.methodGrid {
+.paymentMethodsList {
   display: flex;
+  flex-direction: column;
   gap: 1rem;
 }
 
-.methodPill {
-  flex: 1;
+.paymentOptionCard {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e0dcd2;
+  border-radius: 12px;
+  background: white;
+  transition: all 0.2s;
+  overflow: hidden;
+}
+
+.paymentOptionCard.selected {
+  border-color: #E7A03B;
+  background-color: #fff9f0;
+  box-shadow: 0 4px 12px rgba(231, 160, 59, 0.08);
+}
+
+.paymentOptionHeader {
+  display: flex;
+  align-items: center;
+  padding: 1.25rem;
+  cursor: pointer;
+  gap: 1rem;
+}
+
+.paymentOptionIcon {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  padding: 1rem;
-  border: 1px solid #e0dcd2;
-  border-radius: 12px;
-  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  background: #f7f5f2;
+  border-radius: 50%;
+  color: #555;
   transition: all 0.2s;
-  background: white;
 }
 
-.methodPill:hover {
-  border-color: #bbb;
+.paymentOptionCard.selected .paymentOptionIcon {
+  background: #E7A03B;
+  color: white;
 }
 
-.methodPill.selected {
-  border-color: #E7A03B;
-  border-width: 1px;
-  background-color: rgba(231, 160, 59, 0.04);
-  box-shadow: 0 0 0 1px #E7A03B, 0 4px 12px rgba(231, 160, 59, 0.12);
+.paymentOptionDetails {
+  flex: 1;
 }
 
-.methodPillLabel {
+.paymentOptionTitle {
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: #111;
+  margin: 0 0 0.25rem 0;
 }
 
-.methodRadio {
-  display: none;
+.paymentOptionSubtitle {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 0;
+}
+
+.paymentRadioCircle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.paymentOptionCard.selected .paymentRadioCircle {
+  border-color: #E7A03B;
+}
+
+.paymentRadioDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #E7A03B;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.2s;
+}
+
+.paymentOptionCard.selected .paymentRadioDot {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.paymentOptionBody {
+  padding: 0 1.25rem 1.25rem 1.25rem;
+  animation: slideDown 0.3s ease;
+}
+
+.dummyInput {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid #e0dcd2;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  margin-top: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.dummyInput:focus {
+  border-color: #E7A03B;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Right Column: Floating Order Summary */
@@ -1634,6 +1713,21 @@
     box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
     padding: 1.5rem;
   }
+}
+
+@media (max-width: 480px) {
+  .stepHeaderTitle {
+    font-size: 1rem;
+  }
+}
+
+.spinnerIcon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @media (max-width: 640px) {
