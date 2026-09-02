@@ -2,9 +2,10 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ChevronDown, Search, Heart, User, ShoppingBag, Package, Tag, MapPin, Bell, LogOut, Star, Truck, Percent, Crown, Menu, X, Dog, Cat, Fish, Bird, MessageCircle, BookOpen, Phone, ShieldQuestion, Headset } from "lucide-react";
+import { useRouter, usePathname } from "next/navigation";
+import { ChevronDown, Search, Heart, User, ShoppingBag, Package, Tag, MapPin, Bell, LogOut, Star, Truck, Percent, Crown, Menu, X, Dog, Cat, Fish, Bird, MessageCircle, BookOpen, Phone, ShieldQuestion, Headset, ArrowRight, Sun } from "lucide-react";
 import styles from "./Navbar.module.css";
+import { megaMenuData } from "@/data/megaMenuData";
 
 const taxonomy = {
   Dogs: {
@@ -62,8 +63,16 @@ const mobileLinks = [
 
 export function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [menuHoverAllowed, setMenuHoverAllowed] = useState(true);
   const [openMobileCategory, setOpenMobileCategory] = useState<string | null>(null);
+  const [activeSidebarItems, setActiveSidebarItems] = useState<Record<string, string>>({
+    Dogs: 'food',
+    Cats: 'food',
+    Fish: 'food',
+    Birds: 'food'
+  });
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -77,6 +86,11 @@ export function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    // Force close any open menus when the route changes
+    setMenuHoverAllowed(false);
+  }, [pathname]);
 
   const handleAccountClick = () => {
     if (!isLoggedIn) {
@@ -164,27 +178,93 @@ export function Navbar() {
 
         {/* Center Section: Navigation Links */}
         <nav className={styles.centerSection}>
-          {Object.entries(taxonomy).map(([category, data]) => (
-            <div key={category} className={styles.dropdownWrapper}>
-              <Link href={data.categoryHref} className={`${styles.navItem} ${styles.dropdownTrigger}`}>
+          {Object.entries(megaMenuData).map(([category, data]) => (
+            <div 
+              key={category} 
+              className={styles.dropdownWrapper}
+              onMouseEnter={() => setMenuHoverAllowed(true)}
+            >
+              <Link 
+                href={data.categoryHref} 
+                className={`${styles.navItem} ${styles.dropdownTrigger}`}
+                onClick={() => setMenuHoverAllowed(false)}
+              >
                 {category}
                 <ChevronDown className={styles.chevron} strokeWidth={1.5} />
               </Link>
-              <div className={styles.dropdownMenu}>
-                {data.items.map((sub, idx) => (
-                  <Link key={idx} href={sub.href} className={styles.dropdownLink}>
-                    {sub.name}
+              
+              <div className={`${styles.megaMenu} ${!menuHoverAllowed ? styles.forceHide : ''}`}>
+                {/* Left Sidebar */}
+                <div className={styles.megaSidebar}>
+                  {data.sidebar.map((item) => {
+                    const SidebarIcon = item.Icon;
+                    const isActive = activeSidebarItems[category] === item.id;
+                    return (
+                      <div 
+                        key={item.id} 
+                        className={`${styles.megaSidebarItem} ${isActive ? styles.megaSidebarItemActive : ''}`}
+                        onMouseEnter={() => setActiveSidebarItems(prev => ({ ...prev, [category]: item.id }))}
+                      >
+                        <span className={styles.megaSidebarItemLeft}>
+                          <SidebarIcon size={18} strokeWidth={isActive ? 2 : 1.5} className={styles.megaSidebarIcon} />
+                          {item.label}
+                        </span>
+                        {isActive && <ChevronDown className={styles.megaSidebarCaret} size={16} strokeWidth={2.5} />}
+                      </div>
+                    );
+                  })}
+                  <Link 
+                    href={data.categoryHref} 
+                    className={styles.megaViewAll}
+                    onClick={() => setMenuHoverAllowed(false)}
+                  >
+                    View All {category} Products <ArrowRight size={14} strokeWidth={2} />
                   </Link>
-                ))}
+                </div>
+
+                {/* Middle Content */}
+                <div className={styles.megaContent}>
+                  <div className={styles.megaColumns}>
+                    {data.content[activeSidebarItems[category] as keyof typeof data.content]?.map((col, idx) => (
+                      <div key={idx} className={styles.megaColumn}>
+                        <h4 className={styles.megaColTitle}>{col.title}</h4>
+                        <ul className={styles.megaColList}>
+                          {col.items.map((link, i) => (
+                            <li key={i}>
+                              <Link 
+                                href={link.href} 
+                                className={styles.megaColLink}
+                                onClick={() => setMenuHoverAllowed(false)}
+                              >
+                                {link.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Promo Banner */}
+                  <div className={styles.megaPromoBanner}>
+                    <div className={styles.megaPromoIconWrap}>
+                      <Sun size={20} strokeWidth={1.8} className={styles.megaPromoIcon} /> 
+                    </div>
+                    <div className={styles.megaPromoText}>
+                      <span className={styles.megaPromoTitle}>Not sure what's best for your pet?</span>
+                      <span className={styles.megaPromoSub}>Get expert recommendations</span>
+                    </div>
+                    <ArrowRight size={16} strokeWidth={2} className={styles.megaPromoArrow} />
+                  </div>
+                </div>
+
+                {/* Right Image */}
+                <div className={styles.megaImageCol}>
+                  <Image src={data.image} alt={category} fill className={styles.megaImage} style={{ objectFit: 'cover' }} />
+                </div>
               </div>
             </div>
           ))}
-          <Link href="/brands" className={styles.navItem}>
-            Brands
-          </Link>
-          <Link href="/offers" className={styles.navItem}>
-            Offers
-          </Link>
           <Link href="/blogs" className={styles.navItem}>
             Blogs
           </Link>

@@ -16,6 +16,7 @@
 }
 
 .container {
+  position: relative;
   display: flex;
   height: 6rem;
   align-items: center;
@@ -30,7 +31,6 @@
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  flex: 1;
 }
 
 .rightSection {
@@ -38,24 +38,22 @@
   align-items: center;
   justify-content: flex-end;
   gap: 1.5rem;
-  flex: 1;
 }
 
 .logoWrapper {
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  height: 95px;
-  overflow: visible;
+  height: auto;
 }
 
 .logoImage {
   width: auto;
-  height: 95px;
+  height: 80px;
   object-fit: contain;
   user-select: none;
   mix-blend-mode: multiply;
-  transform: scale(1.25);
+  transform: translateY(-2px) scale(1.1);
   transform-origin: left center;
 }
 
@@ -177,8 +175,7 @@
   display: none;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
-  flex: 2;
+  gap: 2.5rem;
 }
 
 @media (min-width: 960px) {
@@ -189,14 +186,35 @@
 
 .navItem {
   text-decoration: none;
-  color: #211C15;
-  font-weight: 500;
-  font-size: 0.925rem;
+  color: #38342E;
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.01em;
   transition: color 0.2s ease;
   position: relative;
   display: flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.35rem;
+  padding: 0.5rem 0;
+}
+
+.navItem::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #F5821F;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.navItem:hover::after,
+.dropdownWrapper:hover .navItem::after {
+  transform: scaleX(1);
+  transform-origin: left;
 }
 
 .navItem:hover {
@@ -219,7 +237,7 @@
 }
 
 .dropdownWrapper {
-  position: relative;
+  position: static;
   display: flex;
   align-items: center;
   padding: 1rem 0;
@@ -234,74 +252,220 @@
   transform: rotate(180deg);
 }
 
-.dropdownMenu {
+.megaMenu {
   position: absolute;
-  top: calc(100% + 15px);
-  left: -1.5rem;
-  min-width: 260px;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(12px);
-  border-radius: 16px;
-  box-shadow: 0 12px 48px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  width: 960px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 16px 64px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
   border: 1px solid rgba(0,0,0,0.06);
-  padding: 0.5rem 0;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(12px);
   transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   z-index: 100;
+  display: grid;
+  grid-template-columns: 260px 1fr 280px;
+  overflow: hidden;
+}
+
+.megaMenu::before {
+  content: '';
+  position: absolute;
+  top: -25px;
+  left: 0;
+  right: 0;
+  height: 25px;
+  background: transparent;
+}
+
+.dropdownWrapper:hover .megaMenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.megaSidebar {
+  padding: 1.5rem 0;
+  border-right: 1px solid rgba(0,0,0,0.04);
   display: flex;
   flex-direction: column;
 }
 
-/* Arrow pointing up for category dropdowns */
-.dropdownMenu::before {
-  content: '';
-  position: absolute;
-  top: -6px;
-  left: 2.5rem; /* Align roughly with the nav item text */
-  width: 12px;
-  height: 12px;
-  background: #ffffff;
-  transform: rotate(45deg);
-  border-left: 1px solid rgba(0,0,0,0.06);
-  border-top: 1px solid rgba(0,0,0,0.06);
-  border-top-left-radius: 2px;
-}
-
-/* Add a transparent bridge so hovering off the word doesn't instantly close the menu */
-.dropdownMenu::after {
-  content: '';
-  position: absolute;
-  top: -20px;
-  left: 0;
-  right: 0;
-  height: 20px;
-  background: transparent;
-}
-
-.dropdownWrapper:hover .dropdownMenu {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
-
-.dropdownLink {
-  display: block;
-  padding: 0.7rem 1rem;
-  margin: 2px 10px;
-  border-radius: 10px;
-  font-size: 0.95rem;
+.megaSidebarItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1.5rem;
+  margin: 0 0.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #555;
+  transition: all 0.2s;
   font-weight: 500;
-  color: #38342E;
-  text-decoration: none;
-  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  font-size: 0.95rem;
 }
 
-.dropdownLink:hover {
-  background-color: #FEF7EE;
-  color: #E7A03B;
-  transform: translateX(4px);
+.megaSidebarItemLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.megaSidebarIcon {
+  color: #888;
+}
+
+.megaSidebarItemActive,
+.megaSidebarItem:hover {
+  background-color: #FFF7F0;
+  color: #211C15;
+}
+
+.megaSidebarItemActive .megaSidebarIcon,
+.megaSidebarItem:hover .megaSidebarIcon {
+  color: #F5821F;
+}
+
+.megaSidebarCaret {
+  color: #F5821F;
+}
+
+.megaViewAll {
+  margin-top: auto;
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+  padding-top: 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #F5821F;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: opacity 0.2s;
+}
+.megaViewAll:hover {
+  opacity: 0.8;
+}
+
+.megaContent {
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.megaColumns {
+  display: flex;
+  gap: 3rem;
+  flex: 1;
+}
+
+.megaColumn {
+  flex: 1;
+}
+
+.megaColTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #211C15;
+  margin-bottom: 1.25rem;
+  position: relative;
+  display: inline-block;
+}
+
+.megaColTitle::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 24px;
+  height: 2px;
+  background-color: #F5821F;
+}
+
+.megaColList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.megaColLink {
+  color: #666;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.megaColLink:hover {
+  color: #F5821F;
+}
+
+.megaPromoBanner {
+  margin-top: 2.5rem;
+  background-color: #FFFDF9;
+  border: 1px solid #FDF3E9;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.megaPromoBanner:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 130, 31, 0.08);
+}
+
+.megaPromoIconWrap {
+  background-color: #FFF7F0;
+  color: #F5821F;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.megaPromoText {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.megaPromoTitle {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #211C15;
+}
+
+.megaPromoSub {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.megaPromoArrow {
+  color: #F5821F;
+}
+
+.megaImageCol {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.megaImage {
+  object-fit: cover;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
 }
 
 .announcementBar {
