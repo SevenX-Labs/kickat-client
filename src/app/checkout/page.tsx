@@ -241,16 +241,20 @@ export default function CheckoutPage() {
           </div>
 
           <div className={styles.stepperContainer}>
-            <div className={`${styles.stepItem} ${currentStep >= 1 ? styles.active : ''}`}>
-              <span className={styles.stepIcon}>1</span> Shipping
+            <div 
+              className={`${styles.stepItem} ${currentStep >= 1 ? styles.active : ''}`}
+              onClick={() => setCurrentStep(1)}
+              style={{ cursor: 'pointer' }}
+            >
+              <span className={currentStep >= 1 ? styles.stepIcon : styles.stepIconOutline}>1</span> Shipping
             </div>
             <div className={styles.stepDivider}></div>
-            <div className={`${styles.stepItem} ${currentStep === 2 ? styles.active : ''}`}>
-              <span className={styles.stepIconOutline}>2</span> Payment
+            <div className={`${styles.stepItem} ${currentStep >= 2 ? styles.active : ''}`}>
+              <span className={currentStep >= 2 ? styles.stepIcon : styles.stepIconOutline}>2</span> Payment
             </div>
             <div className={styles.stepDivider}></div>
-            <div className={styles.stepItem}>
-              <span className={styles.stepIconOutline}>3</span> Review
+            <div className={`${styles.stepItem} ${currentStep >= 3 ? styles.active : ''}`}>
+              <span className={currentStep >= 3 ? styles.stepIcon : styles.stepIconOutline}>3</span> Review
             </div>
           </div>
         </div>
@@ -260,6 +264,7 @@ export default function CheckoutPage() {
           <div className={styles.formsColumn}>
             
             <div className={styles.mainCard}>
+              {currentStep === 1 && (
               <div className={styles.mainCardHeader}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                   <div>
@@ -273,10 +278,11 @@ export default function CheckoutPage() {
                   )}
                 </div>
               </div>
+              )}
 
               {/* Step 1: Address Container */}
               <div className={styles.stepContainerAlt}>
-                {currentStep > 1 && (
+                {currentStep === 3 && (
                 <div className={styles.collapsedSummary}>
                   <div className={styles.summaryName}>
                     {firstName || 'Customer'}
@@ -442,7 +448,7 @@ export default function CheckoutPage() {
 
             {/* Step 2: Payment Container */}
             {currentStep === 2 && (
-              <div className={styles.stepContainerAlt}>
+              <div className={styles.stepContainerAlt} style={{ marginTop: 0 }}>
                 <div className={`${styles.stepHeader} ${styles.activeStepHeader}`}>
                   <div className={styles.stepHeaderTitle}>
                     <span className={styles.stepNumberBadge}>2</span>
