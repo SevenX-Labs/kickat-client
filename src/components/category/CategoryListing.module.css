@@ -156,13 +156,6 @@
   position: sticky;
   top: 5.5rem;
   align-self: start;
-  max-height: calc(100vh - 6.5rem);
-  overflow-y: auto;
-  scrollbar-width: none;
-}
-
-.sidebar::-webkit-scrollbar {
-  display: none;
 }
 
 .sidebar::after {
@@ -170,10 +163,6 @@
   display: block;
   min-height: 1.5rem;
   flex-shrink: 0;
-}
-
-.sidebar::-webkit-scrollbar-thumb {
-  display: none;
 }
 
 .sidebarHeader {

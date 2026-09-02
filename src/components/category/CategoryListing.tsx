@@ -14,6 +14,7 @@ import {
   Grid2X2,
   X,
   RotateCcw,
+  ChevronDown,
 } from 'lucide-react';
 import { CategoryInfo } from '@/data/categoryData';
 import styles from './CategoryListing.module.css';
@@ -207,24 +208,26 @@ export function CategoryListing({ category }: CategoryListingProps) {
             <div className={styles.groupHeader}>
               <span className={styles.groupTitle}>Options</span>
             </div>
-            <label className={styles.checkLabel}>
-              <input
-                type="checkbox"
-                checked={inStockOnly}
-                onChange={(e) => setInStockOnly(e.target.checked)}
-                className={styles.checkbox}
-              />
-              <span className={styles.checkText}>In Stock Only</span>
-            </label>
-            <label className={styles.checkLabel}>
-              <input
-                type="checkbox"
-                checked={minRating === 4.5}
-                onChange={(e) => setMinRating(e.target.checked ? 4.5 : 0)}
-                className={styles.checkbox}
-              />
-              <span className={styles.checkText}>4.5★ & Above</span>
-            </label>
+            <div className={styles.checkList}>
+              <label className={styles.checkLabel}>
+                <input
+                  type="checkbox"
+                  checked={inStockOnly}
+                  onChange={(e) => setInStockOnly(e.target.checked)}
+                  className={styles.checkbox}
+                />
+                <span className={styles.checkText}>In Stock Only</span>
+              </label>
+              <label className={styles.checkLabel}>
+                <input
+                  type="checkbox"
+                  checked={minRating === 4.5}
+                  onChange={(e) => setMinRating(e.target.checked ? 4.5 : 0)}
+                  className={styles.checkbox}
+                />
+                <span className={styles.checkText}>4.5★ & Above</span>
+              </label>
+            </div>
           </div>
         </aside>
 
