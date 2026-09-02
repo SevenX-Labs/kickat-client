@@ -30,26 +30,37 @@ const features = [
 ];
 
 export function TrustStrip() {
+  const trackContent = features.map((feature, idx) => {
+    const Icon = feature.icon;
+    return (
+      <div key={idx} className={styles.featureWrapper}>
+        <div className={styles.item}>
+          <div className={styles.iconWrapper}>
+            <Icon className={styles.icon} strokeWidth={1.5} />
+          </div>
+          <div className={styles.textContent}>
+            <span className={styles.title}>{feature.title}</span>
+            <span className={styles.subtitle}>{feature.subtitle}</span>
+          </div>
+        </div>
+        {idx < features.length - 1 ? (
+          <div className={styles.divider} />
+        ) : (
+          <div className={`${styles.divider} ${styles.mobileOnlyDivider}`} />
+        )}
+      </div>
+    );
+  });
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.container}>
-        {features.map((feature, idx) => {
-          const Icon = feature.icon;
-          return (
-            <div key={idx} className={styles.featureWrapper}>
-              <div className={styles.item}>
-                <div className={styles.iconWrapper}>
-                  <Icon className={styles.icon} strokeWidth={1.5} />
-                </div>
-                <div className={styles.textContent}>
-                  <span className={styles.title}>{feature.title}</span>
-                  <span className={styles.subtitle}>{feature.subtitle}</span>
-                </div>
-              </div>
-              {idx < features.length - 1 && <div className={styles.divider} />}
-            </div>
-          );
-        })}
+        <div className={styles.track}>
+          {trackContent}
+        </div>
+        <div className={`${styles.track} ${styles.duplicateTrack}`} aria-hidden="true">
+          {trackContent}
+        </div>
       </div>
     </div>
   );

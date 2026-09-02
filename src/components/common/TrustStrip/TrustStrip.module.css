@@ -10,7 +10,6 @@
 .container {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   background-color: #ffffff;
   border-radius: 16px;
   padding: 1.75rem 1.5rem;
@@ -18,11 +17,18 @@
   max-width: 1440px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(0, 0, 0, 0.03);
-  overflow-x: auto;
-  scrollbar-width: none;
+  overflow: hidden;
+  position: relative;
 }
 
-.container::-webkit-scrollbar {
+.track {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.duplicateTrack {
   display: none;
 }
 
@@ -82,16 +88,48 @@
   background-color: rgba(0, 0, 0, 0.06);
 }
 
+.mobileOnlyDivider {
+  display: none;
+}
+
 @media (max-width: 1024px) {
+  .wrapper {
+    padding: 0 1rem 2rem 1rem;
+  }
+
   .container {
+    padding: 1.25rem 0; /* Removing horizontal padding so marquee is seamless */
+  }
+
+  .track {
+    width: max-content;
+    flex-shrink: 0;
     justify-content: flex-start;
+    animation: scroll 20s linear infinite;
   }
   
+  .duplicateTrack {
+    display: flex;
+  }
+
   .featureWrapper {
     flex: none;
   }
   
   .item {
     justify-content: flex-start;
+  }
+
+  .mobileOnlyDivider {
+    display: block;
+  }
+}
+
+@keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
   }
 }
