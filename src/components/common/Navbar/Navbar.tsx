@@ -180,8 +180,17 @@ export function Navbar() {
 
         {/* Right Section: Search + Premium Actions */}
         <div className={styles.rightSection}>
-
-
+          <div className={styles.searchContainer}>
+            <div className={styles.searchWrapper}>
+              <Search className={styles.searchIcon} size={16} strokeWidth={1.8} />
+              <input
+                type="text"
+                placeholder="Search products..."
+                className={styles.searchInput}
+              />
+            </div>
+          </div>
+          
           <div className={styles.actions}>
             <button className={`${styles.iconBtn} ${styles.wishlistBtn}`} aria-label="Wishlist" title="Wishlist">
               <Heart size={20} strokeWidth={1.75} />
