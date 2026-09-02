@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { ArrowLeft, CreditCard, ShieldCheck, ShoppingBag, Trash2 } from 'lucide-react';
 import styles from './Cart.module.css';
 import { RelatedProducts } from '@/components/shop/ProductDetail/RelatedProducts';
 import { TrustStrip } from '@/components/common/TrustStrip/TrustStrip';
@@ -78,7 +79,7 @@ export default function CartPage() {
   };
 
   const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  const tax = subtotal * 0.18; // 18% GST mock
+  const tax = Math.round(subtotal * 0.18); // 18% GST mock
   
   // Free shipping threshold
   const freeShippingThreshold = 2000;
@@ -88,12 +89,24 @@ export default function CartPage() {
 
   return (
     <main className={styles.container}>
-      <h1 className={styles.title}>Your Cart</h1>
+      <div className={styles.pageHeader}>
+        <button onClick={() => router.push('/shop')} className={styles.backBtn}>
+          <ArrowLeft size={17} strokeWidth={1.8} />
+          Continue Shopping
+        </button>
+        <div>
+          <p className={styles.eyebrow}>Shopping bag</p>
+          <h1 className={styles.title}>Your Cart</h1>
+          <p className={styles.subtitle}>{cartItems.length} items ready for checkout</p>
+        </div>
+      </div>
       
       {cartItems.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '4rem 0' }}>
-          <p style={{ fontSize: '1.2rem', color: '#666', marginBottom: '2rem' }}>Your cart is empty.</p>
-          <button onClick={() => router.push('/shop')} className={styles.checkoutBtn} style={{ maxWidth: '250px', margin: '0 auto', display: 'block' }}>
+        <div className={styles.emptyState}>
+          <ShoppingBag size={44} strokeWidth={1.4} />
+          <h2>Your cart is empty.</h2>
+          <p>Browse our latest essentials and bring your favorites back here.</p>
+          <button onClick={() => router.push('/shop')} className={styles.checkoutBtn}>
             Continue Shopping
           </button>
         </div>
@@ -109,13 +122,16 @@ export default function CartPage() {
                 
                 <div className={styles.itemDetails}>
                   <div className={styles.itemHeader}>
-                    <button onClick={() => router.push(`/product/${item.id}`)} className={styles.itemName} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left', font: 'inherit' }}>
+                    <button onClick={() => router.push(`/product/${item.id}`)} className={styles.itemName}>
                       {item.name}
                     </button>
                     <span className={styles.itemPrice}>₹{(item.price * item.quantity).toLocaleString()}</span>
                   </div>
                   
-                  <span className={styles.itemVariant}>{item.variant}</span>
+                  <div className={styles.itemMeta}>
+                    <span>{item.variant}</span>
+                    <span>₹{item.price.toLocaleString()} each</span>
+                  </div>
                   
                   <div className={styles.itemActions}>
                     <div className={styles.quantityControl}>
@@ -124,6 +140,7 @@ export default function CartPage() {
                       <button className={styles.qtyBtn} onClick={() => updateQuantity(item.id, 1)} aria-label="Increase quantity">+</button>
                     </div>
                     <button className={styles.removeBtn} onClick={() => removeItem(item.id)}>
+                      <Trash2 size={16} strokeWidth={1.7} />
                       Remove
                     </button>
                   </div>
@@ -134,7 +151,10 @@ export default function CartPage() {
 
           {/* Right Column: Order Summary */}
           <div className={styles.summaryColumn}>
-            <h2 className={styles.summaryTitle}>Order Summary</h2>
+            <div className={styles.summaryHeader}>
+              <h2 className={styles.summaryTitle}>Order Summary</h2>
+              <span>{cartItems.length} items</span>
+            </div>
             
             <div className={styles.shippingTracker}>
               {isFreeShipping ? (
@@ -179,12 +199,13 @@ export default function CartPage() {
                 }
               }} 
               className={styles.checkoutBtn}
-              style={{ width: '100%' }}
             >
+              <CreditCard size={18} strokeWidth={1.8} />
               Proceed to Checkout
             </button>
             
-            <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666', fontSize: '0.85rem' }}>
+            <div className={styles.secureNote}>
+              <ShieldCheck size={16} strokeWidth={1.8} />
               Secure Encrypted Checkout
             </div>
           </div>
@@ -192,7 +213,7 @@ export default function CartPage() {
       )}
       
       {/* You May Also Like / Trust Strip */}
-      <div style={{ marginTop: '6rem' }}>
+      <div className={styles.relatedSection}>
         <RelatedProducts />
       </div>
       <TrustStrip />

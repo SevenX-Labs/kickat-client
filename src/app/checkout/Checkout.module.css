@@ -1702,15 +1702,10 @@
   }
   
   .floatingSummaryCard {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    top: auto;
-    margin-top: 0;
-    border-radius: 20px 20px 0 0;
-    z-index: 100;
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+    position: static;
+    margin-top: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
     padding: 1.5rem;
   }
 }
@@ -1748,5 +1743,21 @@
   }
   .stepItem {
     gap: 0.5rem;
+  }
+  .featuresRow {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .successCardHeader {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .cardHeaderItem {
+    border-left: none !important;
+    padding-left: 0 !important;
+    align-items: flex-start !important;
+  }
+  .secondaryActionsRow {
+    flex-direction: column;
   }
 }
