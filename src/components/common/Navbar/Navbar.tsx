@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -64,10 +64,19 @@ export function Navbar() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [openMobileCategory, setOpenMobileCategory] = useState<string | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     if (typeof window === "undefined") return false;
     return localStorage.getItem("isLoggedIn") === "true";
   });
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleAccountClick = () => {
     if (!isLoggedIn) {
@@ -96,7 +105,7 @@ export function Navbar() {
   const duplicatedItems = [...items, ...items, ...items, ...items];
 
   return (
-    <header className={styles.header}>
+    <header className={`${styles.header} ${isScrolled ? styles.scrolled : ''}`}>
       {/* Announcement Bar */}
       <div className={styles.announcementBar}>
         <div className={styles.marquee}>
@@ -136,7 +145,7 @@ export function Navbar() {
             aria-expanded={isMenuOpen}
             onClick={() => setIsMenuOpen((open) => !open)}
           >
-            {isMenuOpen ? <X size={22} strokeWidth={1.8} /> : <Menu size={22} strokeWidth={1.8} />}
+            {isMenuOpen ? <X size={22} strokeWidth={1.5} /> : <Menu size={22} strokeWidth={1.5} />}
           </button>
 
           <Link href="/" className={styles.logoWrapper}>
@@ -151,38 +160,44 @@ export function Navbar() {
               onContextMenu={(e) => e.preventDefault()}
             />
           </Link>
-
-          <nav className={styles.navLinks}>
-            {Object.entries(taxonomy).map(([category, data]) => (
-              <div key={category} className={styles.dropdownWrapper}>
-                <Link href={data.categoryHref} className={`${styles.navItem} ${styles.dropdownTrigger}`}>
-                  {category}
-                  <ChevronDown className={styles.chevron} strokeWidth={2} />
-                </Link>
-                <div className={styles.dropdownMenu}>
-                  {data.items.map((sub, idx) => (
-                    <Link key={idx} href={sub.href} className={styles.dropdownLink}>
-                      {sub.name}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            ))}
-            
-            <Link href="/testimonials" className={styles.navItem}>
-              Testimonial
-            </Link>
-            <Link href="/blogs" className={styles.navItem}>
-              Blogs
-            </Link>
-          </nav>
         </div>
+
+        {/* Center Section: Navigation Links */}
+        <nav className={styles.centerSection}>
+          {Object.entries(taxonomy).map(([category, data]) => (
+            <div key={category} className={styles.dropdownWrapper}>
+              <Link href={data.categoryHref} className={`${styles.navItem} ${styles.dropdownTrigger}`}>
+                {category}
+                <ChevronDown className={styles.chevron} strokeWidth={1.5} />
+              </Link>
+              <div className={styles.dropdownMenu}>
+                {data.items.map((sub, idx) => (
+                  <Link key={idx} href={sub.href} className={styles.dropdownLink}>
+                    {sub.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ))}
+          <Link href="/brands" className={styles.navItem}>
+            Brands
+          </Link>
+          <Link href="/offers" className={styles.navItem}>
+            Offers
+          </Link>
+          <Link href="/blogs" className={styles.navItem}>
+            Blogs
+          </Link>
+          <Link href="/testimonials" className={styles.navItem}>
+            Testimonials
+          </Link>
+        </nav>
 
         {/* Right Section: Search + Premium Actions */}
         <div className={styles.rightSection}>
           <div className={styles.searchContainer}>
             <div className={styles.searchWrapper}>
-              <Search className={styles.searchIcon} size={16} strokeWidth={1.8} />
+              <Search className={styles.searchIcon} size={16} strokeWidth={1.5} />
               <input
                 type="text"
                 placeholder="Search products..."
@@ -193,7 +208,7 @@ export function Navbar() {
           
           <div className={styles.actions}>
             <button className={`${styles.iconBtn} ${styles.wishlistBtn}`} aria-label="Wishlist" title="Wishlist">
-              <Heart size={20} strokeWidth={1.75} />
+              <Heart size={20} strokeWidth={1.5} />
             </button>
 
             <div className={styles.accountWrapper}>
@@ -203,7 +218,7 @@ export function Navbar() {
                 style={{ cursor: 'pointer' }}
                 onClick={handleAccountClick}
               >
-                <User size={20} strokeWidth={1.75} />
+                <User size={20} strokeWidth={1.5} />
               </div>
 
               <div className={styles.accountDropdown}>
@@ -265,7 +280,7 @@ export function Navbar() {
             </div>
 
             <Link href="/cart" className={styles.cartBtn} aria-label="Shopping Cart" title="Cart">
-              <ShoppingBag size={20} strokeWidth={1.75} />
+              <ShoppingBag size={20} strokeWidth={1.5} />
               <span className={styles.badge}>2</span>
             </Link>
           </div>
