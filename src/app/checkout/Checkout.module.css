@@ -385,6 +385,149 @@
   background: #000;
 }
 
+/* Saved Address Block */
+.editChangeBtn {
+  background: white;
+  border: 1px solid #e5e7eb;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #111;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.editChangeBtn:hover {
+  background: #f9fafb;
+}
+
+.savedAddressContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.savedAddressBlock {
+  background: #fffaf5;
+  border: 1px solid #f97316;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.savedAddressTop {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.homeIconWrapper {
+  width: 48px;
+  height: 48px;
+  background: #ffedd5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.savedAddressDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.savedAddressName {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.homeTag {
+  background: #dcfce7;
+  color: #166534;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.15rem 0.6rem;
+  border-radius: 12px;
+}
+
+.savedAddressText {
+  font-size: 0.95rem;
+  color: #4b5563;
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+}
+
+.savedAddressPhone {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.savedAddressDivider {
+  height: 1px;
+  border-bottom: 1px dashed #fcd34d;
+  margin: 1.5rem 0;
+}
+
+.savedAddressFeatures {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.featureItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.8rem;
+  color: #4b5563;
+  line-height: 1.4;
+}
+
+.featureItem strong {
+  color: #111;
+}
+
+.featureIcon {
+  color: #111;
+  margin-top: 2px;
+}
+
+.featureIconGreen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: #dcfce7;
+  border-radius: 50%;
+  margin-top: 2px;
+}
+
+.addNewAddressBtn {
+  background: transparent;
+  border: none;
+  color: #f97316;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  align-self: flex-start;
+}
+.addNewAddressBtn:hover {
+  text-decoration: underline;
+}
+
 .methodGrid {
   display: flex;
   gap: 1rem;
@@ -885,6 +1028,109 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
   padding: 2rem;
   border: 1px solid rgba(0,0,0,0.03);
+}
+
+.summaryTitleAlt {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 1.5rem;
+}
+
+.productItemCard {
+  display: flex;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.productItemImage {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  background: #f7f5f2;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.productItemDetails {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.productItemName {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111;
+  line-height: 1.3;
+  margin-bottom: 0.35rem;
+}
+
+.productItemMeta {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+.productItemPriceRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+}
+
+.qtyStepperAlt {
+  display: flex;
+  align-items: center;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 0.25rem 0.5rem;
+}
+
+.qtyBtnAlt {
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0 0.5rem;
+}
+
+.qtyValueAlt {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #111;
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+.productItemPrice {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.summaryRowAlt {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #4b5563;
+  margin-bottom: 0.85rem;
+}
+
+.summaryValueAlt {
+  font-weight: 700;
+  color: #111;
+}
+
+.discountValueAlt {
+  font-weight: 700;
+  color: #10b981; /* green */
+}
+
+.shippingValueAlt {
+  font-weight: 700;
+  color: #10b981;
 }
 
 .promoContainerAlt {

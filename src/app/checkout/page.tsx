@@ -5,7 +5,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { AnimatedOrderButton } from './AnimatedOrderButton';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Check, Truck, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, CreditCard, Smartphone, ChevronDown, User, MapPin, Lock, Edit3, X } from 'lucide-react';
+import { Check, Truck, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, CreditCard, Smartphone, ChevronDown, User, MapPin, Lock, Edit3, X, Home, Shield, Plus } from 'lucide-react';
 import styles from './Checkout.module.css';
 
 // Mock Cart Data for Checkout
@@ -39,6 +39,9 @@ export default function CheckoutPage() {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [zipCode, setZipCode] = useState('');
+  
+  // Saved Address Toggle for Demo
+  const [hasSavedAddress, setHasSavedAddress] = useState(true);
 
   const phoneDigits = phone.replace(/\D/g, '').length;
   const isValidPhone = phoneDigits === 10;
@@ -193,12 +196,16 @@ export default function CheckoutPage() {
             
             <div className={styles.mainCard}>
               <div className={styles.mainCardHeader}>
-                <div className={styles.mainCardIcon}>
-                  <MapPin size={24} color="#f97316" />
-                </div>
-                <div>
-                  <h2 className={styles.mainCardTitle}>Shipping Address</h2>
-                  <p className={styles.mainCardSubtitle}>Enter your details to get your order delivered</p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                  <div>
+                    <h2 className={styles.mainCardTitle}>Delivery Address</h2>
+                    <p className={styles.mainCardSubtitle}>Your order will be delivered to this address</p>
+                  </div>
+                  {currentStep === 1 && hasSavedAddress && (
+                    <button type="button" className={styles.editChangeBtn} onClick={() => setHasSavedAddress(false)}>
+                      <Edit3 size={14} /> Edit / Change
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -218,9 +225,51 @@ export default function CheckoutPage() {
               
                 {currentStep === 1 && (
                   <div className={styles.stepBodyAlt}>
-                    {/* Contact Info */}
-                    <div className={styles.formSectionAlt}>
-                      <h3 className={styles.sectionTitleAlt}><User size={18} strokeWidth={1.5} /> Contact Information</h3>
+                    
+                    {hasSavedAddress ? (
+                      <div className={styles.savedAddressContainer}>
+                        <div className={styles.savedAddressBlock}>
+                          <div className={styles.savedAddressTop}>
+                            <div className={styles.homeIconWrapper}><Home size={24} color="#f97316" /></div>
+                            <div className={styles.savedAddressDetails}>
+                              <div className={styles.savedAddressName}>Sahil Hode <span className={styles.homeTag}>Home</span></div>
+                              <div className={styles.savedAddressText}>
+                                Marleshwar Apartment, Diva Sabe Gaon, Diva Road (E),<br/>
+                                Sabe Road, Sabe Gaon, Kalyan - 400612, Maharashtra
+                              </div>
+                              <div className={styles.savedAddressPhone}>8652601566</div>
+                            </div>
+                          </div>
+                          <div className={styles.savedAddressDivider}></div>
+                          <div className={styles.savedAddressFeatures}>
+                            <div className={styles.featureItem}>
+                              <div className={styles.featureIconGreen}><Check size={16} strokeWidth={3} color="#10b981" /></div>
+                              <div><strong>Delivery here</strong><br/><span>Usually in 24-48 hrs</span></div>
+                            </div>
+                            <div className={styles.featureItem}>
+                              <div className={styles.featureIcon}><MapPin size={16} /></div>
+                              <div><strong>Near you</strong><br/><span>Kalyan, Maharashtra</span></div>
+                            </div>
+                            <div className={styles.featureItem}>
+                              <div className={styles.featureIcon}><Shield size={16} /></div>
+                              <div><strong>Safe & Secure</strong><br/><span>100% Secure Delivery</span></div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <button type="button" className={styles.addNewAddressBtn} onClick={() => setHasSavedAddress(false)}>
+                          <Plus size={16} /> Add New Address
+                        </button>
+                        
+                        <button type="button" className={styles.nextStepBtnAlt} onClick={() => setCurrentStep(2)} style={{ marginTop: '1.5rem' }}>
+                          Proceed to Payment <ChevronRight size={18} />
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        {/* Contact Info */}
+                        <div className={styles.formSectionAlt}>
+                          <h3 className={styles.sectionTitleAlt}><User size={18} strokeWidth={1.5} /> Contact Information</h3>
                       <div className={styles.formGrid}>
                       <div className={styles.inputGroup}>
                         <label className={styles.label}>First Name</label>
@@ -320,6 +369,8 @@ export default function CheckoutPage() {
                   >
                     Proceed to Payment <ChevronRight size={18} />
                   </button>
+                      </>
+                    )}
                 </div>
               )}
             </div>
@@ -363,53 +414,41 @@ export default function CheckoutPage() {
           {/* Right Column: Floating Order Summary */}
           <div className={styles.summaryColumn}>
             <div className={styles.floatingSummaryCard}>
-              <h2 className={styles.summaryTitle}>Order</h2>
+              <h2 className={styles.summaryTitleAlt}>Order Summary</h2>
               
-              <div className={styles.heroProductView}>
-                <button type="button" className={`${styles.carouselBtn} ${styles.carouselPrev}`}>
-                  <ChevronLeft size={20} />
-                </button>
-                <div style={{ position: 'relative', width: '120px', height: '120px' }}>
-                  <Image src={checkoutItems[0].image} alt="Hero Product" fill style={{ objectFit: 'contain' }} />
+              <div className={styles.productItemCard}>
+                <div className={styles.productItemImage}>
+                  <Image src={checkoutItems[0].image} alt="Product" fill style={{ objectFit: 'contain' }} />
                 </div>
-                <button type="button" className={`${styles.carouselBtn} ${styles.carouselNext}`}>
-                  <ChevronRight size={20} />
-                </button>
-              </div>
-
-              <div className={styles.heroProductInfo}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <h3 className={styles.heroProductName}>{checkoutItems[0].name}</h3>
-                  <Link href="/cart" className={styles.editCartLink}><Edit3 size={14} /></Link>
-                </div>
-                <div className={styles.heroProductMeta}>
-                  <span>Size: OS</span>
-                  <span>Color: Default</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                  <div className={styles.heroProductPrice}>
-                    <span className={styles.originalPrice}>₹2,999</span>
-                    <span>₹{checkoutItems[0].price.toLocaleString()}</span>
+                <div className={styles.productItemDetails}>
+                  <h3 className={styles.productItemName}>{checkoutItems[0].name}</h3>
+                  <div className={styles.productItemMeta}>
+                    Size: OS &nbsp;•&nbsp; Color: Default
                   </div>
-                  <div className={styles.qtyStepper}>
-                    <button type="button" className={styles.qtyBtn}>-</button>
-                    <span className={styles.qtyValue}>1</span>
-                    <button type="button" className={styles.qtyBtn}>+</button>
+                  <div className={styles.productItemPriceRow}>
+                    <div className={styles.qtyStepperAlt}>
+                      <button type="button" className={styles.qtyBtnAlt}>-</button>
+                      <span className={styles.qtyValueAlt}>1</span>
+                      <button type="button" className={styles.qtyBtnAlt}>+</button>
+                    </div>
+                    <div className={styles.productItemPrice}>
+                      ₹{checkoutItems[0].price.toLocaleString()}
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className={styles.summaryRow}>
+              <div className={styles.summaryRowAlt}>
                 <span>Subtotal</span>
-                <span>₹{subtotal.toLocaleString()}</span>
+                <span className={styles.summaryValueAlt}>₹{subtotal.toLocaleString()}</span>
               </div>
-              <div className={styles.discountRow}>
+              <div className={styles.summaryRowAlt}>
                 <span>Discount</span>
-                <span>-₹0</span>
+                <span className={styles.discountValueAlt}>-₹0</span>
               </div>
-              <div className={styles.summaryRow}>
+              <div className={styles.summaryRowAlt}>
                 <span>Shipping</span>
-                <span>{shipping === 0 ? 'Free' : `₹${shipping}`}</span>
+                <span className={styles.shippingValueAlt}>{shipping === 0 ? 'FREE' : `₹${shipping}`}</span>
               </div>
               
               <div className={styles.promoContainerAlt}>
