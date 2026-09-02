@@ -32,7 +32,7 @@ const heroStats = [
 ];
 
 const secondaryStats = [
-  { icon: Truck, value: '2–3 Day', label: 'FREE DELIVERY' },
+  { icon: Truck, value: 'Fast', label: 'NATIONWIDE SHIPPING' },
   { icon: Shield, value: '200+', label: 'TRUSTED BRANDS' },
   { icon: Award, value: '30 Day', label: 'EASY RETURNS' },
 ];
