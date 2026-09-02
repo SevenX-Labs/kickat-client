@@ -516,6 +516,16 @@
   }
 
   .waves { height: 40px; min-height: 40px; }
+
+  .glassCircle {
+    top: auto;
+    right: auto;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 320px;
+    height: 320px;
+  }
 }
 
 @media (min-width: 1024px) and (max-height: 720px) {
@@ -662,9 +672,11 @@
 
   .glassCircle {
     top: auto;
-    right: -28%;
-    bottom: 2.5rem;
-    width: 300px;
-    height: 300px;
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 280px;
+    height: 280px;
+    bottom: 2rem;
   }
 }
