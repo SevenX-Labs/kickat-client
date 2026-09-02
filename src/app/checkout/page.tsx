@@ -42,6 +42,12 @@ export default function CheckoutPage() {
   
   // Saved Address Toggle for Demo
   const [hasSavedAddress, setHasSavedAddress] = useState(true);
+  
+  // Promo code toggle state
+  const [isPromoOpen, setIsPromoOpen] = useState(false);
+  
+  // Price details toggle state
+  const [isPriceDetailsOpen, setIsPriceDetailsOpen] = useState(false);
 
   const phoneDigits = phone.replace(/\D/g, '').length;
   const isValidPhone = phoneDigits === 10;
@@ -169,24 +175,26 @@ export default function CheckoutPage() {
     <div className={styles.pageBg}>
       <main className={styles.container}>
         
-        <div className={styles.checkoutHeader}>
-          <Link href="/cart" className={styles.titleIcon}>
-            <ArrowLeft size={28} />
-          </Link>
-          <h1 className={styles.title}>Checkout</h1>
-        </div>
+        <div className={styles.headerRow}>
+          <div className={styles.checkoutHeader}>
+            <Link href="/cart" className={styles.titleIcon}>
+              <ArrowLeft size={28} />
+            </Link>
+            <h1 className={styles.title}>Checkout</h1>
+          </div>
 
-        <div className={styles.stepperContainer}>
-          <div className={`${styles.stepItem} ${currentStep >= 1 ? styles.active : ''}`}>
-            <span className={styles.stepIcon}>1</span> Shipping
-          </div>
-          <div className={styles.stepDivider}></div>
-          <div className={`${styles.stepItem} ${currentStep === 2 ? styles.active : ''}`}>
-            <span className={styles.stepIconOutline}>2</span> Payment
-          </div>
-          <div className={styles.stepDivider}></div>
-          <div className={styles.stepItem}>
-            <span className={styles.stepIconOutline}>3</span> Review
+          <div className={styles.stepperContainer}>
+            <div className={`${styles.stepItem} ${currentStep >= 1 ? styles.active : ''}`}>
+              <span className={styles.stepIcon}>1</span> Shipping
+            </div>
+            <div className={styles.stepDivider}></div>
+            <div className={`${styles.stepItem} ${currentStep === 2 ? styles.active : ''}`}>
+              <span className={styles.stepIconOutline}>2</span> Payment
+            </div>
+            <div className={styles.stepDivider}></div>
+            <div className={styles.stepItem}>
+              <span className={styles.stepIconOutline}>3</span> Review
+            </div>
           </div>
         </div>
         
@@ -438,31 +446,50 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              <div className={styles.summaryRowAlt}>
-                <span>Subtotal</span>
-                <span className={styles.summaryValueAlt}>₹{subtotal.toLocaleString()}</span>
+              <div className={styles.priceDetailsToggle} onClick={() => setIsPriceDetailsOpen(!isPriceDetailsOpen)}>
+                <span>Price Details</span>
+                <ChevronDown 
+                  size={16} 
+                  color="#888" 
+                  style={{ transform: isPriceDetailsOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} 
+                />
               </div>
-              <div className={styles.summaryRowAlt}>
-                <span>Discount</span>
-                <span className={styles.discountValueAlt}>-₹0</span>
-              </div>
-              <div className={styles.summaryRowAlt}>
-                <span>Shipping</span>
-                <span className={styles.shippingValueAlt}>{shipping === 0 ? 'FREE' : `₹${shipping}`}</span>
-              </div>
+
+              {isPriceDetailsOpen && (
+                <div className={styles.priceDetailsDropdown}>
+                  <div className={styles.summaryRowAlt}>
+                    <span>Subtotal</span>
+                    <span className={styles.summaryValueAlt}>₹{subtotal.toLocaleString()}</span>
+                  </div>
+                  <div className={styles.summaryRowAlt}>
+                    <span>Discount</span>
+                    <span className={styles.discountValueAlt}>-₹0</span>
+                  </div>
+                  <div className={styles.summaryRowAlt}>
+                    <span>Shipping</span>
+                    <span className={styles.shippingValueAlt}>{shipping === 0 ? 'FREE' : `₹${shipping}`}</span>
+                  </div>
+                </div>
+              )}
               
               <div className={styles.promoContainerAlt}>
-                <div className={styles.promoHeaderAlt}>
+                <div className={styles.promoHeaderAlt} onClick={() => setIsPromoOpen(!isPromoOpen)}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
                     Have a promo code?
                   </div>
-                  <ChevronDown size={16} color="#888" />
+                  <ChevronDown 
+                    size={16} 
+                    color="#888" 
+                    style={{ transform: isPromoOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} 
+                  />
                 </div>
-                <div className={styles.promoInputWrapperAlt}>
-                  <input type="text" className={styles.promoInputAlt} placeholder="Enter code" />
-                  <button type="button" className={styles.promoBtnAlt}>Apply</button>
-                </div>
+                {isPromoOpen && (
+                  <div className={styles.promoInputWrapperAlt}>
+                    <input type="text" className={styles.promoInputAlt} placeholder="Enter code" />
+                    <button type="button" className={styles.promoBtnAlt}>Apply</button>
+                  </div>
+                )}
               </div>
               
               <div className={styles.totalRowAlt}>
