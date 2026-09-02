@@ -147,6 +147,7 @@
   background-color: #FBF7EE;
   padding: 1.5rem 2rem 2rem 2rem;
   border-radius: 16px;
+  margin-top: -4.5rem;
 }
 
 .summaryTitle {
@@ -239,6 +240,7 @@
   }
   .summaryColumn {
     position: static;
+    margin-top: 0;
   }
 }
 

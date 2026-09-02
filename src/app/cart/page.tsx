@@ -24,6 +24,38 @@ const initialCart = [
     price: 899,
     quantity: 2,
     image: '/hero-products/dog_food.png'
+  },
+  {
+    id: '3',
+    name: 'Ultra Soft Pet Bed Cushion',
+    variant: 'Grey / Medium',
+    price: 1299,
+    quantity: 1,
+    image: '/hero-products/pet_bowl.png'
+  },
+  {
+    id: '4',
+    name: 'Interactive Cat Teaser Toy',
+    variant: 'Multi-color',
+    price: 399,
+    quantity: 3,
+    image: '/hero-products/dog_food.png'
+  },
+  {
+    id: '5',
+    name: 'Stainless Steel Non-Slip Pet Bowl',
+    variant: 'Silver / Large',
+    price: 499,
+    quantity: 2,
+    image: '/hero-products/pet_bowl.png'
+  },
+  {
+    id: '6',
+    name: 'Adjustable Mesh Dog Harness',
+    variant: 'Blue / Small',
+    price: 799,
+    quantity: 1,
+    image: '/hero-products/dog_food.png'
   }
 ];
 

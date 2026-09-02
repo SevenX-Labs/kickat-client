@@ -23,6 +23,34 @@ const checkoutItems = [
     price: 899,
     quantity: 2,
     image: '/hero-products/dog_food.png'
+  },
+  {
+    id: '3',
+    name: 'Ultra Soft Pet Bed Cushion',
+    price: 1299,
+    quantity: 1,
+    image: '/hero-products/pet_bowl.png'
+  },
+  {
+    id: '4',
+    name: 'Interactive Cat Teaser Toy',
+    price: 399,
+    quantity: 3,
+    image: '/hero-products/dog_food.png'
+  },
+  {
+    id: '5',
+    name: 'Stainless Steel Non-Slip Pet Bowl',
+    price: 499,
+    quantity: 2,
+    image: '/hero-products/pet_bowl.png'
+  },
+  {
+    id: '6',
+    name: 'Adjustable Mesh Dog Harness',
+    price: 799,
+    quantity: 1,
+    image: '/hero-products/dog_food.png'
   }
 ];
 
@@ -31,14 +59,15 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  // Form states for validation checkmarks
-  const [firstName, setFirstName] = useState('');
-  const [flat, setFlat] = useState('');
-  const [street, setStreet] = useState('');
-  const [city, setCity] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [zipCode, setZipCode] = useState('');
+  // Form states for validation checkmarks (pre-filled with dummy data)
+  const [firstName, setFirstName] = useState('Eduard');
+  const [flat, setFlat] = useState('Flat 101');
+  const [street, setStreet] = useState('SABE ROAD');
+  const [city, setCity] = useState('Mumbai');
+  const [stateName, setStateName] = useState('Maharashtra');
+  const [phone, setPhone] = useState('9876543210');
+  const [email, setEmail] = useState('eduard@example.com');
+  const [zipCode, setZipCode] = useState('400001');
   
   // Saved Address Toggle for Demo
   const [hasSavedAddress, setHasSavedAddress] = useState(true);
@@ -48,6 +77,9 @@ export default function CheckoutPage() {
   
   // Price details toggle state
   const [isPriceDetailsOpen, setIsPriceDetailsOpen] = useState(false);
+  
+  // Items list toggle state
+  const [isItemsExpanded, setIsItemsExpanded] = useState(false);
 
   const phoneDigits = phone.replace(/\D/g, '').length;
   const isValidPhone = phoneDigits === 10;
@@ -60,9 +92,28 @@ export default function CheckoutPage() {
   const tax = subtotal * 0.18; // 18% GST mock
   const shipping = subtotal >= 2000 ? 0 : 150;
   const total = subtotal + tax + shipping;
+  const totalItemsCount = checkoutItems.reduce((acc, item) => acc + item.quantity, 0);
+
+  const displayedItems = isItemsExpanded ? checkoutItems : checkoutItems.slice(0, 2);
+  const hiddenItemsCount = checkoutItems.length - 2;
 
   const [orderNumber, setOrderNumber] = useState(0);
   const [particles, setParticles] = useState<{id: number, tx: string, ty: string, color: string}[]>([]);
+
+  const handleAddressSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validateStep1()) {
+      setCurrentStep(2);
+    }
+  };
+
+  const handleCityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setCity(val);
+    if (val.toLowerCase().trim() === 'mumbai') {
+      setStateName('Maharashtra');
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -288,7 +339,7 @@ export default function CheckoutPage() {
                       <div className={styles.inputGroup}>
                         <label className={styles.label}>Last Name</label>
                         <div className={styles.inputWrapper}>
-                          <input type="text" required className={styles.input} placeholder="e.g. Franz" />
+                          <input type="text" required className={styles.input} placeholder="e.g. Franz" defaultValue="Franz" />
                         </div>
                       </div>
                       <div className={styles.inputGroup}>
@@ -323,9 +374,9 @@ export default function CheckoutPage() {
                         </div>
                       </div>
                       <div className={styles.inputGroup}>
-                        <label className={styles.label}>Building, Company</label>
+                        <label className={styles.labelAlt}>Building, Company</label>
                         <div className={styles.inputWrapper}>
-                          <input type="text" className={styles.input} placeholder="e.g. Sunshine Apartments" />
+                          <input type="text" className={styles.inputAlt} placeholder="e.g. Sunshine Apartments" defaultValue="Sunshine Apartments" />
                         </div>
                       </div>
                       <div className={styles.inputGroup}>
@@ -337,13 +388,13 @@ export default function CheckoutPage() {
                       <div className={styles.inputGroup}>
                         <label className={styles.label}>City</label>
                         <div className={styles.inputWrapper}>
-                          <input type="text" required className={styles.input} placeholder="Mumbai" value={city} onChange={(e) => setCity(e.target.value)} />
+                          <input type="text" required className={styles.input} placeholder="Mumbai" value={city} onChange={handleCityChange} />
                         </div>
                       </div>
                       <div className={styles.inputGroup}>
                         <label className={styles.labelAlt}>State</label>
                         <div className={styles.inputWrapper}>
-                          <input type="text" required className={styles.inputAlt} placeholder="Maharashtra" value={city} onChange={(e) => setCity(e.target.value)} />
+                          <input type="text" required className={styles.inputAlt} placeholder="Maharashtra" value={stateName} onChange={(e) => setStateName(e.target.value)} />
                         </div>
                       </div>
                       <div className={styles.inputGroup}>
@@ -422,29 +473,39 @@ export default function CheckoutPage() {
           {/* Right Column: Floating Order Summary */}
           <div className={styles.summaryColumn}>
             <div className={styles.floatingSummaryCard}>
-              <h2 className={styles.summaryTitleAlt}>Order Summary</h2>
+              <h2 className={styles.summaryTitleAlt} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                Order Summary
+                <span style={{ fontSize: '0.85rem', color: '#666', fontWeight: 500 }}>({totalItemsCount} items)</span>
+              </h2>
               
-              <div className={styles.productItemCard}>
-                <div className={styles.productItemImage}>
-                  <Image src={checkoutItems[0].image} alt="Product" fill style={{ objectFit: 'contain' }} />
-                </div>
-                <div className={styles.productItemDetails}>
-                  <h3 className={styles.productItemName}>{checkoutItems[0].name}</h3>
-                  <div className={styles.productItemMeta}>
-                    Size: OS &nbsp;•&nbsp; Color: Default
-                  </div>
-                  <div className={styles.productItemPriceRow}>
-                    <div className={styles.qtyStepperAlt}>
-                      <button type="button" className={styles.qtyBtnAlt}>-</button>
-                      <span className={styles.qtyValueAlt}>1</span>
-                      <button type="button" className={styles.qtyBtnAlt}>+</button>
+              <div className={styles.checkoutStaticList}>
+                {displayedItems.map((item) => (
+                  <div key={item.id} className={styles.staticProductCard}>
+                    <div className={styles.staticProductImage}>
+                      <Image src={item.image} alt={item.name} fill style={{ objectFit: 'contain' }} />
                     </div>
-                    <div className={styles.productItemPrice}>
-                      ₹{checkoutItems[0].price.toLocaleString()}
+                    <div className={styles.staticProductInfo}>
+                      <div className={styles.staticProductTop}>
+                        <h3 className={styles.staticProductName}>{item.name}</h3>
+                        <div className={styles.staticProductPrice}>₹{(item.price * item.quantity).toLocaleString()}</div>
+                      </div>
+                      <div className={styles.staticProductQty}>Qty: {item.quantity}</div>
                     </div>
                   </div>
-                </div>
+                ))}
               </div>
+
+              {hiddenItemsCount > 0 && (
+                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                  <button 
+                    type="button"
+                    onClick={() => setIsItemsExpanded(!isItemsExpanded)}
+                    className={styles.expandItemsBtn}
+                  >
+                    {isItemsExpanded ? 'Show less ↑' : `+ ${hiddenItemsCount} more items ↓`}
+                  </button>
+                </div>
+              )}
 
               <div className={styles.priceDetailsToggle} onClick={() => setIsPriceDetailsOpen(!isPriceDetailsOpen)}>
                 <span>Price Details</span>

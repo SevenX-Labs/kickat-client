@@ -74,10 +74,13 @@ export function Navbar() {
     Birds: 'food'
   });
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem("isLoggedIn") === "true";
-  });
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsLoggedIn(localStorage.getItem("isLoggedIn") === "true");
+    }
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {

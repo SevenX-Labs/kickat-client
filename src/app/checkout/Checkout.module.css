@@ -1026,7 +1026,8 @@
 
 .floatingSummaryCard {
   position: sticky;
-  top: 2rem;
+  top: 1.5rem;
+  margin-top: -3.5rem;
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
@@ -1035,10 +1036,11 @@
 }
 
 .summaryTitleAlt {
-  font-size: 1.15rem;
+  font-family: var(--font-ibm-plex-sans), sans-serif;
+  font-size: 1.1rem;
   font-weight: 700;
-  color: #111;
   margin-bottom: 1.5rem;
+  color: #111;
 }
 
 .productItemCard {
@@ -1051,9 +1053,86 @@
   position: relative;
   width: 90px;
   height: 90px;
-  background: #f7f5f2;
+  background: #fcfbf9;
   border-radius: 8px;
+  overflow: hidden;
   flex-shrink: 0;
+}
+
+/* Static Compact List Styles */
+.checkoutStaticList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.staticProductCard {
+  display: flex;
+  gap: 1rem;
+}
+
+.staticProductImage {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.staticProductInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.staticProductTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.staticProductName {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.staticProductPrice {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111;
+  white-space: nowrap;
+}
+
+.staticProductQty {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.expandItemsBtn {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  background: #f5f5f5;
+  transition: all 0.2s;
+}
+
+.expandItemsBtn:hover {
+  background: #eaeaea;
+  color: #111;
 }
 
 .productItemDetails {
@@ -1542,11 +1621,14 @@
   .summaryColumn {
     position: static;
   }
+  
   .floatingSummaryCard {
     position: fixed;
     bottom: 0;
     left: 0;
-    width: 100%;
+    right: 0;
+    top: auto;
+    margin-top: 0;
     border-radius: 20px 20px 0 0;
     z-index: 100;
     box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
