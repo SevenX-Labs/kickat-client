@@ -121,11 +121,12 @@ export const CATALOG_PRODUCTS: CatalogProduct[] = [
     mainCategory: 'dogs',
     subCategory: 'dog-food-treats',
     brand: 'NutriDog',
-    badge: 'Popular',
+    badge: 'Best Seller',
     tags: ['Organic', 'High Protein', 'Grain Free'],
     sizes: ['1kg', '3kg', '5kg'],
     color: '#E7A03B',
     isTopRated: true,
+    description: 'Grain-free organic kibble for a healthier, happier pup.',
   },
   {
     id: 'd-2',

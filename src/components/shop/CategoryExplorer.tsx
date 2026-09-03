@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import ProductCard from '../common/ProductCard/ProductCard';
 import { useRouter } from 'next/navigation';
 import {
   Star,
@@ -396,68 +397,7 @@ export function CategoryExplorer({
                     }
                   >
                     {paginatedProducts.map((product) => (
-                      <Link 
-                        href={`/product/${product.id}`} 
-                        key={product.id} 
-                        className={styles.productCard}
-                        style={{ textDecoration: 'none', color: 'inherit' }}
-                      >
-                        <div className={styles.cardImageContainer}>
-                          <Image
-                            src={product.image}
-                            alt={product.name}
-                            fill
-                            style={{ objectFit: 'contain' }}
-                            className={styles.productImg}
-                          />
-                          {product.badge && (
-                            <span
-                              className={`${styles.badge} ${
-                                product.badge === 'New'
-                                  ? styles.badgeInk
-                                  : product.badge === 'Organic'
-                                  ? styles.badgeForest
-                                  : styles.badgeAmber
-                              }`}
-                            >
-                              {product.badge}
-                            </span>
-                          )}
-                          <button
-                            className={styles.quickAddBtn}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              alert(`Added ${product.name} to cart!`);
-                            }}
-                            title="Add to Cart"
-                          >
-                            <ShoppingBag size={16} />
-                          </button>
-                        </div>
-
-                        <div className={styles.cardContent}>
-                          <div className={styles.ratingRow}>
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                size={13}
-                                fill={i < product.rating ? '#E7A03B' : 'none'}
-                                color={i < product.rating ? '#E7A03B' : '#dcdcdc'}
-                              />
-                            ))}
-                          </div>
-
-                          <h3 className={styles.productTitle}>{product.name}</h3>
-
-                          <div className={styles.priceContainer}>
-                            <span className={styles.price}>₹{product.price}</span>
-                            {product.originalPrice && (
-                              <span className={styles.originalPrice}>₹{product.originalPrice}</span>
-                            )}
-                          </div>
-                        </div>
-                      </Link>
+                      <ProductCard key={product.id} product={product as any} />
                     ))}
                   </div>
                 )}

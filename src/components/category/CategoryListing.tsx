@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import ProductCard from '../common/ProductCard/ProductCard';
 import {
   Search,
   Star,
@@ -243,62 +244,9 @@ export function CategoryListing({ category }: CategoryListingProps) {
               </div>
               <div className={styles.bestsellersGrid}>
                 {category.bestsellers.map((item) => (
-                  <Link 
-                    href={`/product/${item.id}`} 
-                    key={item.id} 
-                    className={styles.bestsellerCard}
-                    style={{ textDecoration: 'none', color: 'inherit' }}
-                  >
-                    <div className={styles.bestsellerImgWrap}>
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        fill
-                        style={{ objectFit: 'contain' }}
-                        className={styles.bestsellerImg}
-                      />
-                      {item.badge && (
-                        <span
-                          className={`${styles.cardBadge} ${
-                            item.badge === 'New'
-                              ? styles.badgeInk
-                              : item.badge === 'Organic'
-                              ? styles.badgeForest
-                              : styles.badgeAmber
-                          }`}
-                        >
-                          {item.badge}
-                        </span>
-                      )}
-                    </div>
-                    <div className={styles.bestsellerInfo}>
-                      <span className={styles.brandTag}>{item.brand}</span>
-                      <h4 className={styles.bestsellerName}>{item.name}</h4>
-                      <div className={styles.ratingRow}>
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            size={12}
-                            fill={i < item.rating ? '#E7A03B' : 'none'}
-                            color={i < item.rating ? '#E7A03B' : '#dcdcdc'}
-                          />
-                        ))}
-                      </div>
-                      <div className={styles.bestsellerFooter}>
-                        <span className={styles.bestsellerPrice}>₹{item.price.toLocaleString()}</span>
-                        <button
-                          className={styles.addCartBtn}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            alert(`Added ${item.name} to cart!`);
-                          }}
-                        >
-                          Add to Cart
-                        </button>
-                      </div>
-                    </div>
-                  </Link>
+                  <div key={item.id} className={styles.bestsellerCardWrapper}>
+                    <ProductCard product={item as any} />
+                  </div>
                 ))}
               </div>
             </div>
@@ -377,68 +325,7 @@ export function CategoryListing({ category }: CategoryListingProps) {
           ) : (
             <div className={`${styles.productGrid} ${styles[`gridCols${gridCols}`]}`}>
               {filteredProducts.map((product) => (
-                <Link 
-                  href={`/product/${product.id}`} 
-                  key={product.id} 
-                  className={styles.productCard}
-                  style={{ textDecoration: 'none', color: 'inherit' }}
-                >
-                  <div className={styles.cardImgContainer}>
-                    <Image
-                      src={product.image}
-                      alt={product.name}
-                      fill
-                      style={{ objectFit: 'contain' }}
-                      className={styles.productImg}
-                    />
-                    {product.badge && (
-                      <span
-                        className={`${styles.cardBadge} ${
-                          product.badge === 'New'
-                            ? styles.badgeInk
-                            : product.badge === 'Organic'
-                            ? styles.badgeForest
-                            : styles.badgeAmber
-                        }`}
-                      >
-                        {product.badge}
-                      </span>
-                    )}
-                    <button
-                      className={styles.quickAddBtn}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        alert(`Added ${product.name} to cart!`);
-                      }}
-                      title="Add to Cart"
-                    >
-                      <ShoppingBag size={16} />
-                    </button>
-                  </div>
-
-                  <div className={styles.cardContent}>
-                    <div className={styles.ratingRow}>
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          size={13}
-                          fill={i < product.rating ? '#E7A03B' : 'none'}
-                          color={i < product.rating ? '#E7A03B' : '#dcdcdc'}
-                        />
-                      ))}
-                    </div>
-
-                    <h3 className={styles.productTitle}>{product.name}</h3>
-
-                    <div className={styles.priceRow}>
-                      <span className={styles.price}>₹{product.price.toLocaleString()}</span>
-                      {product.originalPrice && (
-                        <span className={styles.originalPrice}>₹{product.originalPrice.toLocaleString()}</span>
-                      )}
-                    </div>
-                  </div>
-                </Link>
+                <ProductCard key={product.id} product={product as any} />
               ))}
             </div>
           )}
