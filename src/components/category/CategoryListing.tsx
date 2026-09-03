@@ -96,6 +96,14 @@ export function CategoryListing({ category }: CategoryListingProps) {
 
   return (
     <div className={styles.pageWrapper}>
+      {/* Mobile Filter Overlay */}
+      {mobileFilterOpen && (
+        <div 
+          className={styles.mobileFilterOverlay}
+          onClick={() => setMobileFilterOpen(false)}
+        />
+      )}
+      
       {/* 1. Breadcrumb & Header */}
       <div className={styles.topContainer}>
         <nav className={styles.breadcrumb} aria-label="Breadcrumb">

@@ -158,6 +158,37 @@
   align-self: start;
 }
 
+@media (max-width: 959px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 320px;
+    height: 100vh;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    border-radius: 0;
+    margin: 0;
+    overflow-y: auto;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+  }
+  
+  .sidebarMobileOpen {
+    left: 0;
+  }
+  
+  .mobileFilterOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 999;
+  }
+}
+
 .sidebar::after {
   content: "";
   display: block;
@@ -220,6 +251,13 @@
   background: none;
   border: none;
   cursor: pointer;
+  color: #211C15;
+}
+
+@media (max-width: 959px) {
+  .closeMobileBtn {
+    display: block;
+  }
 }
 
 /* Filter Groups (Thin Bottom Border Dividers) */
@@ -425,8 +463,14 @@
 
 .bestsellersGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .bestsellersGrid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
 }
 
 .bestsellerCard {
@@ -524,7 +568,30 @@
 }
 
 .mobileFilterToggle {
-  display: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(33, 28, 21, 0.12);
+  background: #ffffff;
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: #211C15;
+  transition: all 0.2s ease;
+}
+
+.mobileFilterToggle:hover {
+  border-color: #E7A03B;
+  color: #E7A03B;
+}
+
+@media (min-width: 960px) {
+  .mobileFilterToggle {
+    display: none;
+  }
 }
 
 .sortWrapper {
@@ -604,7 +671,7 @@
 }
 
 .gridCols3 {
-  grid-template-columns: repeat(1, 1fr);
+  grid-template-columns: repeat(2, 1fr);
 }
 
 @media (min-width: 640px) {
@@ -620,7 +687,7 @@
 }
 
 .gridCols4 {
-  grid-template-columns: repeat(1, 1fr);
+  grid-template-columns: repeat(2, 1fr);
 }
 
 @media (min-width: 640px) {

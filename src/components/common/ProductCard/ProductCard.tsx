@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, Heart, ShoppingCart } from 'lucide-react';
+import { Heart, Star, ShoppingCart } from 'lucide-react';
 import styles from './ProductCard.module.css';
 
 export interface Product {
@@ -26,76 +26,103 @@ interface ProductCardProps {
   product: Product;
 }
 
+// Short description map for products to match ProductRow exact behavior
+const productDescriptions: Record<string, string> = {
+  'd-1': 'Grain-free organic kibble for a healthier, happier pup.',
+  'd-2': 'Heavy ceramic bowl with non-slip grip, dishwasher safe.',
+  'd-3': 'Durable natural rubber toy perfect for teething puppies.',
+  'd-4': 'Reflective padded harness for safe nighttime walks.',
+  'c-1': 'Wild salmon & tuna treats cats go crazy for.',
+  'c-2': 'Spinning feather toy with USB rechargeable motor.',
+  'c-3': 'Natural tofu clumping litter, dust-free & flushable.',
+  'c-4': 'Whisker-friendly shallow dish for comfortable feeding.',
+};
+
+function getDescription(product: Product): string {
+  return product.description || productDescriptions[product.id] || product.tags?.slice(0, 2).join(' · ') || 'Premium quality pet essential.';
+}
+
 export default function ProductCard({ product }: ProductCardProps) {
+  const rating = product.rating || 4.8;
+  const reviewsCount = product.reviewsCount || 128;
+  const description = getDescription(product);
+  
   return (
-    <Link 
-      href={`/product/${product.id}`} 
-      className={styles.productCard}
-      style={{ textDecoration: 'none', color: 'inherit' }}
-    >
-      <div className={styles.imageSection}>
+    <div className={styles.productCard}>
+      {/* Image area */}
+      <div className={styles.cardImageArea}>
         {product.badge && (
-          <div className={styles.badge}>
-            {product.badge.toUpperCase()}
-          </div>
+          <span className={`${styles.cardBadge} ${
+            product.badge === 'Popular' || product.badge === 'Organic' ? styles.badgeGreen : 
+            product.badge === 'New' ? styles.badgeBrown : 
+            product.badge === 'Sale' ? styles.badgeRed : styles.badgeGreen
+          }`}>
+            {product.badge === 'Popular' ? 'BEST SELLER' : product.badge === 'New' ? 'NEW ARRIVAL' : product.badge === 'Sale' ? 'SALE 15% OFF' : product.badge.toUpperCase()}
+          </span>
         )}
         <button 
-          className={styles.wishlistBtn}
+          className={styles.cardWishlistBtn} 
+          aria-label="Add to wishlist"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             alert(`Added ${product.name} to wishlist!`);
           }}
         >
-          <Heart size={16} color="#666" strokeWidth={2} />
+          <Heart size={16} color="#666" strokeWidth={1.5} />
         </button>
-        <div className={styles.imageWrapper}>
+        <Link href={`/product/${product.id}`} className={styles.cardImageLink}>
           <Image
             src={product.image}
             alt={product.name}
             fill
-            className={styles.productImage}
+            className={styles.cardImage}
+            style={{ objectFit: 'contain' }}
           />
-        </div>
+        </Link>
       </div>
 
-      <div className={styles.contentSection}>
-        <h3 className={styles.productTitle} title={product.name}>
-          {product.name}
-        </h3>
+      {/* Info area */}
+      <div className={styles.cardInfo}>
+        <Link href={`/product/${product.id}`} className={styles.cardTitleLink}>
+          <h3 className={styles.cardTitle}>{product.name}</h3>
+        </Link>
         
-
-
-        <div className={styles.ratingRow}>
-          <Star size={14} fill="#f59e0b" color="#f59e0b" />
-          <span className={styles.ratingText}>
-            <span className={styles.ratingValue}>{product.rating}</span>
-            {product.reviewsCount && <span className={styles.reviewsCount}>({product.reviewsCount})</span>}
-          </span>
+        <div className={styles.cardRatingRow}>
+          <Star size={13} fill="#E7A03B" color="#E7A03B" strokeWidth={0} />
+          <span className={styles.cardRatingText}>{rating} ({reviewsCount})</span>
           <span className={styles.ratingDivider}>|</span>
-          <span className={styles.happyParents}>2.2K+ Happy Parents</span>
+          <span className={styles.happyParentsText}>2.2K+ Happy Parents</span>
         </div>
-
-        <div className={styles.footerRow}>
+        
+        <div className={styles.cardBottom}>
           <div className={styles.priceContainer}>
-            <span className={styles.currentPrice}>₹{product.price.toLocaleString()}</span>
+            <span className={styles.cardPrice}>₹{product.price.toLocaleString()}</span>
             {product.originalPrice && (
-              <span className={styles.originalPrice}>₹{product.originalPrice.toLocaleString()}</span>
+              <>
+                <span className={styles.originalPrice}>₹{product.originalPrice.toLocaleString()}</span>
+                {product.badge === 'Sale' && <span className={styles.discountTag}>15% OFF</span>}
+              </>
             )}
           </div>
           
           <button 
-            className={styles.cartBtn}
+            className={`${styles.addToCartBtn} ${
+              product.badge === 'Popular' || product.badge === 'Organic' ? styles.cartBtnGreen : 
+              product.badge === 'New' ? styles.cartBtnBrown : 
+              product.badge === 'Sale' ? styles.cartBtnRed : styles.cartBtnGreen
+            }`}
+            aria-label="Add to cart"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               alert(`Added ${product.name} to cart!`);
             }}
           >
-            <ShoppingCart size={16} color="#fff" />
+            <ShoppingCart size={16} color="#fff" strokeWidth={1.5} />
           </button>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
