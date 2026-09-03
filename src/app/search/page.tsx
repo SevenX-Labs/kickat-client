@@ -2,17 +2,14 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Search, ArrowLeft, Clock, TrendingUp, X } from 'lucide-react';
 import styles from './Search.module.css';
+import { CATALOG_PRODUCTS } from '@/data/categoryData';
+import ProductCard from '@/components/common/ProductCard/ProductCard';
 
 const RECENT_SEARCHES = ['Dog food', 'Cat toys', 'Leash', 'Anti-slip bowl'];
 const TRENDING_SEARCHES = ['Premium dog food', 'Cat tree', 'Winter coat for dogs', 'Automatic feeder'];
 
-const MOCK_RESULTS = [
-  { id: '1', name: 'Ceramic Anti-Slip Pet Bowl', category: 'Accessories', price: 1499, image: '/hero-products/pet_bowl.png' },
-  { id: '2', name: 'Premium Leather Dog Collar', category: 'Accessories', price: 899, image: '/hero-products/pet_bowl.png' }, // using dummy image
-];
 
 export default function SearchPage() {
   const [query, setQuery] = useState('');
@@ -76,21 +73,14 @@ export default function SearchPage() {
           <div className={styles.section}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
               <h2 className={styles.sectionTitle} style={{ margin: 0 }}>Results for "{query}"</h2>
-              <span style={{ color: '#888', fontSize: '0.9rem' }}>{MOCK_RESULTS.length} items found</span>
+              <span style={{ color: '#888', fontSize: '0.9rem' }}>2 items found</span>
             </div>
             
             <div className={styles.resultsGrid}>
-              {MOCK_RESULTS.map(product => (
-                <Link href={`/product/${product.id}`} key={product.id} style={{ textDecoration: 'none' }}>
-                  <div className={styles.productCard}>
-                    <div className={styles.imageWrapper}>
-                      <Image src={product.image} alt={product.name} fill style={{ objectFit: 'contain', padding: '1rem' }} />
-                    </div>
-                    <div className={styles.productTitle}>{product.name}</div>
-                    <div className={styles.productMeta}>{product.category}</div>
-                    <div className={styles.productPrice}>₹{product.price.toLocaleString()}</div>
-                  </div>
-                </Link>
+              {CATALOG_PRODUCTS.slice(0, 2).map(product => (
+                <div key={product.id} className={styles.productCardWrapper}>
+                  <ProductCard product={product as any} />
+                </div>
               ))}
             </div>
           </div>

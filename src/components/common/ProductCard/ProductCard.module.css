@@ -168,6 +168,8 @@
   justify-content: space-between;
   margin-top: auto;
   padding-top: 0.75rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .priceContainer {

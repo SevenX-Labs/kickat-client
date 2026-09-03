@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Heart, Star, ShoppingCart, Users } from 'lucide-react';
+import { Heart, Star, ShoppingCart, Users, Trash2 } from 'lucide-react';
 import styles from './ProductCard.module.css';
 
 export interface Product {
@@ -24,6 +24,7 @@ export interface Product {
 
 interface ProductCardProps {
   product: Product;
+  onRemoveFromWishlist?: (id: string) => void;
 }
 
 // Short description map for products to match ProductRow exact behavior
@@ -42,7 +43,7 @@ function getDescription(product: Product): string {
   return product.description || productDescriptions[product.id] || product.tags?.slice(0, 2).join(' · ') || 'Premium quality pet essential.';
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, onRemoveFromWishlist }: ProductCardProps) {
   const rating = product.rating || 4.8;
   const reviewsCount = product.reviewsCount || 128;
   const description = getDescription(product);
@@ -60,17 +61,31 @@ export default function ProductCard({ product }: ProductCardProps) {
             {product.badge === 'Popular' ? '★ BEST SELLER' : product.badge === 'New' ? 'NEW ARRIVAL' : product.badge === 'Sale' ? 'SALE 15% OFF' : product.badge.toUpperCase()}
           </span>
         )}
-        <button 
-          className={styles.cardWishlistBtn} 
-          aria-label="Add to wishlist"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            alert(`Added ${product.name} to wishlist!`);
-          }}
-        >
-          <Heart size={16} color="#666" strokeWidth={1.5} />
-        </button>
+        {onRemoveFromWishlist ? (
+          <button 
+            className={styles.cardRemoveBtn} 
+            aria-label="Remove from wishlist"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onRemoveFromWishlist(product.id);
+            }}
+          >
+            <Trash2 size={16} strokeWidth={2} color="#C34A42" />
+          </button>
+        ) : (
+          <button 
+            className={styles.cardWishlistBtn} 
+            aria-label="Add to wishlist"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              alert(`Added ${product.name} to wishlist!`);
+            }}
+          >
+            <Heart size={16} color="#666" strokeWidth={1.5} />
+          </button>
+        )}
         <Link href={`/product/${product.id}`} className={styles.cardImageLink}>
           <Image
             src={product.image}
