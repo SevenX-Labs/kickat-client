@@ -899,3 +899,138 @@
   opacity: 0.3;
   cursor: not-allowed;
 }
+
+/* ══════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE OVERRIDES (≤ 899px)
+   Master-Detail Side-by-Side Category Explorer Layout
+   ══════════════════════════════════════════════════════════ */
+@media (max-width: 899px) {
+
+  /* ── 1. Page Wrapper — compact mobile padding ── */
+  .pageWrapper {
+    padding: 0.5rem 0.5rem 2rem;
+  }
+
+  /* ── 2. Master Layout — 2-column side-by-side rail + panel ── */
+  .masterLayout {
+    grid-template-columns: 94px 1fr;
+    gap: 0.6rem;
+  }
+
+  /* ── 3. Left Category Rail ── */
+  .sidebar {
+    top: 4.5rem;
+    max-height: calc(100vh - 5.5rem);
+    gap: 0.35rem;
+  }
+
+  .railHeader {
+    display: none;
+  }
+
+  .railList {
+    padding: 0.5rem 0.35rem;
+    border-radius: 14px;
+    gap: 0.4rem;
+  }
+
+  .railItem {
+    padding: 0.65rem 0.35rem;
+    gap: 0.35rem;
+    border-radius: 12px;
+  }
+
+  .railAvatarWrap {
+    width: 48px;
+    height: 48px;
+  }
+
+  .railLabel {
+    font-size: 0.8rem;
+    line-height: 1.15;
+  }
+
+  .activeBar {
+    width: 3px;
+    height: 24px;
+    left: -0.2rem;
+  }
+
+  /* ── 4. Right Main Panel ── */
+  .mainPanel {
+    gap: 1rem;
+    min-width: 0;
+  }
+
+  .subCategoriesSection {
+    padding: 1rem 0.75rem;
+    border-radius: 16px;
+  }
+
+  .subCatSectionHeader {
+    margin-bottom: 0.85rem;
+    padding-bottom: 0.55rem;
+  }
+
+  .subCatEyebrow {
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.15rem;
+  }
+
+  .subCatMainTitle {
+    font-size: 1.35rem;
+  }
+
+  .subCatCountBadge {
+    font-size: 0.68rem;
+    padding: 0.25rem 0.65rem;
+  }
+
+  /* ── 5. Sub-Categories 2-Column Grid ── */
+  .subCategoriesGrid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+
+  .subCategoryCard {
+    padding: 0.85rem 0.4rem;
+    border-radius: 14px;
+  }
+
+  .subCardImgWrap {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 0.45rem;
+    background: #FFF8F0;
+    border-radius: 50%;
+    padding: 5px;
+  }
+
+  .subCardInfo {
+    gap: 0.2rem;
+  }
+
+  .subCardTitle {
+    font-size: 0.78rem;
+    font-weight: 500;
+    line-height: 1.25;
+    order: 1;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .subCardCount {
+    font-size: 0.68rem;
+    color: #E7A03B;
+    font-weight: 600;
+    order: 2;
+  }
+
+  .subCardLink {
+    display: none;
+  }
+}
