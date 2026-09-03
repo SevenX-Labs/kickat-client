@@ -281,10 +281,14 @@
   background: transparent;
 }
 
-.dropdownWrapper:hover .megaMenu {
+.dropdownWrapper:hover .megaMenu:not(.forceHide) {
   opacity: 1;
   visibility: visible;
   transform: translateX(-50%) translateY(0);
+}
+
+.forceHide {
+  display: none !important;
 }
 
 .megaSidebar {
