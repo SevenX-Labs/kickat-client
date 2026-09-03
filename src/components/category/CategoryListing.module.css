@@ -1045,20 +1045,19 @@
   }
 
   .mobileFilterToggle {
-    padding: 0 0.85rem;
-    font-size: 0.78rem;
+    padding: 0 0.65rem;
     min-height: 38px;
     height: 38px;
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
+    justify-content: center;
+    gap: 0.35rem;
     flex-shrink: 0;
     border-radius: 9999px;
     border: 1.5px solid rgba(33, 28, 21, 0.12);
     background: #ffffff;
     color: #211C15;
-    font-family: var(--font-ibm-plex-mono), monospace;
-    font-weight: 500;
+    cursor: pointer;
   }
 
   .toolbarRight {

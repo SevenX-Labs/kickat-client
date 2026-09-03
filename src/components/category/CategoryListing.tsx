@@ -262,8 +262,7 @@ export function CategoryListing({ category }: CategoryListingProps) {
               className={styles.mobileFilterToggle}
               aria-label="Open filters"
             >
-              <SlidersHorizontal size={16} />
-              <span className={styles.mobileFilterText}>Filters</span>
+              <SlidersHorizontal size={18} />
               {activeFilterCount > 0 && (
                 <span className={styles.activePill}>{activeFilterCount}</span>
               )}
