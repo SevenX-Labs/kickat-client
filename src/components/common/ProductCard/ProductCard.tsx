@@ -64,9 +64,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           {product.name}
         </h3>
         
-        <p className={styles.productDescription}>
-          {product.description || `Premium ${product.subCategory.replace(/-/g, ' ')} for a healthier, happier pet.`}
-        </p>
+
 
         <div className={styles.ratingRow}>
           <Star size={14} fill="#f59e0b" color="#f59e0b" />
