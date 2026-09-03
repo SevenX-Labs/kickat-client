@@ -7,6 +7,8 @@
   overflow: hidden;
   transition: box-shadow 0.3s ease, transform 0.3s ease;
   width: 100%;
+  max-width: 250px;
+  margin: 0 auto;
 }
 
 .productCard:hover {
@@ -18,7 +20,7 @@
   position: relative;
   background-color: #f6f3eb;
   width: 100%;
-  height: 200px;
+  aspect-ratio: 1 / 1.05;
   padding: 0;
 }
 
@@ -82,7 +84,7 @@
 
 .productTitle {
   font-family: 'Merriweather', 'Georgia', serif;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 900;
   color: #05192d;
   margin: 0 0 8px 0;
