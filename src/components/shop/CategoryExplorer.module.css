@@ -185,6 +185,14 @@
   transition: all 0.25s ease;
 }
 
+.railIcon {
+  color: rgba(33, 28, 21, 0.55);
+}
+
+.activeIcon {
+  color: #E7A03B;
+}
+
 .railItemActive .railAvatarWrap {
   background: #ffffff;
   border-color: #E7A03B;

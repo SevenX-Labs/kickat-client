@@ -15,6 +15,7 @@ import {
   ArrowRight,
   Filter,
   Check,
+  Sparkles,
 } from 'lucide-react';
 import {
   MAIN_CATEGORIES,
@@ -86,6 +87,17 @@ export function CategoryExplorer({
 
   // Active Main Category Object
   const activeMainCatObj = useMemo(() => {
+    if (selectedMainCat === 'all') {
+      const allSubcats = MAIN_CATEGORIES.filter((c) => c.slug !== 'all')
+        .flatMap((c) => c.subcategories);
+      return {
+        id: 'all',
+        name: 'All Categories',
+        slug: 'all',
+        count: CATALOG_PRODUCTS.length,
+        subcategories: allSubcats,
+      };
+    }
     return MAIN_CATEGORIES.find((c) => c.slug === selectedMainCat) || MAIN_CATEGORIES[1];
   }, [selectedMainCat]);
 
@@ -193,7 +205,7 @@ export function CategoryExplorer({
               <span className={styles.railTitle}>CATEGORIES</span>
             </div>
             <div className={styles.railList}>
-              {MAIN_CATEGORIES.filter((cat) => cat.slug !== 'all').map((cat) => {
+              {MAIN_CATEGORIES.map((cat) => {
                 const isSelected = selectedMainCat === cat.slug;
                 const iconSrc = MAIN_CAT_ICONS[cat.slug] || '/category-images/food.png';
 
@@ -204,13 +216,17 @@ export function CategoryExplorer({
                     className={`${styles.railItem} ${isSelected ? styles.railItemActive : ''}`}
                   >
                     <div className={styles.railAvatarWrap}>
-                      <Image
-                        src={iconSrc}
-                        alt={cat.name}
-                        width={36}
-                        height={36}
-                        className={styles.railAvatar}
-                      />
+                      {cat.slug === 'all' ? (
+                        <LayoutGrid size={20} className={isSelected ? styles.activeIcon : styles.railIcon} />
+                      ) : (
+                        <Image
+                          src={iconSrc}
+                          alt={cat.name}
+                          width={36}
+                          height={36}
+                          className={styles.railAvatar}
+                        />
+                      )}
                     </div>
                     <span className={styles.railLabel}>{cat.name}</span>
                     {isSelected && <div className={styles.activeBar} />}
