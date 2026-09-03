@@ -193,7 +193,6 @@ export function Navbar() {
                 onClick={() => setMenuHoverAllowed(false)}
               >
                 {category}
-                <ChevronDown className={styles.chevron} strokeWidth={1.5} />
               </Link>
               
               <div className={`${styles.megaMenu} ${!menuHoverAllowed ? styles.forceHide : ''}`}>
