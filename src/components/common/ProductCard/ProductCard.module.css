@@ -7,8 +7,6 @@
   overflow: hidden;
   transition: box-shadow 0.3s ease, transform 0.3s ease;
   width: 100%;
-  max-width: 250px;
-  margin: 0 auto;
   align-self: start;
 }
 
