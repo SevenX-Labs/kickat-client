@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Heart, Star, ShoppingCart } from 'lucide-react';
+import { Heart, Star, ShoppingCart, Users } from 'lucide-react';
 import styles from './ProductCard.module.css';
 
 export interface Product {
@@ -57,7 +57,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             product.badge === 'New' ? styles.badgeBrown : 
             product.badge === 'Sale' ? styles.badgeRed : styles.badgeGreen
           }`}>
-            {product.badge === 'Popular' ? 'BEST SELLER' : product.badge === 'New' ? 'NEW ARRIVAL' : product.badge === 'Sale' ? 'SALE 15% OFF' : product.badge.toUpperCase()}
+            {product.badge === 'Popular' ? '★ BEST SELLER' : product.badge === 'New' ? 'NEW ARRIVAL' : product.badge === 'Sale' ? 'SALE 15% OFF' : product.badge.toUpperCase()}
           </span>
         )}
         <button 
@@ -77,7 +77,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             alt={product.name}
             fill
             className={styles.cardImage}
-            style={{ objectFit: 'contain' }}
+            style={{ objectFit: 'cover' }}
           />
         </Link>
       </div>
@@ -89,10 +89,15 @@ export default function ProductCard({ product }: ProductCardProps) {
         </Link>
         
         <div className={styles.cardRatingRow}>
-          <Star size={13} fill="#E7A03B" color="#E7A03B" strokeWidth={0} />
-          <span className={styles.cardRatingText}>{rating} ({reviewsCount})</span>
+          <div className={styles.ratingLeft}>
+            <Star size={13} fill="#E7A03B" color="#E7A03B" strokeWidth={0} />
+            <span className={styles.cardRatingText}>{rating.toFixed(1)} ({reviewsCount})</span>
+          </div>
           <span className={styles.ratingDivider}>|</span>
-          <span className={styles.happyParentsText}>2.2K+ Happy Parents</span>
+          <div className={styles.ratingRight}>
+            <Users size={12} color="#888" strokeWidth={2} />
+            <span className={styles.happyParentsText}>2.2K+ bought</span>
+          </div>
         </div>
         
         <div className={styles.cardBottom}>
