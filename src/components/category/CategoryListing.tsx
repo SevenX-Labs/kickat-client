@@ -2,20 +2,13 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import ProductCard from '../common/ProductCard/ProductCard';
 import {
   Search,
-  Star,
-  ShoppingBag,
   SlidersHorizontal,
-  LayoutGrid,
-  Grid3X3,
-  Grid2X2,
   X,
   RotateCcw,
-  ChevronDown,
 } from 'lucide-react';
 import { CategoryInfo } from '@/data/categoryData';
 import styles from './CategoryListing.module.css';
@@ -104,22 +97,7 @@ export function CategoryListing({ category }: CategoryListingProps) {
         />
       )}
       
-      {/* 1. Breadcrumb & Header */}
-      <div className={styles.topContainer}>
-        <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-          <Link href="/" className={styles.breadcrumbLink}>Home</Link>
-          <span className={styles.breadcrumbSep}>/</span>
-          <Link href={`/category/${category.categorySlug}`} className={styles.breadcrumbLink}>
-            {category.mainCategoryName}
-          </Link>
-          {category.subcategoryName && (
-            <>
-              <span className={styles.breadcrumbSep}>/</span>
-              <span className={styles.breadcrumbCurrent}>{category.subcategoryName}</span>
-            </>
-          )}
-        </nav>
-      </div>
+
 
       {/* Main Layout: Sidebar Filters + Main Content */}
       <div className={styles.mainLayout}>
@@ -129,26 +107,26 @@ export function CategoryListing({ category }: CategoryListingProps) {
           <div className={styles.sidebarHeader}>
             <div className={styles.sidebarTitleRow}>
               <SlidersHorizontal className={styles.filterIcon} size={18} />
-              <h2 className={styles.sidebarTitle}>Filter Products</h2>
+              <h2 className={styles.sidebarTitle}>Filters</h2>
               {activeFilterCount > 0 && (
                 <span className={styles.activePill}>{activeFilterCount}</span>
               )}
             </div>
-            {activeFilterCount > 0 && (
-              <button onClick={clearAllFilters} className={styles.clearBtn}>
-                Clear all
+            <div className={styles.sidebarActions}>
+              {activeFilterCount > 0 && (
+                <button onClick={clearAllFilters} className={styles.clearBtn}>
+                  Clear all
+                </button>
+              )}
+              <button
+                onClick={() => setMobileFilterOpen(false)}
+                className={styles.closeMobileBtn}
+                aria-label="Close filters"
+              >
+                <X size={22} />
               </button>
-            )}
-            <button
-              onClick={() => setMobileFilterOpen(false)}
-              className={styles.closeMobileBtn}
-              aria-label="Close filters"
-            >
-              <X size={20} />
-            </button>
+            </div>
           </div>
-
-
 
           {/* Price Filter */}
           <div className={styles.filterGroup}>
@@ -160,7 +138,7 @@ export function CategoryListing({ category }: CategoryListingProps) {
               type="range"
               min={200}
               max={6000}
-              step={100}
+              step={50}
               value={maxPrice}
               onChange={(e) => setMaxPrice(Number(e.target.value))}
               className={styles.rangeSlider}
@@ -226,20 +204,6 @@ export function CategoryListing({ category }: CategoryListingProps) {
         {/* Content Area */}
         <div className={styles.contentArea}>
           
-          {/* Bestsellers Strip at Top of Results */}
-          {category.bestsellers.length > 0 && (
-            <div className={styles.bestsellersSection}>
-              <div className={styles.bestsellersHeader}>
-                <span className={styles.sectionEyebrow}>TOP RATED IN CATEGORY</span>
-                <h3 className={styles.bestsellersTitle}>Category Bestsellers</h3>
-              </div>
-              <div className={styles.bestsellersGrid}>
-                {category.bestsellers.map((item) => (
-                  <ProductCard key={item.id} product={item as any} />
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* Toolbar Row */}
           <div className={styles.toolbar}>
@@ -263,40 +227,33 @@ export function CategoryListing({ category }: CategoryListingProps) {
                   onChange={(e) => setSortBy(e.target.value as 'featured' | 'price-low' | 'price-high' | 'rating')}
                   className={styles.sortSelect}
                 >
-                  <option value="featured">Featured & Popular</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
-                  <option value="rating">Highest Rated</option>
+                  <option value="featured">Featured</option>
+                  <option value="price-low">Price: Low–High</option>
+                  <option value="price-high">Price: High–Low</option>
+                  <option value="rating">Top Rated</option>
                 </select>
               </div>
             </div>
 
             <div className={styles.toolbarRight}>
-              <span className={styles.resultCount}>
-                Showing <strong>{filteredProducts.length}</strong> products
-              </span>
-              <div className={styles.gridToggle}>
-                <button
-                  onClick={() => setGridCols(2)}
-                  className={`${styles.densityBtn} ${gridCols === 2 ? styles.densityActive : ''}`}
-                  title="2 Columns"
-                >
-                  <Grid2X2 size={16} />
-                </button>
-                <button
-                  onClick={() => setGridCols(3)}
-                  className={`${styles.densityBtn} ${gridCols === 3 ? styles.densityActive : ''}`}
-                  title="3 Columns"
-                >
-                  <Grid3X3 size={16} />
-                </button>
-                <button
-                  onClick={() => setGridCols(4)}
-                  className={`${styles.densityBtn} ${gridCols === 4 ? styles.densityActive : ''}`}
-                  title="4 Columns"
-                >
-                  <LayoutGrid size={16} />
-                </button>
+              <div className={styles.toolbarSearch}>
+                <Search size={15} className={styles.toolbarSearchIcon} />
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className={styles.toolbarSearchInput}
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className={styles.toolbarSearchClear}
+                    aria-label="Clear search"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -304,9 +261,9 @@ export function CategoryListing({ category }: CategoryListingProps) {
           {/* Product Grid */}
           {filteredProducts.length === 0 ? (
             <div className={styles.emptyState}>
-              <RotateCcw size={40} className={styles.emptyIcon} />
-              <h3 className={styles.emptyTitle}>No products match your filters</h3>
-              <p className={styles.emptySubtitle}>Try adjusting your price range, search query, or brand selections.</p>
+              <RotateCcw size={32} className={styles.emptyIcon} />
+              <h3 className={styles.emptyTitle}>No products found</h3>
+              <p className={styles.emptySubtitle}>Try adjusting your filters or price range.</p>
               <button onClick={clearAllFilters} className={styles.resetBtn}>
                 Clear All Filters
               </button>

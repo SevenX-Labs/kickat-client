@@ -235,6 +235,10 @@
 
 /* ── Responsive adjustments for narrow grids ── */
 @media (max-width: 640px) {
+  .productCard {
+    max-width: 100%;
+  }
+
   .cardInfo {
     padding: 0.75rem;
   }

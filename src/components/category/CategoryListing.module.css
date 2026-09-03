@@ -3,7 +3,7 @@
   width: 100%;
   min-height: calc(100vh - 5rem);
   background-color: #FBF7EE;
-  padding: 1.5rem 2rem 4rem;
+  padding: 1rem 2rem 4rem;
 }
 
 .topContainer {
@@ -462,14 +462,32 @@
 }
 
 .bestsellersGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
+  overflow-x: auto;
   gap: 1rem;
+  padding-bottom: 0.5rem;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+}
+
+.bestsellersGrid::-webkit-scrollbar {
+  display: none;
+}
+
+.bestsellersGrid > * {
+  flex: 0 0 calc(75% - 0.75rem);
+  scroll-snap-align: start;
 }
 
 @media (min-width: 640px) {
-  .bestsellersGrid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  .bestsellersGrid > * {
+    flex: 0 0 calc(50% - 0.5rem);
+  }
+}
+
+@media (min-width: 960px) {
+  .bestsellersGrid > * {
+    flex: 0 0 calc(25% - 0.75rem);
   }
 }
 
@@ -627,37 +645,59 @@
   border-color: #E7A03B;
 }
 
-.resultCount {
-  font-family: var(--font-ibm-plex-mono), monospace;
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: rgba(33, 28, 21, 0.65);
-}
-
-.gridToggle {
+/* ── Toolbar Search ── */
+.toolbarSearch {
+  position: relative;
   display: flex;
-  gap: 0.35rem;
+  align-items: center;
+  flex: 1;
+  max-width: 280px;
 }
 
-.densityBtn {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  border: 1.5px solid rgba(33, 28, 21, 0.12);
+.toolbarSearchIcon {
+  position: absolute;
+  left: 0.85rem;
+  color: rgba(33, 28, 21, 0.4);
+  pointer-events: none;
+}
+
+.toolbarSearchInput {
+  width: 100%;
+  padding: 0.5rem 2.25rem 0.5rem 2.35rem;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(33, 28, 21, 0.1);
+  background: #FBF7EE;
+  font-size: 0.82rem;
+  color: #211C15;
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.toolbarSearchInput::placeholder {
+  color: rgba(33, 28, 21, 0.4);
+}
+
+.toolbarSearchInput:focus {
+  border-color: #E7A03B;
   background: #ffffff;
+}
+
+.toolbarSearchClear {
+  position: absolute;
+  right: 0.6rem;
+  background: none;
+  border: none;
+  cursor: pointer;
   color: rgba(33, 28, 21, 0.4);
   display: flex;
   align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  padding: 0.25rem;
+  border-radius: 50%;
+  transition: color 0.2s ease;
 }
 
-.densityActive,
-.densityBtn:hover {
-  background: #E7A03B;
-  border-color: #E7A03B;
-  color: #ffffff;
+.toolbarSearchClear:hover {
+  color: #E7A03B;
 }
 
 /* ── Product Grid ────────────────────────────────────────── */
@@ -899,4 +939,324 @@
   font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
+}
+
+/* ══════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE OVERRIDES (≤ 639px)
+   ══════════════════════════════════════════════════════════ */
+@media (max-width: 639px) {
+
+  /* ── 1. Page Wrapper — tighter, no horizontal overflow ── */
+  .pageWrapper {
+    padding: 0.25rem 0.85rem 2.5rem;
+    overflow-x: hidden;
+  }
+
+  .topContainer {
+    display: none;
+  }
+
+  .breadcrumb::-webkit-scrollbar {
+    display: none;
+  }
+
+  .breadcrumbLink,
+  .breadcrumbCurrent,
+  .breadcrumbSep {
+    flex-shrink: 0;
+  }
+
+  /* ── 3. Bestsellers Section — premium compact carousel ── */
+  .bestsellersSection {
+    padding: 0.85rem;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(33, 28, 21, 0.03);
+  }
+
+  .bestsellersHeader {
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.55rem;
+  }
+
+  .sectionEyebrow {
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.15rem;
+  }
+
+  .bestsellersTitle {
+    font-size: 1.1rem;
+  }
+
+  .bestsellersGrid {
+    gap: 0.6rem;
+    margin: 0 -0.85rem;
+    padding: 0 0.85rem 0.25rem;
+  }
+
+  /* Cards fill their carousel slot properly */
+  .bestsellersGrid > * {
+    flex: 0 0 47%;
+    min-width: 0;
+    max-width: none;
+  }
+
+  /* ── 4. Toolbar — flush, no box on mobile ── */
+  .toolbar {
+    padding: 0 0 0.2rem 0;
+    border-radius: 0;
+    gap: 0;
+    flex-wrap: nowrap;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  .toolbarLeft {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .mobileFilterToggle {
+    padding: 0 0.75rem;
+    font-size: 0.75rem;
+    min-height: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-shrink: 0;
+  }
+
+  .sortWrapper {
+    gap: 0.3rem;
+    min-width: 0;
+    flex: 1;
+    justify-content: flex-end;
+  }
+
+  .sortLabel {
+    font-size: 0.6rem;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  .sortSelect {
+    padding: 0 0.6rem;
+    font-size: 0.72rem;
+    min-height: 38px;
+    height: 38px;
+    max-width: 130px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .toolbarRight {
+    display: none;
+  }
+
+  /* ── 6. Product Grid — forced 2 columns, cards fill ── */
+  .productGrid {
+    gap: 0.6rem;
+  }
+
+  .gridCols2,
+  .gridCols3,
+  .gridCols4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* ── 7. Empty State — compact and centered ── */
+  .emptyState {
+    padding: 2rem 1.25rem;
+    border-radius: 14px;
+  }
+
+  .emptyIcon {
+    margin-bottom: 0.6rem;
+  }
+
+  .emptyTitle {
+    font-size: 1.05rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .emptySubtitle {
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+    max-width: 260px;
+    line-height: 1.45;
+  }
+
+  .resetBtn {
+    padding: 0.55rem 1.35rem;
+    font-size: 0.8rem;
+    min-height: 44px;
+  }
+
+  /* ── 8. Sidebar Drawer — premium mobile UX ── */
+  .sidebar {
+    width: min(320px, 88vw);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-radius: 0 16px 16px 0;
+  }
+
+  .sidebar::after {
+    display: none;
+  }
+
+  .sidebarHeader {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #ffffff;
+    padding: 1.15rem 1.25rem;
+    border-bottom: 1px solid rgba(33, 28, 21, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .sidebarTitleRow {
+    gap: 0.4rem;
+  }
+
+  .sidebarTitle {
+    font-size: 1.1rem;
+  }
+
+  .sidebarActions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .clearBtn {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.75rem;
+    border: 1px solid rgba(231, 160, 59, 0.3);
+    border-radius: 9999px;
+    color: #E7A03B;
+    background: rgba(231, 160, 59, 0.06);
+    min-height: 34px;
+  }
+
+  .closeMobileBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #FBF7EE;
+    border: 1px solid rgba(33, 28, 21, 0.08);
+    color: #211C15;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  .closeMobileBtn:active {
+    background: rgba(33, 28, 21, 0.08);
+    transform: scale(0.95);
+  }
+
+  /* Filter groups inside drawer */
+  .filterGroup {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgba(33, 28, 21, 0.06);
+    gap: 0.65rem;
+  }
+
+  .filterGroup:last-of-type {
+    border-bottom: none;
+  }
+
+  .groupTitle {
+    font-size: 0.7rem;
+  }
+
+  .checkLabel {
+    min-height: 44px;
+    padding: 0.35rem 0;
+    gap: 0.65rem;
+  }
+
+  .checkbox {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+  }
+
+  .checkText {
+    font-size: 0.88rem;
+  }
+
+  .checkCountBadge {
+    font-size: 0.7rem;
+  }
+
+  .rangeSlider {
+    height: 6px;
+  }
+
+  .rangeLabels {
+    font-size: 0.68rem;
+  }
+
+
+
+  /* ── Content Area — tighter vertical rhythm ── */
+  .contentArea {
+    gap: 0.4rem;
+  }
+
+  /* ── Main Layout — no gap on mobile (sidebar is drawer) ── */
+  .mainLayout {
+    gap: 0;
+  }
+}
+
+/* ── Extra-narrow screens (≤ 359px) ── */
+@media (max-width: 359px) {
+  .pageWrapper {
+    padding: 0.6rem 0.6rem 2rem;
+  }
+
+  .bestsellersGrid > * {
+    flex: 0 0 52%;
+  }
+
+  .toolbar {
+    padding: 0.5rem 0.6rem;
+  }
+
+  .mobileFilterToggle {
+    padding: 0 0.55rem;
+    font-size: 0.7rem;
+  }
+
+  .sortSelect {
+    padding: 0 0.45rem;
+    font-size: 0.68rem;
+    max-width: 110px;
+  }
+
+  .sortLabel {
+    display: none;
+  }
+
+  .emptySubtitle {
+    max-width: 220px;
+    font-size: 0.76rem;
+  }
 }
