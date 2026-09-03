@@ -140,24 +140,7 @@ export function CategoryListing({ category }: CategoryListingProps) {
             </button>
           </div>
 
-          {/* Filter Search */}
-          <div className={styles.filterGroup}>
-            <div className={styles.searchWrap}>
-              <Search className={styles.searchIcon} size={16} />
-              <input
-                type="text"
-                placeholder="Search in this category..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className={styles.searchInput}
-              />
-              {searchQuery && (
-                <button onClick={() => setSearchQuery('')} className={styles.searchClear}>
-                  <X size={14} />
-                </button>
-              )}
-            </div>
-          </div>
+
 
           {/* Price Filter */}
           <div className={styles.filterGroup}>
