@@ -289,6 +289,25 @@
   color: rgba(33, 28, 21, 0.55);
 }
 
+.sidebarSortSelect {
+  padding: 0.55rem 0.85rem;
+  border-radius: 10px;
+  border: 1.5px solid rgba(33, 28, 21, 0.12);
+  background: #ffffff;
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-size: 0.825rem;
+  font-weight: 500;
+  color: #211C15;
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+  transition: border-color 0.2s ease;
+}
+
+.sidebarSortSelect:focus {
+  border-color: #E7A03B;
+}
+
 .priceValue {
   font-family: var(--font-ibm-plex-mono), monospace;
   font-size: 0.8rem;
@@ -1001,58 +1020,45 @@
     max-width: none;
   }
 
-  /* ── 4. Toolbar — flush, no box on mobile ── */
+  /* ── 4. Toolbar — search first, filter button last ── */
   .toolbar {
     padding: 0 0 0.2rem 0;
     border-radius: 0;
-    gap: 0;
+    gap: 0.5rem;
     flex-wrap: nowrap;
     background: transparent;
     border: none;
     box-shadow: none;
-  }
-
-  .toolbarLeft {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
     width: 100%;
-    justify-content: space-between;
   }
 
-  .mobileFilterToggle {
-    padding: 0 0.75rem;
-    font-size: 0.75rem;
-    min-height: 38px;
-    height: 38px;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    flex-shrink: 0;
+  .toolbarSearch {
+    flex: 1;
+    max-width: none;
+    width: 100%;
   }
 
   .sortWrapper {
-    gap: 0.3rem;
-    min-width: 0;
-    flex: 1;
-    justify-content: flex-end;
+    display: none;
   }
 
-  .sortLabel {
-    font-size: 0.6rem;
-    letter-spacing: 0.05em;
-    flex-shrink: 0;
-  }
-
-  .sortSelect {
-    padding: 0 0.6rem;
-    font-size: 0.72rem;
+  .mobileFilterToggle {
+    padding: 0 0.85rem;
+    font-size: 0.78rem;
     min-height: 38px;
     height: 38px;
-    max-width: 130px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-shrink: 0;
+    border-radius: 9999px;
+    border: 1.5px solid rgba(33, 28, 21, 0.12);
+    background: #ffffff;
+    color: #211C15;
+    font-family: var(--font-ibm-plex-mono), monospace;
+    font-weight: 500;
   }
 
   .toolbarRight {

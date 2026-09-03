@@ -128,6 +128,23 @@ export function CategoryListing({ category }: CategoryListingProps) {
             </div>
           </div>
 
+          {/* Sort By Filter Group */}
+          <div className={styles.filterGroup}>
+            <div className={styles.groupHeader}>
+              <span className={styles.groupTitle}>Sort By</span>
+            </div>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as 'featured' | 'price-low' | 'price-high' | 'rating')}
+              className={styles.sidebarSortSelect}
+            >
+              <option value="featured">Featured & Popular</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="rating">Highest Rated</option>
+            </select>
+          </div>
+
           {/* Price Filter */}
           <div className={styles.filterGroup}>
             <div className={styles.groupHeader}>
@@ -203,59 +220,54 @@ export function CategoryListing({ category }: CategoryListingProps) {
 
         {/* Content Area */}
         <div className={styles.contentArea}>
-          
-
           {/* Toolbar Row */}
           <div className={styles.toolbar}>
-            <div className={styles.toolbarLeft}>
-              <button
-                onClick={() => setMobileFilterOpen(true)}
-                className={styles.mobileFilterToggle}
-              >
-                <SlidersHorizontal size={16} />
-                Filters
-                {activeFilterCount > 0 && (
-                  <span className={styles.activePill}>{activeFilterCount}</span>
-                )}
-              </button>
-
-              <div className={styles.sortWrapper}>
-                <label htmlFor="sortSelect" className={styles.sortLabel}>SORT BY:</label>
-                <select
-                  id="sortSelect"
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as 'featured' | 'price-low' | 'price-high' | 'rating')}
-                  className={styles.sortSelect}
+            <div className={styles.toolbarSearch}>
+              <Search size={15} className={styles.toolbarSearchIcon} />
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={styles.toolbarSearchInput}
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className={styles.toolbarSearchClear}
+                  aria-label="Clear search"
                 >
-                  <option value="featured">Featured</option>
-                  <option value="price-low">Price: Low–High</option>
-                  <option value="price-high">Price: High–Low</option>
-                  <option value="rating">Top Rated</option>
-                </select>
-              </div>
+                  <X size={14} />
+                </button>
+              )}
             </div>
 
-            <div className={styles.toolbarRight}>
-              <div className={styles.toolbarSearch}>
-                <Search size={15} className={styles.toolbarSearchIcon} />
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className={styles.toolbarSearchInput}
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className={styles.toolbarSearchClear}
-                    aria-label="Clear search"
-                  >
-                    <X size={14} />
-                  </button>
-                )}
-              </div>
+            <div className={styles.sortWrapper}>
+              <label htmlFor="sortSelect" className={styles.sortLabel}>SORT BY:</label>
+              <select
+                id="sortSelect"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as 'featured' | 'price-low' | 'price-high' | 'rating')}
+                className={styles.sortSelect}
+              >
+                <option value="featured">Featured</option>
+                <option value="price-low">Price: Low–High</option>
+                <option value="price-high">Price: High–Low</option>
+                <option value="rating">Top Rated</option>
+              </select>
             </div>
+
+            <button
+              onClick={() => setMobileFilterOpen(true)}
+              className={styles.mobileFilterToggle}
+              aria-label="Open filters"
+            >
+              <SlidersHorizontal size={16} />
+              <span className={styles.mobileFilterText}>Filters</span>
+              {activeFilterCount > 0 && (
+                <span className={styles.activePill}>{activeFilterCount}</span>
+              )}
+            </button>
           </div>
 
           {/* Product Grid */}
