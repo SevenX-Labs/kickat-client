@@ -321,21 +321,8 @@
   }
   
   .grid {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
-    padding-bottom: 1rem;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  
-  .grid::-webkit-scrollbar {
-    display: none;
-  }
-  
-  .productCard {
-    min-width: 280px;
-    scroll-snap-align: start;
   }
 }

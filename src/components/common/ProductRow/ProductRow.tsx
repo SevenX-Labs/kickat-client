@@ -1,5 +1,6 @@
 "use client";
 
+import Link from 'next/link';
 import { PawPrint, ArrowRight } from 'lucide-react';
 import styles from './ProductRow.module.css';
 import ProductCard from '../ProductCard/ProductCard';
@@ -44,9 +45,7 @@ export function ProductRow({ eyebrow, title, subtitle, products, viewAllLink = '
 
         <div className={styles.grid}>
           {displayProducts.map(product => (
-            <div key={product.id} className={styles.productCardWrapper}>
-              <ProductCard product={product as any} />
-            </div>
+            <ProductCard key={product.id} product={product as any} />
           ))}
         </div>
       </div>

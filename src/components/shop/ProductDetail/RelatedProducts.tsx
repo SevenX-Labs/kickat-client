@@ -1,5 +1,6 @@
 "use client";
 
+import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import styles from './ProductDetail.module.css';
 import { Product } from './ProductDetail';
@@ -32,9 +33,7 @@ export function RelatedProducts({ currentProduct }: RelatedProductsProps) {
 
       <div className={styles.relatedGrid}>
         {productsToDisplay.map(product => (
-          <div key={product.id} className={styles.productCardWrapper}>
-            <ProductCard product={product as any} />
-          </div>
+          <ProductCard key={product.id} product={product as any} />
         ))}
       </div>
     </div>

@@ -78,9 +78,7 @@ export default function SearchPage() {
             
             <div className={styles.resultsGrid}>
               {CATALOG_PRODUCTS.slice(0, 2).map(product => (
-                <div key={product.id} className={styles.productCardWrapper}>
-                  <ProductCard product={product as any} />
-                </div>
+                <ProductCard key={product.id} product={product as any} />
               ))}
             </div>
           </div>

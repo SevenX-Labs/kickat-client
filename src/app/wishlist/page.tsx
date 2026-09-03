@@ -33,9 +33,7 @@ export default function WishlistPage() {
         {wishlistItems.length > 0 ? (
           <div className={styles.grid}>
             {wishlistItems.map(product => (
-              <div key={product.id} className={styles.productCardWrapper}>
-                <ProductCard product={product as any} onRemoveFromWishlist={handleRemove} />
-              </div>
+              <ProductCard key={product.id} product={product as any} onRemoveFromWishlist={handleRemove} />
             ))}
           </div>
         ) : (

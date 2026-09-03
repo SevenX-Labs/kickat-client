@@ -235,9 +235,7 @@ export function CategoryListing({ category }: CategoryListingProps) {
               </div>
               <div className={styles.bestsellersGrid}>
                 {category.bestsellers.map((item) => (
-                  <div key={item.id} className={styles.bestsellerCardWrapper}>
-                    <ProductCard product={item as any} />
-                  </div>
+                  <ProductCard key={item.id} product={item as any} />
                 ))}
               </div>
             </div>
