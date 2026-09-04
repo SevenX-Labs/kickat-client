@@ -364,13 +364,14 @@
 @media (max-width: 640px) {
   .productCard {
     display: flex;
+    flex-wrap: wrap;
     flex-direction: row;
     align-items: flex-start;
     max-width: 100%;
-    padding: 1rem; /* Consistent 16px padding */
-    border-radius: 18px;
+    padding: 0.85rem;
+    border-radius: 16px;
     background: #ffffff;
-    gap: 0.85rem;
+    gap: 0.75rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     border: 1px solid rgba(0, 0, 0, 0.04);
     height: auto;
@@ -382,14 +383,12 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   }
 
-  /* Image Area: Proportional ~38% width for clear presentation */
+  /* Image Area: Compact 110px square on mobile */
   .cardImageArea {
-    width: 38%;
-    min-width: 115px;
-    max-width: 135px;
-    height: auto;
+    width: 110px;
+    height: 110px;
     aspect-ratio: 1 / 1;
-    border-radius: 14px;
+    border-radius: 12px;
     padding: 0;
     overflow: hidden;
     position: relative;
@@ -403,7 +402,7 @@
     top: 5px;
     left: 5px;
     padding: 0.12rem 0.38rem;
-    font-size: 0.59375rem; /* ~9.5px */
+    font-size: 0.59375rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.02em;
@@ -419,23 +418,23 @@
     display: none !important;
   }
 
-  /* Content Column: Vertical hierarchy Title -> Rating -> Price+Discount -> Swatches -> CTA Row */
+  /* Content Column (Top Right) */
   .cardInfo {
     display: flex;
     flex-direction: column;
     flex: 1;
     min-width: 0;
     padding: 0;
-    gap: 0;
+    gap: 0.15rem;
   }
 
   .cardTitle {
     font-family: var(--font-sans), Inter, -apple-system, sans-serif;
-    font-size: 1rem; /* 16px */
+    font-size: 0.9375rem; /* 15px */
     font-weight: 600;
     color: #111827;
-    margin-bottom: 0.25rem;
-    line-height: 1.35;
+    margin-bottom: 0.15rem;
+    line-height: 1.3;
     letter-spacing: -0.01em;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -448,7 +447,7 @@
     display: flex;
     align-items: center;
     gap: 0.3rem;
-    margin-bottom: 0.35rem;
+    margin-bottom: 0.2rem;
   }
 
   .starsGroup {
@@ -469,13 +468,12 @@
     font-weight: 500;
   }
 
-  /* Price Container */
   .priceContainer {
     display: flex;
     align-items: baseline;
-    gap: 0.5rem; /* 8px gap */
+    gap: 0.4rem;
     flex-wrap: wrap;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.2rem;
   }
 
   .priceRowUpper {
@@ -486,7 +484,7 @@
 
   .cardPrice {
     font-family: var(--font-sans), Inter, sans-serif;
-    font-size: 1.125rem; /* 18px */
+    font-size: 1.0625rem; /* 17px */
     font-weight: 700;
     color: #111827;
     line-height: 1;
@@ -494,7 +492,7 @@
   }
 
   .originalPrice {
-    font-size: 0.875rem; /* 14px */
+    font-size: 0.8125rem; /* 13px */
     color: #9CA3AF;
     text-decoration: line-through;
     font-weight: 400;
@@ -502,54 +500,52 @@
   }
 
   .discountTag {
-    font-size: 0.6875rem; /* 11px */
+    font-size: 0.625rem; /* 10px */
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.02em;
-    padding: 0.2rem 0.55rem;
+    padding: 0.15rem 0.45rem;
     border-radius: 9999px;
     background-color: #16A34A;
     color: #ffffff;
     line-height: 1;
   }
 
-  /* Color Swatches directly under price row with consistent 8px spacing */
   .colorSwatches {
     display: flex !important;
     align-items: center;
     gap: 0.45rem;
-    margin-top: 0.15rem; /* 8px spacing below price */
-    margin-bottom: 0.65rem;
+    margin-top: 0.15rem;
+    margin-bottom: 0.1rem;
   }
 
   .swatchDot {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     border: 1px solid rgba(0, 0, 0, 0.12);
     display: inline-block;
-    box-shadow: 0 1.5px 5px rgba(0, 0, 0, 0.14);
+    box-shadow: 0 1.5px 4px rgba(0, 0, 0, 0.12);
   }
 
   .swatchActive {
     transform: scale(1.1);
     outline: 2px solid #FD802E;
-    outline-offset: 3px;
+    outline-offset: 2.5px;
   }
 
-  /* Remove vertical divider */
   .desktopDivider {
     display: none !important;
   }
 
-  /* CTA Column: Tightly Grouped Button Row + In Stock & Delivery Subtitle */
+  /* Full Width Action Column on Mobile (Bottom Row) */
   .cardActionCol {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
     width: 100%;
+    flex-basis: 100%;
     min-width: 0;
-    margin-top: 0.1rem;
+    margin-top: 0.25rem;
     gap: 0.35rem;
   }
 
@@ -562,8 +558,8 @@
 
   .addToCartBtn {
     flex: 1;
-    height: 44px !important;
-    min-height: 44px !important;
+    height: 42px !important;
+    min-height: 42px !important;
     border-radius: 9999px !important;
     background: linear-gradient(180deg, #FD802E 0%, #E56E1D 100%) !important;
     color: #ffffff !important;
@@ -586,10 +582,10 @@
 
   .desktopWishlistBtn {
     display: flex !important;
-    width: 44px !important;
-    height: 44px !important;
-    min-width: 44px !important;
-    min-height: 44px !important;
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
     border-radius: 50% !important;
     background-color: #ffffff !important;
     border: 1px solid rgba(0, 0, 0, 0.1) !important;
@@ -602,20 +598,21 @@
 
   .stockDeliveryGroup {
     display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-    margin-top: 0.15rem;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.1rem;
     margin-left: 0.15rem;
   }
 
   .inStockBadge {
     display: flex !important;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.3rem;
     color: #16A34A;
-    font-size: 0.78125rem;
+    font-size: 0.75rem;
     font-weight: 600;
-    margin-top: 0;
   }
 
   .deliveryText {
