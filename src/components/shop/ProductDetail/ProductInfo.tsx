@@ -67,11 +67,6 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
   return (
     <div className={styles.infoWrapper}>
-      {/* Best Seller Badge */}
-      <div className={styles.badgeRow}>
-        <span className={styles.bestSellerBadge}>{badge}</span>
-      </div>
-
       {/* Product Title */}
       <h1 className={styles.productTitle}>{title}</h1>
 
@@ -124,6 +119,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
                 className={`${styles.colorSwatchBtn} ${isSelected ? styles.colorSwatchActive : ''}`}
                 style={{ background: bgStyle }}
                 onClick={() => setSelectedColor(color.name)}
+                title={color.name}
                 aria-label={`Select ${color.name} color`}
               />
             );
@@ -134,7 +130,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
       {/* Size Selector */}
       <div className={styles.selectorBlock}>
         <div className={styles.selectorHeaderWithLink}>
-          <div>
+          <div className={styles.selectorHeader}>
             <span className={styles.selectorTitle}>Size:</span>
             <span className={styles.selectorValue}>{selectedSize}</span>
           </div>
@@ -189,7 +185,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
         <div className={styles.stockStatusBox}>
           <span className={styles.greenDot} />
           <span className={styles.stockBold}>In Stock</span>
-          <span className={styles.stockSub}>Only 5 left!</span>
+          <span className={styles.lowStockBadge}>Only 5 left</span>
         </div>
       </div>
 

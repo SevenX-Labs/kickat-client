@@ -441,114 +441,142 @@
 }
 
 .shortDescription {
-  font-size: 0.825rem;
-  line-height: 1.45;
-  color: #524D45;
-  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #555047;
+  margin: 0.1rem 0 0.35rem 0;
 }
 
 .selectorBlock {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.45rem;
 }
 
 .selectorHeader {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.8rem;
+  gap: 0.35rem;
+  font-size: 0.85rem;
 }
 
 .selectorHeaderWithLink {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
 }
 
 .selectorTitle {
-  font-weight: 600;
-  color: #211C15;
+  font-weight: 700;
+  color: #1A1612;
 }
 
 .selectorValue {
-  font-weight: 500;
-  color: #524D45;
+  font-weight: 600;
+  color: #635C52;
 }
 
 .colorSwatchesRow {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.65rem;
 }
 
 .colorSwatchBtn {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: 2px solid #ffffff;
   cursor: pointer;
-  box-shadow: 0 0 0 1px #D6D1C7;
-  transition: all 0.2s ease;
+  box-shadow: 0 0 0 1px #D6D1C7, 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.colorSwatchBtn:hover {
+  transform: translateY(-1px) scale(1.06);
 }
 
 .colorSwatchActive {
-  box-shadow: 0 0 0 2px #FD802E !important;
-  transform: scale(1.08);
+  box-shadow: 0 0 0 2px #FFFCF9, 0 0 0 4px #FD802E, 0 4px 12px rgba(253, 128, 46, 0.2) !important;
+  transform: scale(1.1);
 }
 
 .sizePillsRow {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
 }
 
 .sizePillBtn {
-  min-width: 42px;
-  height: 34px;
-  padding: 0 0.75rem;
-  border-radius: 8px;
-  border: 1px solid #D6D1C7;
+  min-width: 46px;
+  height: 38px;
+  padding: 0 0.9rem;
+  border-radius: 10px;
+  border: 1px solid #D9D3C7;
   background: #ffffff;
-  font-weight: 600;
-  font-size: 0.8rem;
+  font-weight: 700;
+  font-size: 0.85rem;
   color: #211C15;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sizePillBtn:hover {
+  border-color: #FD802E;
+  color: #FD802E;
+  background-color: #FFF9F4;
 }
 
 .sizePillActive {
   background-color: #FD802E !important;
   color: #ffffff !important;
   border-color: #FD802E !important;
+  box-shadow: 0 4px 14px rgba(253, 128, 46, 0.35);
+  transform: translateY(-1px);
 }
 
 .sizeGuideRowLink {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
-  border: none;
-  background: transparent;
-  color: #211C15;
+  gap: 0.35rem;
+  border: 1px solid rgba(253, 128, 46, 0.25);
+  background: #FFF8F2;
+  color: #FD802E;
+  padding: 0.3rem 0.75rem;
+  border-radius: 20px;
   font-size: 0.775rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sizeGuideRowLink:hover {
+  background: #FD802E;
+  color: #ffffff;
+  border-color: #FD802E;
+  box-shadow: 0 3px 10px rgba(253, 128, 46, 0.25);
 }
 
 .quantityStockRow {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.25rem;
+  margin-top: 0.25rem;
 }
 
 .quantityStepper {
   display: flex;
   align-items: center;
-  border: 1px solid #D6D1C7;
-  border-radius: 8px;
+  border: 1px solid #D9D3C7;
+  border-radius: 12px;
   background: #ffffff;
-  height: 36px;
+  height: 40px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  overflow: hidden;
 }
 
 .stepperBtn {
@@ -561,27 +589,41 @@
   justify-content: center;
   cursor: pointer;
   color: #211C15;
+  transition: all 0.2s ease;
+}
+
+.stepperBtn:hover {
+  background-color: #FFF5EE;
+  color: #FD802E;
 }
 
 .stepperValue {
-  width: 32px;
+  width: 34px;
   text-align: center;
-  font-weight: 600;
-  font-size: 0.9rem;
+  font-weight: 700;
+  font-size: 0.925rem;
+  color: #1A1612;
 }
 
 .stockStatusBox {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
   font-size: 0.85rem;
 }
 
 .greenDot {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   background-color: #22C55E;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+  animation: pulseDot 2s infinite ease-in-out;
+}
+
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.15); opacity: 0.8; }
 }
 
 .stockBold {
@@ -589,8 +631,14 @@
   color: #1A1612;
 }
 
-.stockSub {
-  color: #78746D;
+.lowStockBadge {
+  background-color: #FEF3C7;
+  color: #92400E;
+  font-size: 0.725rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  border: 1px solid rgba(217, 119, 6, 0.2);
 }
 
 .primaryCtasRow {
