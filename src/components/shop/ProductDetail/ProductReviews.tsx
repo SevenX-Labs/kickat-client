@@ -1,74 +1,14 @@
 "use client";
 
-import { useState, useRef } from 'react';
-import { Star, ThumbsUp, CheckCircle, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
+import { Star, Edit3 } from 'lucide-react';
 import Image from 'next/image';
-import styles from './ProductReviews.module.css';
+import styles from './ProductDetail.module.css';
 import { Product } from './ProductDetail';
 
 interface ProductReviewsProps {
   product: Product;
 }
-
-const MOCK_REVIEWS = [
-  {
-    id: 1,
-    name: 'Sarah J.',
-    date: 'August 12, 2026',
-    rating: 5,
-    title: 'Absolutely perfect for my pet!',
-    content: 'I was hesitant at first, but the quality is outstanding. The materials feel premium and it is exactly as described. My dog loves it. Highly recommend to anyone looking for a durable product.',
-    verified: true,
-    helpful: 24,
-    avatarColor: '#FD802E',
-    photos: ['/hero-products/dog_food.png', '/hero-products/cat_treats.png'],
-  },
-  {
-    id: 2,
-    name: 'Michael T.',
-    date: 'August 5, 2026',
-    rating: 4,
-    title: 'Great quality, fast shipping',
-    content: 'Very happy with this purchase. It looks great and feels very durable. Knocking off one star just because the packaging was slightly damaged, but the product was pristine.',
-    verified: true,
-    helpful: 12,
-    avatarColor: '#4CAF50',
-  },
-  {
-    id: 3,
-    name: 'Emily R.',
-    date: 'July 28, 2026',
-    rating: 5,
-    title: 'Exceeded expectations',
-    content: 'Beautifully designed and very functional. You can tell a lot of thought went into making this. Would highly recommend to any pet owner.',
-    verified: false,
-    helpful: 8,
-    avatarColor: '#2196F3',
-  },
-  {
-    id: 4,
-    name: 'David L.',
-    date: 'July 15, 2026',
-    rating: 5,
-    title: 'Worth every penny',
-    content: 'The craftsmanship is top-notch. I have tried several other brands, but nothing comes close to this level of detail. My pet instantly took to it.',
-    verified: true,
-    helpful: 35,
-    avatarColor: '#9C27B0',
-    photos: ['/hero-products/bird_seed.png'],
-  },
-  {
-    id: 5,
-    name: 'Jessica W.',
-    date: 'July 2, 2026',
-    rating: 4,
-    title: 'Solid product',
-    content: 'Good material and it fits perfectly. Only issue is that it took a while to arrive, but the support team was very helpful and responsive.',
-    verified: true,
-    helpful: 5,
-    avatarColor: '#F44336',
-  }
-];
 
 const RATING_BREAKDOWN = [
   { stars: 5, percentage: 68 },
@@ -78,164 +18,119 @@ const RATING_BREAKDOWN = [
   { stars: 1, percentage: 1 },
 ];
 
+const CUSTOMER_PHOTOS = [
+  '/hero-products/dog_food.png',
+  '/hero-products/pet_toy.png',
+  '/hero-products/pet_bowl.png',
+  '/hero-products/cat_treats.png',
+  '/hero-products/bird_seed.png',
+];
+
 export function ProductReviews({ product }: ProductReviewsProps) {
-  const rating = product.rating || 4.2;
-  const reviewsCount = product.reviewsCount || 128;
-  const [expandedReviews, setExpandedReviews] = useState<Record<number, boolean>>({});
-  const [helpfulClicked, setHelpfulClicked] = useState<Record<number, boolean>>({});
-  const sliderRef = useRef<HTMLDivElement>(null);
-
-  const toggleExpand = (id: number) => {
-    setExpandedReviews(prev => ({ ...prev, [id]: !prev[id] }));
-  };
-
-  const toggleHelpful = (id: number) => {
-    setHelpfulClicked(prev => ({ ...prev, [id]: !prev[id] }));
-  };
-
-  const scrollLeft = () => {
-    if (sliderRef.current) {
-      sliderRef.current.scrollBy({ left: -400, behavior: 'smooth' });
-    }
-  };
-
-  const scrollRight = () => {
-    if (sliderRef.current) {
-      sliderRef.current.scrollBy({ left: 400, behavior: 'smooth' });
-    }
-  };
+  const rating = product.rating || 4.8;
+  const reviewsCount = product.reviewsCount || 64;
+  const [showReviewModal, setShowReviewModal] = useState(false);
 
   return (
-    <div className={styles.reviewsContainer} id="reviews">
-      <h2 className={styles.sectionTitle}>Customer Reviews</h2>
-      
-      <div className={styles.reviewsHeader}>
-        {/* Rating Summary Panel */}
-        <div className={styles.ratingSummaryPanel}>
-          <div className={styles.ratingBigNumberBlock}>
-            <span className={styles.bigRating}>{rating}</span>
-            <div className={styles.ratingStarsCol}>
-              <div className={styles.stars}>
-                {[...Array(5)].map((_, i) => (
-                  <Star 
-                    key={i} 
-                    size={18} 
-                    fill={i < Math.floor(rating) ? "#FD802E" : "none"} 
-                    color={i < Math.floor(rating) ? "#FD802E" : "#dcdcdc"} 
-                    strokeWidth={2}
-                  />
-                ))}
+    <div className={styles.reviewsMainWrapper} id="reviews">
+      <h2 className={styles.reviewsSectionHeaderTitle}>Customer Reviews</h2>
+
+      {/* Top Ratings Overview Row */}
+      <div className={styles.reviewsOverviewCard}>
+        {/* Left: Big Rating Number & Stars */}
+        <div className={styles.ratingNumberBlock}>
+          <span className={styles.bigRatingScore}>{rating}</span>
+          <div className={styles.ratingStarsCol}>
+            <div className={styles.starsRowInline}>
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  size={18}
+                  fill="#FD802E"
+                  color="#FD802E"
+                  strokeWidth={1}
+                />
+              ))}
+            </div>
+            <span className={styles.basedOnText}>Based on {reviewsCount} reviews</span>
+          </div>
+        </div>
+
+        {/* Center: Rating Progress Bars */}
+        <div className={styles.ratingProgressBarsCol}>
+          {RATING_BREAKDOWN.map((item) => (
+            <div key={item.stars} className={styles.progressRow}>
+              <span className={styles.starLabelNum}>{item.stars} ★</span>
+              <div className={styles.progressTrack}>
+                <div
+                  className={styles.progressFill}
+                  style={{ width: `${item.percentage}%` }}
+                />
               </div>
-              <span className={styles.ratingSubtitle}>Based on {reviewsCount} reviews</span>
+              <span className={styles.percentageVal}>{item.percentage}%</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Right: Write a Review Button */}
+        <div className={styles.writeReviewBtnCol}>
+          <button
+            type="button"
+            className={styles.writeReviewBtn}
+            onClick={() => setShowReviewModal(true)}
+          >
+            <Edit3 size={15} />
+            <span>Write a Review</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Customer Photos Row */}
+      <div className={styles.customerPhotosSection}>
+        <h3 className={styles.customerPhotosTitle}>Customer Photos</h3>
+        <div className={styles.customerPhotosRow}>
+          {CUSTOMER_PHOTOS.map((photo, idx) => (
+            <div key={idx} className={styles.photoTileWrap}>
+              <Image
+                src={photo}
+                alt={`Customer review photo ${idx + 1}`}
+                fill
+                sizes="120px"
+                className={styles.customerPhotoImg}
+              />
+            </div>
+          ))}
+
+          {/* +12 More Tile */}
+          <div className={`${styles.photoTileWrap} ${styles.morePhotosTile}`}>
+            <Image
+              src={CUSTOMER_PHOTOS[0]}
+              alt="More customer photos"
+              fill
+              sizes="120px"
+              className={styles.customerPhotoImg}
+            />
+            <div className={styles.morePhotosOverlay}>
+              <span className={styles.moreCountText}>+12</span>
+              <span className={styles.moreLabelText}>More</span>
             </div>
           </div>
-          <div className={styles.ratingBars}>
-            {RATING_BREAKDOWN.map((row) => (
-              <div key={row.stars} className={styles.ratingBarRow}>
-                <span className={styles.starLabel}>{row.stars}★</span>
-                <div className={styles.barTrack}>
-                  <div className={styles.barFill} style={{ width: `${row.percentage}%` }}></div>
-                </div>
-                <span className={styles.percentLabel}>{row.percentage}%</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Action Controls */}
-        <div className={styles.headerControls}>
-          <div className={styles.sortDropdown}>
-            <span className={styles.sortLabel}>Sort by:</span>
-            <button className={styles.sortBtn}>
-              Most Helpful <ChevronDown size={14} />
-            </button>
-          </div>
-          <button className={styles.writeReviewBtn}>Write a Review</button>
         </div>
       </div>
 
-      {/* Reviews Slider */}
-      <div className={styles.sliderWrapper}>
-        <button className={`${styles.sliderBtn} ${styles.leftBtn}`} onClick={scrollLeft}>
-          <ChevronLeft size={24} />
-        </button>
-
-        <div className={styles.reviewsSlider} ref={sliderRef}>
-          {MOCK_REVIEWS.map(review => {
-            const isExpanded = expandedReviews[review.id];
-            const isHelpful = helpfulClicked[review.id];
-            
-            return (
-              <div key={review.id} className={styles.reviewCard}>
-                <div className={styles.cardHeader}>
-                  <div className={styles.avatar} style={{ backgroundColor: review.avatarColor }}>
-                    {review.name.charAt(0)}
-                  </div>
-                  <div className={styles.reviewerInfo}>
-                    <div className={styles.reviewerNameRow}>
-                      <span className={styles.reviewerName}>{review.name}</span>
-                      {review.verified && (
-                        <span className={styles.verifiedBadge}>
-                          <CheckCircle size={12} /> Verified Purchase
-                        </span>
-                      )}
-                    </div>
-                    <span className={styles.reviewDate}>{review.date}</span>
-                  </div>
-                </div>
-
-                <div className={styles.reviewStars}>
-                  {[...Array(5)].map((_, i) => (
-                    <Star 
-                      key={i} 
-                      size={14} 
-                      fill={i < review.rating ? "#FD802E" : "none"} 
-                      color={i < review.rating ? "#FD802E" : "#dcdcdc"} 
-                      strokeWidth={2}
-                    />
-                  ))}
-                </div>
-                
-                <h4 className={styles.reviewTitle}>{review.title}</h4>
-                
-                <div className={styles.reviewBodyContainer}>
-                  <p className={`${styles.reviewContent} ${isExpanded ? styles.expanded : ''}`}>
-                    {review.content}
-                  </p>
-                  {review.content.length > 120 && (
-                    <button className={styles.readMoreBtn} onClick={() => toggleExpand(review.id)}>
-                      {isExpanded ? 'Show less' : 'Read more'}
-                    </button>
-                  )}
-                </div>
-
-                {review.photos && review.photos.length > 0 && (
-                  <div className={styles.reviewPhotos}>
-                    {review.photos.map((photo, idx) => (
-                      <div key={idx} className={styles.photoThumbnail}>
-                        <Image src={photo} alt="Customer photo" fill className={styles.photoImage} />
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div className={styles.cardFooter}>
-                  <button 
-                    className={`${styles.helpfulBtn} ${isHelpful ? styles.helpfulActive : ''}`}
-                    onClick={() => toggleHelpful(review.id)}
-                  >
-                    <ThumbsUp size={14} /> Helpful? ({review.helpful + (isHelpful ? 1 : 0)})
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+      {showReviewModal && (
+        <div className={styles.modalBackdrop} onClick={() => setShowReviewModal(false)}>
+          <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
+            <h3>Write a Review</h3>
+            <p>Share your experience with {product.name || 'this product'}.</p>
+            <textarea className={styles.modalTextarea} placeholder="Write your review here..." rows={4} />
+            <div className={styles.modalActions}>
+              <button type="button" onClick={() => setShowReviewModal(false)} className={styles.cancelBtn}>Cancel</button>
+              <button type="button" onClick={() => { alert('Thank you for your review!'); setShowReviewModal(false); }} className={styles.submitBtn}>Submit</button>
+            </div>
+          </div>
         </div>
-
-        <button className={`${styles.sliderBtn} ${styles.rightBtn}`} onClick={scrollRight}>
-          <ChevronRight size={24} />
-        </button>
-      </div>
+      )}
     </div>
   );
 }

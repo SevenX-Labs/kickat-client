@@ -2,38 +2,34 @@
 
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import HomeProductCard from '@/components/common/HomeProductCard/HomeProductCard';
+import { CATALOG_PRODUCTS } from '@/data/categoryData';
 import styles from './ProductDetail.module.css';
 import { Product } from './ProductDetail';
-import { CATALOG_PRODUCTS } from '@/data/categoryData';
-import ProductCard from '../../common/ProductCard/ProductCard';
 
 interface RelatedProductsProps {
   currentProduct?: Product;
 }
 
 export function RelatedProducts({ currentProduct }: RelatedProductsProps) {
-  // If currentProduct is provided, filter by category. Otherwise just show first 4 products.
-  const related = currentProduct 
-    ? CATALOG_PRODUCTS.filter(p => p.mainCategory === currentProduct.mainCategory && p.id !== currentProduct.id).slice(0, 4)
-    : CATALOG_PRODUCTS.slice(0, 4);
-
-  const productsToDisplay = related;
+  // Filter out current product & take top 4 related products
+  const related = CATALOG_PRODUCTS.filter(
+    (p) => !currentProduct || p.id !== currentProduct.id
+  ).slice(0, 4);
 
   return (
-    <div className={styles.relatedSectionWrapper}>
-      <div className={styles.relatedHeader}>
-        <div className={styles.relatedHeaderLeft}>
-          <span className={styles.relatedEyebrow}>Pairs well with</span>
-          <h2 className={styles.relatedTitle}>You May Also Like</h2>
-        </div>
-        <Link href="/category" className={styles.viewAllLink}>
-          View All <ArrowRight size={18} />
+    <div className={styles.relatedProductsWrapper}>
+      <div className={styles.relatedProductsHeader}>
+        <h2 className={styles.relatedProductsTitle}>You may also like</h2>
+        <Link href="/category" className={styles.viewAllOrangeLink}>
+          <span>View All</span>
+          <ArrowRight size={16} />
         </Link>
       </div>
 
-      <div className={styles.relatedGrid}>
-        {productsToDisplay.map(product => (
-          <ProductCard key={product.id} product={product as any} />
+      <div className={styles.relatedProductsGrid}>
+        {related.map((prod) => (
+          <HomeProductCard key={prod.id} product={prod} />
         ))}
       </div>
     </div>

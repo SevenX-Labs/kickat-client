@@ -1,12 +1,14 @@
 "use client";
 
-import styles from './ProductDetail.module.css';
+import Link from 'next/link';
 import { ProductGallery } from './ProductGallery';
 import { ProductInfo } from './ProductInfo';
+import { ProductTrustStrip } from './ProductTrustStrip';
 import { ProductTabs } from './ProductTabs';
+import { ProductSpecsAndSizeGuide } from './ProductSpecsAndSizeGuide';
 import { ProductReviews } from './ProductReviews';
 import { RelatedProducts } from './RelatedProducts';
-import Link from 'next/link';
+import styles from './ProductDetail.module.css';
 
 export interface Product {
   id: string;
@@ -30,51 +32,68 @@ interface ProductDetailProps {
 }
 
 export function ProductDetail({ product }: ProductDetailProps) {
-  // Format category names for display (e.g., 'dogs' -> 'Dogs')
-  const mainCategoryName = product.mainCategory.charAt(0).toUpperCase() + product.mainCategory.slice(1);
-  const subCategoryName = product.subCategory.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  const mainCategoryName =
+    product.mainCategory.charAt(0).toUpperCase() + product.mainCategory.slice(1);
+  const subCategoryName = product.subCategory
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 
   return (
     <div className={styles.pageContainer}>
-      {/* Breadcrumbs */}
+      {/* 1. Breadcrumbs Header */}
       <div className={styles.container}>
-        <nav className={styles.breadcrumbs}>
+        <nav className={styles.breadcrumbsNav} aria-label="Breadcrumb">
           <Link href="/" className={styles.breadcrumbLink}>Home</Link>
-          <span className={styles.breadcrumbSeparator}>/</span>
-          <Link href={`/categories/${product.mainCategory}`} className={styles.breadcrumbLink}>{mainCategoryName}</Link>
-          <span className={styles.breadcrumbSeparator}>/</span>
+          <span className={styles.breadcrumbDivider}>/</span>
+          <Link href={`/category/${product.mainCategory}`} className={styles.breadcrumbLink}>{mainCategoryName}</Link>
+          <span className={styles.breadcrumbDivider}>/</span>
           <Link href={`/category/${product.mainCategory}/${product.subCategory}`} className={styles.breadcrumbLink}>{subCategoryName}</Link>
-          <span className={styles.breadcrumbSeparator}>/</span>
+          <span className={styles.breadcrumbDivider}>/</span>
           <span className={styles.breadcrumbCurrent}>{product.name}</span>
         </nav>
       </div>
 
-      {/* Top Section: Gallery + Info */}
-      <section className={styles.topSection}>
+      {/* 2. Main Product Section (2-Column Desktop, Stacked Mobile) */}
+      <section className={styles.mainProductSection}>
         <div className={styles.container}>
-          <div className={styles.productLayout}>
+          <div className={styles.mainProductGrid}>
             <ProductGallery images={product.images} />
             <ProductInfo product={product} />
           </div>
         </div>
       </section>
 
-      {/* Middle Section: Tabs */}
-      <section className={styles.tabsSection}>
+      {/* 3. Trust Strip Band */}
+      <section className={styles.sectionPadding}>
+        <div className={styles.container}>
+          <ProductTrustStrip />
+        </div>
+      </section>
+
+      {/* 4. Tabbed Content Section */}
+      <section className={styles.sectionPadding}>
         <div className={styles.container}>
           <ProductTabs product={product} />
         </div>
       </section>
 
-      {/* Reviews Section */}
-      <section className={styles.reviewsSectionWrapper}>
+      {/* 5. Product Details + Size Guide (2-Column Row) */}
+      <section className={styles.sectionPadding}>
+        <div className={styles.container}>
+          <ProductSpecsAndSizeGuide />
+        </div>
+      </section>
+
+      {/* 6. Customer Reviews Section */}
+      <section className={styles.sectionPadding}>
         <div className={styles.container}>
           <ProductReviews product={product} />
         </div>
       </section>
 
-      {/* Bottom Section: Related Products */}
-      <section className={styles.relatedSection}>
+      {/* 7. "You may also like" Section */}
+      <section className={styles.sectionPadding}>
         <div className={styles.container}>
           <RelatedProducts currentProduct={product} />
         </div>
