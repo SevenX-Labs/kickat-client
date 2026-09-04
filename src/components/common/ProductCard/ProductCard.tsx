@@ -207,14 +207,14 @@ export default function ProductCard({ product, onRemoveFromWishlist }: ProductCa
           </button>
         </div>
 
-        {/* In Stock Indicator & Express Delivery Subtitle */}
+        {/* In Stock Indicator & Delivery Subtitle */}
         <div className={styles.stockDeliveryGroup}>
           <div className={styles.inStockBadge}>
             <span className={styles.greenPulseDot} />
-            <Truck size={14} className={styles.truckIcon} />
+            <Truck size={13} className={styles.truckIcon} />
             <span>In Stock</span>
           </div>
-          <span className={styles.deliveryText}>Express Delivery by Tomorrow</span>
+          <span className={styles.deliveryText}>· Delivery Tomorrow</span>
         </div>
       </div>
     </div>
