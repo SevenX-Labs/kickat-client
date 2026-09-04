@@ -36,7 +36,7 @@ export function TrustStrip() {
       <div key={idx} className={styles.featureWrapper}>
         <div className={styles.item}>
           <div className={styles.iconWrapper}>
-            <Icon className={styles.icon} strokeWidth={1.5} />
+            <Icon className={styles.icon} size={20} strokeWidth={2} />
           </div>
           <div className={styles.textContent}>
             <span className={styles.title}>{feature.title}</span>

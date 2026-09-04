@@ -380,14 +380,14 @@
   gap: 0.1rem;
 }
 
-/* Glassmorphism Background Circle */
+/* Glassmorphism Background Circle (Reduced Size) */
 .glassCircle {
   position: absolute;
   top: 50%;
   right: 8%;
   transform: translateY(-50%);
-  width: min(520px, 42vw);
-  height: min(520px, 42vw);
+  width: min(420px, 35vw);
+  height: min(420px, 35vw);
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.1) 100%);
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
@@ -524,8 +524,8 @@
     bottom: 2rem;
     left: 50%;
     transform: translateX(-50%);
-    width: 320px;
-    height: 320px;
+    width: 250px;
+    height: 250px;
   }
 }
 
@@ -613,8 +613,8 @@
   .glassCircle {
     top: 62%;
     right: 8%;
-    width: 430px;
-    height: 430px;
+    width: 350px;
+    height: 350px;
   }
 }
 
@@ -676,8 +676,8 @@
     right: auto;
     left: 50%;
     transform: translateX(-50%);
-    width: 280px;
-    height: 280px;
+    width: 220px;
+    height: 220px;
     bottom: 2rem;
   }
 }
