@@ -104,9 +104,9 @@
 }
 
 .searchInput:focus {
-  border-color: #F5821F;
+  border-color: #FD802E;
   background-color: #ffffff;
-  box-shadow: 0 4px 14px rgba(245, 130, 31, 0.08);
+  box-shadow: 0 4px 14px rgba(253, 128, 46, 0.12);
 }
 
 .searchIcon {
@@ -145,8 +145,8 @@
 
 .iconBtn:hover,
 .cartBtn:hover {
-  color: #E7A03B;
-  background-color: rgba(231, 160, 59, 0.08);
+  color: #FD802E;
+  background-color: rgba(253, 128, 46, 0.08);
   transform: translateY(-1px);
 }
 
@@ -154,7 +154,7 @@
   position: absolute;
   top: 0px;
   right: -2px;
-  background-color: #F5821F;
+  background-color: #FD802E;
   color: #ffffff;
   font-family: var(--font-sans), sans-serif;
   font-size: 0.65rem;
@@ -167,7 +167,7 @@
   justify-content: center;
   border-radius: 9999px;
   border: 2px solid #FFFCF9;
-  box-shadow: 0 2px 6px rgba(245, 130, 31, 0.2);
+  box-shadow: 0 2px 6px rgba(253, 128, 46, 0.25);
   pointer-events: none;
 }
 
@@ -198,6 +198,25 @@
   padding: 0.5rem 0;
 }
 
+.navItem:hover {
+  color: #FD802E;
+}
+
+.activeNavItem {
+  color: #FD802E !important;
+}
+
+.activeNavItem::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2.5px;
+  background-color: #FD802E;
+  border-radius: 99px;
+}
+
 .navItem::after {
   content: '';
   position: absolute;
@@ -215,10 +234,6 @@
 .dropdownWrapper:hover .navItem::after {
   transform: scaleX(1);
   transform-origin: left;
-}
-
-.navItem:hover {
-  color: #F5821F;
 }
 
 .dropdownTrigger {
@@ -473,7 +488,7 @@
 }
 
 .announcementBar {
-  background: linear-gradient(90deg, #111111, #1a1a1a, #111111);
+  background: linear-gradient(90deg, #192C37, #233D4C, #192C37);
   color: #F8F5F0;
   padding: 0.65rem 0;
   font-size: 0.75rem;
@@ -518,16 +533,16 @@
 }
 
 .itemIcon {
-  color: #E7A03B;
+  color: #FD802E;
   opacity: 0.9;
   flex-shrink: 0;
 }
 
 .separatorIcon {
-  color: #E7A03B;
+  color: #FD802E;
   margin: 0 3.25rem;
   opacity: 0.9;
-  filter: drop-shadow(0 0 6px rgba(231, 160, 59, 0.4));
+  filter: drop-shadow(0 0 6px rgba(253, 128, 46, 0.4));
   animation: pulseStar 2s ease-in-out infinite;
   flex-shrink: 0;
 }
@@ -641,6 +656,16 @@
   text-decoration: none;
   transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
   box-shadow: 0 4px 14px rgba(245, 130, 31, 0.35);
+}
+
+.drawerCheckoutBtn {
+  background: #FD802E;
+  color: #ffffff;
+}
+
+.drawerCheckoutBtn:hover {
+  background: #E56E1D;
+  color: #ffffff;
 }
 
 .signInBtn:hover {

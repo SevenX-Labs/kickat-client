@@ -44,7 +44,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
       <div className={styles.ratingWrapper}>
         <div className={styles.ratingStars}>
-          <Star size={16} fill="none" color="#E7A03B" strokeWidth={2.5} />
+          <Star size={16} fill="none" color="#FD802E" strokeWidth={2.5} />
           <span className={styles.ratingNumber}>{rating}</span>
         </div>
         <a href="#reviews" className={styles.reviewsAnchor}>({reviewsCount} reviews)</a>

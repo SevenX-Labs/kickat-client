@@ -99,7 +99,7 @@
 }
 
 .thumbnailBtn.active {
-  border-color: #E7A03B;
+  border-color: #FD802E;
 }
 
 .thumbnailImage {
@@ -292,7 +292,7 @@
 }
 
 .colorBtn.active {
-  border-color: #E7A03B;
+  border-color: #FD802E;
 }
 
 /* Sizes */
@@ -319,9 +319,9 @@
 }
 
 .sizeBtn.active {
-  background: #E7A03B;
+  background: #FD802E;
   color: white;
-  border-color: #E7A03B;
+  border-color: #FD802E;
 }
 
 /* Actions */
@@ -507,7 +507,7 @@
 }
 
 .accordionBtn.active {
-  color: #E7A03B;
+  color: #FD802E;
   font-weight: 600;
 }
 
@@ -562,7 +562,7 @@
 .tabBtn.active {
   color: #111;
   font-weight: 600;
-  border-bottom-color: #E7A03B;
+  border-bottom-color: #FD802E;
 }
 
 .tabContent {
@@ -620,7 +620,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #E7A03B;
+  color: #FD802E;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   flex-shrink: 0;
 }
@@ -648,7 +648,7 @@
 .bulletDash {
   width: 16px;
   height: 2px;
-  background-color: #E7A03B;
+  background-color: #FD802E;
   display: inline-block;
 }
 
@@ -727,7 +727,7 @@
 
 .viewAllLink:hover svg {
   transform: translateX(4px);
-  color: #E7A03B;
+  color: #FD802E;
 }
 
 .relatedGrid {
@@ -805,7 +805,7 @@
 }
 
 .badgeAmber {
-  background-color: #E7A03B;
+  background-color: #FD802E;
   color: white;
 }
 

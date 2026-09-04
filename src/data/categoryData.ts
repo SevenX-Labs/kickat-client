@@ -25,12 +25,13 @@ export interface CatalogProduct {
   subCategory: string;  // e.g. 'dog-food-treats'
   subcategory?: string;
   brand: string;
-  badge?: 'Sale' | 'New' | 'Popular' | 'Organic';
+  badge?: 'Sale' | 'New' | 'Popular' | 'Organic' | 'Best Seller';
   tags: string[];
   sizes?: string[];
   color?: string;
   isTopRated?: boolean;
   inStock?: boolean;
+  description?: string;
 }
 
 export type Product = CatalogProduct;
@@ -124,7 +125,7 @@ export const CATALOG_PRODUCTS: CatalogProduct[] = [
     badge: 'Best Seller',
     tags: ['Organic', 'High Protein', 'Grain Free'],
     sizes: ['1kg', '3kg', '5kg'],
-    color: '#E7A03B',
+    color: '#FD802E',
     isTopRated: true,
     description: 'Grain-free organic kibble for a healthier, happier pup.',
   },
@@ -158,7 +159,7 @@ export const CATALOG_PRODUCTS: CatalogProduct[] = [
     badge: 'Sale',
     tags: ['Durable', 'Teething', 'Eco Friendly'],
     sizes: ['S', 'M', 'L'],
-    color: '#F5821F',
+    color: '#FD802E',
   },
   {
     id: 'd-4',
@@ -204,7 +205,7 @@ export const CATALOG_PRODUCTS: CatalogProduct[] = [
     brand: 'KittyHaus',
     badge: 'Popular',
     tags: ['Salmon', 'Grain Free', 'Crunchy'],
-    color: '#E7A03B',
+    color: '#FD802E',
     isTopRated: true,
   },
   {

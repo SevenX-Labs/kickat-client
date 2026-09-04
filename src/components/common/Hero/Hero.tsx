@@ -72,11 +72,11 @@ export function Hero() {
               </div>
               <div className={styles.ratingGroup}>
                 <div className={styles.stars} aria-hidden="true">
-                  <Star size={14} fill="#F5821F" color="#F5821F" strokeWidth={1} />
-                  <Star size={14} fill="#F5821F" color="#F5821F" strokeWidth={1} />
-                  <Star size={14} fill="#F5821F" color="#F5821F" strokeWidth={1} />
-                  <Star size={14} fill="#F5821F" color="#F5821F" strokeWidth={1} />
-                  <Star size={14} fill="#E7A03B" color="#E7A03B" strokeWidth={1} opacity={0.45} />
+                  <Star size={14} fill="#FD802E" color="#FD802E" strokeWidth={1} />
+                  <Star size={14} fill="#FD802E" color="#FD802E" strokeWidth={1} />
+                  <Star size={14} fill="#FD802E" color="#FD802E" strokeWidth={1} />
+                  <Star size={14} fill="#FD802E" color="#FD802E" strokeWidth={1} />
+                  <Star size={14} fill="#FD802E" color="#FD802E" strokeWidth={1} opacity={0.45} />
                 </div>
                 <span>4.9/5 from 25K+ happy pet parents</span>
               </div>

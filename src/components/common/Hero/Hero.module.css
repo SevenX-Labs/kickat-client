@@ -26,7 +26,7 @@
   right: -5%;
   width: 700px;
   height: 700px;
-  background: radial-gradient(circle, rgba(245, 130, 31, 0.15) 0%, rgba(245, 130, 31, 0) 70%);
+  background: radial-gradient(circle, rgba(253, 128, 46, 0.15) 0%, rgba(253, 128, 46, 0) 70%);
   animation: morphWavy 14s ease-in-out infinite, spinBlob 25s linear infinite;
 }
 
@@ -159,14 +159,14 @@
   font-size: 4.65rem;
   font-weight: 400;
   line-height: 0.95;
-  color: #26211F;
+  color: #233D4C;
   margin-bottom: 1.15rem;
   letter-spacing: 0;
   max-width: 10ch;
 }
 
 .highlight {
-  color: #F5821F;
+  color: #FD802E;
   font-style: italic;
   font-weight: 500;
   position: relative;
@@ -179,7 +179,7 @@
   left: 0;
   width: 100%;
   height: 3px;
-  background: linear-gradient(90deg, rgba(245, 130, 31, 0.4), rgba(245, 130, 31, 0));
+  background: linear-gradient(90deg, rgba(253, 128, 46, 0.4), rgba(253, 128, 46, 0));
   border-radius: 2px;
 }
 
@@ -215,10 +215,10 @@
 }
 
 .primaryBtn {
-  background: #F5821F;
+  background: #FD802E;
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 6px 20px rgba(245, 130, 31, 0.35);
+  box-shadow: 0 6px 20px rgba(253, 128, 46, 0.35);
 }
 
 @keyframes gradientLiquid {
@@ -279,8 +279,8 @@
 }
 
 .primaryBtn:hover {
-  background: #E06D0C;
-  box-shadow: 0 12px 28px rgba(245, 130, 31, 0.45);
+  background: #E56E1D;
+  box-shadow: 0 12px 28px rgba(253, 128, 46, 0.45);
 }
 
 .primaryBtn:hover::before, .secondaryBtn:hover::before {
@@ -292,25 +292,26 @@
 }
 
 .primaryBtn:active {
-  box-shadow: 0 6px 12px rgba(245, 130, 31, 0.3);
+  box-shadow: 0 6px 12px rgba(253, 128, 46, 0.3);
 }
 
 .secondaryBtn {
-  background-color: #211C15;
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 6px 20px rgba(33, 28, 21, 0.18);
+  background-color: transparent;
+  color: #233D4C;
+  border: 1.5px solid #233D4C;
+  box-shadow: none;
 }
 
 .secondaryBtn:hover {
-  background-color: #111111;
+  background-color: #233D4C;
   color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+  border-color: #233D4C;
+  box-shadow: 0 10px 24px rgba(35, 61, 76, 0.3);
 }
 
 .secondaryBtn:active {
-  box-shadow: 0 6px 12px rgba(38, 33, 31, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px) scale(0.98);
+  box-shadow: 0 4px 12px rgba(35, 61, 76, 0.2);
 }
 
 .btnText {

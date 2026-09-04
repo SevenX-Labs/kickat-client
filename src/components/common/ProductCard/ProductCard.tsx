@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Heart, Star, ShoppingCart, Users, Trash2 } from 'lucide-react';
+import { Heart, Star, ShoppingCart, Trash2 } from 'lucide-react';
 import styles from './ProductCard.module.css';
 
 export interface Product {
@@ -27,38 +27,22 @@ interface ProductCardProps {
   onRemoveFromWishlist?: (id: string) => void;
 }
 
-// Short description map for products to match ProductRow exact behavior
-const productDescriptions: Record<string, string> = {
-  'd-1': 'Grain-free organic kibble for a healthier, happier pup.',
-  'd-2': 'Heavy ceramic bowl with non-slip grip, dishwasher safe.',
-  'd-3': 'Durable natural rubber toy perfect for teething puppies.',
-  'd-4': 'Reflective padded harness for safe nighttime walks.',
-  'c-1': 'Wild salmon & tuna treats cats go crazy for.',
-  'c-2': 'Spinning feather toy with USB rechargeable motor.',
-  'c-3': 'Natural tofu clumping litter, dust-free & flushable.',
-  'c-4': 'Whisker-friendly shallow dish for comfortable feeding.',
-};
-
-function getDescription(product: Product): string {
-  return product.description || productDescriptions[product.id] || product.tags?.slice(0, 2).join(' · ') || 'Premium quality pet essential.';
-}
-
 export default function ProductCard({ product, onRemoveFromWishlist }: ProductCardProps) {
   const rating = product.rating || 4.8;
-  const reviewsCount = product.reviewsCount || 128;
-  const description = getDescription(product);
+  const reviewsCount = product.reviewsCount || 64;
   
+  // Calculate discount percentage if originalPrice exists
+  const discountPercent = product.originalPrice && product.originalPrice > product.price 
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+    : product.badge === 'Sale' ? 15 : null;
+
   return (
     <div className={styles.productCard}>
-      {/* Image area */}
+      {/* Top Image Area with warm beige background */}
       <div className={styles.cardImageArea}>
         {product.badge && (
-          <span className={`${styles.cardBadge} ${
-            product.badge === 'Popular' || product.badge === 'Organic' ? styles.badgeGreen : 
-            product.badge === 'New' ? styles.badgeBrown : 
-            product.badge === 'Sale' ? styles.badgeRed : styles.badgeGreen
-          }`}>
-            {product.badge === 'Popular' ? '★ BEST SELLER' : product.badge === 'New' ? 'NEW ARRIVAL' : product.badge === 'Sale' ? 'SALE 15% OFF' : product.badge.toUpperCase()}
+          <span className={styles.cardBadge}>
+            {product.badge === 'Popular' ? 'Best Seller' : product.badge === 'New' ? 'New Arrival' : product.badge === 'Sale' ? 'Sale 15% OFF' : product.badge}
           </span>
         )}
         {onRemoveFromWishlist ? (
@@ -71,7 +55,7 @@ export default function ProductCard({ product, onRemoveFromWishlist }: ProductCa
               onRemoveFromWishlist(product.id);
             }}
           >
-            <Trash2 size={16} strokeWidth={2} color="#C34A42" />
+            <Trash2 size={15} strokeWidth={2} color="#C34A42" />
           </button>
         ) : (
           <button 
@@ -83,7 +67,7 @@ export default function ProductCard({ product, onRemoveFromWishlist }: ProductCa
               alert(`Added ${product.name} to wishlist!`);
             }}
           >
-            <Heart size={16} color="#666" strokeWidth={1.5} />
+            <Heart size={15} color="#111827" strokeWidth={1.8} />
           </button>
         )}
         <Link href={`/product/${product.id}`} className={styles.cardImageLink}>
@@ -92,56 +76,58 @@ export default function ProductCard({ product, onRemoveFromWishlist }: ProductCa
             alt={product.name}
             fill
             className={styles.cardImage}
-            style={{ objectFit: 'cover' }}
+            style={{ objectFit: 'contain' }}
           />
         </Link>
       </div>
 
-      {/* Info area */}
+      {/* Info Area */}
       <div className={styles.cardInfo}>
         <Link href={`/product/${product.id}`} className={styles.cardTitleLink}>
           <h3 className={styles.cardTitle}>{product.name}</h3>
         </Link>
         
+        {/* Rating Row */}
         <div className={styles.cardRatingRow}>
-          <div className={styles.ratingLeft}>
-            <Star size={13} fill="#E7A03B" color="#E7A03B" strokeWidth={0} />
-            <span className={styles.cardRatingText}>{rating.toFixed(1)} ({reviewsCount})</span>
+          <div className={styles.starsGroup}>
+            {[1, 2, 3, 4, 5].map((star) => (
+              <Star 
+                key={star} 
+                size={13} 
+                fill={star <= Math.floor(rating) ? "#FD802E" : star - rating < 1 ? "#FD802E" : "#E5E7EB"} 
+                color={star <= Math.floor(rating) ? "#FD802E" : star - rating < 1 ? "#FD802E" : "#E5E7EB"} 
+                strokeWidth={0} 
+              />
+            ))}
           </div>
-          <span className={styles.ratingDivider}>|</span>
-          <div className={styles.ratingRight}>
-            <Users size={12} color="#888" strokeWidth={2} />
-            <span className={styles.happyParentsText}>2.2K+ bought</span>
-          </div>
+          <span className={styles.cardRatingScore}>{rating.toFixed(1)}</span>
+          <span className={styles.cardReviewsCount}>({reviewsCount})</span>
         </div>
         
-        <div className={styles.cardBottom}>
-          <div className={styles.priceContainer}>
-            <span className={styles.cardPrice}>₹{product.price.toLocaleString()}</span>
-            {product.originalPrice && (
-              <>
-                <span className={styles.originalPrice}>₹{product.originalPrice.toLocaleString()}</span>
-                {product.badge === 'Sale' && <span className={styles.discountTag}>15% OFF</span>}
-              </>
-            )}
-          </div>
-          
-          <button 
-            className={`${styles.addToCartBtn} ${
-              product.badge === 'Popular' || product.badge === 'Organic' ? styles.cartBtnGreen : 
-              product.badge === 'New' ? styles.cartBtnBrown : 
-              product.badge === 'Sale' ? styles.cartBtnRed : styles.cartBtnGreen
-            }`}
-            aria-label="Add to cart"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              alert(`Added ${product.name} to cart!`);
-            }}
-          >
-            <ShoppingCart size={16} color="#fff" strokeWidth={1.5} />
-          </button>
+        {/* Price & Discount Row */}
+        <div className={styles.priceContainer}>
+          <span className={styles.cardPrice}>₹{product.price.toLocaleString()}</span>
+          {product.originalPrice && (
+            <span className={styles.originalPrice}>₹{product.originalPrice.toLocaleString()}</span>
+          )}
+          {discountPercent && (
+            <span className={styles.discountTag}>{discountPercent}% OFF</span>
+          )}
         </div>
+
+        {/* Full-width Add to Cart Button */}
+        <button 
+          className={styles.addToCartBtn}
+          aria-label="Add to cart"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            alert(`Added ${product.name} to cart!`);
+          }}
+        >
+          <ShoppingCart size={15} color="#ffffff" strokeWidth={2} />
+          <span>Add to Cart</span>
+        </button>
       </div>
     </div>
   );

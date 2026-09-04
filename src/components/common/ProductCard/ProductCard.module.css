@@ -1,16 +1,17 @@
-/* ── Product Card (unified container) ── */
+/* ── Product Card (Compact Unified Container) ── */
 .productCard {
   display: flex;
   flex-direction: column;
-  background: #fff;
-  border-radius: 16px;
+  background: #ffffff;
+  border-radius: 20px;
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 0.5rem;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.07);
   height: 100%;
   width: 100%;
-  max-width: 210px;
+  max-width: 220px;
   min-width: 0;
   margin: 0 auto;
   cursor: pointer;
@@ -18,19 +19,20 @@
 
 .productCard:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
 }
 
 /* ── Image area ── */
 .cardImageArea {
   position: relative;
   width: 100%;
-  aspect-ratio: 1 / 0.85;
+  aspect-ratio: 1 / 0.82;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #F8F5F0;
-  padding: 0;
+  background-color: #EFE7DC;
+  border-radius: 15px;
+  padding: 0.6rem;
   overflow: hidden;
 }
 
@@ -42,70 +44,66 @@
 }
 
 .cardImage {
-  padding: 0;
-  transition: transform 0.4s ease;
+  padding: 0.25rem;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .productCard:hover .cardImage {
-  transform: scale(1.04);
+  transform: scale(1.05);
 }
 
 /* ── Badge ── */
 .cardBadge {
   position: absolute;
-  top: 14px;
-  left: 14px;
-  padding: 0.35rem 0.6rem;
-  border-radius: 6px;
-  color: white;
+  top: 8px;
+  left: 8px;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  background-color: #FD802E;
+  color: #ffffff;
   font-size: 0.65rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.01em;
   z-index: 2;
   font-family: var(--font-inter), sans-serif;
-  display: flex;
-  align-items: center;
+  box-shadow: 0 2px 6px rgba(253, 128, 46, 0.25);
 }
 
-.badgeGreen { background-color: #1A2E26; }
-.badgeBrown { background-color: #A37E3B; }
-.badgeRed { background-color: #C34A42; }
-
-/* ── Wishlist button ── */
-.cardWishlistBtn {
+/* ── Wishlist / Remove button ── */
+.cardWishlistBtn,
+.cardRemoveBtn {
   position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 34px;
-  height: 34px;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background-color: #fff;
-  border: 1px solid rgba(0,0,0,0.06);
+  background-color: #ffffff;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   z-index: 2;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .cardWishlistBtn:hover {
-  transform: scale(1.05);
+  transform: scale(1.08);
 }
 
 .cardWishlistBtn:hover svg {
-  color: #E7A03B !important;
-  fill: #E7A03B;
+  color: #FD802E !important;
+  fill: #FD802E;
 }
 
 /* ── Info area ── */
 .cardInfo {
   display: flex;
   flex-direction: column;
-  padding: 1rem;
-  background-color: #fff;
+  padding: 0.65rem 0.25rem 0.25rem 0.25rem;
+  background-color: #ffffff;
   flex: 1;
 }
 
@@ -115,12 +113,12 @@
 }
 
 .cardTitle {
-  font-family: var(--font-fraunces), serif;
-  font-size: 1.15rem;
-  font-weight: 600;
-  color: #1A2E26;
-  line-height: 1.3;
-  margin-bottom: 0.85rem;
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.25;
+  margin-bottom: 0.4rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -131,167 +129,119 @@
 .cardRatingRow {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.ratingLeft {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.ratingRight {
-  display: flex;
-  align-items: center;
   gap: 0.35rem;
+  margin-bottom: 0.5rem;
 }
 
-.cardRatingText {
-  font-size: 0.75rem;
-  color: #555;
+.starsGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+}
+
+.cardRatingScore {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #111827;
+  margin-left: 0.15rem;
+}
+
+.cardReviewsCount {
+  font-size: 0.78rem;
+  color: #6B7280;
   font-weight: 500;
 }
 
-.ratingDivider {
-  color: #ddd;
-  font-size: 0.75rem;
-}
-
-.happyParentsText {
-  font-size: 0.75rem;
-  color: #888;
-}
-
-/* ── Bottom: price + add to cart ── */
-.cardBottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: auto;
-  padding-top: 0.75rem;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
+/* ── Price & Discount Row ── */
 .priceContainer {
   display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.65rem;
   flex-wrap: wrap;
 }
 
 .cardPrice {
   font-family: var(--font-inter), sans-serif;
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: #171717;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #111827;
   letter-spacing: -0.02em;
 }
 
 .originalPrice {
-  font-size: 0.85rem;
-  color: #888;
+  font-size: 0.82rem;
+  color: #9CA3AF;
   text-decoration: line-through;
   font-weight: 500;
 }
 
 .discountTag {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 700;
-  color: #1A2E26;
-  background-color: #EAF0EB;
+  color: #ffffff;
+  background-color: #28A745;
   padding: 0.2rem 0.5rem;
-  border-radius: 6px;
+  border-radius: 9999px;
+  line-height: 1;
 }
 
-/* ── Add to cart buttons ── */
+/* ── Add to Cart Button (Compact Pill) ── */
 .addToCartBtn {
-  width: 38px;
+  width: 100%;
   height: 38px;
-  border-radius: 12px;
+  border-radius: 9999px;
   border: none;
+  background-color: #FD802E;
+  color: #ffffff;
+  font-size: 0.84rem;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.45rem;
   cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 3px 12px rgba(253, 128, 46, 0.25);
+  margin-top: auto;
 }
 
 .addToCartBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+  background-color: #E56E1D;
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 16px rgba(253, 128, 46, 0.35);
 }
 
-.cartBtnGreen { background-color: #1A2E26; }
-.cartBtnGreen:hover { background-color: #2D4C3A; }
+.addToCartBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(253, 128, 46, 0.2);
+}
 
-.cartBtnBrown { background-color: #A37E3B; }
-.cartBtnBrown:hover { background-color: #927038; }
-
-.cartBtnRed { background-color: #C34A42; }
-.cartBtnRed:hover { background-color: #A83B34; }
-
-/* ── Responsive adjustments for narrow grids ── */
+/* ── Responsive Adjustments ── */
 @media (max-width: 640px) {
   .productCard {
     max-width: 100%;
+    padding: 0.45rem;
   }
 
   .cardInfo {
-    padding: 0.75rem;
-  }
-  
-  .cardTitle {
-    font-size: 0.95rem;
-    margin-bottom: 0.65rem;
-  }
-  
-  .cardRatingRow {
-    flex-wrap: wrap;
-    gap: 0.2rem;
+    padding: 0.5rem 0.15rem 0.15rem 0.15rem;
   }
 
-  .ratingLeft, .ratingRight {
-    gap: 0.2rem;
+  .cardTitle {
+    font-size: 0.88rem;
   }
-  
+
   .cardPrice {
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
 
   .originalPrice {
-    font-size: 0.75rem;
+    font-size: 0.78rem;
   }
 
   .addToCartBtn {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
-  }
-
-  .addToCartBtn svg {
-    width: 15px;
-    height: 15px;
-  }
-
-  .cardBadge {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.55rem;
-    top: 10px;
-    left: 10px;
-  }
-
-  .cardWishlistBtn {
-    width: 30px;
-    height: 30px;
-    top: 10px;
-    right: 10px;
-  }
-
-  .cardWishlistBtn svg {
-    width: 14px;
-    height: 14px;
+    height: 36px;
+    font-size: 0.8rem;
   }
 }

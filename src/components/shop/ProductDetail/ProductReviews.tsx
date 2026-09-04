@@ -20,7 +20,7 @@ const MOCK_REVIEWS = [
     content: 'I was hesitant at first, but the quality is outstanding. The materials feel premium and it is exactly as described. My dog loves it. Highly recommend to anyone looking for a durable product.',
     verified: true,
     helpful: 24,
-    avatarColor: '#E7A03B',
+    avatarColor: '#FD802E',
     photos: ['/hero-products/dog_food.png', '/hero-products/cat_treats.png'],
   },
   {
@@ -120,8 +120,8 @@ export function ProductReviews({ product }: ProductReviewsProps) {
                   <Star 
                     key={i} 
                     size={18} 
-                    fill={i < Math.floor(rating) ? "#E7A03B" : "none"} 
-                    color={i < Math.floor(rating) ? "#E7A03B" : "#dcdcdc"} 
+                    fill={i < Math.floor(rating) ? "#FD802E" : "none"} 
+                    color={i < Math.floor(rating) ? "#FD802E" : "#dcdcdc"} 
                     strokeWidth={2}
                   />
                 ))}
@@ -189,8 +189,8 @@ export function ProductReviews({ product }: ProductReviewsProps) {
                     <Star 
                       key={i} 
                       size={14} 
-                      fill={i < review.rating ? "#E7A03B" : "none"} 
-                      color={i < review.rating ? "#E7A03B" : "#dcdcdc"} 
+                      fill={i < review.rating ? "#FD802E" : "none"} 
+                      color={i < review.rating ? "#FD802E" : "#dcdcdc"} 
                       strokeWidth={2}
                     />
                   ))}

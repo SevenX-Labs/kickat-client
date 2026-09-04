@@ -85,7 +85,7 @@
 
 .barFill {
   height: 100%;
-  background-color: #E7A03B;
+  background-color: #FD802E;
   border-radius: 3px;
 }
 
@@ -358,8 +358,8 @@
 
 .loadMoreBtn {
   background: transparent;
-  border: 2px solid #E7A03B;
-  color: #E7A03B;
+  border: 2px solid #FD802E;
+  color: #FD802E;
   padding: 0.75rem 2rem;
   border-radius: 50px;
   font-weight: 600;
@@ -368,7 +368,7 @@
 }
 
 .loadMoreBtn:hover {
-  background: #E7A03B;
+  background: #FD802E;
   color: white;
 }
 

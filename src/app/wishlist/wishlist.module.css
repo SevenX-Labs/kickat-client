@@ -167,7 +167,7 @@
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   border-radius: 999px;
-  background-color: #26211F;
+  background-color: #233D4C;
   color: #fff;
   border: none;
   font-size: 0.85rem;
@@ -177,8 +177,8 @@
 }
 
 .addToCartBtn:hover {
-  background-color: #E7A03B;
-  box-shadow: 0 4px 14px rgba(231, 160, 59, 0.35);
+  background-color: #FD802E;
+  box-shadow: 0 4px 14px rgba(253, 128, 46, 0.35);
 }
 
 .emptyState {
@@ -197,11 +197,11 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background-color: #FBF7EE;
+  background-color: #FFF5EE;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #E7A03B;
+  color: #FD802E;
   margin-bottom: 1.5rem;
 }
 
@@ -209,7 +209,7 @@
   font-family: var(--font-fraunces), serif;
   font-size: 2rem;
   font-weight: 700;
-  color: #111;
+  color: #233D4C;
   margin-bottom: 1rem;
 }
 
@@ -222,7 +222,7 @@
 
 .shopBtn {
   padding: 0.8rem 2rem;
-  background-color: #26211F;
+  background-color: #233D4C;
   color: #fff;
   border-radius: 999px;
   text-decoration: none;
@@ -231,9 +231,9 @@
 }
 
 .shopBtn:hover {
-  background-color: #E7A03B;
+  background-color: #FD802E;
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(231, 160, 59, 0.25);
+  box-shadow: 0 8px 20px rgba(253, 128, 46, 0.25);
 }
 
 @media (max-width: 768px) {

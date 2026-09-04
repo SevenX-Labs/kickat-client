@@ -29,7 +29,7 @@
 }
 
 .breadcrumbLink:hover {
-  color: #E7A03B;
+  color: #FD802E;
 }
 
 .breadcrumbSep {
@@ -37,7 +37,7 @@
 }
 
 .breadcrumbCurrent {
-  color: #E7A03B;
+  color: #FD802E;
   font-weight: 600;
 }
 
@@ -62,7 +62,7 @@
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.18em;
-  color: #E7A03B;
+  color: #FD802E;
   display: block;
   margin-bottom: 0.25rem;
 }
@@ -121,8 +121,8 @@
 
 .subChip:hover,
 .subChipActive {
-  background: #E7A03B;
-  border-color: #E7A03B;
+  background: #FD802E;
+  border-color: #FD802E;
   color: #ffffff;
   font-weight: 500;
 }
@@ -211,7 +211,7 @@
 }
 
 .filterIcon {
-  color: #E7A03B;
+  color: #FD802E;
 }
 
 .sidebarTitle {
@@ -225,7 +225,7 @@
   font-family: var(--font-ibm-plex-mono), monospace;
   font-size: 0.65rem;
   font-weight: 600;
-  background: #E7A03B;
+  background: #FD802E;
   color: #ffffff;
   padding: 0.15rem 0.45rem;
   border-radius: 9999px;
@@ -236,7 +236,7 @@
   border: none;
   font-family: var(--font-ibm-plex-mono), monospace;
   font-size: 0.725rem;
-  color: #E7A03B;
+  color: #FD802E;
   cursor: pointer;
   padding: 0;
   font-weight: 500;
@@ -305,14 +305,14 @@
 }
 
 .sidebarSortSelect:focus {
-  border-color: #E7A03B;
+  border-color: #FD802E;
 }
 
 .priceValue {
   font-family: var(--font-ibm-plex-mono), monospace;
   font-size: 0.8rem;
   font-weight: 600;
-  color: #E7A03B;
+  color: #FD802E;
 }
 
 .searchWrap {
@@ -333,7 +333,7 @@
 }
 
 .searchInput:focus {
-  border-color: #E7A03B;
+  border-color: #FD802E;
   background: #ffffff;
 }
 
@@ -358,7 +358,7 @@
 
 .rangeSlider {
   width: 100%;
-  accent-color: #E7A03B;
+  accent-color: #FD802E;
   cursor: pointer;
 }
 
@@ -388,7 +388,7 @@
 }
 
 .checkLabel:hover {
-  color: #E7A03B;
+  color: #FD802E;
 }
 
 /* Premium Custom Checkboxes */
@@ -411,7 +411,7 @@
 }
 
 .checkbox:hover {
-  border-color: #E7A03B;
+  border-color: #FD802E;
   box-shadow: 0 0 0 2px rgba(231, 160, 59, 0.1);
 }
 
@@ -468,7 +468,7 @@
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.15em;
-  color: #E7A03B;
+  color: #FD802E;
   display: block;
   margin-bottom: 0.2rem;
 }
@@ -565,7 +565,7 @@
   font-family: var(--font-fraunces), serif;
   font-size: 1.15rem;
   font-weight: 600;
-  color: #E7A03B;
+  color: #FD802E;
 }
 
 .addCartBtn {
@@ -581,7 +581,7 @@
 }
 
 .addCartBtn:hover {
-  background: #E7A03B;
+  background: #FD802E;
 }
 
 /* ── Toolbar ───────────────────────────────────────────── */
@@ -621,8 +621,8 @@
 }
 
 .mobileFilterToggle:hover {
-  border-color: #E7A03B;
-  color: #E7A03B;
+  border-color: #FD802E;
+  color: #FD802E;
 }
 
 @media (min-width: 960px) {
@@ -661,7 +661,7 @@
 }
 
 .sortSelect:focus {
-  border-color: #E7A03B;
+  border-color: #FD802E;
 }
 
 /* ── Toolbar Search ── */
@@ -697,7 +697,7 @@
 }
 
 .toolbarSearchInput:focus {
-  border-color: #E7A03B;
+  border-color: #FD802E;
   background: #ffffff;
 }
 
@@ -716,7 +716,7 @@
 }
 
 .toolbarSearchClear:hover {
-  color: #E7A03B;
+  color: #FD802E;
 }
 
 /* ── Product Grid ────────────────────────────────────────── */
@@ -815,7 +815,7 @@
 }
 
 .badgeAmber {
-  background-color: #E7A03B;
+  background-color: #FD802E;
   color: #ffffff;
 }
 
@@ -857,7 +857,7 @@
 }
 
 .quickAddBtn:hover {
-  background: #E7A03B;
+  background: #FD802E;
   transform: scale(1.08) !important;
 }
 
@@ -904,7 +904,7 @@
   font-family: var(--font-fraunces), serif;
   font-size: 1.35rem;
   font-weight: 600;
-  color: #E7A03B;
+  color: #FD802E;
   line-height: 1;
 }
 
@@ -1150,7 +1150,7 @@
     padding: 0.35rem 0.75rem;
     border: 1px solid rgba(231, 160, 59, 0.3);
     border-radius: 9999px;
-    color: #E7A03B;
+    color: #FD802E;
     background: rgba(231, 160, 59, 0.06);
     min-height: 34px;
   }

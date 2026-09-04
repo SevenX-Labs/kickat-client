@@ -1,5 +1,6 @@
 "use client";
 
+import Link from 'next/link';
 import { useState } from 'react';
 import { Heart } from 'lucide-react';
 import styles from './wishlist.module.css';
@@ -39,7 +40,7 @@ export default function WishlistPage() {
         ) : (
           <div className={styles.emptyState}>
             <div className={styles.emptyIcon}>
-              <Heart size={40} fill="#E7A03B" strokeWidth={0} />
+              <Heart size={40} fill="#FD802E" strokeWidth={0} />
             </div>
             <h2 className={styles.emptyTitle}>Your wishlist is empty</h2>
             <p className={styles.emptyDesc}>

@@ -1,6 +1,6 @@
 .footer {
   width: 100%;
-  background-color: #26211F;
+  background-color: #233D4C;
   color: #FCFAF6;
   padding: 5rem 2rem 2rem 2rem;
 }
@@ -70,7 +70,7 @@
 }
 
 .socialLink:hover {
-  color: #F5821F;
+  color: #FD802E;
 }
 
 .linksCol {
@@ -94,7 +94,7 @@
 }
 
 .link:hover {
-  color: #F5821F;
+  color: #FD802E;
 }
 
 .newsletterCol {
@@ -133,11 +133,11 @@
 }
 
 .input:focus {
-  border-color: #F5821F;
+  border-color: #FD802E;
 }
 
 .submitBtn {
-  background-color: #F5821F;
+  background-color: #FD802E;
   color: white;
   border: none;
   border-radius: 8px;
@@ -148,7 +148,7 @@
 }
 
 .submitBtn:hover {
-  background-color: #d97015;
+  background-color: #E56E1D;
 }
 
 .bottomSection {

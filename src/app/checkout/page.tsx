@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from 'react';
-import { useToast } from "@/components/ui/use-toast";
 import { AnimatedOrderButton } from './AnimatedOrderButton';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -55,7 +54,7 @@ const checkoutItems = [
 ];
 
 export default function CheckoutPage() {
-  const [currentStep, setCurrentStep] = useState<1 | 2>(1);
+  const [currentStep, setCurrentStep] = useState<number>(1);
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
