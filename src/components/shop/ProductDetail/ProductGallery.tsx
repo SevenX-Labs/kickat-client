@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Play, Maximize } from 'lucide-react';
+import { Play, Maximize, Heart, Share2 } from 'lucide-react';
 import styles from './ProductDetail.module.css';
 
 interface ProductGalleryProps {
@@ -11,6 +11,7 @@ interface ProductGalleryProps {
 
 export function ProductGallery({ images }: ProductGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isWishlisted, setIsWishlisted] = useState(false);
 
   // Ensure we have at least 5 thumbnail items for the strip (4 images + 1 video tile)
   const defaultImages = [
@@ -64,6 +65,35 @@ export function ProductGallery({ images }: ProductGalleryProps) {
         {/* Top Text Overlay */}
         <div className={styles.mainImageTopOverlay}>
           <span className={styles.overlaySubtitle}>Natural &nbsp;|&nbsp; Safe &nbsp;|&nbsp; Premium Quality</span>
+        </div>
+
+        {/* Top Right Floating Actions: Wishlist (top) & Share (below) */}
+        <div className={styles.imageTopRightActions}>
+          <button
+            type="button"
+            className={`${styles.imageFloatingBtn} ${isWishlisted ? styles.wishlistActive : ''}`}
+            aria-label="Add to Wishlist"
+            onClick={() => setIsWishlisted(!isWishlisted)}
+          >
+            <Heart size={16} fill={isWishlisted ? "#FD802E" : "none"} color={isWishlisted ? "#FD802E" : "#211C15"} />
+          </button>
+          <button
+            type="button"
+            className={styles.imageFloatingBtn}
+            aria-label="Share product"
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                if (navigator.share) {
+                  navigator.share({ title: 'Check out this product', url: window.location.href }).catch(() => {});
+                } else {
+                  navigator.clipboard.writeText(window.location.href);
+                  alert('Link copied to clipboard!');
+                }
+              }
+            }}
+          >
+            <Share2 size={16} color="#211C15" />
+          </button>
         </div>
 
         {/* Center Product Image */}

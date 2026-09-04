@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Star, ShoppingBag, Zap, Heart, Share2, Gift, Ruler, Minus, Plus, Check } from 'lucide-react';
+import { Star, ShoppingBag, Zap, Ruler, Minus, Plus, Check } from 'lucide-react';
 import styles from './ProductDetail.module.css';
 import { Product } from './ProductDetail';
 
@@ -17,7 +17,6 @@ export function ProductInfo({ product }: ProductInfoProps) {
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const [hasAdded, setHasAdded] = useState(false);
-  const [isWishlisted, setIsWishlisted] = useState(false);
 
   const title = product.name || "Mim & Mate Natural Rubber Chew Toy";
   const badge = product.badge || "Best Seller";
@@ -218,38 +217,6 @@ export function ProductInfo({ product }: ProductInfoProps) {
         </button>
       </div>
 
-      {/* Secondary Actions Row */}
-      <div className={styles.secondaryActionsRow}>
-        <button
-          type="button"
-          className={`${styles.secondaryPillBtn} ${isWishlisted ? styles.wishlistActive : ''}`}
-          onClick={() => setIsWishlisted(!isWishlisted)}
-        >
-          <Heart size={14} fill={isWishlisted ? "#FD802E" : "none"} color={isWishlisted ? "#FD802E" : "#4A453E"} />
-          <span>Add to Wishlist</span>
-        </button>
-
-        <button
-          type="button"
-          className={styles.secondaryPillBtn}
-          onClick={() => {
-            if (navigator.share) {
-              navigator.share({ title, url: window.location.href }).catch(() => {});
-            } else {
-              navigator.clipboard.writeText(window.location.href);
-              alert('Link copied to clipboard!');
-            }
-          }}
-        >
-          <Share2 size={14} />
-          <span>Share</span>
-        </button>
-
-        <button type="button" className={styles.secondaryPillBtn}>
-          <Gift size={14} />
-          <span>Gift this item</span>
-        </button>
-      </div>
     </div>
   );
 }

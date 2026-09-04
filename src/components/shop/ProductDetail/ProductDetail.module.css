@@ -51,6 +51,7 @@
 
 /* ── 2. MAIN PRODUCT SECTION GRID ── */
 .mainProductSection {
+  padding-top: 1.5rem;
   margin-bottom: 1.5rem;
 }
 
@@ -232,6 +233,36 @@
 
 .expandZoomBtn:hover {
   transform: scale(1.08);
+}
+
+.imageTopRightActions {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.imageFloatingBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #211C15;
+  transition: all 0.2s ease;
+}
+
+.imageFloatingBtn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 /* ── RIGHT COLUMN: PRODUCT INFO ── */

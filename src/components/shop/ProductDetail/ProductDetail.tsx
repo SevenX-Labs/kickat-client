@@ -41,18 +41,6 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
   return (
     <div className={styles.pageContainer}>
-      {/* 1. Breadcrumbs Header */}
-      <div className={styles.container}>
-        <nav className={styles.breadcrumbsNav} aria-label="Breadcrumb">
-          <Link href="/" className={styles.breadcrumbLink}>Home</Link>
-          <span className={styles.breadcrumbDivider}>/</span>
-          <Link href={`/category/${product.mainCategory}`} className={styles.breadcrumbLink}>{mainCategoryName}</Link>
-          <span className={styles.breadcrumbDivider}>/</span>
-          <Link href={`/category/${product.mainCategory}/${product.subCategory}`} className={styles.breadcrumbLink}>{subCategoryName}</Link>
-          <span className={styles.breadcrumbDivider}>/</span>
-          <span className={styles.breadcrumbCurrent}>{product.name}</span>
-        </nav>
-      </div>
 
       {/* 2. Main Product Section (2-Column Desktop, Stacked Mobile) */}
       <section className={styles.mainProductSection}>
