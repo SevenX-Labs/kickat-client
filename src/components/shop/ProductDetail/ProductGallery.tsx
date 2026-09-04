@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Play, Maximize, Heart, Share2 } from 'lucide-react';
+import { Play, Maximize, Heart, Share2, X } from 'lucide-react';
 import styles from './ProductDetail.module.css';
 
 interface ProductGalleryProps {
@@ -12,6 +12,7 @@ interface ProductGalleryProps {
 export function ProductGallery({ images }: ProductGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   // Ensure we have at least 5 thumbnail items for the strip (4 images + 1 video tile)
   const defaultImages = [
@@ -122,16 +123,36 @@ export function ProductGallery({ images }: ProductGalleryProps) {
         <button
           type="button"
           className={styles.expandZoomBtn}
-          aria-label="Expand image"
-          onClick={() => {
-            if (typeof window !== 'undefined') {
-              window.open(thumbnails[activeIndex]?.src, '_blank');
-            }
-          }}
+          aria-label="Expand image view"
+          onClick={() => setIsLightboxOpen(true)}
         >
           <Maximize size={16} />
         </button>
       </div>
+
+      {/* In-Page Lightbox Modal */}
+      {isLightboxOpen && (
+        <div className={styles.lightboxModalBackdrop} onClick={() => setIsLightboxOpen(false)}>
+          <div className={styles.lightboxModalContent} onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className={styles.lightboxCloseBtn}
+              onClick={() => setIsLightboxOpen(false)}
+              aria-label="Close expanded view"
+            >
+              <X size={20} />
+            </button>
+            <div className={styles.lightboxImageWrap}>
+              <Image
+                src={thumbnails[activeIndex]?.src || defaultImages[0]}
+                alt="Enlarged Product View"
+                fill
+                className={styles.lightboxImage}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
