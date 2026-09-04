@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { PawPrint, ArrowRight } from 'lucide-react';
 import styles from './ProductRow.module.css';
-import ProductCard from '../ProductCard/ProductCard';
+import HomeProductCard from '../HomeProductCard/HomeProductCard';
 import { CatalogProduct } from '@/data/categoryData';
 
 type Product = CatalogProduct;
@@ -16,8 +16,6 @@ export interface ProductRowProps {
   viewAllLink?: string;
   backgroundColor?: 'cream' | 'white';
 }
-
-
 
 export function ProductRow({ eyebrow, title, subtitle, products, viewAllLink = '/shop', backgroundColor = 'cream' }: ProductRowProps) {
   const displayProducts = products.slice(0, 4);
@@ -45,7 +43,7 @@ export function ProductRow({ eyebrow, title, subtitle, products, viewAllLink = '
 
         <div className={styles.grid}>
           {displayProducts.map(product => (
-            <ProductCard key={product.id} product={product as any} />
+            <HomeProductCard key={product.id} product={product as any} />
           ))}
         </div>
       </div>
