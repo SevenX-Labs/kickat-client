@@ -38,7 +38,79 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
   const sizes = ['S', 'M', 'L'];
 
-  const handleAddToCart = () => {
+  const animateFlyToCart = (startElem: HTMLElement) => {
+    const cartBtn = document.getElementById('navbar-cart-btn');
+    const imageSrc = product.image || '/hero-products/dog_food.png';
+
+    if (!cartBtn) {
+      window.dispatchEvent(new CustomEvent('cart-item-added'));
+      return;
+    }
+
+    const startRect = startElem.getBoundingClientRect();
+    const endRect = cartBtn.getBoundingClientRect();
+
+    const flyingImg = document.createElement('img');
+    flyingImg.src = imageSrc;
+    flyingImg.alt = 'Flying Product Preview';
+
+    const width = 64;
+    const height = 64;
+    const startX = startRect.left + startRect.width / 2 - width / 2;
+    const startY = startRect.top + startRect.height / 2 - height / 2;
+    const endX = endRect.left + endRect.width / 2 - 20;
+    const endY = endRect.top + endRect.height / 2 - 20;
+
+    Object.assign(flyingImg.style, {
+      position: 'fixed',
+      top: `${startY}px`,
+      left: `${startX}px`,
+      width: `${width}px`,
+      height: `${height}px`,
+      objectFit: 'cover',
+      borderRadius: '16px',
+      boxShadow: '0 12px 30px rgba(253, 128, 46, 0.45), 0 4px 12px rgba(0, 0, 0, 0.2)',
+      border: '2.5px solid #ffffff',
+      zIndex: '99999',
+      pointerEvents: 'none',
+      backgroundColor: '#ffffff',
+    });
+
+    document.body.appendChild(flyingImg);
+
+    const deltaX = endX - startX;
+    const deltaY = endY - startY;
+
+    const animation = flyingImg.animate(
+      [
+        {
+          transform: 'translate3d(0, 0, 0) scale(1) rotate(0deg)',
+          opacity: 1,
+        },
+        {
+          offset: 0.45,
+          transform: `translate3d(${deltaX * 0.45}px, ${deltaY * 0.45 - 130}px, 0) scale(0.7) rotate(-12deg)`,
+          opacity: 0.95,
+        },
+        {
+          transform: `translate3d(${deltaX}px, ${deltaY}px, 0) scale(0.12) rotate(-30deg)`,
+          opacity: 0.1,
+        },
+      ],
+      {
+        duration: 750,
+        easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+        fill: 'forwards',
+      }
+    );
+
+    animation.onfinish = () => {
+      flyingImg.remove();
+      window.dispatchEvent(new CustomEvent('cart-item-added'));
+    };
+  };
+
+  const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (hasAdded) {
       router.push('/cart');
       return;
@@ -49,11 +121,14 @@ export function ProductInfo({ product }: ProductInfoProps) {
       router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
       return;
     }
+    const buttonElem = e.currentTarget;
     setIsAdding(true);
+    animateFlyToCart(buttonElem);
+
     setTimeout(() => {
       setIsAdding(false);
       setHasAdded(true);
-    }, 1000);
+    }, 750);
   };
 
   const handleBuyNow = () => {

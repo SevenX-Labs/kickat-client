@@ -150,6 +150,17 @@
   transform: translateY(-1px);
 }
 
+.cartBounce {
+  animation: cartPopBounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes cartPopBounce {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.35) rotate(-10deg); background-color: rgba(253, 128, 46, 0.15); color: #FD802E; }
+  70% { transform: scale(0.9) rotate(5deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
 .badge {
   position: absolute;
   top: 0px;

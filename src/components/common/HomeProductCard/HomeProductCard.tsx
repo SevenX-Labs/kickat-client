@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Heart, Star, ShoppingCart, Trash2 } from 'lucide-react';
+import { Heart, Star, ShoppingCart, Trash2, Check } from 'lucide-react';
 import styles from './HomeProductCard.module.css';
 
 export interface HomeProduct {
@@ -28,11 +28,11 @@ interface HomeProductCardProps {
 
 export default function HomeProductCard({ product, onRemoveFromWishlist }: HomeProductCardProps) {
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [isAdded, setIsAdded] = useState(false);
 
   const rating = product.rating || 4.8;
   const reviewsCount = product.reviewsCount || 64;
 
-  // Calculate discount percentage
   const discountPercent = product.originalPrice && product.originalPrice > product.price
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : product.badge === 'Sale' ? 25 : 20;
@@ -45,6 +45,75 @@ export default function HomeProductCard({ product, onRemoveFromWishlist }: HomeP
     } else {
       setIsWishlisted((prev) => !prev);
     }
+  };
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isAdded) return;
+
+    const startElem = e.currentTarget as HTMLElement;
+    const cartBtn = document.getElementById('navbar-cart-btn');
+    const imageSrc = product.image || '/hero-products/dog_food.png';
+
+    if (cartBtn) {
+      const startRect = startElem.getBoundingClientRect();
+      const endRect = cartBtn.getBoundingClientRect();
+
+      const flyingImg = document.createElement('img');
+      flyingImg.src = imageSrc;
+      flyingImg.alt = 'Flying product preview';
+
+      const width = 56;
+      const height = 56;
+      const startX = startRect.left + startRect.width / 2 - width / 2;
+      const startY = startRect.top + startRect.height / 2 - height / 2;
+      const endX = endRect.left + endRect.width / 2 - 20;
+      const endY = endRect.top + endRect.height / 2 - 20;
+
+      Object.assign(flyingImg.style, {
+        position: 'fixed',
+        top: `${startY}px`,
+        left: `${startX}px`,
+        width: `${width}px`,
+        height: `${height}px`,
+        objectFit: 'cover',
+        borderRadius: '14px',
+        boxShadow: '0 10px 25px rgba(253, 128, 46, 0.45), 0 4px 12px rgba(0, 0, 0, 0.2)',
+        border: '2px solid #ffffff',
+        zIndex: '99999',
+        pointerEvents: 'none',
+        backgroundColor: '#ffffff',
+      });
+
+      document.body.appendChild(flyingImg);
+
+      const deltaX = endX - startX;
+      const deltaY = endY - startY;
+
+      const animation = flyingImg.animate(
+        [
+          { transform: 'translate3d(0, 0, 0) scale(1) rotate(0deg)', opacity: 1 },
+          { offset: 0.45, transform: `translate3d(${deltaX * 0.45}px, ${deltaY * 0.45 - 120}px, 0) scale(0.68) rotate(-12deg)`, opacity: 0.95 },
+          { transform: `translate3d(${deltaX}px, ${deltaY}px, 0) scale(0.12) rotate(-30deg)`, opacity: 0.1 },
+        ],
+        {
+          duration: 700,
+          easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+          fill: 'forwards',
+        }
+      );
+
+      animation.onfinish = () => {
+        flyingImg.remove();
+        window.dispatchEvent(new CustomEvent('cart-item-added'));
+      };
+    } else {
+      window.dispatchEvent(new CustomEvent('cart-item-added'));
+    }
+
+    setIsAdded(true);
+    setTimeout(() => setIsAdded(false), 1800);
   };
 
   const getBadgeText = () => {
@@ -124,14 +193,19 @@ export default function HomeProductCard({ product, onRemoveFromWishlist }: HomeP
         <button
           className={styles.addToCartBtn}
           aria-label="Add to cart"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            alert(`Added ${product.name} to cart!`);
-          }}
+          onClick={handleAddToCart}
         >
-          <ShoppingCart size={15} color="#ffffff" strokeWidth={2.2} />
-          <span>Add to Cart</span>
+          {isAdded ? (
+            <>
+              <Check size={15} color="#ffffff" strokeWidth={2.5} />
+              <span>Added!</span>
+            </>
+          ) : (
+            <>
+              <ShoppingCart size={15} color="#ffffff" strokeWidth={2.2} />
+              <span>Add to Cart</span>
+            </>
+          )}
         </button>
       </div>
     </div>

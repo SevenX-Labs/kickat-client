@@ -75,11 +75,24 @@ export function Navbar() {
   });
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [cartCount, setCartCount] = useState(2);
+  const [isCartBouncing, setIsCartBouncing] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       setIsLoggedIn(localStorage.getItem("isLoggedIn") === "true");
     }
+
+    const handleCartItemAdded = () => {
+      setCartCount((prev) => prev + 1);
+      setIsCartBouncing(true);
+      setTimeout(() => {
+        setIsCartBouncing(false);
+      }, 600);
+    };
+
+    window.addEventListener("cart-item-added", handleCartItemAdded);
+    return () => window.removeEventListener("cart-item-added", handleCartItemAdded);
   }, []);
 
   useEffect(() => {
@@ -361,9 +374,15 @@ export function Navbar() {
               </div>
             </div>
 
-            <Link href="/cart" className={styles.cartBtn} aria-label="Shopping Cart" title="Cart">
+            <Link
+              href="/cart"
+              id="navbar-cart-btn"
+              className={`${styles.cartBtn} ${isCartBouncing ? styles.cartBounce : ''}`}
+              aria-label="Shopping Cart"
+              title="Cart"
+            >
               <ShoppingBag size={20} strokeWidth={1.5} />
-              <span className={styles.badge}>2</span>
+              <span className={styles.badge}>{cartCount}</span>
             </Link>
           </div>
         </div>
