@@ -63,8 +63,7 @@ export function ProductGallery({ images }: ProductGalleryProps) {
       <div className={styles.mainImageContainer}>
         {/* Top Text Overlay */}
         <div className={styles.mainImageTopOverlay}>
-          <h2 className={styles.overlayMainTitle}>Tough Play<br />Healthier Days</h2>
-          <p className={styles.overlaySubtitle}>Natural &nbsp;|&nbsp; Safe &nbsp;|&nbsp; Durable</p>
+          <span className={styles.overlaySubtitle}>Natural &nbsp;|&nbsp; Safe &nbsp;|&nbsp; Premium Quality</span>
         </div>
 
         {/* Center Product Image */}
