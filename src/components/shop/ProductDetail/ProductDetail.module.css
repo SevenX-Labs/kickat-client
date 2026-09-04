@@ -1526,5 +1526,73 @@
   margin: 0.75rem 0 0 0;
 }
 
+/* ── SIZE GUIDE DIALOGUE MODAL ── */
+.sizeModalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  animation: fadeIn 0.2s ease;
+}
+
+.sizeModalCard {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 2rem;
+  max-width: 520px;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+.sizeModalCloseBtn {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  border: none;
+  background: #FAFAF8;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #78746D;
+  transition: all 0.2s ease;
+}
+
+.sizeModalCloseBtn:hover {
+  background: #EBE5DB;
+  color: #211C15;
+}
+
+.sizeModalHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.sizeModalTitle {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1A1612;
+  margin: 0;
+}
+
+.sizeModalSubtitle {
+  font-size: 0.85rem;
+  color: #78746D;
+  margin: 0;
+}
+
 
 

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Star, ShoppingBag, Zap, Ruler, Minus, Plus, Check } from 'lucide-react';
+import { Star, ShoppingBag, Zap, Ruler, Minus, Plus, Check, X, Dog, Droplets, Waves, Sun } from 'lucide-react';
 import styles from './ProductDetail.module.css';
 import { Product } from './ProductDetail';
 
@@ -12,11 +12,12 @@ interface ProductInfoProps {
 
 export function ProductInfo({ product }: ProductInfoProps) {
   const router = useRouter();
-  const [selectedColor, setSelectedColor] = useState('Pumpkin');
+  const [selectedColor, setSelectedColor] = useState('Charcoal & Pumpkin');
   const [selectedSize, setSelectedSize] = useState('M');
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const [hasAdded, setHasAdded] = useState(false);
+  const [isSizeGuideModalOpen, setIsSizeGuideModalOpen] = useState(false);
 
   const title = product.name || "Mim & Mate Natural Rubber Chew Toy";
   const badge = product.badge || "Best Seller";
@@ -29,10 +30,10 @@ export function ProductInfo({ product }: ProductInfoProps) {
   const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
 
   const colorSwatches = [
+    { name: 'Charcoal & Pumpkin', hex: '#2B2E33', hex2: '#FD802E' },
     { name: 'Pumpkin', hex: '#FD802E' },
-    { name: 'Beige', hex: '#E6DEC9' },
-    { name: 'Grey', hex: '#787E85' },
     { name: 'Charcoal', hex: '#2B2E33' },
+    { name: 'Beige', hex: '#E6DEC9' },
   ];
 
   const sizes = ['S', 'M', 'L'];
@@ -113,12 +114,15 @@ export function ProductInfo({ product }: ProductInfoProps) {
         <div className={styles.colorSwatchesRow}>
           {colorSwatches.map((color) => {
             const isSelected = selectedColor === color.name;
+            const bgStyle = color.hex2
+              ? `linear-gradient(135deg, ${color.hex} 50%, ${color.hex2} 50%)`
+              : color.hex;
             return (
               <button
                 key={color.name}
                 type="button"
                 className={`${styles.colorSwatchBtn} ${isSelected ? styles.colorSwatchActive : ''}`}
-                style={{ backgroundColor: color.hex }}
+                style={{ background: bgStyle }}
                 onClick={() => setSelectedColor(color.name)}
                 aria-label={`Select ${color.name} color`}
               />
@@ -134,7 +138,11 @@ export function ProductInfo({ product }: ProductInfoProps) {
             <span className={styles.selectorTitle}>Size:</span>
             <span className={styles.selectorValue}>{selectedSize}</span>
           </div>
-          <button type="button" className={styles.sizeGuideRowLink}>
+          <button
+            type="button"
+            className={styles.sizeGuideRowLink}
+            onClick={() => setIsSizeGuideModalOpen(true)}
+          >
             <Ruler size={14} />
             <span>Size Guide</span>
           </button>
@@ -217,6 +225,68 @@ export function ProductInfo({ product }: ProductInfoProps) {
         </button>
       </div>
 
+      {/* Size Guide Dialogue Box Modal */}
+      {isSizeGuideModalOpen && (
+        <div className={styles.sizeModalBackdrop} onClick={() => setIsSizeGuideModalOpen(false)}>
+          <div className={styles.sizeModalCard} onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className={styles.sizeModalCloseBtn}
+              onClick={() => setIsSizeGuideModalOpen(false)}
+              aria-label="Close size guide"
+            >
+              <X size={18} />
+            </button>
+
+            <div className={styles.sizeModalHeader}>
+              <h3 className={styles.sizeModalTitle}>Size Guide &amp; Recommendations</h3>
+              <p className={styles.sizeModalSubtitle}>Find the perfect fit for your pet by weight and breed.</p>
+            </div>
+
+            <div className={styles.sizeCardsRow}>
+              <div className={styles.sizeCardTile}>
+                <span className={styles.sizeCardLetter}>S</span>
+                <span className={styles.sizeCardWeight}>Up to 5 kg</span>
+                <div className={styles.sizeCardDogIconWrap}>
+                  <Dog size={24} className={styles.dogIconDefault} />
+                </div>
+              </div>
+              <div className={styles.sizeCardTile}>
+                <span className={styles.sizeCardLetter}>M</span>
+                <span className={styles.sizeCardWeight}>5 – 15 kg</span>
+                <div className={styles.sizeCardDogIconWrap}>
+                  <Dog size={24} className={styles.dogIconDefault} />
+                </div>
+              </div>
+              <div className={styles.sizeCardTile}>
+                <span className={styles.sizeCardLetter}>L</span>
+                <span className={styles.sizeCardWeight}>15 – 30 kg</span>
+                <div className={styles.sizeCardDogIconWrap}>
+                  <Dog size={24} className={styles.dogIconDefault} />
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.careSection}>
+              <h4 className={styles.careTitle}>Care Instructions</h4>
+              <div className={styles.careItemsRow}>
+                <div className={styles.careItem}>
+                  <Droplets size={16} className={styles.careIcon} />
+                  <span>Wash with mild soap</span>
+                </div>
+                <div className={styles.careItem}>
+                  <Waves size={16} className={styles.careIcon} />
+                  <span>Rinse thoroughly</span>
+                </div>
+                <div className={styles.careItem}>
+                  <Sun size={16} className={styles.careIcon} />
+                  <span>Air dry completely</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

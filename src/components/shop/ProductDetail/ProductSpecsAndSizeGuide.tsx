@@ -13,7 +13,7 @@ const DEFAULT_SPECS = [
   { label: 'Suitable for', value: 'Dogs' },
   { label: 'Life Stage', value: 'Puppy & Adult' },
   { label: 'Size', value: 'S / M / L' },
-  { label: 'Color', value: 'Pumpkin, Beige, Grey, Charcoal' },
+  { label: 'Color', value: 'Charcoal & Pumpkin, Beige' },
   { label: 'Weight', value: '180 g (Medium)' },
   { label: 'Country of Origin', value: 'India' },
 ];
