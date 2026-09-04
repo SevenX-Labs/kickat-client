@@ -993,7 +993,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.25rem;
-  cursor: pointer;
+  cursor: default;
   transition: all 0.2s ease;
 }
 
@@ -1448,5 +1448,83 @@
   border-radius: 10px;
   cursor: pointer;
 }
+
+/* ── FAQ SECTION (BELOW CUSTOMER REVIEWS) ── */
+.faqMainWrapper {
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #EBE5DB;
+  padding: 2rem;
+}
+
+.faqSectionHeaderTitle {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #1A1612;
+  margin: 0 0 1.25rem 0;
+}
+
+.faqAccordionContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.faqAccordionItem {
+  border: 1px solid #EBE5DB;
+  border-radius: 14px;
+  background: #FAFAF8;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.faqItemOpen {
+  border-color: #FD802E;
+  background: #ffffff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+}
+
+.faqQuestionBtn {
+  width: 100%;
+  padding: 1.15rem 1.25rem;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  cursor: pointer;
+}
+
+.faqQuestionText {
+  font-size: 0.925rem;
+  font-weight: 700;
+  color: #1A1612;
+}
+
+.faqChevron {
+  color: #78746D;
+  transition: transform 0.25s ease;
+  flex-shrink: 0;
+}
+
+.faqChevronRotate {
+  transform: rotate(180deg);
+  color: #FD802E;
+}
+
+.faqAnswerContent {
+  padding: 0 1.25rem 1.15rem 1.25rem;
+  border-top: 1px solid #F3ECE1;
+  animation: fadeIn 0.2s ease;
+}
+
+.faqAnswerText {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #524D45;
+  margin: 0.75rem 0 0 0;
+}
+
 
 

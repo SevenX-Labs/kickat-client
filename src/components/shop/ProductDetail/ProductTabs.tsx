@@ -15,8 +15,6 @@ const TABS = [
   { id: 'Materials', label: 'Materials' },
   { id: 'Size & Fit', label: 'Size & Fit' },
   { id: 'Shipping & Returns', label: 'Shipping & Returns' },
-  { id: 'Reviews', label: 'Reviews (64)' },
-  { id: 'FAQs', label: 'FAQs' },
 ];
 
 export function ProductTabs({ product }: ProductTabsProps) {
@@ -122,21 +120,6 @@ export function ProductTabs({ product }: ProductTabsProps) {
         return (
           <p className={styles.tabTextContent}>
             Enjoy free express shipping on all orders over ₹999. Standard delivery time is 2-4 business days. Returns accepted within 7 days of delivery for un-opened or defective items.
-          </p>
-        );
-
-      case 'Reviews':
-        return (
-          <p className={styles.tabTextContent}>
-            Rated 4.8 / 5 based on 64 verified buyer reviews. Scroll down to see full customer ratings and photos.
-          </p>
-        );
-
-      case 'FAQs':
-        return (
-          <p className={styles.tabTextContent}>
-            Q: Is this toy suitable for aggressive chewers?<br />
-            A: Yes! Crafted from thick natural rubber, it is engineered for heavy play and moderate chewing routines.
           </p>
         );
 

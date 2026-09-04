@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from 'react';
 import { ArrowRight, Droplets, Waves, Sun, Dog } from 'lucide-react';
 import styles from './ProductDetail.module.css';
 
@@ -26,7 +25,6 @@ const SIZE_CARDS = [
 ];
 
 export function ProductSpecsAndSizeGuide({ productDetails }: SpecsAndSizeGuideProps) {
-  const [selectedSizeIndex, setSelectedSizeIndex] = useState(1);
 
   const specsList = productDetails
     ? Object.entries(productDetails).map(([label, value]) => ({ label, value }))
@@ -54,28 +52,17 @@ export function ProductSpecsAndSizeGuide({ productDetails }: SpecsAndSizeGuidePr
           <p className={styles.sizeGuideSubtitle}>Choose the right size for your dog.</p>
         </div>
 
-        {/* 3 Size Cards */}
+        {/* 3 Size Cards (Static reference guide) */}
         <div className={styles.sizeCardsRow}>
-          {SIZE_CARDS.map((card, idx) => {
-            const isSelected = selectedSizeIndex === idx;
-            return (
-              <button
-                key={card.size}
-                type="button"
-                onClick={() => setSelectedSizeIndex(idx)}
-                className={`${styles.sizeCardTile} ${isSelected ? styles.sizeCardActive : ''}`}
-              >
-                <span className={styles.sizeCardLetter}>{card.size}</span>
-                <span className={styles.sizeCardWeight}>{card.weight}</span>
-                <div className={styles.sizeCardDogIconWrap}>
-                  <Dog
-                    size={28}
-                    className={isSelected ? styles.dogIconActive : styles.dogIconDefault}
-                  />
-                </div>
-              </button>
-            );
-          })}
+          {SIZE_CARDS.map((card) => (
+            <div key={card.size} className={styles.sizeCardTile}>
+              <span className={styles.sizeCardLetter}>{card.size}</span>
+              <span className={styles.sizeCardWeight}>{card.weight}</span>
+              <div className={styles.sizeCardDogIconWrap}>
+                <Dog size={28} className={styles.dogIconDefault} />
+              </div>
+            </div>
+          ))}
         </div>
 
         <button type="button" className={styles.viewDetailedSizeGuideLink}>

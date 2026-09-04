@@ -7,6 +7,7 @@ import { ProductTrustStrip } from './ProductTrustStrip';
 import { ProductTabs } from './ProductTabs';
 import { ProductSpecsAndSizeGuide } from './ProductSpecsAndSizeGuide';
 import { ProductReviews } from './ProductReviews';
+import { ProductFAQ } from './ProductFAQ';
 import { RelatedProducts } from './RelatedProducts';
 import styles from './ProductDetail.module.css';
 
@@ -32,17 +33,10 @@ interface ProductDetailProps {
 }
 
 export function ProductDetail({ product }: ProductDetailProps) {
-  const mainCategoryName =
-    product.mainCategory.charAt(0).toUpperCase() + product.mainCategory.slice(1);
-  const subCategoryName = product.subCategory
-    .split('-')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-
   return (
     <div className={styles.pageContainer}>
 
-      {/* 2. Main Product Section (2-Column Desktop, Stacked Mobile) */}
+      {/* 1. Main Product Section (2-Column Desktop, Stacked Mobile) */}
       <section className={styles.mainProductSection}>
         <div className={styles.container}>
           <div className={styles.mainProductGrid}>
@@ -52,31 +46,38 @@ export function ProductDetail({ product }: ProductDetailProps) {
         </div>
       </section>
 
-      {/* 3. Trust Strip Band */}
+      {/* 2. Trust Strip Band */}
       <section className={styles.sectionPadding}>
         <div className={styles.container}>
           <ProductTrustStrip />
         </div>
       </section>
 
-      {/* 4. Tabbed Content Section */}
+      {/* 3. Tabbed Content Section (Details, Materials, Size & Fit, Shipping & Returns) */}
       <section className={styles.sectionPadding}>
         <div className={styles.container}>
           <ProductTabs product={product} />
         </div>
       </section>
 
-      {/* 5. Product Details + Size Guide (2-Column Row) */}
+      {/* 4. Product Details + Size Guide (2-Column Row) */}
       <section className={styles.sectionPadding}>
         <div className={styles.container}>
           <ProductSpecsAndSizeGuide />
         </div>
       </section>
 
-      {/* 6. Customer Reviews Section */}
+      {/* 5. Customer Reviews Section */}
       <section className={styles.sectionPadding}>
         <div className={styles.container}>
           <ProductReviews product={product} />
+        </div>
+      </section>
+
+      {/* 6. Frequently Asked Questions (FAQ) Section - Below Customer Reviews */}
+      <section className={styles.sectionPadding}>
+        <div className={styles.container}>
+          <ProductFAQ />
         </div>
       </section>
 
