@@ -1,20 +1,15 @@
-/* ── Product Card (Compact Unified Container) ── */
+/* ── Product Card Base ── */
 .productCard {
   display: flex;
-  flex-direction: column;
   background: #ffffff;
   border-radius: 20px;
   overflow: hidden;
-  padding: 0.5rem;
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(0, 0, 0, 0.07);
-  height: 100%;
   width: 100%;
-  max-width: 220px;
-  min-width: 0;
-  margin: 0 auto;
   cursor: pointer;
+  box-sizing: border-box;
 }
 
 .productCard:hover {
@@ -22,18 +17,15 @@
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
 }
 
-/* ── Image area ── */
+/* ── Image Area ── */
 .cardImageArea {
   position: relative;
-  width: 100%;
-  aspect-ratio: 1 / 0.82;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: #EFE7DC;
-  border-radius: 15px;
-  padding: 0.6rem;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .cardImageLink {
@@ -44,7 +36,6 @@
 }
 
 .cardImage {
-  padding: 0.25rem;
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -55,28 +46,21 @@
 /* ── Badge ── */
 .cardBadge {
   position: absolute;
-  top: 8px;
-  left: 8px;
-  padding: 0.25rem 0.65rem;
   border-radius: 9999px;
   background-color: #FD802E;
   color: #ffffff;
-  font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.01em;
   z-index: 2;
   font-family: var(--font-inter), sans-serif;
   box-shadow: 0 2px 6px rgba(253, 128, 46, 0.25);
+  white-space: nowrap;
 }
 
-/* ── Wishlist / Remove button ── */
+/* ── Wishlist / Remove Button ── */
 .cardWishlistBtn,
 .cardRemoveBtn {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 32px;
-  height: 32px;
   border-radius: 50%;
   background-color: #ffffff;
   border: none;
@@ -98,13 +82,21 @@
   fill: #FD802E;
 }
 
-/* ── Info area ── */
+/* ── Info Area (Middle) ── */
 .cardInfo {
   display: flex;
   flex-direction: column;
-  padding: 0.65rem 0.25rem 0.25rem 0.25rem;
   background-color: #ffffff;
   flex: 1;
+}
+
+.cardBrand {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #FD802E;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
 }
 
 .cardTitleLink {
@@ -114,23 +106,20 @@
 
 .cardTitle {
   font-family: var(--font-inter), sans-serif;
-  font-size: 0.92rem;
   font-weight: 700;
   color: #111827;
   line-height: 1.25;
-  margin-bottom: 0.4rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  word-break: break-word;
+}
+
+.cardDescription {
+  color: #6B7280;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
 }
 
 .cardRatingRow {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  margin-bottom: 0.5rem;
 }
 
 .starsGroup {
@@ -140,70 +129,64 @@
 }
 
 .cardRatingScore {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: #111827;
-  margin-left: 0.15rem;
+  margin-left: 0.2rem;
 }
 
 .cardReviewsCount {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   color: #6B7280;
   font-weight: 500;
+  margin-left: 0.2rem;
 }
 
-/* ── Price & Discount Row ── */
+/* ── Action Column / Row (Price + Add to Cart) ── */
+.cardActionCol {
+  display: flex;
+}
+
 .priceContainer {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  margin-bottom: 0.65rem;
-  flex-wrap: wrap;
 }
 
 .cardPrice {
   font-family: var(--font-inter), sans-serif;
-  font-size: 1.2rem;
   font-weight: 800;
   color: #111827;
   letter-spacing: -0.02em;
 }
 
 .originalPrice {
-  font-size: 0.82rem;
   color: #9CA3AF;
   text-decoration: line-through;
   font-weight: 500;
 }
 
 .discountTag {
-  font-size: 0.65rem;
   font-weight: 700;
   color: #ffffff;
   background-color: #28A745;
-  padding: 0.2rem 0.5rem;
   border-radius: 9999px;
   line-height: 1;
+  white-space: nowrap;
 }
 
-/* ── Add to Cart Button (Compact Pill) ── */
 .addToCartBtn {
-  width: 100%;
-  height: 38px;
   border-radius: 9999px;
   border: none;
   background-color: #FD802E;
   color: #ffffff;
-  font-size: 0.84rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 3px 12px rgba(253, 128, 46, 0.25);
-  margin-top: auto;
+  white-space: nowrap;
 }
 
 .addToCartBtn:hover {
@@ -217,31 +200,198 @@
   box-shadow: 0 2px 6px rgba(253, 128, 46, 0.2);
 }
 
-/* ── Responsive Adjustments ── */
-@media (max-width: 640px) {
+/* ── DESKTOP & LAPTOP VIEW (Min Width 768px): List Format Layout ── */
+@media (min-width: 768px) {
   .productCard {
+    flex-direction: row;
     max-width: 100%;
-    padding: 0.45rem;
+    padding: 1.15rem;
+    gap: 1.5rem;
+    align-items: center;
+    border-radius: 20px;
+  }
+
+  .cardImageArea {
+    width: 190px;
+    height: 155px;
+    aspect-ratio: auto;
+    border-radius: 16px;
+    padding: 0.75rem;
+  }
+
+  .cardBadge {
+    top: 10px;
+    left: 10px;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.68rem;
+  }
+
+  .cardWishlistBtn,
+  .cardRemoveBtn {
+    top: 10px;
+    right: 10px;
+    width: 34px;
+    height: 34px;
   }
 
   .cardInfo {
-    padding: 0.5rem 0.15rem 0.15rem 0.15rem;
+    padding: 0;
+    justify-content: center;
   }
 
   .cardTitle {
+    font-size: 1.12rem;
+    margin-bottom: 0.35rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .cardDescription {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
     font-size: 0.88rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .cardRatingRow {
+    gap: 0.4rem;
+  }
+
+  .cardActionCol {
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    min-width: 190px;
+    flex-shrink: 0;
+    padding-left: 1.5rem;
+    border-left: 1px solid rgba(0, 0, 0, 0.07);
+    gap: 0.85rem;
+  }
+
+  .priceContainer {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.55rem;
   }
 
   .cardPrice {
-    font-size: 1.1rem;
+    font-size: 1.4rem;
   }
 
   .originalPrice {
-    font-size: 0.78rem;
+    font-size: 0.9rem;
+  }
+
+  .discountTag {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.6rem;
   }
 
   .addToCartBtn {
-    height: 36px;
-    font-size: 0.8rem;
+    width: 100%;
+    height: 44px;
+    font-size: 0.9rem;
+    gap: 0.5rem;
+    padding: 0 1.25rem;
+  }
+}
+
+/* ── MOBILE & TABLET VIEW (Max Width 767px): Vertical Mobile Card Layout ── */
+@media (max-width: 767px) {
+  .productCard {
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%; /* Fluid width on mobile, no cramped fixed width! */
+    padding: 0.65rem;
+    border-radius: 18px;
+  }
+
+  .cardImageArea {
+    width: 100%;
+    aspect-ratio: 1 / 0.88;
+    border-radius: 14px;
+    padding: 0.5rem;
+  }
+
+  .cardBadge {
+    top: 8px;
+    left: 8px;
+    padding: 0.22rem 0.6rem;
+    font-size: 0.62rem;
+  }
+
+  .cardWishlistBtn,
+  .cardRemoveBtn {
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .cardInfo {
+    padding: 0.6rem 0.25rem 0.25rem 0.25rem;
+  }
+
+  .cardBrand {
+    display: none;
+  }
+
+  .cardTitle {
+    font-size: 0.94rem;
+    margin-bottom: 0.35rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .cardDescription {
+    display: none; /* Hidden on mobile cards for clean compact UX */
+  }
+
+  .cardRatingRow {
+    gap: 0.3rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .cardActionCol {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+    margin-top: auto;
+    border-left: none;
+    padding-left: 0;
+  }
+
+  .priceContainer {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.45rem;
+    flex-wrap: nowrap; /* Keep prices and discount on ONE line on mobile! */
+  }
+
+  .cardPrice {
+    font-size: 1.22rem;
+  }
+
+  .originalPrice {
+    font-size: 0.82rem;
+  }
+
+  .discountTag {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
+  }
+
+  .addToCartBtn {
+    width: 100%;
+    height: 40px;
+    font-size: 0.84rem;
+    gap: 0.4rem;
   }
 }

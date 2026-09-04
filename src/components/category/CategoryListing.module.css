@@ -722,42 +722,22 @@
 /* ── Product Grid ────────────────────────────────────────── */
 .productGrid {
   display: grid;
-  gap: 1.5rem;
-}
-
-.gridCols2 {
   grid-template-columns: repeat(2, 1fr);
+  gap: 1.15rem;
 }
 
-.gridCols3 {
-  grid-template-columns: repeat(2, 1fr);
+@media (min-width: 768px) {
+  .productGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
 }
 
-@media (min-width: 640px) {
-  .gridCols3 {
+@media (max-width: 520px) {
+  .productGrid {
     grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .gridCols3 {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.gridCols4 {
-  grid-template-columns: repeat(2, 1fr);
-}
-
-@media (min-width: 640px) {
-  .gridCols4 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1100px) {
-  .gridCols4 {
-    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
   }
 }
 
