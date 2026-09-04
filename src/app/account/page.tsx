@@ -68,9 +68,9 @@ function AccountContent() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'Delivered': return <CheckCircle2 size={14} />;
-      case 'Processing': return <Clock size={14} />;
-      case 'Cancelled': return <XCircle size={14} />;
+      case 'Delivered': return <CheckCircle2 size={13} />;
+      case 'Processing': return <Clock size={13} />;
+      case 'Cancelled': return <XCircle size={13} />;
       default: return null;
     }
   };
@@ -93,8 +93,7 @@ function AccountContent() {
       { label: 'Delivered', time: `Expected\nIn 3 Days`, Icon: PackageCheck }
     ];
     
-    // Normalize progress to fit new 5-step timeline (0 to 4)
-    const activeIndex = progress === 1 ? 2 : progress === 2 ? 3 : progress === 3 ? 4 : 1; // Default to Accepted for visuals if 0
+    const activeIndex = progress === 1 ? 2 : progress === 2 ? 3 : progress === 3 ? 4 : 1;
 
     return (
       <div className={styles.progressTrackerCard}>
@@ -105,7 +104,7 @@ function AccountContent() {
           {steps.map((step, idx) => (
             <div key={idx} className={`${styles.stepContainer} ${idx <= activeIndex ? styles.completed : ''}`}>
               <div className={styles.stepTopIcon}>
-                <step.Icon size={24} strokeWidth={2} className={idx <= activeIndex ? styles.iconActive : styles.iconInactive} />
+                <step.Icon size={22} strokeWidth={2} className={idx <= activeIndex ? styles.iconActive : styles.iconInactive} />
                 {idx <= activeIndex && <div className={styles.iconYellowAccent}></div>}
               </div>
               
@@ -113,9 +112,9 @@ function AccountContent() {
               
               <div className={styles.stepCheckWrapper}>
                 {idx <= activeIndex ? (
-                  <div className={styles.checkSquareFilled}><Check size={16} color="white" strokeWidth={4} /></div>
+                  <div className={styles.checkSquareFilled}><Check size={14} color="white" strokeWidth={3} /></div>
                 ) : (
-                  <div className={styles.checkSquareEmpty}><Check size={16} color="white" strokeWidth={4} /></div>
+                  <div className={styles.checkSquareEmpty}><Check size={14} color="white" strokeWidth={3} /></div>
                 )}
               </div>
               
@@ -132,6 +131,61 @@ function AccountContent() {
   return (
     <div className={styles.pageWrapper}>
       <main className={styles.container}>
+        
+        {/* Mobile Profile Header Banner */}
+        <div className={styles.mobileProfileHeader}>
+          <div className={styles.avatar}>
+            {user.firstName.charAt(0)}{user.lastName.charAt(0)}
+          </div>
+          <div className={styles.greeting}>
+            <span className={styles.greetingText}>Welcome back,</span>
+            <h2 className={styles.userName}>{user.firstName} {user.lastName}</h2>
+            <span className={styles.userEmailText}>{user.email}</span>
+          </div>
+          <div className={styles.mobileStatsRow}>
+            <div className={styles.mobileStatChip}>
+              <span className={styles.chipVal}>{user.totalOrders}</span>
+              <span className={styles.chipLbl}>Orders</span>
+            </div>
+            <div className={styles.mobileStatChip}>
+              <span className={`${styles.chipVal} ${styles.statPoints}`}>{user.points}</span>
+              <span className={styles.chipLbl}>Points</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Horizontal Tab Navigation */}
+        <div className={styles.mobileTabNavStrip}>
+          <button 
+            className={`${styles.mobileTabBtn} ${activeTab === 'orders' ? styles.mobileTabActive : ''}`}
+            onClick={() => handleTabChange('orders')}
+          >
+            <Package size={16} />
+            <span>My Orders</span>
+          </button>
+          <button 
+            className={`${styles.mobileTabBtn} ${activeTab === 'profile' ? styles.mobileTabActive : ''}`}
+            onClick={() => handleTabChange('profile')}
+          >
+            <User size={16} />
+            <span>Profile</span>
+          </button>
+          <button 
+            className={`${styles.mobileTabBtn} ${activeTab === 'addresses' ? styles.mobileTabActive : ''}`}
+            onClick={() => handleTabChange('addresses')}
+          >
+            <MapPin size={16} />
+            <span>Addresses</span>
+          </button>
+          <button 
+            className={`${styles.mobileTabBtn} ${activeTab === 'wishlist' ? styles.mobileTabActive : ''}`}
+            onClick={() => handleTabChange('wishlist')}
+          >
+            <Heart size={16} />
+            <span>Wishlist</span>
+          </button>
+        </div>
+
         <div className={styles.accountLayout}>
           
           {/* Sidebar */}
@@ -143,41 +197,54 @@ function AccountContent() {
               <div className={styles.greeting}>
                 <span className={styles.greetingText}>Welcome back,</span>
                 <span className={styles.userName}>{user.firstName} {user.lastName}</span>
+                <span className={styles.userEmailText}>{user.email}</span>
               </div>
             </div>
             
             <nav className={styles.navMenu}>
-              <a 
+              <button 
+                type="button"
                 className={`${styles.navLink} ${activeTab === 'orders' ? styles.active : ''}`}
                 onClick={() => handleTabChange('orders')}
-                style={{ cursor: 'pointer' }}
               >
-                <Package size={20} strokeWidth={2} /> My Orders
-              </a>
-              <a 
+                <div className={styles.navIconWrapper}><Package size={18} strokeWidth={2} /></div>
+                <span>My Orders</span>
+                {activeTab === 'orders' && <div className={styles.activePillDot} />}
+              </button>
+              <button 
+                type="button"
                 className={`${styles.navLink} ${activeTab === 'profile' ? styles.active : ''}`}
                 onClick={() => handleTabChange('profile')}
-                style={{ cursor: 'pointer' }}
               >
-                <User size={20} strokeWidth={2} /> Profile Details
-              </a>
-              <a 
+                <div className={styles.navIconWrapper}><User size={18} strokeWidth={2} /></div>
+                <span>Profile Details</span>
+                {activeTab === 'profile' && <div className={styles.activePillDot} />}
+              </button>
+              <button 
+                type="button"
                 className={`${styles.navLink} ${activeTab === 'addresses' ? styles.active : ''}`}
                 onClick={() => handleTabChange('addresses')}
-                style={{ cursor: 'pointer' }}
               >
-                <MapPin size={20} strokeWidth={2} /> Saved Addresses
-              </a>
-              <a 
+                <div className={styles.navIconWrapper}><MapPin size={18} strokeWidth={2} /></div>
+                <span>Saved Addresses</span>
+                {activeTab === 'addresses' && <div className={styles.activePillDot} />}
+              </button>
+              <button 
+                type="button"
                 className={`${styles.navLink} ${activeTab === 'wishlist' ? styles.active : ''}`}
                 onClick={() => handleTabChange('wishlist')}
-                style={{ cursor: 'pointer' }}
               >
-                <Heart size={20} strokeWidth={2} /> Wishlist
-              </a>
+                <div className={styles.navIconWrapper}><Heart size={18} strokeWidth={2} /></div>
+                <span>Wishlist</span>
+                {activeTab === 'wishlist' && <div className={styles.activePillDot} />}
+              </button>
               
-              <button className={styles.logoutBtn}>
-                <LogOut size={18} strokeWidth={2} /> Sign Out
+              <button 
+                type="button" 
+                className={styles.logoutBtn}
+                onClick={() => router.push('/login')}
+              >
+                <LogOut size={18} strokeWidth={2} /> <span>Sign Out</span>
               </button>
             </nav>
           </aside>
@@ -185,6 +252,7 @@ function AccountContent() {
           {/* Main Content */}
           <div className={styles.contentArea}>
             
+            {/* ORDERS TAB */}
             {activeTab === 'orders' && (
               <div>
                 <div className={styles.sectionHeader}>
@@ -206,7 +274,7 @@ function AccountContent() {
                     ))}
                   </div>
                   <div className={styles.searchBox}>
-                    <Search className={styles.searchIcon} size={16} />
+                    <Search className={styles.searchIcon} size={15} />
                     <input 
                       type="text" 
                       className={styles.searchInput} 
@@ -245,7 +313,7 @@ function AccountContent() {
                       </div>
 
                       {order.status === 'Processing' && order.progress !== undefined && (
-                        <div style={{ marginBottom: '2.5rem', padding: '0 1rem' }}>
+                        <div style={{ marginBottom: '2rem', padding: '0 0.5rem' }}>
                           {renderProgressTracker(order.progress, order.date)}
                         </div>
                       )}
@@ -265,28 +333,130 @@ function AccountContent() {
                       </div>
                       
                       <div className={styles.orderFooter}>
-                        <button className={styles.actionBtn}>View Invoice</button>
+                        <button className={styles.actionBtn} onClick={() => router.push(`/orders/${order.id.replace('#', '')}/invoice`)}>
+                          View Invoice
+                        </button>
                         {order.status !== 'Cancelled' && (
-                          <button className={`${styles.actionBtn} ${styles.primaryBtn}`}>Track Order</button>
+                          <button 
+                            className={`${styles.actionBtn} ${styles.primaryBtn}`}
+                            onClick={() => router.push(`/orders/${order.id.replace('#', '')}`)}
+                          >
+                            Track Order
+                          </button>
                         )}
                       </div>
                     </div>
                   )) : (
-                    <div style={{ padding: '4rem 0', textAlign: 'center', color: '#888' }}>
-                      <Package size={48} style={{ opacity: 0.2, margin: '0 auto 1rem auto' }} />
-                      <p>No orders found matching your criteria.</p>
+                    <div className={styles.emptyStateCard}>
+                      <Package size={44} color="#FD802E" style={{ opacity: 0.5 }} />
+                      <h3 className={styles.emptyStateTitle}>No Orders Found</h3>
+                      <p className={styles.emptyStateDesc}>We couldn't find any orders matching your selected criteria.</p>
                     </div>
                   )}
                 </div>
               </div>
             )}
 
-            {activeTab !== 'orders' && (
-              <div style={{ padding: '4rem 0', textAlign: 'center', color: '#666' }}>
-                <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: '#111' }}>Coming Soon</h2>
-                <p>The {activeTab} section is currently under development.</p>
+            {/* PROFILE DETAILS TAB */}
+            {activeTab === 'profile' && (
+              <div className={styles.tabContentCard}>
+                <div className={styles.sectionHeader}>
+                  <h1 className={styles.title}>Profile Details</h1>
+                  <p className={styles.subtitle}>Manage your personal information, contact details, and account security.</p>
+                </div>
+
+                <div className={styles.profileDetailsGrid}>
+                  <div className={styles.detailFieldBlock}>
+                    <span className={styles.fieldLabel}>Full Name</span>
+                    <span className={styles.fieldValue}>{user.firstName} {user.lastName}</span>
+                  </div>
+                  <div className={styles.detailFieldBlock}>
+                    <span className={styles.fieldLabel}>Email Address</span>
+                    <span className={styles.fieldValue}>{user.email}</span>
+                  </div>
+                  <div className={styles.detailFieldBlock}>
+                    <span className={styles.fieldLabel}>Phone Number</span>
+                    <span className={styles.fieldValue}>+91 98765 43210</span>
+                  </div>
+                  <div className={styles.detailFieldBlock}>
+                    <span className={styles.fieldLabel}>Member Since</span>
+                    <span className={styles.fieldValue}>{user.memberSince}</span>
+                  </div>
+                  <div className={styles.detailFieldBlock}>
+                    <span className={styles.fieldLabel}>Default Currency</span>
+                    <span className={styles.fieldValue}>INR (₹)</span>
+                  </div>
+                  <div className={styles.detailFieldBlock}>
+                    <span className={styles.fieldLabel}>Account Status</span>
+                    <span className={styles.verifiedBadge}>
+                      <CheckCircle2 size={13} /> Verified KickAt Member
+                    </span>
+                  </div>
+                </div>
+
+                <div className={styles.tabActionFooter}>
+                  <button type="button" className={styles.primaryBtn}>Edit Information</button>
+                  <button type="button" className={styles.actionBtn}>Change Password</button>
+                </div>
               </div>
             )}
+
+            {/* SAVED ADDRESSES TAB */}
+            {activeTab === 'addresses' && (
+              <div className={styles.tabContentCard}>
+                <div className={styles.sectionHeader}>
+                  <h1 className={styles.title}>Saved Addresses</h1>
+                  <p className={styles.subtitle}>Manage your shipping addresses for faster checkout.</p>
+                </div>
+
+                <div className={styles.addressesGrid}>
+                  <div className={styles.addressCardActive}>
+                    <div className={styles.addressHeaderRow}>
+                      <span className={styles.addressTypeBadge}>Home</span>
+                      <span className={styles.defaultPill}>Default</span>
+                    </div>
+                    <div className={styles.addressName}>Sarah Jenkins</div>
+                    <p className={styles.addressText}>123 Pet Lover Lane, Block B, Near Park, Mumbai, Maharashtra, 400001</p>
+                    <div className={styles.addressPhone}>Phone: +91 98765 43210</div>
+                    <div className={styles.addressCardActions}>
+                      <button type="button" className={styles.addressEditBtn}>Edit</button>
+                      <button type="button" className={styles.addressRemoveBtn}>Remove</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.tabActionFooter}>
+                  <button type="button" className={styles.primaryBtn}>+ Add New Address</button>
+                </div>
+              </div>
+            )}
+
+            {/* WISHLIST TAB */}
+            {activeTab === 'wishlist' && (
+              <div className={styles.tabContentCard}>
+                <div className={styles.sectionHeader}>
+                  <h1 className={styles.title}>My Wishlist</h1>
+                  <p className={styles.subtitle}>Items you saved for your furry companions.</p>
+                </div>
+
+                <div className={styles.emptyStateCard}>
+                  <div className={styles.emptyIconCircle}>
+                    <Heart size={32} color="#FD802E" />
+                  </div>
+                  <h3 className={styles.emptyStateTitle}>Your Wishlist is Empty</h3>
+                  <p className={styles.emptyStateDesc}>Save items while browsing to track prices and buy them later.</p>
+                  <button 
+                    type="button" 
+                    className={styles.primaryBtn} 
+                    onClick={() => router.push('/category')}
+                    style={{ marginTop: '1rem' }}
+                  >
+                    Explore Products
+                  </button>
+                </div>
+              </div>
+            )}
+
           </div>
 
           {/* Right Stats Panel */}
@@ -301,7 +471,7 @@ function AccountContent() {
               <div className={styles.statLabel}>KickAt Reward Points</div>
             </div>
             <div className={styles.statBlock}>
-              <div className={styles.statValue} style={{ fontSize: '1.25rem', fontFamily: 'inherit', marginTop: '0.5rem' }}>
+              <div className={styles.statValue} style={{ fontSize: '1.25rem', fontFamily: 'inherit', marginTop: '0.25rem' }}>
                 {user.memberSince}
               </div>
               <div className={styles.statLabel}>Member Since</div>
