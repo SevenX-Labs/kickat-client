@@ -6,10 +6,10 @@ import Image from 'next/image';
 import styles from './PetCategories.module.css';
 
 const categories = [
-  { name: 'DOG', image: '/category-images/dog.png', link: '/shop/dogs', cta: 'Shop Dog' },
-  { name: 'CAT', image: '/category-images/cat.png', link: '/shop/cats', cta: 'Shop Cat' },
-  { name: 'FISH', image: '/category-images/fish.png', link: '/shop/fish', cta: 'Shop Fish' },
-  { name: 'BIRD', image: '/category-images/bird.png', link: '/shop/birds', cta: 'Shop Bird' },
+  { name: 'DOG', image: '/category-images/dog.png', link: '/category/dogs', cta: 'Shop Dog' },
+  { name: 'CAT', image: '/category-images/cat.png', link: '/category/cats', cta: 'Shop Cat' },
+  { name: 'FISH', image: '/category-images/fish.png', link: '/category/fish', cta: 'Shop Fish' },
+  { name: 'BIRD', image: '/category-images/bird.png', link: '/category/birds', cta: 'Shop Bird' },
 ];
 
 export function PetCategories() {

@@ -103,21 +103,21 @@
 
 @media (max-width: 640px) {
   .sectionWrapper {
-    padding: 2.5rem 0.85rem;
+    padding: 3rem 1rem;
   }
   
   .header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.85rem;
+    gap: 1rem;
   }
   
   .title {
-    font-size: 1.65rem;
+    font-size: 1.75rem;
   }
   
   .grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1.25rem;
   }
 }

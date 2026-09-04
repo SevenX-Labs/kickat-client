@@ -53,11 +53,11 @@ export function Hero() {
           </p>
           
           <div className={styles.actions}>
-            <Link href="/shop" className={styles.primaryBtn}>
+            <Link href="/category" className={styles.primaryBtn}>
               <span className={styles.btnText}>Shop Now</span>
               <ArrowRight className={styles.btnIcon} size={18} />
             </Link>
-            <Link href="/categories" className={styles.secondaryBtn}>
+            <Link href="/category" className={styles.secondaryBtn}>
               <span className={styles.btnText}>Explore Categories</span>
               <ArrowRight className={styles.btnIcon} size={18} />
             </Link>

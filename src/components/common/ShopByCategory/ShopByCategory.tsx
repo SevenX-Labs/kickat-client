@@ -48,7 +48,7 @@ const categories = [
   {
     name: "See All",
     count: "Explore 17+",
-    href: "/categories",
+    href: "/category",
     icon: <ArrowRight strokeWidth={1.5} size={32} />,
     isAction: true
   }

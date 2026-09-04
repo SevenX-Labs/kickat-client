@@ -90,7 +90,7 @@ export default function CartPage() {
   return (
     <main className={styles.container}>
       <div className={styles.pageHeader}>
-        <button onClick={() => router.push('/shop')} className={styles.backBtn}>
+        <button onClick={() => router.push('/category')} className={styles.backBtn}>
           <ArrowLeft size={17} strokeWidth={1.8} />
           Continue Shopping
         </button>
@@ -106,7 +106,7 @@ export default function CartPage() {
           <ShoppingBag size={44} strokeWidth={1.4} />
           <h2>Your cart is empty.</h2>
           <p>Browse our latest essentials and bring your favorites back here.</p>
-          <button onClick={() => router.push('/shop')} className={styles.checkoutBtn}>
+          <button onClick={() => router.push('/category')} className={styles.checkoutBtn}>
             Continue Shopping
           </button>
         </div>

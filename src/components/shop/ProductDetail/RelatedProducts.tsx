@@ -26,7 +26,7 @@ export function RelatedProducts({ currentProduct }: RelatedProductsProps) {
           <span className={styles.relatedEyebrow}>Pairs well with</span>
           <h2 className={styles.relatedTitle}>You May Also Like</h2>
         </div>
-        <Link href="/shop" className={styles.viewAllLink}>
+        <Link href="/category" className={styles.viewAllLink}>
           View All <ArrowRight size={18} />
         </Link>
       </div>

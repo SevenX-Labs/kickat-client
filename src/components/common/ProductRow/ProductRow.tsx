@@ -17,7 +17,7 @@ export interface ProductRowProps {
   backgroundColor?: 'cream' | 'white';
 }
 
-export function ProductRow({ eyebrow, title, subtitle, products, viewAllLink = '/shop', backgroundColor = 'cream' }: ProductRowProps) {
+export function ProductRow({ eyebrow, title, subtitle, products, viewAllLink = '/category', backgroundColor = 'cream' }: ProductRowProps) {
   const displayProducts = products.slice(0, 4);
   const bgClass = backgroundColor === 'white' ? styles.bgWhite : styles.bgCream;
 
