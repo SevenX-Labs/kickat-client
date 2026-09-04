@@ -201,9 +201,6 @@ export function CategoryExplorer({
             )}
 
             {/* Main Categories Vertical Rail */}
-            <div className={styles.railHeader}>
-              <span className={styles.railTitle}>CATEGORIES</span>
-            </div>
             <div className={styles.railList}>
               {MAIN_CATEGORIES.map((cat) => {
                 const isSelected = selectedMainCat === cat.slug;
