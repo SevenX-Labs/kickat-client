@@ -128,10 +128,12 @@ export default function ProductCard({ product, onRemoveFromWishlist }: ProductCa
       {/* Right/Bottom Action Column: Price + Add to Cart Button */}
       <div className={styles.cardActionCol}>
         <div className={styles.priceContainer}>
-          <span className={styles.cardPrice}>₹{product.price.toLocaleString()}</span>
-          {product.originalPrice && (
-            <span className={styles.originalPrice}>₹{product.originalPrice.toLocaleString()}</span>
-          )}
+          <div className={styles.priceMainRow}>
+            <span className={styles.cardPrice}>₹{product.price.toLocaleString()}</span>
+            {product.originalPrice && (
+              <span className={styles.originalPrice}>₹{product.originalPrice.toLocaleString()}</span>
+            )}
+          </div>
           {discountPercent && (
             <span className={styles.discountTag}>{discountPercent}% OFF</span>
           )}
