@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Search, ChevronRight, Package, ArrowRight } from 'lucide-react';
+import { Search, ChevronRight, Package, ArrowRight, Filter, ChevronDown } from 'lucide-react';
 import styles from './Orders.module.css';
 
 // Mock Data
@@ -47,6 +47,7 @@ export default function OrdersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilters, setStatusFilters] = useState<string[]>([]);
   const [timeFilter, setTimeFilter] = useState<string>('Last 30 days');
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
   const toggleStatusFilter = (status: string) => {
     setStatusFilters(prev => 
@@ -58,7 +59,6 @@ export default function OrdersPage() {
 
   const filteredOrders = useMemo(() => {
     return orders.filter(order => {
-      // 1. Search Filter
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const matchesId = order.id.toLowerCase().includes(query);
@@ -68,16 +68,13 @@ export default function OrdersPage() {
         if (!matchesId && !matchesProduct) return false;
       }
 
-      // 2. Status Filter
       if (statusFilters.length > 0) {
         const mappedStatuses = statusFilters.map(s => s === 'On the way' ? 'Processing' : s);
         if (!mappedStatuses.includes(order.status)) return false;
       }
 
-      // 3. Time Filter (Simple mock implementation based on year string)
       if (timeFilter === '2026' && !order.date.includes('2026')) return false;
       if (timeFilter === '2025' && !order.date.includes('2025')) return false;
-      // Note: 'Last 30 days' and 'Older' bypass this mock check to just show everything recent
 
       return true;
     });
@@ -100,37 +97,51 @@ export default function OrdersPage() {
           
           {/* Left Sidebar Filters */}
           <aside className={styles.sidebar}>
-            <div className={styles.sidebarHeader}>Filters</div>
-            
-            <div className={styles.filterSection}>
-              <div className={styles.filterTitle}>Order Status</div>
-              {['On the way', 'Delivered', 'Cancelled', 'Returned'].map(status => (
-                <label key={status} className={styles.checkboxLabel}>
-                  <input 
-                    type="checkbox" 
-                    className={styles.checkboxInput} 
-                    checked={statusFilters.includes(status)}
-                    onChange={() => toggleStatusFilter(status)}
-                  />
-                  {status}
-                </label>
-              ))}
-            </div>
-            
-            <div className={styles.filterSection}>
-              <div className={styles.filterTitle}>Order Time</div>
-              {['Last 30 days', '2026', '2025', 'Older'].map(time => (
-                <label key={time} className={styles.checkboxLabel}>
-                  <input 
-                    type="radio" 
-                    name="orderTime"
-                    className={styles.checkboxInput} 
-                    checked={timeFilter === time}
-                    onChange={() => setTimeFilter(time)}
-                  />
-                  {time}
-                </label>
-              ))}
+            <button
+              type="button"
+              className={styles.mobileFilterToggleBtn}
+              onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
+            >
+              <span className={styles.mobileFilterToggleText}>
+                <Filter size={16} />
+                <span>Filter Orders {statusFilters.length > 0 ? `(${statusFilters.length})` : ''}</span>
+              </span>
+              <ChevronDown size={16} className={`${styles.chevronIcon} ${isMobileFilterOpen ? styles.rotate180 : ''}`} />
+            </button>
+
+            <div className={`${styles.sidebarBody} ${isMobileFilterOpen ? styles.sidebarBodyOpen : ''}`}>
+              <div className={styles.sidebarHeader}>Filters</div>
+              
+              <div className={styles.filterSection}>
+                <div className={styles.filterTitle}>Order Status</div>
+                {['On the way', 'Delivered', 'Cancelled', 'Returned'].map(status => (
+                  <label key={status} className={styles.checkboxLabel}>
+                    <input 
+                      type="checkbox" 
+                      className={styles.checkboxInput} 
+                      checked={statusFilters.includes(status)}
+                      onChange={() => toggleStatusFilter(status)}
+                    />
+                    {status}
+                  </label>
+                ))}
+              </div>
+              
+              <div className={styles.filterSection}>
+                <div className={styles.filterTitle}>Order Time</div>
+                {['Last 30 days', '2026', '2025', 'Older'].map(time => (
+                  <label key={time} className={styles.checkboxLabel}>
+                    <input 
+                      type="radio" 
+                      name="orderTime"
+                      className={styles.checkboxInput} 
+                      checked={timeFilter === time}
+                      onChange={() => setTimeFilter(time)}
+                    />
+                    {time}
+                  </label>
+                ))}
+              </div>
             </div>
           </aside>
 
