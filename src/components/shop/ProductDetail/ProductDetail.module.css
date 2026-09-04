@@ -137,12 +137,12 @@
   background: linear-gradient(135deg, #F3ECE1 0%, #EAE0D1 100%);
   border-radius: 20px;
   overflow: hidden;
-  aspect-ratio: 1 / 0.92;
-  max-height: 450px;
+  aspect-ratio: 1 / 0.82;
+  max-height: 370px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 1rem;
+  padding: 0.75rem 1rem;
   box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.02);
 }
 
@@ -170,7 +170,7 @@
 
 .mainImageCenterWrap {
   position: absolute;
-  inset: 2rem 1rem 2.25rem 1rem;
+  inset: 0.75rem 0.5rem 0.75rem 0.5rem;
   z-index: 1;
 }
 
@@ -1290,19 +1290,21 @@
 @media (max-width: 900px) {
   .relatedProductsGrid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 0.85rem;
   }
 }
 
 @media (max-width: 480px) {
   .relatedProductsGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.65rem;
   }
 }
 
 /* ── MOBILE RESPONSIVENESS (375px & SMALL SCREENS) ── */
 @media (max-width: 640px) {
   .pageContainer {
-    padding-bottom: 5rem;
+    padding-bottom: 6rem;
   }
 
   .container {
@@ -1314,9 +1316,9 @@
   }
 
   .mainImageContainer {
-    aspect-ratio: 1 / 0.95;
-    max-height: 320px;
-    padding: 0.75rem;
+    aspect-ratio: 1 / 0.8;
+    max-height: 270px;
+    padding: 0.6rem;
   }
 
   .thumbnailBtn {
@@ -1332,14 +1334,26 @@
     font-size: 1.35rem;
   }
 
+  /* Fixed Bottom Sticky Bar on Mobile */
   .primaryCtasRow {
-    gap: 0.5rem;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(33, 28, 21, 0.08);
+    padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+    margin: 0;
+    gap: 0.6rem;
   }
 
   .addToCartMainBtn,
   .buyNowMainBtn {
-    height: 42px;
-    font-size: 0.8rem;
+    height: 44px;
+    font-size: 0.85rem;
     padding: 0 0.5rem;
   }
 
