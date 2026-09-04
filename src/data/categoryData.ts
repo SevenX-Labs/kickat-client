@@ -344,6 +344,62 @@ export const CATALOG_PRODUCTS: CatalogProduct[] = [
     brand: 'AquaPure',
     tags: ['Stainless Steel', 'Tools'],
   },
+  {
+    id: 'f-8',
+    name: 'HydroClean Magnetic Glass Cleaner Brush',
+    price: 599,
+    originalPrice: 799,
+    rating: 5,
+    reviewsCount: 88,
+    image: '/category-images/accessories.png',
+    mainCategory: 'fish',
+    subCategory: 'aquarium-tools',
+    brand: 'AquaPure',
+    badge: 'Popular',
+    tags: ['Magnetic', 'Cleaner'],
+  },
+  {
+    id: 'f-9',
+    name: 'AquaWave Wavemaker Submersible Flow Pump 15W',
+    price: 1599,
+    originalPrice: 1999,
+    rating: 5,
+    reviewsCount: 114,
+    image: '/category-images/fish.png',
+    mainCategory: 'fish',
+    subCategory: 'aquarium-pumps',
+    brand: 'AquaPure',
+    badge: 'New',
+    tags: ['Wavemaker', 'Flow Pump'],
+  },
+  {
+    id: 'f-10',
+    name: 'BioFoam Dual Sponge Aquarium Air Filter 200L',
+    price: 499,
+    originalPrice: 699,
+    rating: 4,
+    reviewsCount: 96,
+    image: '/category-images/accessories.png',
+    mainCategory: 'fish',
+    subCategory: 'aquarium-filtration',
+    brand: 'AquaPure',
+    badge: 'Sale',
+    tags: ['BioFoam', 'Sponge Filter'],
+  },
+  {
+    id: 'f-11',
+    name: 'EcoPlant High Lumen LED Aquarium Light Bar 60cm',
+    price: 2199,
+    originalPrice: 2699,
+    rating: 5,
+    reviewsCount: 142,
+    image: '/category-images/accessories.png',
+    mainCategory: 'fish',
+    subCategory: 'aquarium-lighting',
+    brand: 'AquaPure',
+    badge: 'Best Seller',
+    tags: ['EcoPlant', 'LED Light'],
+  },
 
   // Birds
   {
@@ -404,6 +460,22 @@ export function getCategoryData(categorySlug: string, subcategorySlug?: string):
     return true;
   });
 
+  // Ensure enough products for a rich list display (10 products)
+  const categoryFallback = CATALOG_PRODUCTS.filter((p) => p.mainCategory === mainCat!.slug);
+  const displayProducts = [...matchingProducts];
+  categoryFallback.forEach((p) => {
+    if (displayProducts.length < 10 && !displayProducts.some((existing) => existing.id === p.id)) {
+      displayProducts.push(p);
+    }
+  });
+  if (displayProducts.length < 10) {
+    CATALOG_PRODUCTS.forEach((p) => {
+      if (displayProducts.length < 10 && !displayProducts.some((existing) => existing.id === p.id)) {
+        displayProducts.push(p);
+      }
+    });
+  }
+
   const bestsellers = CATALOG_PRODUCTS.filter(
     (p) => p.mainCategory === mainCat!.slug && p.isTopRated
   ).slice(0, 3);
@@ -430,6 +502,6 @@ export function getCategoryData(categorySlug: string, subcategorySlug?: string):
       { name: 'Maison Petit', count: 6 },
     ],
     bestsellers: bestsellers.length > 0 ? bestsellers : CATALOG_PRODUCTS.slice(0, 3),
-    products: matchingProducts.length > 0 ? matchingProducts : CATALOG_PRODUCTS.filter((p) => p.mainCategory === mainCat!.slug),
+    products: displayProducts.length > 0 ? displayProducts : CATALOG_PRODUCTS,
   };
 }

@@ -1,39 +1,51 @@
-/* ── Product Card (Unified Grid Card) ── */
+/* ══════════════════════════════════════════════════════════
+   PREMIUM E-COMMERCE PRODUCT CARD DESIGN
+   - Mobile Viewport (375px) & Desktop Responsive
+   - Apple / Nike / Chewy Premium Tier Aesthetic
+   ══════════════════════════════════════════════════════════ */
+
+/* ── 1. Desktop & Base Horizontal Card ── */
 .productCard {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
   background: #ffffff;
-  border-radius: 20px;
-  overflow: hidden;
-  padding: 0.65rem;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(0, 0, 0, 0.07);
-  height: 100%;
+  border-radius: 18px;
+  padding: 1rem; /* 16px padding */
+  gap: 1.25rem;
   width: 100%;
-  max-width: 240px;
-  min-width: 0;
-  margin: 0 auto;
-  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
   box-sizing: border-box;
+  position: relative;
+  cursor: pointer;
 }
 
 .productCard:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
 
-/* ── Image Area ── */
+.productCard:active {
+  transform: scale(0.98);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Framed Image Area */
 .cardImageArea {
   position: relative;
-  width: 100%;
-  aspect-ratio: 1 / 0.88;
+  width: 140px;
+  height: 105px;
+  aspect-ratio: 1 / 0.75;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #EFE7DC;
-  border-radius: 15px;
-  padding: 0.5rem;
+  background-color: #F8F6F2;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.02);
+  padding: 0.3rem;
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -46,7 +58,7 @@
 }
 
 .cardImage {
-  padding: 0.25rem;
+  padding: 0;
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -54,64 +66,40 @@
   transform: scale(1.05);
 }
 
-/* ── Badge ── */
+/* Badge Top-Left (Compact 10px uppercase pill) */
 .cardBadge {
   position: absolute;
-  top: 8px;
-  left: 8px;
-  padding: 0.25rem 0.65rem;
+  top: 6px;
+  left: 6px;
+  padding: 0.15rem 0.45rem;
   border-radius: 9999px;
   background-color: #FD802E;
   color: #ffffff;
-  font-size: 0.65rem;
+  font-size: 0.625rem; /* 10px */
   font-weight: 700;
-  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
   z-index: 2;
-  font-family: var(--font-inter), sans-serif;
-  box-shadow: 0 2px 6px rgba(253, 128, 46, 0.25);
+  font-family: var(--font-sans), Inter, sans-serif;
+  box-shadow: 0 2px 5px rgba(253, 128, 46, 0.25);
   white-space: nowrap;
 }
 
-/* ── Wishlist / Remove Button ── */
+/* Hidden on desktop list view (shown inside CTA row) */
 .cardWishlistBtn,
 .cardRemoveBtn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: #ffffff;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 2;
-  transition: all 0.25s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: none;
 }
 
-.cardWishlistBtn:hover {
-  transform: scale(1.08);
-}
-
-.cardWishlistBtn:hover svg {
-  color: #FD802E !important;
-  fill: #FD802E;
-}
-
-/* ── Info Area ── */
+/* Middle Content Area */
 .cardInfo {
   display: flex;
   flex-direction: column;
-  padding: 0.65rem 0.2rem 0.2rem 0.2rem;
-  background-color: #ffffff;
+  justify-content: center;
+  gap: 0.2rem;
   flex: 1;
-}
-
-.cardBrand {
-  display: none;
+  min-width: 0;
 }
 
 .cardTitleLink {
@@ -119,13 +107,15 @@
   color: inherit;
 }
 
+/* Refined Sans-Serif Title (16px/600) */
 .cardTitle {
-  font-family: var(--font-inter), sans-serif;
-  font-size: 0.94rem;
-  font-weight: 700;
+  font-family: var(--font-sans), Inter, -apple-system, sans-serif;
+  font-size: 1rem; /* 16px */
+  font-weight: 600;
   color: #111827;
-  line-height: 1.25;
-  margin-bottom: 0.4rem;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+  margin-bottom: 0.2rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -133,15 +123,12 @@
   word-break: break-word;
 }
 
-.cardDescription {
-  display: none;
-}
-
+/* Rating & Reviews (13px/500) */
 .cardRatingRow {
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.25rem;
 }
 
 .starsGroup {
@@ -151,121 +138,489 @@
 }
 
 .cardRatingScore {
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: 0.8125rem; /* 13px */
+  font-weight: 600;
   color: #111827;
   margin-left: 0.15rem;
 }
 
 .cardReviewsCount {
-  font-size: 0.8rem;
-  color: #6B7280;
+  font-size: 0.8125rem; /* 13px */
+  color: #4B5563; /* Higher contrast gray */
   font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s ease;
 }
 
-/* ── Action Column & Price Rows ── */
-.cardActionCol {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  margin-top: auto;
+.cardReviewsCount:hover {
+  color: #111827;
+  text-decoration: underline;
 }
 
+/* Price Row (18px/700 price, 14px/400 strikethrough, 8px gaps) */
 .priceContainer {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.35rem;
-  margin-bottom: 0.75rem;
+  align-items: baseline;
+  gap: 0.5rem; /* 8px gap */
+  flex-wrap: wrap;
+  margin-bottom: 0.25rem;
 }
 
-.priceMainRow {
+.priceRowUpper {
   display: flex;
   align-items: baseline;
-  gap: 0.45rem;
+  gap: 0.4rem;
 }
 
 .cardPrice {
-  font-family: var(--font-inter), sans-serif;
-  font-size: 1.25rem;
-  font-weight: 800;
+  font-family: var(--font-sans), Inter, sans-serif;
+  font-size: 1.125rem; /* 18px */
+  font-weight: 700;
   color: #111827;
   letter-spacing: -0.02em;
 }
 
 .originalPrice {
-  font-size: 0.84rem;
+  font-size: 0.875rem; /* 14px */
   color: #9CA3AF;
   text-decoration: line-through;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .discountTag {
-  font-size: 0.65rem;
-  font-weight: 700;
+  font-size: 0.6875rem; /* 11px */
+  font-weight: 600;
+  text-transform: uppercase;
   color: #ffffff;
-  background-color: #28A745;
+  background-color: #16A34A;
   padding: 0.2rem 0.55rem;
   border-radius: 9999px;
   line-height: 1;
   display: inline-block;
+  white-space: nowrap;
 }
 
-/* ── Add to Cart Button (Pill Shape) ── */
-.addToCartBtn {
+/* Color Swatches Variant Selector (22px, drop shadow, 1.1x scale + 3px gap ring) */
+.colorSwatches {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem; /* 8px margin above swatch row */
+  margin-bottom: 0.1rem;
+}
+
+.swatchDot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  display: inline-block;
+  cursor: pointer;
+  box-shadow: 0 1.5px 5px rgba(0, 0, 0, 0.14);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), outline 0.2s ease;
+}
+
+.swatchDot:hover {
+  transform: scale(1.12);
+}
+
+.swatchActive {
+  transform: scale(1.1);
+  outline: 2px solid #FD802E;
+  outline-offset: 3px;
+}
+
+/* Desktop Divider */
+.desktopDivider {
+  width: 1px;
+  height: 75px;
+  background-color: rgba(0, 0, 0, 0.06);
+  flex-shrink: 0;
+  margin: 0 0.25rem;
+}
+
+/* Right Action Column */
+.cardActionCol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  min-width: 175px;
+}
+
+.rightActionsRow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   width: 100%;
-  height: 40px;
+}
+
+/* Tactile Gradient CTA Button with 0 2px 8px shadow */
+.addToCartBtn {
+  height: 44px;
   border-radius: 9999px;
   border: none;
-  background-color: #FD802E;
+  background: linear-gradient(180deg, #FD802E 0%, #E56E1D 100%);
   color: #ffffff;
-  font-size: 0.88rem;
+  font-size: 0.875rem;
   font-weight: 700;
+  padding: 0 1.15rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
+  gap: 0.4rem;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 3px 12px rgba(253, 128, 46, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+  white-space: nowrap;
 }
 
 .addToCartBtn:hover {
-  background-color: #E56E1D;
+  background: linear-gradient(180deg, #FF8C3E 0%, #EC7320 100%);
   transform: translateY(-1.5px);
-  box-shadow: 0 6px 16px rgba(253, 128, 46, 0.35);
+  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.4);
 }
 
 .addToCartBtn:active {
   transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(253, 128, 46, 0.2);
+  box-shadow: 0 2px 6px rgba(249, 115, 22, 0.25);
 }
 
-/* ── Responsive Adjustments ── */
+/* Wishlist Button with smooth pop transition */
+.desktopWishlistBtn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
+}
+
+.desktopWishlistBtn:hover {
+  transform: scale(1.08);
+  border-color: #FD802E;
+}
+
+.wishlistedActive {
+  background-color: #FFF5EE !important;
+  border-color: #FD802E !important;
+}
+
+.heartFilled {
+  fill: #FD802E !important;
+  color: #FD802E !important;
+  stroke: #FD802E !important;
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
+}
+
+/* In Stock & Delivery Group (Directly under button with tight 6px spacing) */
+.stockDeliveryGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin-top: 0.25rem; /* Tight 6px spacing under CTA button */
+}
+
+.inStockBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #16A34A;
+  font-size: 0.78125rem; /* 12.5px */
+  font-weight: 600;
+}
+
+.greenPulseDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #16A34A;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.truckIcon {
+  color: #16A34A;
+}
+
+.deliveryText {
+  font-size: 0.75rem; /* 12px */
+  color: #6B7280;
+  font-weight: 400;
+}
+
+/* ══════════════════════════════════════════════════════════
+   MOBILE OVERRIDES (<= 640px, 375px Viewport Optimization)
+   ══════════════════════════════════════════════════════════ */
 @media (max-width: 640px) {
   .productCard {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
     max-width: 100%;
-    padding: 0.55rem;
+    padding: 1rem; /* Consistent 16px padding */
+    border-radius: 18px;
+    background: #ffffff;
+    gap: 0.85rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    height: auto;
+    position: relative;
   }
 
+  .productCard:active {
+    transform: scale(0.98);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Image Area: Proportional ~38% width for clear presentation */
+  .cardImageArea {
+    width: 38%;
+    min-width: 115px;
+    max-width: 135px;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    border-radius: 14px;
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+    background: #F8F6F2;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.02);
+    flex-shrink: 0;
+  }
+
+  .cardBadge {
+    top: 5px;
+    left: 5px;
+    padding: 0.12rem 0.38rem;
+    font-size: 0.59375rem; /* ~9.5px */
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+    background: #FD802E;
+    color: #ffffff;
+    border-radius: 9999px;
+    box-shadow: 0 1.5px 4px rgba(253, 128, 46, 0.25);
+  }
+
+  .cardWishlistBtn,
+  .cardRemoveBtn {
+    display: none !important;
+  }
+
+  /* Content Column: Vertical hierarchy Title -> Rating -> Price+Discount -> Swatches -> CTA Row */
   .cardInfo {
-    padding: 0.5rem 0.15rem 0.15rem 0.15rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+    gap: 0;
   }
 
   .cardTitle {
-    font-size: 0.88rem;
+    font-family: var(--font-sans), Inter, -apple-system, sans-serif;
+    font-size: 1rem; /* 16px */
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.25rem;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: auto;
+  }
+
+  .cardRatingRow {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .starsGroup {
+    display: flex;
+    align-items: center;
+    gap: 0.1rem;
+  }
+
+  .cardRatingScore {
+    font-size: 0.8125rem; /* 13px */
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .cardReviewsCount {
+    font-size: 0.8125rem; /* 13px */
+    color: #4B5563;
+    font-weight: 500;
+  }
+
+  /* Price Container */
+  .priceContainer {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem; /* 8px gap */
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+  }
+
+  .priceRowUpper {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
   }
 
   .cardPrice {
-    font-size: 1.15rem;
+    font-family: var(--font-sans), Inter, sans-serif;
+    font-size: 1.125rem; /* 18px */
+    font-weight: 700;
+    color: #111827;
+    line-height: 1;
+    letter-spacing: -0.02em;
   }
 
   .originalPrice {
-    font-size: 0.78rem;
+    font-size: 0.875rem; /* 14px */
+    color: #9CA3AF;
+    text-decoration: line-through;
+    font-weight: 400;
+    line-height: 1;
+  }
+
+  .discountTag {
+    font-size: 0.6875rem; /* 11px */
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    padding: 0.2rem 0.55rem;
+    border-radius: 9999px;
+    background-color: #16A34A;
+    color: #ffffff;
+    line-height: 1;
+  }
+
+  /* Color Swatches directly under price row with consistent 8px spacing */
+  .colorSwatches {
+    display: flex !important;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 0.15rem; /* 8px spacing below price */
+    margin-bottom: 0.65rem;
+  }
+
+  .swatchDot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    display: inline-block;
+    box-shadow: 0 1.5px 5px rgba(0, 0, 0, 0.14);
+  }
+
+  .swatchActive {
+    transform: scale(1.1);
+    outline: 2px solid #FD802E;
+    outline-offset: 3px;
+  }
+
+  /* Remove vertical divider */
+  .desktopDivider {
+    display: none !important;
+  }
+
+  /* CTA Column: Tightly Grouped Button Row + In Stock & Delivery Subtitle */
+  .cardActionCol {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    min-width: 0;
+    margin-top: 0.1rem;
+    gap: 0.35rem;
+  }
+
+  .rightActionsRow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
   }
 
   .addToCartBtn {
-    height: 38px;
-    font-size: 0.82rem;
+    flex: 1;
+    height: 44px !important;
+    min-height: 44px !important;
+    border-radius: 9999px !important;
+    background: linear-gradient(180deg, #FD802E 0%, #E56E1D 100%) !important;
+    color: #ffffff !important;
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+    padding: 0 0.85rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.4rem !important;
+    border: none !important;
+    box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3) !important;
+    cursor: pointer;
+  }
+
+  .btnText {
+    display: inline !important;
+    white-space: nowrap;
+  }
+
+  .desktopWishlistBtn {
+    display: flex !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    border-radius: 50% !important;
+    background-color: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  }
+
+  .stockDeliveryGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    margin-top: 0.15rem;
+    margin-left: 0.15rem;
+  }
+
+  .inStockBadge {
+    display: flex !important;
+    align-items: center;
+    gap: 0.35rem;
+    color: #16A34A;
+    font-size: 0.78125rem;
+    font-weight: 600;
+    margin-top: 0;
+  }
+
+  .deliveryText {
+    font-size: 0.75rem;
+    color: #6B7280;
+    font-weight: 400;
   }
 }

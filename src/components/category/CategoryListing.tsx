@@ -87,6 +87,8 @@ export function CategoryListing({ category }: CategoryListingProps) {
     });
   }, [category.products, category.subcategories, searchQuery, maxPrice, selectedSubcategories, selectedBrands, inStockOnly, minRating, sortBy]);
 
+
+
   return (
     <div className={styles.pageWrapper}>
       {/* Mobile Filter Overlay */}
