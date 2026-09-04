@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Heart, Star, ShoppingCart, Trash2, Truck, Check } from 'lucide-react';
 import styles from './ProductCard.module.css';
 
@@ -48,6 +49,7 @@ function getDescription(product: Product): string {
 }
 
 export default function ProductCard({ product, onRemoveFromWishlist }: ProductCardProps) {
+  const router = useRouter();
   const [selectedSwatch, setSelectedSwatch] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
@@ -72,7 +74,10 @@ export default function ProductCard({ product, onRemoveFromWishlist }: ProductCa
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (isAdded) return;
+    if (isAdded) {
+      router.push('/cart');
+      return;
+    }
 
     const startElem = e.currentTarget as HTMLElement;
     const cartBtn = document.getElementById('navbar-cart-btn');
@@ -116,12 +121,12 @@ export default function ProductCard({ product, onRemoveFromWishlist }: ProductCa
       const animation = flyingImg.animate(
         [
           { transform: 'translate3d(0, 0, 0) scale(1) rotate(0deg)', opacity: 1 },
-          { offset: 0.45, transform: `translate3d(${deltaX * 0.45}px, ${deltaY * 0.45 - 120}px, 0) scale(0.68) rotate(-12deg)`, opacity: 0.95 },
+          { offset: 0.45, transform: `translate3d(${deltaX * 0.45}px, ${deltaY * 0.45 - 140}px, 0) scale(0.72) rotate(-12deg)`, opacity: 0.95 },
           { transform: `translate3d(${deltaX}px, ${deltaY}px, 0) scale(0.12) rotate(-30deg)`, opacity: 0.1 },
         ],
         {
-          duration: 700,
-          easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+          duration: 1800,
+          easing: 'cubic-bezier(0.2, 0.9, 0.3, 1)',
           fill: 'forwards',
         }
       );
@@ -135,18 +140,15 @@ export default function ProductCard({ product, onRemoveFromWishlist }: ProductCa
     }
 
     setIsAdded(true);
-    setTimeout(() => setIsAdded(false), 1800);
   };
 
   return (
     <div className={styles.productCard}>
       {/* Product Image Area */}
       <div className={styles.cardImageArea}>
-        {product.badge && (
+        {product.badge && product.badge !== 'Best Seller' && product.badge !== 'Popular' && (
           <span className={styles.cardBadge}>
-            {product.badge === 'Popular' || product.badge === 'Best Seller'
-              ? 'BESTSELLER'
-              : product.badge === 'New' || product.badge === 'New Arrival'
+            {product.badge === 'New' || product.badge === 'New Arrival'
               ? 'NEW'
               : product.badge === 'Sale'
               ? 'SALE'
@@ -257,7 +259,7 @@ export default function ProductCard({ product, onRemoveFromWishlist }: ProductCa
             {isAdded ? (
               <>
                 <Check size={15} color="#ffffff" strokeWidth={2.5} />
-                <span className={styles.btnText}>Added!</span>
+                <span className={styles.btnText}>Go to Cart</span>
               </>
             ) : (
               <>

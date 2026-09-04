@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Heart, Star, ShoppingCart, Trash2, Check } from 'lucide-react';
 import styles from './HomeProductCard.module.css';
 
@@ -27,6 +28,7 @@ interface HomeProductCardProps {
 }
 
 export default function HomeProductCard({ product, onRemoveFromWishlist }: HomeProductCardProps) {
+  const router = useRouter();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
 
@@ -50,7 +52,10 @@ export default function HomeProductCard({ product, onRemoveFromWishlist }: HomeP
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (isAdded) return;
+    if (isAdded) {
+      router.push('/cart');
+      return;
+    }
 
     const startElem = e.currentTarget as HTMLElement;
     const cartBtn = document.getElementById('navbar-cart-btn');
@@ -94,12 +99,12 @@ export default function HomeProductCard({ product, onRemoveFromWishlist }: HomeP
       const animation = flyingImg.animate(
         [
           { transform: 'translate3d(0, 0, 0) scale(1) rotate(0deg)', opacity: 1 },
-          { offset: 0.45, transform: `translate3d(${deltaX * 0.45}px, ${deltaY * 0.45 - 120}px, 0) scale(0.68) rotate(-12deg)`, opacity: 0.95 },
+          { offset: 0.45, transform: `translate3d(${deltaX * 0.45}px, ${deltaY * 0.45 - 140}px, 0) scale(0.72) rotate(-12deg)`, opacity: 0.95 },
           { transform: `translate3d(${deltaX}px, ${deltaY}px, 0) scale(0.12) rotate(-30deg)`, opacity: 0.1 },
         ],
         {
-          duration: 700,
-          easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+          duration: 1800,
+          easing: 'cubic-bezier(0.2, 0.9, 0.3, 1)',
           fill: 'forwards',
         }
       );
@@ -113,22 +118,24 @@ export default function HomeProductCard({ product, onRemoveFromWishlist }: HomeP
     }
 
     setIsAdded(true);
-    setTimeout(() => setIsAdded(false), 1800);
   };
 
   const getBadgeText = () => {
-    if (!product.badge) return 'Best Seller';
-    if (product.badge === 'Popular' || product.badge === 'Best Seller') return 'Best Seller';
+    if (!product.badge || product.badge === 'Popular' || product.badge === 'Best Seller') {
+      return null;
+    }
     if (product.badge === 'New' || product.badge === 'New Arrival') return 'New';
     if (product.badge === 'Sale') return `${discountPercent}% OFF`;
     return product.badge;
   };
 
+  const badgeText = getBadgeText();
+
   return (
     <div className={styles.homeCard}>
       {/* Top Image Area */}
       <div className={styles.cardImageArea}>
-        <span className={styles.cardBadge}>{getBadgeText()}</span>
+        {badgeText && <span className={styles.cardBadge}>{badgeText}</span>}
 
         <button
           className={`${styles.cardWishlistBtn} ${isWishlisted ? styles.wishlistedActive : ''}`}
@@ -198,7 +205,7 @@ export default function HomeProductCard({ product, onRemoveFromWishlist }: HomeP
           {isAdded ? (
             <>
               <Check size={15} color="#ffffff" strokeWidth={2.5} />
-              <span>Added!</span>
+              <span>Go to Cart</span>
             </>
           ) : (
             <>

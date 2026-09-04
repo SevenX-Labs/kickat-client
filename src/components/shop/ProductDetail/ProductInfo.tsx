@@ -89,7 +89,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
         },
         {
           offset: 0.45,
-          transform: `translate3d(${deltaX * 0.45}px, ${deltaY * 0.45 - 130}px, 0) scale(0.7) rotate(-12deg)`,
+          transform: `translate3d(${deltaX * 0.45}px, ${deltaY * 0.45 - 140}px, 0) scale(0.72) rotate(-12deg)`,
           opacity: 0.95,
         },
         {
@@ -98,8 +98,8 @@ export function ProductInfo({ product }: ProductInfoProps) {
         },
       ],
       {
-        duration: 750,
-        easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+        duration: 1800,
+        easing: 'cubic-bezier(0.2, 0.9, 0.3, 1)',
         fill: 'forwards',
       }
     );
@@ -128,7 +128,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
     setTimeout(() => {
       setIsAdding(false);
       setHasAdded(true);
-    }, 750);
+    }, 1800);
   };
 
   const handleBuyNow = () => {
