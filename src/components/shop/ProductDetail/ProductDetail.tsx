@@ -9,6 +9,7 @@ import { ProductSpecsAndSizeGuide } from './ProductSpecsAndSizeGuide';
 import { ProductReviews } from './ProductReviews';
 import { ProductFAQ } from './ProductFAQ';
 import { RelatedProducts } from './RelatedProducts';
+import { ProductDetailSkeleton } from './ProductDetailSkeleton';
 import styles from './ProductDetail.module.css';
 
 export interface Product {
@@ -30,9 +31,14 @@ export interface Product {
 
 interface ProductDetailProps {
   product: Product;
+  isLoading?: boolean;
 }
 
-export function ProductDetail({ product }: ProductDetailProps) {
+export function ProductDetail({ product, isLoading }: ProductDetailProps) {
+  if (isLoading) {
+    return <ProductDetailSkeleton />;
+  }
+
   return (
     <div className={styles.pageContainer}>
 

@@ -1,12 +1,14 @@
+import { Suspense } from 'react';
 import { CATALOG_PRODUCTS } from '@/data/categoryData';
 import { ProductDetail } from '@/components/shop/ProductDetail/ProductDetail';
+import { ProductDetailSkeleton } from '@/components/shop/ProductDetail/ProductDetailSkeleton';
 
 export const metadata = {
-  title: 'Mim & Mate Natural Rubber Chew Toy | KickAt',
-  description: 'Durable. Safe. Fun. Made for endless play.',
+  title: 'KickAt | Product Details',
+  description: 'Premium pet products for your best friend.',
 };
 
-export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
+async function ProductContent({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
   const product = CATALOG_PRODUCTS.find(p => p.id === resolvedParams.id) || CATALOG_PRODUCTS[0];
 
@@ -19,3 +21,12 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
 
   return <ProductDetail product={{ ...product, images }} />;
 }
+
+export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
+  return (
+    <Suspense fallback={<ProductDetailSkeleton />}>
+      <ProductContent params={params} />
+    </Suspense>
+  );
+}
+
