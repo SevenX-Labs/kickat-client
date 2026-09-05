@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from 'react';
-import { Star, Edit3 } from 'lucide-react';
+import { Star, Edit3, ArrowRight, MessageSquare } from 'lucide-react';
 import Image from 'next/image';
 import styles from './ProductDetail.module.css';
 import { Product } from './ProductDetail';
+import { ReviewsDrawer } from './ReviewsDrawer';
+import { WriteReviewModal } from './WriteReviewModal';
 
 interface ProductReviewsProps {
   product: Product;
@@ -28,17 +30,42 @@ const CUSTOMER_PHOTOS = [
 
 export function ProductReviews({ product }: ProductReviewsProps) {
   const rating = product.rating || 4.8;
-  const reviewsCount = product.reviewsCount || 64;
+  const reviewsCount = product.reviewsCount || 142;
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   return (
     <div className={styles.reviewsMainWrapper} id="reviews">
-      <h2 className={styles.reviewsSectionHeaderTitle}>Customer Reviews</h2>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+        <h2 className={styles.reviewsSectionHeaderTitle} style={{ margin: 0 }}>Customer Reviews</h2>
+        <button
+          type="button"
+          onClick={() => setIsDrawerOpen(true)}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.4rem',
+            background: 'rgba(253, 128, 46, 0.08)',
+            color: '#FD802E',
+            border: '1px solid rgba(253, 128, 46, 0.2)',
+            padding: '0.5rem 1rem',
+            borderRadius: '20px',
+            fontSize: '0.85rem',
+            fontWeight: '700',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          <MessageSquare size={15} />
+          <span>See All {reviewsCount} Reviews</span>
+          <ArrowRight size={14} />
+        </button>
+      </div>
 
       {/* Top Ratings Overview Row */}
       <div className={styles.reviewsOverviewCard}>
         {/* Left: Big Rating Number & Stars */}
-        <div className={styles.ratingNumberBlock}>
+        <div className={styles.ratingNumberBlock} onClick={() => setIsDrawerOpen(true)} style={{ cursor: 'pointer' }}>
           <span className={styles.bigRatingScore}>{rating}</span>
           <div className={styles.ratingStarsCol}>
             <div className={styles.starsRowInline}>
@@ -52,12 +79,12 @@ export function ProductReviews({ product }: ProductReviewsProps) {
                 />
               ))}
             </div>
-            <span className={styles.basedOnText}>Based on {reviewsCount} reviews</span>
+            <span className={styles.basedOnText} style={{ textDecoration: 'underline' }}>Based on {reviewsCount} reviews</span>
           </div>
         </div>
 
         {/* Center: Rating Progress Bars */}
-        <div className={styles.ratingProgressBarsCol}>
+        <div className={styles.ratingProgressBarsCol} onClick={() => setIsDrawerOpen(true)} style={{ cursor: 'pointer' }}>
           {RATING_BREAKDOWN.map((item) => (
             <div key={item.stars} className={styles.progressRow}>
               <span className={styles.starLabelNum}>{item.stars} ★</span>
@@ -87,10 +114,27 @@ export function ProductReviews({ product }: ProductReviewsProps) {
 
       {/* Customer Photos Row */}
       <div className={styles.customerPhotosSection}>
-        <h3 className={styles.customerPhotosTitle}>Customer Photos</h3>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h3 className={styles.customerPhotosTitle}>Customer Photos</h3>
+          <button
+            type="button"
+            onClick={() => setIsDrawerOpen(true)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#FD802E',
+              fontWeight: '700',
+              fontSize: '0.825rem',
+              cursor: 'pointer'
+            }}
+          >
+            See all reviews →
+          </button>
+        </div>
+
         <div className={styles.customerPhotosRow}>
           {CUSTOMER_PHOTOS.map((photo, idx) => (
-            <div key={idx} className={styles.photoTileWrap}>
+            <div key={idx} className={styles.photoTileWrap} onClick={() => setIsDrawerOpen(true)} style={{ cursor: 'pointer' }}>
               <Image
                 src={photo}
                 alt={`Customer review photo ${idx + 1}`}
@@ -102,7 +146,11 @@ export function ProductReviews({ product }: ProductReviewsProps) {
           ))}
 
           {/* +12 More Tile */}
-          <div className={`${styles.photoTileWrap} ${styles.morePhotosTile}`}>
+          <div 
+            className={`${styles.photoTileWrap} ${styles.morePhotosTile}`} 
+            onClick={() => setIsDrawerOpen(true)} 
+            style={{ cursor: 'pointer' }}
+          >
             <Image
               src={CUSTOMER_PHOTOS[0]}
               alt="More customer photos"
@@ -118,19 +166,21 @@ export function ProductReviews({ product }: ProductReviewsProps) {
         </div>
       </div>
 
-      {showReviewModal && (
-        <div className={styles.modalBackdrop} onClick={() => setShowReviewModal(false)}>
-          <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
-            <h3>Write a Review</h3>
-            <p>Share your experience with {product.name || 'this product'}.</p>
-            <textarea className={styles.modalTextarea} placeholder="Write your review here..." rows={4} />
-            <div className={styles.modalActions}>
-              <button type="button" onClick={() => setShowReviewModal(false)} className={styles.cancelBtn}>Cancel</button>
-              <button type="button" onClick={() => { alert('Thank you for your review!'); setShowReviewModal(false); }} className={styles.submitBtn}>Submit</button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Slide-over Reviews Drawer */}
+      <ReviewsDrawer 
+        product={product}
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        onWriteReview={() => setShowReviewModal(true)}
+      />
+
+      {/* Write Review Modal */}
+      <WriteReviewModal
+        product={product}
+        isOpen={showReviewModal}
+        onClose={() => setShowReviewModal(false)}
+      />
     </div>
   );
 }
+
