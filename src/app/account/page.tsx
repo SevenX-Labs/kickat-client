@@ -2,9 +2,10 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { 
-  User, Mail, Phone, Calendar, CreditCard, ShieldCheck, 
-  CheckCircle2, Edit3, Lock, Sparkles, Award, X, Eye, EyeOff
+  User, Mail, Phone, Calendar, ShieldCheck, 
+  Edit3, Sparkles, Crown, ChevronRight, Bell, Tag, X
 } from 'lucide-react';
 import styles from './Account.module.css';
 import AccountSidebarNav from '@/components/account/AccountSidebarNav';
@@ -45,8 +46,11 @@ function AccountProfileContent() {
 
   // Modals & Toast State
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
-  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  // Toggle Preferences State
+  const [emailNotifs, setEmailNotifs] = useState(true);
+  const [promoEmails, setPromoEmails] = useState(true);
 
   // Form States
   const [profileForm, setProfileForm] = useState({
@@ -55,14 +59,6 @@ function AccountProfileContent() {
     email: userData.email,
     phone: userData.phone,
   });
-
-  const [passwordForm, setPasswordForm] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  });
-  const [showCurrentPw, setShowCurrentPw] = useState(false);
-  const [showNewPw, setShowNewPw] = useState(false);
 
   const triggerToast = (msg: string) => {
     setToastMsg(msg);
@@ -84,17 +80,6 @@ function AccountProfileContent() {
     triggerToast('Profile information updated successfully!');
   };
 
-  const handleSavePassword = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      alert("New passwords do not match!");
-      return;
-    }
-    setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
-    setIsChangePasswordOpen(false);
-    triggerToast('Account password changed successfully!');
-  };
-
   return (
     <div className={styles.pageWrapper}>
       {toastMsg && (
@@ -105,14 +90,31 @@ function AccountProfileContent() {
       )}
 
       <main className={styles.container}>
+        {/* Top Breadcrumb & Welcome Greeting Bar */}
+        <div className={styles.topBarWrapper}>
+          <div className={styles.topBreadcrumbGroup}>
+            <Link href="/" className={styles.crumbLink}>Home</Link>
+            <ChevronRight size={13} className={styles.crumbSep} />
+            <Link href="/account" className={styles.crumbLink}>My Account</Link>
+            <ChevronRight size={13} className={styles.crumbSep} />
+            <span className={styles.crumbCurrent}>Profile Details</span>
+          </div>
+          <div className={styles.topGreetingGroup}>
+            <span>Welcome back, <strong>Sarah!</strong></span>
+            <span className={styles.pawIcon}>🐾</span>
+          </div>
+        </div>
+
         <div className={styles.accountLayout}>
           
           {/* Shared Account Navigation */}
           <AccountSidebarNav user={userData} />
 
           {/* Profile Details Content Card */}
-          <div className={styles.contentArea}>
+          <div className={`${styles.contentArea} ${!tab ? styles.hideOnMobileMain : ''}`}>
             <div className={styles.tabContentCard}>
+              
+              {/* Header Title & VIP Tier Badge */}
               <div className={styles.sectionHeader}>
                 <div className={styles.headerTitleRow}>
                   <div>
@@ -120,130 +122,167 @@ function AccountProfileContent() {
                     <p className={styles.subtitle}>Manage your personal identity, contact preferences, and security settings.</p>
                   </div>
                   <div className={styles.vipBadgeHeader}>
-                    <Award size={16} color="#FD802E" />
+                    <Crown size={14} fill="#FD802E" color="#FD802E" />
                     <span>{userData.tier}</span>
                   </div>
                 </div>
               </div>
 
-              <div className={styles.profileDetailsGrid}>
-                {/* Full Name */}
-                <div className={styles.detailFieldBlock}>
-                  <div className={styles.fieldHeader}>
-                    <div className={styles.fieldIconCircle}>
-                      <User size={16} color="#FD802E" />
-                    </div>
-                    <span className={styles.fieldLabel}>Full Name</span>
+              {/* 1. PERSONAL INFORMATION BLOCK */}
+              <div className={styles.sectionBlockCard}>
+                <div className={styles.sectionBlockHeader}>
+                  <div>
+                    <h2 className={styles.blockTitle}>Personal Information</h2>
+                    <p className={styles.blockSubtitle}>Keep your information up to date.</p>
                   </div>
-                  <span className={styles.fieldValue}>{userData.firstName} {userData.lastName}</span>
+                  <button 
+                    type="button" 
+                    className={styles.editSectionBtn}
+                    onClick={() => {
+                      setProfileForm({
+                        firstName: userData.firstName,
+                        lastName: userData.lastName,
+                        email: userData.email,
+                        phone: userData.phone
+                      });
+                      setIsEditProfileOpen(true);
+                    }}
+                  >
+                    <Edit3 size={14} />
+                    <span>Edit</span>
+                  </button>
                 </div>
 
-                {/* Email Address */}
-                <div className={styles.detailFieldBlock}>
-                  <div className={styles.fieldHeader}>
-                    <div className={styles.fieldIconCircle}>
-                      <Mail size={16} color="#FD802E" />
+                <div className={styles.personalInfoGrid}>
+                  {/* Full Name */}
+                  <div className={styles.infoFieldItem}>
+                    <div className={styles.infoFieldIconBox}>
+                      <User size={18} />
                     </div>
-                    <span className={styles.fieldLabel}>Email Address</span>
+                    <div className={styles.infoFieldTextGroup}>
+                      <span className={styles.infoFieldLabel}>Full Name</span>
+                      <span className={styles.infoFieldValue}>{userData.firstName} {userData.lastName}</span>
+                    </div>
                   </div>
-                  <span className={styles.fieldValue}>{userData.email}</span>
-                </div>
 
-                {/* Phone Number */}
-                <div className={styles.detailFieldBlock}>
-                  <div className={styles.fieldHeader}>
-                    <div className={styles.fieldIconCircle}>
-                      <Phone size={16} color="#FD802E" />
+                  {/* Email Address */}
+                  <div className={styles.infoFieldItem}>
+                    <div className={styles.infoFieldIconBox}>
+                      <Mail size={18} />
                     </div>
-                    <span className={styles.fieldLabel}>Phone Number</span>
+                    <div className={styles.infoFieldTextGroup}>
+                      <span className={styles.infoFieldLabel}>Email Address</span>
+                      <span className={styles.infoFieldValue}>{userData.email}</span>
+                    </div>
                   </div>
-                  <span className={styles.fieldValue}>{userData.phone}</span>
-                </div>
 
-                {/* Member Since */}
-                <div className={styles.detailFieldBlock}>
-                  <div className={styles.fieldHeader}>
-                    <div className={styles.fieldIconCircle}>
-                      <Calendar size={16} color="#FD802E" />
+                  {/* Phone Number */}
+                  <div className={styles.infoFieldItem}>
+                    <div className={styles.infoFieldIconBox}>
+                      <Phone size={18} />
                     </div>
-                    <span className={styles.fieldLabel}>Member Since</span>
+                    <div className={styles.infoFieldTextGroup}>
+                      <span className={styles.infoFieldLabel}>Phone Number</span>
+                      <span className={styles.infoFieldValue}>{userData.phone}</span>
+                    </div>
                   </div>
-                  <span className={styles.fieldValue}>{userData.memberSince}</span>
-                </div>
 
-                {/* Preferred Currency */}
-                <div className={styles.detailFieldBlock}>
-                  <div className={styles.fieldHeader}>
-                    <div className={styles.fieldIconCircle}>
-                      <CreditCard size={16} color="#FD802E" />
+                  {/* Member Since */}
+                  <div className={styles.infoFieldItem}>
+                    <div className={styles.infoFieldIconBox}>
+                      <Calendar size={18} />
                     </div>
-                    <span className={styles.fieldLabel}>Preferred Currency</span>
-                  </div>
-                  <span className={styles.fieldValue}>{userData.currency}</span>
-                </div>
-
-                {/* Account Security */}
-                <div className={styles.detailFieldBlock}>
-                  <div className={styles.fieldHeader}>
-                    <div className={styles.fieldIconCircle}>
-                      <ShieldCheck size={16} color="#15803D" />
+                    <div className={styles.infoFieldTextGroup}>
+                      <span className={styles.infoFieldLabel}>Member Since</span>
+                      <span className={styles.infoFieldValue}>{userData.memberSince}</span>
                     </div>
-                    <span className={styles.fieldLabel}>Account Status</span>
-                  </div>
-                  <div className={styles.verifiedBadge}>
-                    <CheckCircle2 size={13} /> Verified KickAt Member
                   </div>
                 </div>
               </div>
 
-              <div className={styles.tabActionFooter}>
-                <button 
-                  type="button" 
-                  className={styles.primaryBtn}
-                  onClick={() => {
-                    setProfileForm({
-                      firstName: userData.firstName,
-                      lastName: userData.lastName,
-                      email: userData.email,
-                      phone: userData.phone
-                    });
-                    setIsEditProfileOpen(true);
-                  }}
-                >
-                  <Edit3 size={15} /> Edit Information
-                </button>
-                
-                <button 
-                  type="button" 
-                  className={styles.actionBtn}
-                  onClick={() => setIsChangePasswordOpen(true)}
-                >
-                  <Lock size={15} /> Change Password
-                </button>
+              {/* 2. ACCOUNT PREFERENCES BLOCK */}
+              <div className={styles.sectionBlockCard}>
+                <div className={styles.sectionBlockHeader}>
+                  <div>
+                    <h2 className={styles.blockTitle}>Account Preferences</h2>
+                    <p className={styles.blockSubtitle}>Manage your communication and account settings.</p>
+                  </div>
+                </div>
+
+                <div className={styles.preferencesList}>
+                  {/* Row 1: Email Notifications */}
+                  <div className={styles.preferenceRowItem}>
+                    <div className={styles.prefIconBox}>
+                      <Bell size={18} />
+                    </div>
+                    <div className={styles.prefTextGroup}>
+                      <span className={styles.prefTitle}>Email Notifications</span>
+                      <span className={styles.prefSubtitle}>Receive updates about your orders, offers and new products</span>
+                    </div>
+                    <button 
+                      type="button"
+                      className={`${styles.toggleSwitch} ${emailNotifs ? styles.toggleOn : ''}`}
+                      onClick={() => setEmailNotifs(!emailNotifs)}
+                    >
+                      <div className={styles.toggleKnob} />
+                    </button>
+                  </div>
+
+                  {/* Row 2: Promotional Emails */}
+                  <div className={styles.preferenceRowItem}>
+                    <div className={styles.prefIconBox}>
+                      <Tag size={18} />
+                    </div>
+                    <div className={styles.prefTextGroup}>
+                      <span className={styles.prefTitle}>Promotional Emails</span>
+                      <span className={styles.prefSubtitle}>Get exclusive deals and pet care tips</span>
+                    </div>
+                    <button 
+                      type="button"
+                      className={`${styles.toggleSwitch} ${promoEmails ? styles.toggleOn : ''}`}
+                      onClick={() => setPromoEmails(!promoEmails)}
+                    >
+                      <div className={styles.toggleKnob} />
+                    </button>
+                  </div>
+
+                  {/* Row 3: Account Privacy */}
+                  <div className={`${styles.preferenceRowItem} ${styles.clickablePrefRow}`}>
+                    <div className={styles.prefIconBox}>
+                      <ShieldCheck size={18} />
+                    </div>
+                    <div className={styles.prefTextGroup}>
+                      <span className={styles.prefTitle}>Account Privacy</span>
+                      <span className={styles.prefSubtitle}>Manage how your information is used</span>
+                    </div>
+                    <div className={styles.prefChevronBox}>
+                      <ChevronRight size={18} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Mobile Footer Need Help Card & Made with love line */}
+            <div className={styles.mobileOnlyFooterGroup}>
+              <div className={styles.mobileHelpBannerCard}>
+                <div className={styles.helpLeftSection}>
+                  <div className={styles.helpMascotCircle}>
+                    <span className={styles.dogEmoji}>🐶</span>
+                  </div>
+                  <div className={styles.helpTextGroup}>
+                    <span className={styles.helpTitle}>Need Help?</span>
+                    <span className={styles.helpSubtitle}>We're here for you!</span>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.madeWithLoveFooter}>
+                <span>Made with ❤️ by <strong>KickAt</strong></span>
               </div>
             </div>
           </div>
 
-          {/* Right VIP Snapshot */}
-          <aside className={styles.statsPanel}>
-            <div className={styles.vipCardHeader}>
-              <span className={styles.vipCardTitle}>KICKAT REWARDS</span>
-              <span className={styles.vipTierTag}>{userData.tier}</span>
-            </div>
-            <div className={styles.rewardsProgressBlock}>
-              <div className={styles.pointsDisplayRow}>
-                <span className={styles.pointsValue}>{userData.points.toLocaleString()}</span>
-                <span className={styles.pointsLabel}>Available Paws</span>
-              </div>
-              <div className={styles.tierProgressBarWrapper}>
-                <div className={styles.tierProgressBarFill} style={{ width: '62%' }}></div>
-              </div>
-              <div className={styles.tierProgressText}>
-                <span>620 pts earned</span>
-                <span>260 pts to Platinum</span>
-              </div>
-            </div>
-          </aside>
 
         </div>
       </main>
@@ -314,89 +353,6 @@ function AccountProfileContent() {
                 </button>
                 <button type="submit" className={`${styles.actionBtn} ${styles.primaryBtn}`}>
                   Save Changes
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Change Password Modal */}
-      {isChangePasswordOpen && (
-        <div className={styles.modalBackdrop} onClick={() => setIsChangePasswordOpen(false)}>
-          <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <div className={styles.modalTitleGroup}>
-                <Lock size={20} color="#FD802E" />
-                <h2>Change Security Password</h2>
-              </div>
-              <button type="button" className={styles.modalCloseBtn} onClick={() => setIsChangePasswordOpen(false)}>
-                <X size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={handleSavePassword} className={styles.modalForm}>
-              <div className={styles.inputGroup}>
-                <label className={styles.inputLabel}>Current Password</label>
-                <div className={styles.pwInputWrapper}>
-                  <input 
-                    type={showCurrentPw ? "text" : "password"} 
-                    required 
-                    className={styles.modalInput}
-                    placeholder="Enter existing password"
-                    value={passwordForm.currentPassword}
-                    onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                  />
-                  <button 
-                    type="button" 
-                    className={styles.pwToggleBtn}
-                    onClick={() => setShowCurrentPw(!showCurrentPw)}
-                  >
-                    {showCurrentPw ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-              </div>
-
-              <div className={styles.inputGroup}>
-                <label className={styles.inputLabel}>New Password</label>
-                <div className={styles.pwInputWrapper}>
-                  <input 
-                    type={showNewPw ? "text" : "password"} 
-                    required 
-                    minLength={6}
-                    className={styles.modalInput}
-                    placeholder="Minimum 6 characters"
-                    value={passwordForm.newPassword}
-                    onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                  />
-                  <button 
-                    type="button" 
-                    className={styles.pwToggleBtn}
-                    onClick={() => setShowNewPw(!showNewPw)}
-                  >
-                    {showNewPw ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-              </div>
-
-              <div className={styles.inputGroup}>
-                <label className={styles.inputLabel}>Confirm New Password</label>
-                <input 
-                  type="password" 
-                  required 
-                  className={styles.modalInput}
-                  placeholder="Re-enter new password"
-                  value={passwordForm.confirmPassword}
-                  onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                />
-              </div>
-
-              <div className={styles.modalFooterActions}>
-                <button type="button" className={styles.actionBtn} onClick={() => setIsChangePasswordOpen(false)}>
-                  Cancel
-                </button>
-                <button type="submit" className={`${styles.actionBtn} ${styles.primaryBtn}`}>
-                  Update Password
                 </button>
               </div>
             </form>

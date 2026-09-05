@@ -5,7 +5,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { 
   Package, CheckCircle2, Clock, Search, XCircle, 
-  ClipboardList, ClipboardCheck, Truck, PackageCheck, Check, ChevronRight, FileText
+  ClipboardList, ClipboardCheck, Truck, PackageCheck, Check, ChevronRight, FileText,
+  MapPin, AlertCircle, SlidersHorizontal, X
 } from 'lucide-react';
 import styles from '../Account.module.css';
 import AccountSidebarNav from '@/components/account/AccountSidebarNav';
@@ -23,31 +24,43 @@ const initialUserData = {
 const orders = [
   {
     id: 'ORD-89241',
-    date: 'August 18, 2026',
+    date: 'Aug 18, 2026',
     total: 1499,
     status: 'Delivered',
+    deliveryText: 'Delivered on Aug 18, 2026',
     items: [
-      { name: 'Ceramic Anti-Slip Pet Bowl', variant: 'Matte White', image: '/hero-products/pet_bowl.png' }
+      { name: 'Ceramic Anti-Slip Pet Bowl', variant: 'Matte White', qty: 1, price: 1499, image: '/hero-products/pet_bowl.png' }
     ]
   },
   {
     id: 'ORD-88102',
-    date: 'August 02, 2026',
+    date: 'Aug 02, 2026',
     total: 2697,
     status: 'Processing',
-    progress: 1, // 0: Placed, 1: Packed, 2: Shipped, 3: Delivered
+    deliveryText: 'Expected delivery by Aug 22, 2026',
+    progress: 1,
     items: [
-      { name: 'Premium Leather Dog Collar', variant: 'Brown / Large', image: '/hero-products/dog_food.png' },
-      { name: 'Organic Cat Treats', variant: 'Salmon Flavor', image: '/hero-products/cat_treats.png' }
+      { name: 'Premium Leather Dog Collar', variant: 'Brown / Large', qty: 1, price: 2697, image: '/hero-products/dog_food.png' }
+    ]
+  },
+  {
+    id: 'ORD-88055',
+    date: 'Jul 28, 2026',
+    total: 3299,
+    status: 'Shipped',
+    deliveryText: 'Shipped • Expected delivery by Aug 05, 2026',
+    items: [
+      { name: 'Automatic Pet Water Fountain', variant: 'Stainless Steel', qty: 1, price: 3299, image: '/hero-products/cat_treats.png' }
     ]
   },
   {
     id: 'ORD-87004',
-    date: 'July 15, 2026',
+    date: 'Jul 15, 2026',
     total: 450,
     status: 'Cancelled',
+    deliveryText: 'Order Cancelled on Jul 15, 2026',
     items: [
-      { name: 'Interactive Cat Toy', variant: 'Blue Feather', image: '/hero-products/cat_treats.png' }
+      { name: 'Interactive Cat Toy', variant: 'Blue Feather', qty: 1, price: 450, image: '/hero-products/cat_treats.png' }
     ]
   }
 ];
@@ -55,18 +68,50 @@ const orders = [
 function AccountOrdersContent() {
   const [userData] = useState(initialUserData);
   const [orderFilter, setOrderFilter] = useState('All');
+  const [sortBy, setSortBy] = useState('newest'); // 'newest', 'oldest', 'price-desc', 'price-asc'
+  const [dateFilter, setDateFilter] = useState('all'); // 'all', 'last30', '2026', '2025'
   const [searchQuery, setSearchQuery] = useState('');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  const isAnyFilterActive = orderFilter !== 'All' || sortBy !== 'newest' || dateFilter !== 'all';
 
   const filteredOrders = orders.filter(order => {
+    // Status filter
     if (orderFilter !== 'All' && order.status !== orderFilter) return false;
-    if (searchQuery && !order.id.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    
+    // Search query filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const matchesId = order.id.toLowerCase().includes(query);
+      const matchesProduct = order.items.some(item => item.name.toLowerCase().includes(query));
+      if (!matchesId && !matchesProduct) return false;
+    }
+
+    // Time period filter
+    if (dateFilter === '2026' && !order.date.includes('2026')) return false;
+    if (dateFilter === '2025' && !order.date.includes('2025')) return false;
+    if (dateFilter === 'last30' && !order.date.includes('Aug')) return false;
+
     return true;
+  }).sort((a, b) => {
+    if (sortBy === 'oldest') {
+      return new Date(a.date).getTime() - new Date(b.date).getTime();
+    }
+    if (sortBy === 'price-desc') {
+      return b.total - a.total;
+    }
+    if (sortBy === 'price-asc') {
+      return a.total - b.total;
+    }
+    // Default: newest first
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
   });
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'Delivered': return <CheckCircle2 size={13} />;
       case 'Processing': return <Clock size={13} />;
+      case 'Shipped': return <Truck size={13} />;
       case 'Cancelled': return <XCircle size={13} />;
       default: return null;
     }
@@ -74,9 +119,30 @@ function AccountOrdersContent() {
 
   const getStatusClass = (status: string) => {
     switch (status) {
-      case 'Delivered': return styles.delivered;
-      case 'Processing': return styles.processing;
-      case 'Cancelled': return styles.cancelled;
+      case 'Delivered': return styles.statusDelivered;
+      case 'Processing': return styles.statusProcessing;
+      case 'Shipped': return styles.statusShipped;
+      case 'Cancelled': return styles.statusCancelled;
+      default: return '';
+    }
+  };
+
+  const getBannerIcon = (status: string) => {
+    switch (status) {
+      case 'Delivered': return <Truck size={16} className={styles.bannerIconDelivered} />;
+      case 'Processing': return <Clock size={16} className={styles.bannerIconProcessing} />;
+      case 'Shipped': return <Truck size={16} className={styles.bannerIconShipped} />;
+      case 'Cancelled': return <AlertCircle size={16} className={styles.bannerIconCancelled} />;
+      default: return <Truck size={16} />;
+    }
+  };
+
+  const getBannerClass = (status: string) => {
+    switch (status) {
+      case 'Delivered': return styles.bannerDelivered;
+      case 'Processing': return styles.bannerProcessing;
+      case 'Shipped': return styles.bannerShipped;
+      case 'Cancelled': return styles.bannerCancelled;
       default: return '';
     }
   };
@@ -110,7 +176,6 @@ function AccountOrdersContent() {
             {steps.map((step, idx) => {
               const isCompleted = idx < activeIndex;
               const isActive = idx === activeIndex;
-              const isUpcoming = idx > activeIndex;
 
               let stepClass = styles.upcoming;
               if (isCompleted) stepClass = styles.completed;
@@ -152,112 +217,175 @@ function AccountOrdersContent() {
       <main className={styles.container}>
         <div className={styles.accountLayout}>
           
-          {/* Account Navigation */}
+          {/* Account Navigation Sidebar */}
           <AccountSidebarNav user={userData} />
 
-          {/* Main Orders Content */}
+          {/* Main Orders Content Area */}
           <div className={styles.contentArea}>
-            <div className={styles.tabContentCard}>
-              <div className={styles.sectionHeader}>
-                <h1 className={styles.title}>Account Orders</h1>
-                <p className={styles.subtitle}>View order progress timelines and manage recent purchases.</p>
+            <div className={styles.ordersPageWrapper}>
+              
+              {/* 1. Header Title Section */}
+              <div className={styles.ordersHeaderGroup}>
+                <h1 className={styles.ordersTitle}>My Orders</h1>
+                <p className={styles.ordersSubtitle}>Track, manage and reorder your purchases.</p>
               </div>
 
-              {/* Filter and Search Bar */}
-              <div className={styles.controlsBar}>
-                <div className={styles.filterTabs}>
-                  {['All', 'Processing', 'Delivered', 'Cancelled'].map(tab => (
-                    <button 
-                      key={tab} 
-                      type="button"
-                      className={`${styles.tabBtn} ${orderFilter === tab ? styles.active : ''}`}
-                      onClick={() => setOrderFilter(tab)}
-                    >
-                      {tab}
-                    </button>
-                  ))}
-                </div>
-
-                <div className={styles.searchBox}>
-                  <Search className={styles.searchIcon} size={15} />
+              {/* 2. Search Input Bar + Icon-Only Filter Button */}
+              <div className={styles.ordersSearchFilterRow}>
+                <div className={styles.ordersSearchBox}>
+                  <Search className={styles.ordersSearchIcon} size={18} />
                   <input 
                     type="text" 
-                    className={styles.searchInput} 
-                    placeholder="Search order ID..." 
+                    className={styles.ordersSearchInput} 
+                    placeholder="Search by order ID, product name..." 
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
+                  {searchQuery && (
+                    <button 
+                      type="button" 
+                      className={styles.clearSearchBtn}
+                      onClick={() => setSearchQuery('')}
+                      aria-label="Clear search"
+                    >
+                      <XCircle size={16} />
+                    </button>
+                  )}
                 </div>
+
+                <button 
+                  type="button" 
+                  className={`${styles.ordersFilterIconButton} ${isAnyFilterActive ? styles.activeFilterIconBtn : ''}`}
+                  onClick={() => setIsFilterOpen(true)}
+                  aria-label="Open filter and sort options"
+                  title="Filter & Sort Orders"
+                >
+                  <SlidersHorizontal size={18} />
+                  {isAnyFilterActive && <span className={styles.filterDotBeacon} />}
+                </button>
               </div>
-              
-              {/* Orders Cards List */}
-              <div className={styles.ordersList}>
+
+              {/* Active Filter Chips Bar (if filters are active) */}
+              {isAnyFilterActive && (
+                <div className={styles.activeFiltersBar}>
+                  <span className={styles.activeFiltersLabel}>Active Filters:</span>
+                  {sortBy !== 'newest' && (
+                    <span className={styles.activeFilterChipTag}>
+                      Sort: {sortBy === 'oldest' ? 'Oldest' : sortBy === 'price-desc' ? 'Price High-Low' : 'Price Low-High'}
+                    </span>
+                  )}
+                  {orderFilter !== 'All' && (
+                    <span className={styles.activeFilterChipTag}>
+                      Status: {orderFilter}
+                    </span>
+                  )}
+                  {dateFilter !== 'all' && (
+                    <span className={styles.activeFilterChipTag}>
+                      Period: {dateFilter === 'last30' ? 'Last 30 Days' : `Year ${dateFilter}`}
+                    </span>
+                  )}
+                  <button 
+                    type="button" 
+                    className={styles.resetFiltersLink}
+                    onClick={() => {
+                      setOrderFilter('All');
+                      setSortBy('newest');
+                      setDateFilter('all');
+                    }}
+                  >
+                    Clear All
+                  </button>
+                </div>
+              )}
+
+              {/* 3. Orders Cards Stack */}
+              <div className={styles.ordersCardsStack}>
                 {filteredOrders.length > 0 ? filteredOrders.map(order => (
-                  <div key={order.id} className={styles.orderCard}>
-                    <div className={styles.orderHeader}>
-                      <div className={styles.orderMetaGrid}>
-                        <div className={styles.metaItem}>
-                          <span className={styles.metaLabel}>Order Placed</span>
-                          <span className={styles.metaValue}>{order.date}</span>
-                        </div>
-                        <div className={styles.metaItem}>
-                          <span className={styles.metaLabel}>Total Amount</span>
-                          <span className={styles.metaValue}>₹{order.total.toLocaleString()}</span>
-                        </div>
-                        <div className={styles.metaItem}>
-                          <span className={styles.metaLabel}>Order Number</span>
-                          <Link href={`/orders/${order.id}`} className={`${styles.metaValue} ${styles.mono}`}>
-                            #{order.id}
-                          </Link>
-                        </div>
+                  <div key={order.id} className={styles.myOrderCard}>
+                    {/* Header Row: Order ID, Date, Status Badge, Chevron */}
+                    <div className={styles.cardHeaderRow}>
+                      <div className={styles.cardHeaderMeta}>
+                        <span className={styles.cardOrderId}>{order.id}</span>
+                        <span className={styles.cardOrderDate}>{order.date}</span>
                       </div>
                       
-                      <div className={styles.orderStatus}>
-                        <span className={`${styles.statusBadge} ${getStatusClass(order.status)}`}>
+                      <div className={styles.cardStatusPillGroup}>
+                        <span className={`${styles.statusBadgePill} ${getStatusClass(order.status)}`}>
                           {getStatusIcon(order.status)}
-                          {order.status}
+                          <span>{order.status}</span>
                         </span>
+                        <ChevronRight size={18} className={styles.cardChevronIcon} />
                       </div>
                     </div>
 
-                    {/* Visual Progress Timeline Tracker Bar */}
+                    {/* Subtle Divider Line */}
+                    <div className={styles.cardRowDivider} />
+
+                    {/* Progress Timeline on Processing Orders */}
                     {order.status === 'Processing' && order.progress !== undefined && (
-                      <div style={{ marginBottom: '1.25rem', padding: '0 0.5rem' }}>
+                      <div style={{ margin: '0.5rem 0 0.85rem' }}>
                         {renderProgressTracker(order.progress, order.date)}
                       </div>
                     )}
                     
-                    <div className={styles.orderBody}>
+                    {/* Product Items List */}
+                    <div className={styles.cardProductList}>
                       {order.items.map((item, idx) => (
-                        <div key={idx} className={styles.orderItemRow}>
-                          <div className={styles.itemThumb}>
-                            <Image src={item.image} alt={item.name} fill className={styles.itemThumbImg} />
+                        <div key={idx} className={styles.cardProductRow}>
+                          <div className={styles.cardProductThumb}>
+                            <Image src={item.image} alt={item.name} fill className={styles.cardThumbImg} />
                           </div>
-                          <div className={styles.itemDetails}>
-                            <Link href={`/orders/${order.id}`} className={styles.itemName}>
+                          <div className={styles.cardProductMeta}>
+                            <Link href={`/orders/${order.id}`} className={styles.cardProductName}>
                               {item.name}
                             </Link>
-                            <div className={styles.itemVariant}>Variant: {item.variant}</div>
+                            <span className={styles.cardProductVariant}>
+                              {item.variant} &nbsp;|&nbsp; Qty: {item.qty || 1}
+                            </span>
+                            <span className={styles.cardProductPrice}>
+                              ₹{(item.price || order.total).toLocaleString()}
+                            </span>
                           </div>
                         </div>
                       ))}
                     </div>
-                    
-                    <div className={styles.orderFooter}>
+
+                    {/* Delivery Status Banner */}
+                    <div className={`${styles.cardDeliveryBanner} ${getBannerClass(order.status)}`}>
+                      <div className={styles.cardDeliveryLeft}>
+                        {getBannerIcon(order.status)}
+                        <span>{order.deliveryText || (order.status === 'Delivered' ? `Delivered on ${order.date}` : `Expected delivery soon`)}</span>
+                      </div>
+                      <ChevronRight size={16} className={styles.cardDeliveryChevron} />
+                    </div>
+
+                    {/* Action Buttons Row */}
+                    <div className={styles.cardActionsRow}>
                       <Link 
                         href={`/orders/${order.id}/invoice`} 
-                        className={styles.actionBtn}
+                        className={styles.cardOutlineBtn}
                       >
-                        <FileText size={14} /> View Invoice
+                        <FileText size={15} />
+                        <span>View Invoice</span>
                       </Link>
 
-                      <Link 
-                        href={`/orders/${order.id}`} 
-                        className={`${styles.actionBtn} ${styles.primaryBtn}`}
-                      >
-                        <span>View Order Details</span>
-                        <ChevronRight size={14} />
-                      </Link>
+                      {order.status === 'Processing' ? (
+                        <Link 
+                          href={`/orders/${order.id}`} 
+                          className={styles.cardSolidBtn}
+                        >
+                          <MapPin size={15} />
+                          <span>Track Package</span>
+                        </Link>
+                      ) : (
+                        <Link 
+                          href={`/orders/${order.id}`} 
+                          className={styles.cardSolidBtn}
+                        >
+                          <Package size={15} />
+                          <span>View Order</span>
+                        </Link>
+                      )}
                     </div>
                   </div>
                 )) : (
@@ -270,32 +398,147 @@ function AccountOrdersContent() {
                   </div>
                 )}
               </div>
-            </div>
-          </div>
 
-          {/* Right VIP Snapshot */}
-          <aside className={styles.statsPanel}>
-            <div className={styles.vipCardHeader}>
-              <span className={styles.vipCardTitle}>KICKAT REWARDS</span>
-              <span className={styles.vipTierTag}>{userData.tier}</span>
             </div>
-            <div className={styles.rewardsProgressBlock}>
-              <div className={styles.pointsDisplayRow}>
-                <span className={styles.pointsValue}>{userData.points.toLocaleString()}</span>
-                <span className={styles.pointsLabel}>Available Paws</span>
+
+            {/* Mobile Footer Support Card */}
+            <div className={styles.mobileOnlyFooterGroup}>
+              <div className={styles.mobileHelpBannerCard}>
+                <div className={styles.helpLeftSection}>
+                  <div className={styles.helpMascotCircle}>
+                    <span className={styles.dogEmoji}>🐶</span>
+                  </div>
+                  <div className={styles.helpTextGroup}>
+                    <span className={styles.helpTitle}>Need Help?</span>
+                    <span className={styles.helpSubtitle}>We're here for you!</span>
+                  </div>
+                </div>
               </div>
-              <div className={styles.tierProgressBarWrapper}>
-                <div className={styles.tierProgressBarFill} style={{ width: '62%' }}></div>
-              </div>
-              <div className={styles.tierProgressText}>
-                <span>620 pts earned</span>
-                <span>260 pts to Platinum</span>
+              <div className={styles.madeWithLoveFooter}>
+                <span>Made with ❤️ by <strong>KickAt</strong></span>
               </div>
             </div>
-          </aside>
+
+          </div>
 
         </div>
       </main>
+
+      {/* Filter & Sort Bottom Sheet Drawer */}
+      {isFilterOpen && (
+        <div className={styles.bottomSheetBackdrop} onClick={() => setIsFilterOpen(false)}>
+          <div className={styles.bottomSheetCard} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.dragHandleBar} />
+
+            <div className={styles.modalHeader}>
+              <div className={styles.modalTitleGroup}>
+                <SlidersHorizontal size={20} color="#FD802E" />
+                <h2>Filter & Sort Orders</h2>
+              </div>
+              <button 
+                type="button" 
+                className={styles.modalCloseBtn} 
+                onClick={() => setIsFilterOpen(false)}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className={styles.filterModalScrollBody}>
+              {/* 1. Sort By (Date & Price) */}
+              <div className={styles.filterSectionBlock}>
+                <span className={styles.filterModalLabel}>Sort By</span>
+                <div className={styles.filterOptionsGrid}>
+                  {[
+                    { key: 'newest', label: '📅 Newest First' },
+                    { key: 'oldest', label: '🗓️ Oldest First' },
+                    { key: 'price-desc', label: '💰 Price: High to Low' },
+                    { key: 'price-asc', label: '🏷️ Price: Low to High' },
+                  ].map(opt => (
+                    <button 
+                      key={opt.key}
+                      type="button"
+                      className={`${styles.filterOptionChip} ${sortBy === opt.key ? styles.filterOptionActive : ''}`}
+                      onClick={() => setSortBy(opt.key)}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 2. Order Status Filter */}
+              <div className={styles.filterSectionBlock}>
+                <span className={styles.filterModalLabel}>Order Status</span>
+                <div className={styles.filterOptionsGrid}>
+                  {[
+                    { key: 'All', label: 'All Orders' },
+                    { key: 'Processing', label: '⏳ Processing' },
+                    { key: 'Shipped', label: '🚚 Shipped' },
+                    { key: 'Delivered', label: '✅ Delivered' },
+                    { key: 'Cancelled', label: '❌ Cancelled' },
+                  ].map(opt => (
+                    <button 
+                      key={opt.key}
+                      type="button"
+                      className={`${styles.filterOptionChip} ${orderFilter === opt.key ? styles.filterOptionActive : ''}`}
+                      onClick={() => setOrderFilter(opt.key)}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 3. Time Period / Date Range Filter */}
+              <div className={styles.filterSectionBlock}>
+                <span className={styles.filterModalLabel}>Time Period</span>
+                <div className={styles.filterOptionsGrid}>
+                  {[
+                    { key: 'all', label: 'All Time' },
+                    { key: 'last30', label: 'Last 30 Days' },
+                    { key: '2026', label: 'Year 2026' },
+                    { key: '2025', label: 'Year 2025' },
+                  ].map(opt => (
+                    <button 
+                      key={opt.key}
+                      type="button"
+                      className={`${styles.filterOptionChip} ${dateFilter === opt.key ? styles.filterOptionActive : ''}`}
+                      onClick={() => setDateFilter(opt.key)}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.filterModalFooter}>
+              {isAnyFilterActive && (
+                <button 
+                  type="button" 
+                  className={styles.actionBtn}
+                  onClick={() => {
+                    setOrderFilter('All');
+                    setSortBy('newest');
+                    setDateFilter('all');
+                  }}
+                >
+                  Reset All
+                </button>
+              )}
+              <button 
+                type="button" 
+                className={`${styles.actionBtn} ${styles.primaryBtn}`}
+                onClick={() => setIsFilterOpen(false)}
+              >
+                Apply Filters
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

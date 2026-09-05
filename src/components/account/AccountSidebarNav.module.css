@@ -1,312 +1,356 @@
-/* AccountSidebarNav.module.css */
+/* AccountSidebarNav.module.css - Unified D2C Sidebar Navigation */
 
-.sidebar {
-  background: #ffffff;
-  border-radius: 20px;
-  border: 1px solid #EBE5DB;
-  padding: 1.5rem 1.25rem;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.03);
-  position: sticky;
-  top: 100px;
-}
-
-.userProfile {
+.navContainer {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 0.6rem;
-  padding-bottom: 1.25rem;
-  margin-bottom: 1.15rem;
-  border-bottom: 1px solid #F0EAE1;
+  gap: 1rem;
+  width: 100%;
 }
 
-.avatarWrapper {
-  position: relative;
+.mainNavWrapper {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
 }
 
-.avatar {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #FFF9F4 0%, #F5EFE6 100%);
-  border: 2.5px solid #FD802E;
-  color: #FD802E;
-  display: flex;
+/* Mobile Back Nav Header */
+.mobileBackNavHeader {
+  display: none;
+  margin-bottom: 0.75rem;
+}
+
+.backBtnLink {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 1.65rem;
+  gap: 0.35rem;
+  padding: 0.25rem 0;
+  background: transparent;
+  border: none;
+  font-size: 0.875rem;
   font-weight: 700;
-  box-shadow: 0 6px 20px rgba(253, 128, 46, 0.22);
+  color: #FD802E;
+  text-decoration: none;
+  box-shadow: none;
+  transition: opacity 0.2s ease;
 }
 
-.avatarEditBtn {
-  position: absolute;
-  bottom: 0;
-  right: -2px;
-  background: #1A1612;
-  color: #ffffff;
-  border: 2px solid #ffffff;
-  width: 26px;
-  height: 26px;
+.backBtnLink:hover {
+  opacity: 0.85;
+}
+
+/* 1. Unified Sidebar Main Card */
+.sidebarMainCard {
+  background: #ffffff;
+  border: 1px solid #EBE5DB;
+  border-radius: 20px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.025);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* User Profile Section inside Card */
+.userProfileSection {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+.avatarCircle {
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
+  background: #FAF7F2;
+  border: 2px solid #E2DCD2;
+  color: #1A1612;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
 }
 
-.avatarEditBtn:hover {
-  background: #FD802E;
-  transform: scale(1.1);
+.profileMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  flex: 1;
 }
 
-.vipBadgeRibbon {
+.vipBadgePill {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
   background: #FFF5EE;
   border: 1px solid rgba(253, 128, 46, 0.25);
-  border-radius: 20px;
-  padding: 0.2rem 0.55rem;
+  border-radius: 12px;
+  padding: 0.15rem 0.5rem;
   font-size: 0.65rem;
   font-weight: 800;
   color: #FD802E;
-  letter-spacing: 0.05em;
-  margin-top: 0.35rem;
-}
-
-.crownBadge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  background: #FFF8DC;
-  border: 1px solid #FFD700;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.greeting {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.greetingText {
-  font-size: 0.725rem;
-  color: #78746D;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-weight: 700;
+  width: fit-content;
+  white-space: nowrap;
 }
 
 .userName {
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: #1A1612;
-  margin: 0.15rem 0 0 0;
+  margin: 0;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.userEmailText {
-  font-size: 0.785rem;
+.userEmail {
+  font-size: 0.775rem;
   color: #78746D;
-  margin-top: 0.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.navMenu {
+.sectionDivider {
+  height: 1px;
+  background-color: #F0EAE1;
+  margin: 1.1rem 0 0.75rem;
+  width: 100%;
+}
+
+/* Navigation Menu Items List */
+.navMenuList {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.35rem;
+  width: 100%;
 }
 
-.navLink {
+.navItemLink {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
-  padding: 0.8rem 1rem;
+  gap: 0.85rem;
+  padding: 0.75rem 0.95rem;
   border-radius: 14px;
   background: transparent;
   border: 1px solid transparent;
   color: #4A453E;
+  text-decoration: none;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   width: 100%;
-  text-align: left;
-  position: relative;
-  text-decoration: none;
+  box-sizing: border-box;
 }
 
-.navIconWrapper {
-  color: #78746D;
-  display: flex;
-  align-items: center;
-  transition: color 0.2s ease;
-}
-
-.navLink:hover {
+.navItemLink:hover {
   background-color: #FAF7F2;
   color: #FD802E;
 }
 
-.navLink:hover .navIconWrapper {
+.navIcon {
+  color: #78746D;
+  transition: color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.navItemLink:hover .navIcon {
   color: #FD802E;
 }
 
-.navLink.active {
+.navTitle {
+  flex: 1;
+  white-space: nowrap;
+}
+
+.navChevron {
+  color: #A39D93;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.navItemLink:hover .navChevron {
+  transform: translateX(3px);
+  color: #FD802E;
+}
+
+/* Active Item Style */
+.activeNavItem {
   background-color: #FFF9F4 !important;
   color: #FD802E !important;
   font-weight: 700 !important;
-  border-color: rgba(253, 128, 46, 0.25);
-  box-shadow: 0 4px 14px rgba(253, 128, 46, 0.1);
+  border-color: rgba(253, 128, 46, 0.25) !important;
 }
 
-.navLink.active .navIconWrapper {
+.activeNavItem .navIcon,
+.activeNavItem .navChevron {
   color: #FD802E !important;
 }
 
-.activePillDot {
-  position: absolute;
-  right: 14px;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: #FD802E;
-  box-shadow: 0 0 8px rgba(253, 128, 46, 0.6);
+/* Sign Out Item */
+.signOutItem {
+  color: #B91C1C !important;
+  margin-top: 0.4rem;
 }
 
-.logoutBtn {
+.signOutItem:hover {
+  background-color: #FEE2E2 !important;
+  border-color: rgba(185, 28, 28, 0.15) !important;
+}
+
+.signOutIcon {
+  color: #B91C1C !important;
+}
+
+.signOutTitle {
+  color: #B91C1C !important;
+  font-weight: 600;
+}
+
+/* 2. Need Help Support Card */
+.helpBannerCard {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFFDFB 100%);
+  border: 1px solid #EBE5DB;
+  border-radius: 20px;
+  padding: 1.15rem 1.1rem;
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  padding: 0.8rem 1rem;
-  border-radius: 14px;
-  background: transparent;
-  border: 1px solid transparent;
-  color: #78746D;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin-top: 1rem;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+}
+
+.helpLeftSection {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
   width: 100%;
 }
 
-.logoutBtn:hover {
-  background-color: #FEE2E2;
-  color: #B91C1C;
-  border-color: rgba(185, 28, 28, 0.15);
-}
-
-/* MOBILE BANNERS */
-.mobileProfileHeader {
-  display: none;
-  background: #ffffff;
-  border-radius: 20px;
-  border: 1px solid #EBE5DB;
-  padding: 1.25rem;
-  margin-bottom: 1rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-  align-items: center;
-  gap: 1rem;
-  position: relative;
-  flex-wrap: wrap;
-}
-
-.mobileTabNavStrip {
-  display: none;
-  gap: 0.5rem;
-  overflow-x: auto;
-  padding-bottom: 0.25rem;
-  margin-bottom: 1.25rem;
-  -webkit-overflow-scrolling: touch;
-}
-
-.mobileTabNavStrip::-webkit-scrollbar {
-  display: none;
-}
-
-.mobileTabBtn {
+.helpMascotCircle {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #FFF5EE;
+  border: 1px solid rgba(253, 128, 46, 0.2);
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  padding: 0.65rem 1.1rem;
-  border-radius: 20px;
-  border: 1px solid #E2DCD2;
-  background: #ffffff;
-  font-size: 0.825rem;
-  font-weight: 700;
-  color: #4A453E;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.2s ease;
-  text-decoration: none;
+  justify-content: center;
+  font-size: 1.65rem;
+  flex-shrink: 0;
 }
 
-.mobileTabActive {
-  background-color: #FD802E !important;
-  color: #ffffff !important;
-  border-color: #FD802E !important;
-  box-shadow: 0 4px 14px rgba(253, 128, 46, 0.3);
-}
-
-.mobileStatsRow {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-left: auto;
-}
-
-.mobileStatChip {
-  background: #FAF7F2;
-  border: 1px solid #E2DCD2;
-  border-radius: 12px;
-  padding: 0.4rem 0.75rem;
+.helpTextGroup {
   display: flex;
   flex-direction: column;
   align-items: center;
-  line-height: 1.1;
+  text-align: center;
+  flex: 1;
+  gap: 0.15rem;
 }
 
-.chipVal {
-  font-weight: 800;
-  font-size: 0.95rem;
-  color: #1A1612;
-}
-
-.chipLbl {
-  font-size: 0.65rem;
-  color: #78746D;
-  text-transform: uppercase;
+.helpTitle {
+  font-family: var(--font-fraunces), Georgia, serif;
   font-weight: 700;
+  font-size: 1.05rem;
+  color: #1A1612;
+  text-align: center;
 }
 
-.statPoints {
+.helpSubtitle {
+  font-size: 0.785rem;
+  color: #78746D;
+  margin-bottom: 0.35rem;
+  text-align: center;
+}
+
+.contactSupportBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border: 1.5px solid #FD802E;
+  background: #ffffff;
   color: #FD802E;
+  padding: 0.35rem 0.95rem;
+  border-radius: 20px;
+  font-size: 0.775rem;
+  font-weight: 700;
+  text-decoration: none;
+  width: fit-content;
+  margin: 0 auto;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(253, 128, 46, 0.1);
+}
+
+.contactSupportBtn:hover {
+  background: #FD802E;
+  color: #ffffff;
+}
+
+/* 3. Made with love by KickAt Footer */
+.madeWithLoveFooter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 0 0.25rem;
+  font-size: 0.825rem;
+  color: #78746D;
+  text-align: center;
+  font-weight: 500;
+  width: 100%;
+}
+
+.madeWithLoveFooter strong {
+  color: #FD802E;
+  font-weight: 800;
+  margin-left: 0.25rem;
+}
+
+/* RESPONSIVE MEDIA QUERIES */
+@media (max-width: 768px) {
+  .mobileBackNavHeader {
+    display: flex;
+  }
+
+  .hideOnMobileSubpage {
+    display: none !important;
+  }
 }
 
 @media (max-width: 640px) {
-  .mobileProfileHeader {
-    display: flex;
+  .sidebarMainCard {
+    padding: 1rem;
+    border-radius: 18px;
   }
 
-  .mobileTabNavStrip {
-    display: flex;
+  .navItemLink {
+    padding: 0.8rem 0.85rem;
+    font-size: 0.9rem;
   }
 
-  .sidebar {
-    display: none;
+  .userProfileSection {
+    gap: 0.75rem;
+  }
+
+  .avatarCircle {
+    width: 48px;
+    height: 48px;
+    font-size: 1.15rem;
+  }
+
+  .helpBannerCard {
+    padding: 1rem;
+    border-radius: 18px;
   }
 }
