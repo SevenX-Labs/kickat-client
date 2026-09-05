@@ -1,0 +1,213 @@
+/* Settings.module.css */
+
+.settingBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  border-bottom: 1px solid #F0EAE1;
+  padding-bottom: 1.75rem;
+}
+
+.settingBlock:last-of-type {
+  border-bottom: none;
+}
+
+.blockTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.iconCircle {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #FFF5EE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.blockTitle {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1A1612;
+  margin: 0 0 0.15rem 0;
+}
+
+.blockSub {
+  font-size: 0.85rem;
+  color: #78746D;
+  margin: 0;
+}
+
+.toggleList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  background: #FAF7F2;
+  border: 1px solid #EBE5DB;
+  border-radius: 18px;
+  padding: 1.25rem 1.35rem;
+}
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px dashed #E2DCD2;
+}
+
+.toggleRow:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.toggleTextGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.toggleTitle {
+  font-size: 0.925rem;
+  font-weight: 700;
+  color: #1A1612;
+}
+
+.toggleDesc {
+  font-size: 0.8rem;
+  color: #78746D;
+  line-height: 1.4;
+}
+
+/* CUSTOM TOGGLE SWITCH */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #D6D1C7;
+  transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.switch input:checked + .slider {
+  background-color: #FD802E;
+}
+
+.switch input:checked + .slider:before {
+  transform: translateX(22px);
+}
+
+/* REGIONAL FORM */
+.regionalForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  background: #FAF7F2;
+  border: 1px solid #EBE5DB;
+  border-radius: 18px;
+  padding: 1.35rem;
+}
+
+/* DANGER BLOCK */
+.dangerBlock {
+  background: #FEF2F2;
+  border: 1px solid rgba(185, 28, 28, 0.2);
+  border-radius: 18px;
+  padding: 1.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.dangerHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.dangerTitle {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #991B1B;
+  margin: 0 0 0.15rem 0;
+}
+
+.dangerDesc {
+  font-size: 0.825rem;
+  color: #7F1D1D;
+  margin: 0;
+}
+
+.deleteAccountBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  border: 1.5px solid #DC2626;
+  color: #DC2626;
+  padding: 0.6rem 1.15rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.deleteAccountBtn:hover {
+  background: #DC2626;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.25);
+}
+
+.confirmDeleteBtn {
+  background: #DC2626;
+  color: #ffffff;
+  border: none;
+  padding: 0.65rem 1.2rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.25);
+  transition: all 0.2s ease;
+}
+
+.confirmDeleteBtn:hover {
+  background: #B91C1C;
+}

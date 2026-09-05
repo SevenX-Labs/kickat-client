@@ -1,12 +1,11 @@
 "use client";
 
 import { useState, Suspense } from 'react';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
   Package, CheckCircle2, Clock, Search, XCircle, 
-  ClipboardList, ClipboardCheck, Truck, PackageCheck, Check, Sparkles, ChevronRight, FileText
+  ClipboardList, ClipboardCheck, Truck, PackageCheck, Check, ChevronRight, FileText
 } from 'lucide-react';
 import styles from '../Account.module.css';
 import AccountSidebarNav from '@/components/account/AccountSidebarNav';
@@ -54,7 +53,6 @@ const orders = [
 ];
 
 function AccountOrdersContent() {
-  const router = useRouter();
   const [userData] = useState(initialUserData);
   const [orderFilter, setOrderFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -139,8 +137,8 @@ function AccountOrdersContent() {
           <div className={styles.contentArea}>
             <div className={styles.tabContentCard}>
               <div className={styles.sectionHeader}>
-                <h1 className={styles.title}>My Orders</h1>
-                <p className={styles.subtitle}>Check the status of recent orders, manage returns, and track deliveries.</p>
+                <h1 className={styles.title}>Account Orders</h1>
+                <p className={styles.subtitle}>View order progress timelines and manage recent purchases.</p>
               </div>
 
               {/* Filter and Search Bar */}
@@ -163,7 +161,7 @@ function AccountOrdersContent() {
                   <input 
                     type="text" 
                     className={styles.searchInput} 
-                    placeholder="Search by order ID..." 
+                    placeholder="Search order ID..." 
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
@@ -186,7 +184,7 @@ function AccountOrdersContent() {
                         </div>
                         <div className={styles.metaItem}>
                           <span className={styles.metaLabel}>Order Number</span>
-                          <Link href={`/account/orders/${order.id}`} className={`${styles.metaValue} ${styles.mono}`}>
+                          <Link href={`/orders/${order.id}`} className={`${styles.metaValue} ${styles.mono}`}>
                             #{order.id}
                           </Link>
                         </div>
@@ -200,6 +198,7 @@ function AccountOrdersContent() {
                       </div>
                     </div>
 
+                    {/* Visual Progress Timeline Tracker Bar */}
                     {order.status === 'Processing' && order.progress !== undefined && (
                       <div style={{ marginBottom: '1.25rem', padding: '0 0.5rem' }}>
                         {renderProgressTracker(order.progress, order.date)}
@@ -213,7 +212,7 @@ function AccountOrdersContent() {
                             <Image src={item.image} alt={item.name} fill className={styles.itemThumbImg} />
                           </div>
                           <div className={styles.itemDetails}>
-                            <Link href={`/account/orders/${order.id}`} className={styles.itemName}>
+                            <Link href={`/orders/${order.id}`} className={styles.itemName}>
                               {item.name}
                             </Link>
                             <div className={styles.itemVariant}>Variant: {item.variant}</div>
@@ -224,14 +223,14 @@ function AccountOrdersContent() {
                     
                     <div className={styles.orderFooter}>
                       <Link 
-                        href={`/account/orders/${order.id}/invoice`} 
+                        href={`/orders/${order.id}/invoice`} 
                         className={styles.actionBtn}
                       >
                         <FileText size={14} /> View Invoice
                       </Link>
 
                       <Link 
-                        href={`/account/orders/${order.id}`} 
+                        href={`/orders/${order.id}`} 
                         className={`${styles.actionBtn} ${styles.primaryBtn}`}
                       >
                         <span>View Order Details</span>

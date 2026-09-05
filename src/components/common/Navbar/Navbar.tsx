@@ -328,7 +328,7 @@ export function Navbar() {
                       <Link href="/account?tab=profile" className={styles.accountDropdownItem}>
                         <User size={18} strokeWidth={1.5} /> My Profile
                       </Link>
-                      <Link href="/account?tab=orders" className={styles.accountDropdownItem}>
+                      <Link href="/orders" className={styles.accountDropdownItem}>
                         <Package size={18} strokeWidth={1.5} /> Orders & Tracking
                       </Link>
                       <Link href="/account?tab=addresses" className={styles.accountDropdownItem}>

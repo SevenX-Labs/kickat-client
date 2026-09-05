@@ -34,6 +34,8 @@ function AccountProfileContent() {
       router.replace('/account/addresses');
     } else if (tab === 'payments' || tab === 'payment-methods') {
       router.replace('/account/payment-methods');
+    } else if (tab === 'settings') {
+      router.replace('/account/settings');
     } else if (tab === 'wishlist') {
       router.replace('/wishlist');
     }

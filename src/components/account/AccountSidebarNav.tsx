@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
-import { Package, User, MapPin, CreditCard, Heart, LogOut, Crown, Camera } from 'lucide-react';
+import { Package, User, MapPin, CreditCard, Settings, Heart, LogOut, Crown, Camera } from 'lucide-react';
 import styles from './AccountSidebarNav.module.css';
 
 interface UserProps {
@@ -33,7 +33,8 @@ export default function AccountSidebarNav({ user = defaultUser }: { user?: UserP
   const isWishlistActive = pathname.startsWith('/wishlist') || pathname.startsWith('/account/wishlist');
   const isAddressesActive = pathname === '/account/addresses' || (pathname === '/account' && currentTab === 'addresses');
   const isPaymentsActive = pathname === '/account/payment-methods' || (pathname === '/account' && (currentTab === 'payments' || currentTab === 'payment-methods'));
-  const isProfileActive = (pathname === '/account' && !['addresses', 'payments', 'payment-methods'].includes(currentTab || '')) || pathname === '/account/profile';
+  const isSettingsActive = pathname === '/account/settings' || (pathname === '/account' && currentTab === 'settings');
+  const isProfileActive = (pathname === '/account' && !['addresses', 'payments', 'payment-methods', 'settings'].includes(currentTab || '')) || pathname === '/account/profile';
 
   return (
     <>
@@ -95,6 +96,13 @@ export default function AccountSidebarNav({ user = defaultUser }: { user?: UserP
         >
           <CreditCard size={16} />
           <span>Payments</span>
+        </Link>
+        <Link 
+          href="/account/settings"
+          className={`${styles.mobileTabBtn} ${isSettingsActive ? styles.mobileTabActive : ''}`}
+        >
+          <Settings size={16} />
+          <span>Settings</span>
         </Link>
         <Link 
           href="/wishlist"
@@ -171,6 +179,15 @@ export default function AccountSidebarNav({ user = defaultUser }: { user?: UserP
           </Link>
 
           <Link 
+            href="/account/settings"
+            className={`${styles.navLink} ${isSettingsActive ? styles.active : ''}`}
+          >
+            <div className={styles.navIconWrapper}><Settings size={18} strokeWidth={2} /></div>
+            <span>Preferences &amp; Settings</span>
+            {isSettingsActive && <div className={styles.activePillDot} />}
+          </Link>
+
+          <Link 
             href="/wishlist"
             className={`${styles.navLink} ${isWishlistActive ? styles.active : ''}`}
           >
@@ -191,4 +208,5 @@ export default function AccountSidebarNav({ user = defaultUser }: { user?: UserP
     </>
   );
 }
+
 
