@@ -90,36 +90,58 @@ function AccountOrdersContent() {
       { label: 'Delivered', time: `Expected\nIn 3 Days`, Icon: PackageCheck }
     ];
     
-    const activeIndex = progress === 1 ? 2 : progress === 2 ? 3 : progress === 3 ? 4 : 1;
+    const activeIndex = progress === 1 ? 2 : progress === 2 ? 3 : progress === 3 ? 4 : 0;
+    const fillWidthPercent = (activeIndex / (steps.length - 1)) * 80;
 
     return (
       <div className={styles.progressTrackerCard}>
-        <div className={styles.progressLineBg}></div>
-        <div className={styles.progressLineFill} style={{ width: `${(activeIndex / (steps.length - 1)) * 100}%` }}></div>
-        
-        <div className={styles.stepsWrapper}>
-          {steps.map((step, idx) => (
-            <div key={idx} className={`${styles.stepContainer} ${idx <= activeIndex ? styles.completed : ''}`}>
-              <div className={styles.stepTopIcon}>
-                <step.Icon size={22} strokeWidth={2} className={idx <= activeIndex ? styles.iconActive : styles.iconInactive} />
-                {idx <= activeIndex && <div className={styles.iconYellowAccent}></div>}
-              </div>
-              
-              <span className={styles.stepLabel}>{step.label}</span>
-              
-              <div className={styles.stepCheckWrapper}>
-                {idx <= activeIndex ? (
-                  <div className={styles.checkSquareFilled}><Check size={14} color="white" strokeWidth={3} /></div>
-                ) : (
-                  <div className={styles.checkSquareEmpty}><Check size={14} color="white" strokeWidth={3} /></div>
-                )}
-              </div>
-              
-              <div className={styles.stepTime}>
-                {step.time.split('\n').map((line, i) => <div key={i}>{line}</div>)}
-              </div>
-            </div>
-          ))}
+        <div className={styles.trackerHeader}>
+          <span className={styles.trackerHeaderTitle}>Order Progress Timeline</span>
+          <span className={styles.trackerHeaderBadge}>
+            <Clock size={12} /> Live Updates
+          </span>
+        </div>
+
+        <div className={styles.stepperMainRow}>
+          <div className={styles.progressLineBg}></div>
+          <div className={styles.progressLineFill} style={{ width: `${fillWidthPercent}%` }}></div>
+          
+          <div className={styles.stepsWrapper}>
+            {steps.map((step, idx) => {
+              const isCompleted = idx < activeIndex;
+              const isActive = idx === activeIndex;
+              const isUpcoming = idx > activeIndex;
+
+              let stepClass = styles.upcoming;
+              if (isCompleted) stepClass = styles.completed;
+              if (isActive) stepClass = styles.activeStep;
+
+              return (
+                <div key={idx} className={`${styles.stepContainer} ${stepClass}`}>
+                  <div className={styles.nodeCircleWrapper}>
+                    {isActive && <div className={styles.pulseBeacon} />}
+                    <div className={styles.nodeCircle}>
+                      <step.Icon size={18} strokeWidth={2.2} />
+                    </div>
+                    {isCompleted && (
+                      <div className={styles.completedBadgeIcon}>
+                        <Check size={10} color="white" strokeWidth={3.5} />
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className={styles.stepMetaGroup}>
+                    <span className={styles.stepLabel}>{step.label}</span>
+                    <div className={styles.stepTime}>
+                      {step.time.split('\n').map((line, i) => (
+                        <div key={i}>{line}</div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     );

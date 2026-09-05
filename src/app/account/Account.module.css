@@ -586,32 +586,70 @@
 
 /* Progress Tracker */
 .progressTrackerCard {
-  background: #FAF7F2;
-  border-radius: 14px;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FAF7F2 100%);
+  border-radius: 18px;
   border: 1px solid #EBE5DB;
-  padding: 1.35rem 1rem 1rem;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+  position: relative;
+  width: 100%;
+}
+
+.trackerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px dashed #EBE5DB;
+}
+
+.trackerHeaderTitle {
+  font-size: 0.775rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #78746D;
+}
+
+.trackerHeaderBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #FFF9F4;
+  border: 1px solid rgba(253, 128, 46, 0.25);
+  color: #FD802E;
+  font-size: 0.725rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+}
+
+.stepperMainRow {
   position: relative;
   width: 100%;
 }
 
 .progressLineBg {
   position: absolute;
-  top: 38px;
-  left: 8%;
-  right: 8%;
+  top: 24px;
+  left: 10%;
+  right: 10%;
   height: 3px;
   background-color: #E2DCD2;
+  border-radius: 10px;
   z-index: 0;
 }
 
 .progressLineFill {
   position: absolute;
-  top: 38px;
-  left: 8%;
+  top: 24px;
+  left: 10%;
   height: 3px;
-  background-color: #FD802E;
+  background: linear-gradient(90deg, #FD802E 0%, #FF9D52 100%);
+  border-radius: 10px;
   z-index: 1;
-  transition: width 0.5s ease;
+  transition: width 0.4s ease-out;
 }
 
 .stepsWrapper {
@@ -628,65 +666,105 @@
   align-items: center;
   flex: 1;
   text-align: center;
+  gap: 0.6rem;
 }
 
-.stepTopIcon {
+.nodeCircleWrapper {
   position: relative;
-  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 0.35rem;
-}
-
-.iconActive {
-  color: #FD802E;
-}
-
-.iconInactive {
-  color: #C2BEB6;
-}
-
-.iconYellowAccent {
-  position: absolute;
-  bottom: 0;
-  right: -2px;
-  width: 10px;
-  height: 10px;
-  background-color: #FD802E;
+  background: #ffffff;
+  padding: 4px;
   border-radius: 50%;
+  z-index: 2;
+}
+
+.nodeCircle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 2;
+}
+
+/* Completed Step */
+.stepContainer.completed .nodeCircle {
+  background: #FD802E;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(253, 128, 46, 0.3);
+}
+
+/* Active Step (Current in-progress step) */
+.stepContainer.activeStep .nodeCircle {
+  background: #FD802E;
+  color: #ffffff;
+  box-shadow: 0 0 0 5px rgba(253, 128, 46, 0.22);
+}
+
+.pulseBeacon {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid #FD802E;
+  animation: beaconPulse 2s infinite;
+  z-index: 1;
+}
+
+@keyframes beaconPulse {
+  0% { transform: scale(0.8); opacity: 0.8; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+
+/* Upcoming Step */
+.stepContainer.upcoming .nodeCircle {
+  background: #ffffff;
+  border: 2px solid #E2DCD2;
+  color: #A39D93;
+}
+
+.completedBadgeIcon {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #15803D;
+  border: 2px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+.stepMetaGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
 }
 
 .stepLabel {
-  font-size: 0.725rem;
+  font-size: 0.775rem;
   font-weight: 600;
   color: #78746D;
-  margin-bottom: 0.4rem;
+  line-height: 1.25;
 }
 
-.stepContainer.completed .stepLabel {
+.stepContainer.completed .stepLabel,
+.stepContainer.activeStep .stepLabel {
   color: #1A1612;
-  font-weight: 700;
+  font-weight: 800;
 }
 
-.stepCheckWrapper {
-  background: #FAF7F2;
-  padding: 0 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 0.4rem;
-}
-
-.checkSquareFilled {
-  background-color: #FD802E;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 6px rgba(253, 128, 46, 0.3);
+.stepTime {
+  font-size: 0.675rem;
+  color: #78746D;
+  font-weight: 500;
 }
 
 .checkSquareEmpty {
