@@ -421,8 +421,14 @@ export function Navbar() {
               </div>
             );
           })}
-          {mobileLinks.map(({ label, href, Icon }) => (
-            <Link key={label} href={href} className={styles.mobileTopLink} onClick={closeMobileMenu}>
+          {mobileLinks.map(({ label, href, Icon, target }: any) => (
+            <Link 
+              key={label} 
+              href={href} 
+              className={styles.mobileTopLink} 
+              onClick={closeMobileMenu}
+              {...(target ? { target, rel: "noopener noreferrer" } : {})}
+            >
               <span className={styles.mobileLinkLabel}>
                 <Icon size={18} strokeWidth={1.8} />
                 {label}
