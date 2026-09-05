@@ -16,28 +16,9 @@ export function Hero() {
   const [show3D, setShow3D] = useState(false);
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
-
-    const triggerLoad = () => {
-      setShow3D(true);
-      window.removeEventListener('pointerdown', triggerLoad);
-      window.removeEventListener('scroll', triggerLoad);
-      window.removeEventListener('mousemove', triggerLoad);
-    };
-
-    window.addEventListener('pointerdown', triggerLoad, { passive: true });
-    window.addEventListener('scroll', triggerLoad, { passive: true });
-    window.addEventListener('mousemove', triggerLoad, { passive: true });
-
-    // Fallback: trigger after LCP metric window completes on slow connections
-    timer = setTimeout(() => setShow3D(true), 3500);
-
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('pointerdown', triggerLoad);
-      window.removeEventListener('scroll', triggerLoad);
-      window.removeEventListener('mousemove', triggerLoad);
-    };
+    // Load 3D model canvas in background while splash loader is displaying
+    const timer = setTimeout(() => setShow3D(true), 400);
+    return () => clearTimeout(timer);
   }, []);
   return (
     <section className={styles.hero}>

@@ -16,16 +16,34 @@ export function SplashScreen() {
       return;
     }
 
-    // Fast initial splash screen (350ms display + 300ms fade out)
-    const timer = setTimeout(() => {
+    let isDismissed = false;
+    const dismissSplash = () => {
+      if (isDismissed) return;
+      isDismissed = true;
       setIsFading(true);
       setTimeout(() => {
         setShowSplash(false);
         sessionStorage.setItem("splashShown", "true");
-      }, 300);
-    }, 350); 
+      }, 500); // Smooth 500ms fade transition
+    };
 
-    return () => clearTimeout(timer);
+    // If page document is already loaded, allow short cinematic preview (~1.2s) then fade
+    if (document.readyState === "complete") {
+      const minTimer = setTimeout(dismissSplash, 1200);
+      return () => clearTimeout(minTimer);
+    } else {
+      const handleLoad = () => {
+        setTimeout(dismissSplash, 600);
+      };
+      window.addEventListener("load", handleLoad);
+      // Safety max fallback timer so loader never gets stuck
+      const maxTimer = setTimeout(dismissSplash, 2400);
+
+      return () => {
+        window.removeEventListener("load", handleLoad);
+        clearTimeout(maxTimer);
+      };
+    }
   }, []);
 
   if (!showSplash) return null;
