@@ -1795,9 +1795,20 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .container {
-    padding: 1rem 0.6rem 3rem;
+    padding: 1rem 0.75rem 6.5rem !important;
+  }
+
+  .headerTitleRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.85rem;
+  }
+
+  .headerTitleRow .primaryBtn {
+    width: 100%;
+    justify-content: center;
   }
 
   .tabContentCard {

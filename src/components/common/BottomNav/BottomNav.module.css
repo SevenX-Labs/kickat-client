@@ -44,10 +44,45 @@
   }
 
   .iconWrapper {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: transform 0.2s ease;
+  }
+
+  .cartBadge {
+    position: absolute;
+    top: -5px;
+    right: -8px;
+    background-color: #FD802E;
+    color: #ffffff;
+    font-family: var(--font-sans), sans-serif;
+    font-size: 0.625rem;
+    font-weight: 700;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    border: 1.5px solid #FFFCF9;
+    box-shadow: 0 2px 6px rgba(253, 128, 46, 0.4);
+    pointer-events: none;
+    line-height: 1;
+    z-index: 5;
+  }
+
+  .cartBounce {
+    animation: cartPopBounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  @keyframes cartPopBounce {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.35) rotate(-10deg); }
+    70% { transform: scale(0.9) rotate(5deg); }
+    100% { transform: scale(1) rotate(0deg); }
   }
 
   .label {

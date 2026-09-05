@@ -80,7 +80,11 @@ export default function ProductCard({ product, onRemoveFromWishlist }: ProductCa
     }
 
     const startElem = e.currentTarget as HTMLElement;
-    const cartBtn = document.getElementById('navbar-cart-btn');
+    const bottomNavCart = document.getElementById('bottom-nav-cart-btn');
+    const topNavbarCart = document.getElementById('navbar-cart-btn');
+    const cartBtn = (bottomNavCart && window.getComputedStyle(bottomNavCart).display !== 'none' && bottomNavCart.offsetWidth > 0)
+      ? bottomNavCart
+      : topNavbarCart;
     const imageSrc = product.image || '/hero-products/dog_food.png';
 
     if (cartBtn) {
@@ -269,18 +273,33 @@ export default function ProductCard({ product, onRemoveFromWishlist }: ProductCa
             )}
           </button>
 
-          {/* Wishlist Button in Action Row */}
-          <button 
-            className={`${styles.desktopWishlistBtn} ${isWishlisted ? styles.wishlistedActive : ''}`} 
-            aria-label="Add to wishlist"
-            onClick={handleWishlistClick}
-          >
-            <Heart
-              size={18}
-              className={isWishlisted ? styles.heartFilled : ''}
-              strokeWidth={2}
-            />
-          </button>
+          {/* Wishlist / Remove Button in Action Row */}
+          {onRemoveFromWishlist ? (
+            <button 
+              className={`${styles.desktopWishlistBtn} ${styles.removeWishlistActive}`} 
+              aria-label="Remove from wishlist"
+              onClick={handleWishlistClick}
+              title="Remove item from wishlist"
+            >
+              <Trash2
+                size={16}
+                strokeWidth={2}
+                color="#DC2626"
+              />
+            </button>
+          ) : (
+            <button 
+              className={`${styles.desktopWishlistBtn} ${isWishlisted ? styles.wishlistedActive : ''}`} 
+              aria-label="Add to wishlist"
+              onClick={handleWishlistClick}
+            >
+              <Heart
+                size={18}
+                className={isWishlisted ? styles.heartFilled : ''}
+                strokeWidth={2}
+              />
+            </button>
+          )}
         </div>
 
         {/* In Stock Indicator & Delivery Subtitle */}

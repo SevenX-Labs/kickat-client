@@ -314,6 +314,16 @@
   border-color: #FD802E !important;
 }
 
+.removeWishlistActive {
+  background-color: #FEF2F2 !important;
+  border-color: rgba(220, 38, 38, 0.25) !important;
+}
+
+.removeWishlistActive:hover {
+  background-color: #FEE2E2 !important;
+  border-color: #DC2626 !important;
+}
+
 .heartFilled {
   fill: #FD802E !important;
   color: #FD802E !important;

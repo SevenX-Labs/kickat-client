@@ -39,7 +39,11 @@ export function ProductInfo({ product }: ProductInfoProps) {
   const sizes = ['S', 'M', 'L'];
 
   const animateFlyToCart = (startElem: HTMLElement) => {
-    const cartBtn = document.getElementById('navbar-cart-btn');
+    const bottomNavCart = document.getElementById('bottom-nav-cart-btn');
+    const topNavbarCart = document.getElementById('navbar-cart-btn');
+    const cartBtn = (bottomNavCart && window.getComputedStyle(bottomNavCart).display !== 'none' && bottomNavCart.offsetWidth > 0)
+      ? bottomNavCart
+      : topNavbarCart;
     const imageSrc = product.image || '/hero-products/dog_food.png';
 
     if (!cartBtn) {
