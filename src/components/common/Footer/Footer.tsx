@@ -51,7 +51,7 @@ export function Footer() {
           </div>
 
           <div className={styles.linksCol}>
-            <h4 className={styles.colTitle}>Dogs & Cats</h4>
+            <h3 className={styles.colTitle}>Dogs & Cats</h3>
             <Link href="/category/dogs/dog-accessories" className={styles.link}>Dog Accessories</Link>
             <Link href="/category/dogs/dog-food-treats" className={styles.link}>Dog Food & Treats</Link>
             <Link href="/category/dogs/dog-grooming-hygiene" className={styles.link}>Dog Grooming</Link>
@@ -64,7 +64,7 @@ export function Footer() {
           </div>
 
           <div className={styles.linksCol}>
-            <h4 className={styles.colTitle}>Fish & Birds</h4>
+            <h3 className={styles.colTitle}>Fish & Birds</h3>
             <Link href="/category/fish/aquarium-filtration" className={styles.link}>Aquarium Filtration</Link>
             <Link href="/category/fish/aquarium-pumps" className={styles.link}>Aquarium Pumps</Link>
             <Link href="/category/fish/aquarium-heating" className={styles.link}>Aquarium Heating</Link>
@@ -78,7 +78,7 @@ export function Footer() {
           </div>
 
           <div className={styles.linksCol}>
-            <h4 className={styles.colTitle}>Support</h4>
+            <h3 className={styles.colTitle}>Support</h3>
             <Link href="/faq" className={styles.link}>FAQ</Link>
             <Link href="/shipping" className={styles.link}>Shipping & Returns</Link>
             <Link href="/orders" className={styles.link}>Track Order</Link>
@@ -86,7 +86,7 @@ export function Footer() {
           </div>
 
           <div className={styles.newsletterCol}>
-            <h4 className={styles.colTitle}>Stay in the loop</h4>
+            <h3 className={styles.colTitle}>Stay in the loop</h3>
             <p className={styles.newsletterText}>Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.</p>
             <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
               <input 

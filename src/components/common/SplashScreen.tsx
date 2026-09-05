@@ -16,14 +16,14 @@ export function SplashScreen() {
       return;
     }
 
-    // 2.8s loading animation for a more cinematic, unhurried premium feel
+    // Fast initial splash screen (350ms display + 300ms fade out)
     const timer = setTimeout(() => {
       setIsFading(true);
       setTimeout(() => {
         setShowSplash(false);
         sessionStorage.setItem("splashShown", "true");
-      }, 800); // Smoother, longer fade transition
-    }, 2800); 
+      }, 300);
+    }, 350); 
 
     return () => clearTimeout(timer);
   }, []);

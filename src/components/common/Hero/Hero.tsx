@@ -1,15 +1,44 @@
 "use client";
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Star, Bone, PawPrint, Fish, ArrowRight } from 'lucide-react';
-import { Canvas } from '@react-three/fiber';
-
-import { Suspense } from 'react';
-import { BottleModel } from './BottleModel';
+import dynamic from 'next/dynamic';
 import styles from './Hero.module.css';
 
+// Dynamic import of Three.js Canvas to prevent main-thread hydration delay
+const DynamicBottleCanvas = dynamic(() => import('./BottleModelCanvas').then(mod => mod.BottleModelCanvas), {
+  ssr: false,
+  loading: () => <div style={{ width: '100%', height: '100%' }} />
+});
 
 export function Hero() {
+  const [show3D, setShow3D] = useState(false);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    const triggerLoad = () => {
+      setShow3D(true);
+      window.removeEventListener('pointerdown', triggerLoad);
+      window.removeEventListener('scroll', triggerLoad);
+      window.removeEventListener('mousemove', triggerLoad);
+    };
+
+    window.addEventListener('pointerdown', triggerLoad, { passive: true });
+    window.addEventListener('scroll', triggerLoad, { passive: true });
+    window.addEventListener('mousemove', triggerLoad, { passive: true });
+
+    // Fallback: trigger after LCP metric window completes on slow connections
+    timer = setTimeout(() => setShow3D(true), 3500);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('pointerdown', triggerLoad);
+      window.removeEventListener('scroll', triggerLoad);
+      window.removeEventListener('mousemove', triggerLoad);
+    };
+  }, []);
   return (
     <section className={styles.hero}>
       {/* Wavy Fluid Background Animations */}
@@ -86,17 +115,7 @@ export function Hero() {
 
         {/* Right Column: Interactive 3D Model */}
         <div className={styles.visualContent} style={{ cursor: 'grab' }}>
-          <Canvas 
-            camera={{ position: [-1.5, 0, 8], fov: 45 }}
-            style={{ width: '100%', height: '100%' }}
-            gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
-            dpr={[1, 1.5]}
-            performance={{ min: 0.5 }}
-          >
-            <Suspense fallback={null}>
-              <BottleModel />
-            </Suspense>
-          </Canvas>
+          {show3D && <DynamicBottleCanvas />}
         </div>
 
       </div>

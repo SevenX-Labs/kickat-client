@@ -75,8 +75,10 @@
 
 .marqueeTrack {
   display: flex;
-  gap: 1.5rem;
+  gap: 1.75rem;
   width: max-content;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
   animation: scroll 40s linear infinite;
 }
 

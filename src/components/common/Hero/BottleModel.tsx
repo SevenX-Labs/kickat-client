@@ -5,12 +5,6 @@ import { useFrame } from "@react-three/fiber";
 import { useGLTF, PresentationControls, Environment, Float, ContactShadows } from "@react-three/drei";
 import * as THREE from 'three';
 
-// Preload both models for faster rendering
-useGLTF.preload("/cat-shampoo-bottle-3d-model.glb");
-useGLTF.preload("/dog-shampoo-bottle-3d-model.glb");
-useGLTF.preload("/red-seed-feeder-3d-model.glb");
-useGLTF.preload("/aquarium-filter-3d-model.glb");
-
 // Animated wrapper for a single bottle
 function AnimatedBottle({ 
   scene, 
@@ -87,8 +81,14 @@ export function BottleModel() {
   const [activeModel, setActiveModel] = useState<'cat' | 'dog' | 'bird' | 'filter'>('cat');
   const models = ['cat', 'dog', 'bird', 'filter'];
 
-  // Auto-switch models every 6 seconds
+  // Defer secondary 3D model loading until after initial hydration
   useEffect(() => {
+    const timer = setTimeout(() => {
+      useGLTF.preload("/dog-shampoo-bottle-3d-model.glb");
+      useGLTF.preload("/red-seed-feeder-3d-model.glb");
+      useGLTF.preload("/aquarium-filter-3d-model.glb");
+    }, 1200);
+
     const interval = setInterval(() => {
       setActiveModel(prev => {
         if (prev === 'cat') return 'dog';
@@ -96,8 +96,11 @@ export function BottleModel() {
         if (prev === 'bird') return 'filter';
         return 'cat';
       });
-    }, 5000); // 5 seconds for snappier experience
-    return () => clearInterval(interval);
+    }, 5000);
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+    };
   }, []);
 
   function getState(modelName: string): 'active' | 'next' | 'prev' {
@@ -110,20 +113,19 @@ export function BottleModel() {
 
   return (
     <PresentationControls
-      snap={true} // Snap back to center
-      rotation={[0, -0.3, 0]} // Initial rotation
-      polar={[-0.1, 0.1]} // Restrict vertical rotation
-      azimuth={[-Math.PI / 2, Math.PI / 2]} // Restrict horizontal rotation
+      snap={true}
+      rotation={[0, -0.3, 0]}
+      polar={[-0.1, 0.1]}
+      azimuth={[-Math.PI / 2, Math.PI / 2]}
     >
       <Float speed={1.5} rotationIntensity={0.1} floatIntensity={0.5} floatingRange={[-0.05, 0.05]}>
-        {/* Render models simultaneously to allow for cross-animations */}
         <AnimatedBottle scene={catScene} state={getState('cat')} baseScale={5.7} baseY={-3.2} />
         <AnimatedBottle scene={dogScene} state={getState('dog')} baseScale={6.2} baseY={-3.2} />
         <AnimatedBottle scene={birdScene} state={getState('bird')} baseScale={5.5} baseY={-2.6} modelRotationOffset={Math.PI} />
         <AnimatedBottle scene={filterScene} state={getState('filter')} baseScale={5.0} baseY={-2.6} />
       </Float>
         
-      {/* Realistic contact shadow under the bottle - baked for performance */}
+      {/* Baked contact shadows to avoid continuous repaints */}
       <ContactShadows 
         position={[0, -2.6, 0]} 
         opacity={0.3} 
@@ -132,9 +134,9 @@ export function BottleModel() {
         far={2} 
         color="#000000"
         frames={1}
+        resolution={256}
       />
       
-      {/* High-end studio lighting */}
       <Environment preset="studio" />
       <ambientLight intensity={0.6} />
       <directionalLight position={[5, 5, 5]} intensity={1.5} />
@@ -143,3 +145,4 @@ export function BottleModel() {
     </PresentationControls>
   );
 }
+

@@ -242,7 +242,7 @@ export function Navbar() {
                   <div className={styles.megaColumns}>
                     {data.content[activeSidebarItems[category] as keyof typeof data.content]?.map((col, idx) => (
                       <div key={idx} className={styles.megaColumn}>
-                        <h4 className={styles.megaColTitle}>{col.title}</h4>
+                        <h3 className={styles.megaColTitle}>{col.title}</h3>
                         <ul className={styles.megaColList}>
                           {col.items.map((link, i) => (
                             <li key={i}>

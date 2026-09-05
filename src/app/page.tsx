@@ -1,13 +1,16 @@
+import dynamic from 'next/dynamic';
 import { Hero } from "@/components/common/Hero";
 import { ShopByCategory } from "@/components/common/ShopByCategory";
 import { ProductRow } from "@/components/common/ProductRow";
 import { TrustStrip } from "@/components/common/TrustStrip";
-import { WhyKickat } from "@/components/common/WhyKickat";
 import { CATALOG_PRODUCTS } from '@/data/categoryData';
-import { CustomerReviews } from "@/components/common/CustomerReviews";
-import { FAQ } from "@/components/common/FAQ";
-import { InstagramFeed } from "@/components/common/InstagramFeed";
-import { Footer } from "@/components/common/Footer";
+
+// Dynamic code-splitting for below-the-fold components
+const WhyKickat = dynamic(() => import("@/components/common/WhyKickat").then(mod => mod.WhyKickat));
+const CustomerReviews = dynamic(() => import("@/components/common/CustomerReviews").then(mod => mod.CustomerReviews));
+const FAQ = dynamic(() => import("@/components/common/FAQ").then(mod => mod.FAQ));
+const InstagramFeed = dynamic(() => import("@/components/common/InstagramFeed").then(mod => mod.InstagramFeed));
+const Footer = dynamic(() => import("@/components/common/Footer").then(mod => mod.Footer));
 
 export default function Home() {
   // Deduped product selections — zero overlap between rows

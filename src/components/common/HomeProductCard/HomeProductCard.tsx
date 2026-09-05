@@ -155,7 +155,7 @@ export default function HomeProductCard({ product, onRemoveFromWishlist }: HomeP
             src={product.image}
             alt={product.name}
             fill
-            unoptimized
+            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             className={styles.cardImage}
             style={{ objectFit: 'cover' }}
           />

@@ -108,6 +108,8 @@
     width: max-content;
     flex-shrink: 0;
     justify-content: flex-start;
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
     animation: scroll 20s linear infinite;
   }
   
