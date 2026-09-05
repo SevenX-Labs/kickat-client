@@ -122,7 +122,7 @@ export default function CartPage() {
                 
                 <div className={styles.itemDetails}>
                   <div className={styles.itemHeader}>
-                    <button onClick={() => router.push(`/product/${item.id}`)} className={styles.itemName}>
+                    <button onClick={() => window.open(`/product/${item.id}`, '_blank')} className={styles.itemName}>
                       {item.name}
                     </button>
                     <span className={styles.itemPrice}>₹{(item.price * item.quantity).toLocaleString()}</span>

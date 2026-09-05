@@ -150,7 +150,7 @@ export default function HomeProductCard({ product, onRemoveFromWishlist }: HomeP
           />
         </button>
 
-        <Link href={`/product/${product.id}`} prefetch={true} className={styles.cardImageLink}>
+        <Link href={`/product/${product.id}`} prefetch={true} target="_blank" rel="noopener noreferrer" className={styles.cardImageLink}>
           <Image
             src={product.image}
             alt={product.name}
@@ -164,7 +164,7 @@ export default function HomeProductCard({ product, onRemoveFromWishlist }: HomeP
 
       {/* Content Block */}
       <div className={styles.cardContent}>
-        <Link href={`/product/${product.id}`} prefetch={true} className={styles.cardTitleLink}>
+        <Link href={`/product/${product.id}`} prefetch={true} target="_blank" rel="noopener noreferrer" className={styles.cardTitleLink}>
           <h3 className={styles.cardTitle}>{product.name}</h3>
         </Link>
 
