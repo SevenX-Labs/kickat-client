@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { ChevronDown, Search, Heart, User, ShoppingBag, Package, Tag, MapPin, Bell, LogOut, Star, Truck, Percent, Crown, Menu, X, Dog, Cat, Fish, Bird, MessageCircle, BookOpen, Phone, ShieldQuestion, Headset, ArrowRight, Sun } from "lucide-react";
+import { ChevronDown, Search, Heart, User, ShoppingBag, Package, Tag, MapPin, Bell, LogOut, Star, Truck, Percent, Crown, Menu, X, Dog, Cat, Fish, Bird, MessageCircle, BookOpen, Phone, ShieldQuestion, Headset, ArrowRight, Sun, Sparkles } from "lucide-react";
 import styles from "./Navbar.module.css";
 import { megaMenuData } from "@/data/megaMenuData";
 
@@ -58,6 +58,16 @@ const mobileLinks = [
   { label: "Blogs", href: "/blogs", Icon: BookOpen },
   { label: "Contact", href: "/contact", Icon: Phone },
   { label: "Privacy Policy", href: "/privacy-policy", Icon: ShieldQuestion },
+  { label: "Help & Support", href: "/contact", Icon: Headset },
+];
+
+const sideDrawerLinks = [
+  { label: "Wishlist", href: "/wishlist", Icon: Heart },
+  { label: "Why KickAt", href: "/#why-kickat", Icon: Sparkles },
+  { label: "Testimonials", href: "/testimonials", Icon: MessageCircle },
+  { label: "Contact Us", href: "/contact", Icon: Phone },
+  { label: "Privacy Policy", href: "/privacy-policy", Icon: ShieldQuestion },
+  { label: "Blogs", href: "/blogs", Icon: BookOpen },
   { label: "Help & Support", href: "/contact", Icon: Headset },
 ];
 
@@ -388,54 +398,53 @@ export function Navbar() {
         </div>
       </div>
 
-      <div className={`${styles.mobilePanel} ${isMenuOpen ? styles.mobilePanelOpen : ''}`}>
+      {/* Half-Width Side Drawer Overlay Backdrop */}
+      <div 
+        className={`${styles.sideDrawerBackdrop} ${isMenuOpen ? styles.sideDrawerBackdropOpen : ''}`}
+        onClick={() => setIsMenuOpen(false)}
+      />
 
+      {/* Half-Width Side Drawer Panel (Slides in from Left) */}
+      <div className={`${styles.sideDrawerPanel} ${isMenuOpen ? styles.sideDrawerPanelOpen : ''}`}>
+        <div className={styles.sideDrawerHeader}>
+          <Image
+            src="/logo-clean.png"
+            alt="KickAt Logo"
+            width={130}
+            height={42}
+            className={styles.sideDrawerLogo}
+          />
+          <button 
+            type="button" 
+            className={styles.sideDrawerCloseBtn} 
+            onClick={() => setIsMenuOpen(false)}
+            aria-label="Close drawer"
+          >
+            <X size={18} />
+          </button>
+        </div>
 
-        <nav className={styles.mobileNav}>
-          {Object.entries(taxonomy).map(([category, data]) => {
-            const Icon = data.Icon;
-            return (
-              <div key={category} className={styles.mobileCategory}>
-                <button
-                  type="button"
-                  className={styles.mobileCategoryTitle}
-                  aria-expanded={openMobileCategory === category}
-                  onClick={() => setOpenMobileCategory((current) => current === category ? null : category)}
-                >
-                  <span className={styles.mobileLinkLabel}>
-                    <Icon size={18} strokeWidth={1.8} />
-                    {category}
-                  </span>
-                  <ChevronDown className={`${styles.chevron} ${openMobileCategory === category ? styles.mobileChevronOpen : ''}`} strokeWidth={2} />
-                </button>
-                <div className={`${styles.mobileSubLinks} ${openMobileCategory === category ? styles.mobileSubLinksOpen : ''}`}>
-                  <Link href={data.categoryHref} className={styles.mobileSubLink} onClick={closeMobileMenu}>
-                    View All {category}
-                  </Link>
-                  {data.items.map((sub, idx) => (
-                    <Link key={idx} href={sub.href} className={styles.mobileSubLink} onClick={closeMobileMenu}>
-                      {sub.name}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-          {mobileLinks.map(({ label, href, Icon, target }: any) => (
+        <div className={styles.sideDrawerNav}>
+          <span className={styles.sideDrawerNavGroupTitle}>Quick Navigation</span>
+          {sideDrawerLinks.map(({ label, href, Icon }) => (
             <Link 
               key={label} 
               href={href} 
-              className={styles.mobileTopLink} 
-              onClick={closeMobileMenu}
-              {...(target ? { target, rel: "noopener noreferrer" } : {})}
+              className={styles.sideDrawerItem}
+              onClick={() => setIsMenuOpen(false)}
             >
-              <span className={styles.mobileLinkLabel}>
-                <Icon size={18} strokeWidth={1.8} />
-                {label}
-              </span>
+              <Icon size={18} className={styles.sideDrawerItemIcon} />
+              <span>{label}</span>
             </Link>
           ))}
-        </nav>
+        </div>
+
+        <div className={styles.sideDrawerFooter}>
+          <div className={styles.sideDrawerBadge}>
+            <Crown size={14} />
+            <span>KickAt VIP Pet Perks</span>
+          </div>
+        </div>
       </div>
     </header>
   );
