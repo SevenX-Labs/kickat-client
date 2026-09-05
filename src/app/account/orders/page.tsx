@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { 
   Package, CheckCircle2, Clock, Search, XCircle, 
   ClipboardList, ClipboardCheck, Truck, PackageCheck, Check, ChevronRight, FileText,
-  MapPin, AlertCircle, SlidersHorizontal, X
+  MapPin, AlertCircle, SlidersHorizontal, X, Calendar, CalendarDays, History, ArrowDownWideNarrow, ArrowUpWideNarrow
 } from 'lucide-react';
 import styles from '../Account.module.css';
 import AccountSidebarNav from '@/components/account/AccountSidebarNav';
@@ -168,7 +168,8 @@ function AccountOrdersContent() {
           </span>
         </div>
 
-        <div className={styles.stepperMainRow}>
+      <div className={styles.stepperMainRow}>
+        <div className={styles.stepperScrollTrack}>
           <div className={styles.progressLineBg}></div>
           <div className={styles.progressLineFill} style={{ width: `${fillWidthPercent}%` }}></div>
           
@@ -208,6 +209,7 @@ function AccountOrdersContent() {
             })}
           </div>
         </div>
+      </div>
       </div>
     );
   };
@@ -432,7 +434,7 @@ function AccountOrdersContent() {
 
             <div className={styles.modalHeader}>
               <div className={styles.modalTitleGroup}>
-                <SlidersHorizontal size={20} color="#FD802E" />
+                <SlidersHorizontal size={18} color="#FD802E" />
                 <h2>Filter & Sort Orders</h2>
               </div>
               <button 
@@ -440,7 +442,7 @@ function AccountOrdersContent() {
                 className={styles.modalCloseBtn} 
                 onClick={() => setIsFilterOpen(false)}
               >
-                <X size={18} />
+                <X size={16} />
               </button>
             </div>
 
@@ -450,10 +452,10 @@ function AccountOrdersContent() {
                 <span className={styles.filterModalLabel}>Sort By</span>
                 <div className={styles.filterOptionsGrid}>
                   {[
-                    { key: 'newest', label: '📅 Newest First' },
-                    { key: 'oldest', label: '🗓️ Oldest First' },
-                    { key: 'price-desc', label: '💰 Price: High to Low' },
-                    { key: 'price-asc', label: '🏷️ Price: Low to High' },
+                    { key: 'newest', label: 'Newest First', Icon: Calendar },
+                    { key: 'oldest', label: 'Oldest First', Icon: History },
+                    { key: 'price-desc', label: 'Price: High to Low', Icon: ArrowDownWideNarrow },
+                    { key: 'price-asc', label: 'Price: Low to High', Icon: ArrowUpWideNarrow },
                   ].map(opt => (
                     <button 
                       key={opt.key}
@@ -461,7 +463,8 @@ function AccountOrdersContent() {
                       className={`${styles.filterOptionChip} ${sortBy === opt.key ? styles.filterOptionActive : ''}`}
                       onClick={() => setSortBy(opt.key)}
                     >
-                      {opt.label}
+                      <opt.Icon size={14} className={styles.optionChipIcon} />
+                      <span>{opt.label}</span>
                     </button>
                   ))}
                 </div>
@@ -472,11 +475,11 @@ function AccountOrdersContent() {
                 <span className={styles.filterModalLabel}>Order Status</span>
                 <div className={styles.filterOptionsGrid}>
                   {[
-                    { key: 'All', label: 'All Orders' },
-                    { key: 'Processing', label: '⏳ Processing' },
-                    { key: 'Shipped', label: '🚚 Shipped' },
-                    { key: 'Delivered', label: '✅ Delivered' },
-                    { key: 'Cancelled', label: '❌ Cancelled' },
+                    { key: 'All', label: 'All Orders', Icon: Package },
+                    { key: 'Processing', label: 'Processing', Icon: Clock },
+                    { key: 'Shipped', label: 'Shipped', Icon: Truck },
+                    { key: 'Delivered', label: 'Delivered', Icon: CheckCircle2 },
+                    { key: 'Cancelled', label: 'Cancelled', Icon: XCircle },
                   ].map(opt => (
                     <button 
                       key={opt.key}
@@ -484,7 +487,8 @@ function AccountOrdersContent() {
                       className={`${styles.filterOptionChip} ${orderFilter === opt.key ? styles.filterOptionActive : ''}`}
                       onClick={() => setOrderFilter(opt.key)}
                     >
-                      {opt.label}
+                      <opt.Icon size={14} className={styles.optionChipIcon} />
+                      <span>{opt.label}</span>
                     </button>
                   ))}
                 </div>
@@ -495,10 +499,10 @@ function AccountOrdersContent() {
                 <span className={styles.filterModalLabel}>Time Period</span>
                 <div className={styles.filterOptionsGrid}>
                   {[
-                    { key: 'all', label: 'All Time' },
-                    { key: 'last30', label: 'Last 30 Days' },
-                    { key: '2026', label: 'Year 2026' },
-                    { key: '2025', label: 'Year 2025' },
+                    { key: 'all', label: 'All Time', Icon: Calendar },
+                    { key: 'last30', label: 'Last 30 Days', Icon: Clock },
+                    { key: '2026', label: 'Year 2026', Icon: CalendarDays },
+                    { key: '2025', label: 'Year 2025', Icon: CalendarDays },
                   ].map(opt => (
                     <button 
                       key={opt.key}
@@ -506,7 +510,8 @@ function AccountOrdersContent() {
                       className={`${styles.filterOptionChip} ${dateFilter === opt.key ? styles.filterOptionActive : ''}`}
                       onClick={() => setDateFilter(opt.key)}
                     >
-                      {opt.label}
+                      <opt.Icon size={14} className={styles.optionChipIcon} />
+                      <span>{opt.label}</span>
                     </button>
                   ))}
                 </div>
