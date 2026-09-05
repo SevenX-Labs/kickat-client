@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo, memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -27,7 +27,7 @@ interface HomeProductCardProps {
   onRemoveFromWishlist?: (id: string) => void;
 }
 
-export default function HomeProductCard({ product, onRemoveFromWishlist }: HomeProductCardProps) {
+function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProductCardProps) {
   const router = useRouter();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
@@ -35,11 +35,13 @@ export default function HomeProductCard({ product, onRemoveFromWishlist }: HomeP
   const rating = product.rating || 4.8;
   const reviewsCount = product.reviewsCount || 64;
 
-  const discountPercent = product.originalPrice && product.originalPrice > product.price
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-    : product.badge === 'Sale' ? 25 : 20;
+  const discountPercent = useMemo(() => {
+    return product.originalPrice && product.originalPrice > product.price
+      ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+      : product.badge === 'Sale' ? 25 : 20;
+  }, [product.originalPrice, product.price, product.badge]);
 
-  const handleWishlistClick = (e: React.MouseEvent) => {
+  const handleWishlistClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (onRemoveFromWishlist) {
@@ -47,9 +49,9 @@ export default function HomeProductCard({ product, onRemoveFromWishlist }: HomeP
     } else {
       setIsWishlisted((prev) => !prev);
     }
-  };
+  }, [onRemoveFromWishlist, product.id]);
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (isAdded) {
@@ -122,89 +124,103 @@ export default function HomeProductCard({ product, onRemoveFromWishlist }: HomeP
     }
 
     setIsAdded(true);
-  };
-
-  const getBadgeText = () => {
-    if (!product.badge || product.badge === 'Popular' || product.badge === 'Best Seller') {
-      return null;
-    }
-    if (product.badge === 'New' || product.badge === 'New Arrival') return 'New';
-    if (product.badge === 'Sale') return `${discountPercent}% OFF`;
-    return product.badge;
-  };
-
-  const badgeText = getBadgeText();
+  }, [isAdded, product.image, router]);
 
   return (
-    <div className={styles.homeCard}>
-      {/* Top Image Area */}
+    <div className={styles.card}>
+      {/* Product Image Area */}
       <div className={styles.cardImageArea}>
-        {badgeText && <span className={styles.cardBadge}>{badgeText}</span>}
+        {product.badge && (
+          <span className={styles.cardBadge}>
+            {product.badge === 'New' || product.badge === 'New Arrival'
+              ? 'NEW'
+              : product.badge === 'Sale'
+              ? 'SALE'
+              : product.badge.toUpperCase()}
+          </span>
+        )}
 
-        <button
-          className={`${styles.cardWishlistBtn} ${isWishlisted ? styles.wishlistedActive : ''}`}
-          aria-label="Add to wishlist"
-          onClick={handleWishlistClick}
-        >
-          <Heart
-            size={15}
-            className={isWishlisted ? styles.heartFilled : ''}
-            strokeWidth={2}
-            color={isWishlisted ? '#FD802E' : '#111827'}
-          />
-        </button>
+        {/* Wishlist Button */}
+        {onRemoveFromWishlist ? (
+          <button 
+            className={styles.cardWishlistBtn} 
+            aria-label="Remove from wishlist"
+            onClick={handleWishlistClick}
+          >
+            <Trash2 size={16} strokeWidth={2} color="#C34A42" />
+          </button>
+        ) : (
+          <button 
+            className={`${styles.cardWishlistBtn} ${isWishlisted ? styles.wishlistedActive : ''}`} 
+            aria-label="Add to wishlist"
+            onClick={handleWishlistClick}
+          >
+            <Heart
+              size={16}
+              className={isWishlisted ? styles.heartFilled : ''}
+              color={isWishlisted ? '#FD802E' : '#111827'}
+              strokeWidth={1.8}
+            />
+          </button>
+        )}
 
-        <Link href={`/product/${product.id}`} prefetch={true} target="_blank" rel="noopener noreferrer" className={styles.cardImageLink}>
+        <Link href={`/product/${product.id}`} prefetch={true} className={styles.cardImageLink}>
           <Image
             src={product.image}
             alt={product.name}
             fill
             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             className={styles.cardImage}
-            style={{ objectFit: 'cover' }}
+            style={{ objectFit: 'contain' }}
           />
         </Link>
       </div>
 
-      {/* Content Block */}
+      {/* Details Area */}
       <div className={styles.cardContent}>
-        <Link href={`/product/${product.id}`} prefetch={true} target="_blank" rel="noopener noreferrer" className={styles.cardTitleLink}>
+        <div className={styles.categoryRow}>
+          <span className={styles.categoryText}>{product.brand || product.mainCategory || 'KickAt Essential'}</span>
+        </div>
+
+        <Link href={`/product/${product.id}`} prefetch={true} className={styles.cardTitleLink}>
           <h3 className={styles.cardTitle}>{product.name}</h3>
         </Link>
 
         {/* Rating Row */}
-        <div className={styles.cardRatingRow}>
-          <div className={styles.starsGroup}>
+        <div className={styles.ratingRow}>
+          <div className={styles.stars}>
             {[1, 2, 3, 4, 5].map((star) => (
-              <Star
-                key={star}
-                size={12}
-                fill={star <= Math.floor(rating) ? "#FD802E" : star - rating < 1 ? "#FD802E" : "#E5E7EB"}
-                color={star <= Math.floor(rating) ? "#FD802E" : star - rating < 1 ? "#FD802E" : "#E5E7EB"}
-                strokeWidth={0}
+              <Star 
+                key={star} 
+                size={12} 
+                fill={star <= Math.floor(rating) ? "#FD802E" : "#E5E7EB"} 
+                color={star <= Math.floor(rating) ? "#FD802E" : "#E5E7EB"} 
+                strokeWidth={0} 
               />
             ))}
           </div>
-          <span className={styles.cardRatingScore}>{rating.toFixed(1)}</span>
-          <span className={styles.cardReviewsCount}>({reviewsCount})</span>
+          <span className={styles.ratingScore}>{rating.toFixed(1)}</span>
+          <span className={styles.reviewsCount}>({reviewsCount})</span>
         </div>
 
         {/* Price Row */}
-        <div className={styles.priceContainer}>
-          <div className={styles.priceRowUpper}>
-            <span className={styles.cardPrice}>₹{product.price.toLocaleString()}</span>
+        <div className={styles.priceRow}>
+          <div className={styles.priceGroup}>
+            <span className={styles.currentPrice}>₹{product.price.toLocaleString()}</span>
             {product.originalPrice && (
               <span className={styles.originalPrice}>₹{product.originalPrice.toLocaleString()}</span>
             )}
           </div>
-          <span className={styles.discountTag}>{discountPercent}% OFF</span>
+          {discountPercent && (
+            <span className={styles.discountBadge}>{discountPercent}% OFF</span>
+          )}
         </div>
 
         {/* Add to Cart Button */}
-        <button
-          className={styles.addToCartBtn}
-          aria-label="Add to cart"
+        <button 
+          className={`${styles.addToCartBtn} ${isAdded ? styles.addedBtn : ''}`}
           onClick={handleAddToCart}
+          aria-label="Add to cart"
         >
           {isAdded ? (
             <>
@@ -222,3 +238,6 @@ export default function HomeProductCard({ product, onRemoveFromWishlist }: HomeP
     </div>
   );
 }
+
+export const HomeProductCard = memo(HomeProductCardComponent);
+export default HomeProductCard;

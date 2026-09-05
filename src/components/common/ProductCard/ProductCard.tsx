@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo, memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -48,7 +48,7 @@ function getDescription(product: Product): string {
   return product.description || productDescriptions[product.id] || (product.tags && product.tags.length > 0 ? product.tags.join(' · ') : 'Premium quality pet essential curated for health & comfort.');
 }
 
-export default function ProductCard({ product, onRemoveFromWishlist }: ProductCardProps) {
+function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProps) {
   const router = useRouter();
   const [selectedSwatch, setSelectedSwatch] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -57,11 +57,13 @@ export default function ProductCard({ product, onRemoveFromWishlist }: ProductCa
   const rating = product.rating || 4.8;
   const reviewsCount = product.reviewsCount || 64;
   
-  const discountPercent = product.originalPrice && product.originalPrice > product.price 
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-    : product.badge === 'Sale' ? 15 : null;
+  const discountPercent = useMemo(() => {
+    return product.originalPrice && product.originalPrice > product.price 
+      ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+      : product.badge === 'Sale' ? 15 : null;
+  }, [product.originalPrice, product.price, product.badge]);
 
-  const handleWishlistClick = (e: React.MouseEvent) => {
+  const handleWishlistClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (onRemoveFromWishlist) {
@@ -69,9 +71,9 @@ export default function ProductCard({ product, onRemoveFromWishlist }: ProductCa
     } else {
       setIsWishlisted((prev) => !prev);
     }
-  };
+  }, [onRemoveFromWishlist, product.id]);
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (isAdded) {
@@ -144,7 +146,7 @@ export default function ProductCard({ product, onRemoveFromWishlist }: ProductCa
     }
 
     setIsAdded(true);
-  };
+  }, [isAdded, product.image, router]);
 
   return (
     <div className={styles.productCard}>
@@ -315,3 +317,6 @@ export default function ProductCard({ product, onRemoveFromWishlist }: ProductCa
     </div>
   );
 }
+
+export const ProductCard = memo(ProductCardComponent);
+export default ProductCard;
