@@ -783,8 +783,7 @@
   }
 
   .mobileMenuBtn {
-    display: inline-flex;
-    flex-shrink: 0;
+    display: none !important;
   }
 
   .navLinks {
@@ -958,14 +957,13 @@
     display: flex;
   }
 
-  .cartBtn,
-  .mobileMenuBtn {
+  .cartBtn {
     width: 2.35rem;
     height: 2.35rem;
   }
 
+  .mobileMenuBtn,
   .mobilePanel {
-    max-height: calc(100svh - 6.2rem);
-    padding: 0 0.8rem 1rem;
+    display: none !important;
   }
 }

@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Lora, Fraunces, IBM_Plex_Mono } from "next/font/google";
+import { Navbar } from "@/components/common/Navbar";
+import { BottomNav } from "@/components/common/BottomNav";
+import { SmoothScrollProvider } from "@/components/common/SmoothScrollProvider";
+import { SplashScreen } from "@/components/common/SplashScreen";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -38,10 +42,6 @@ export const metadata: Metadata = {
   },
 };
 
-import { Navbar } from "@/components/common/Navbar";
-import { SmoothScrollProvider } from "@/components/common/SmoothScrollProvider";
-import { SplashScreen } from "@/components/common/SplashScreen";
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -57,6 +57,7 @@ export default function RootLayout({
         <SmoothScrollProvider>
           <Navbar />
           {children}
+          <BottomNav />
         </SmoothScrollProvider>
       </body>
     </html>
