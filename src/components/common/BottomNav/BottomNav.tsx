@@ -57,28 +57,60 @@ export function BottomNav() {
     },
   ];
 
+  const activeIndex = navItems.findIndex((item) => item.isActive);
+
   return (
-    <nav className={styles.bottomNavContainer}>
+    <nav className={styles.bottomNavContainer} aria-label="Mobile Navigation">
+      {/* Top ambient highlight gradient */}
+      <div className={styles.topAmbientBorder} />
+
       <div className={styles.bottomNavInner}>
+        {/* Animated Sliding Active Indicator with Glowing Beam */}
+        {activeIndex !== -1 && (
+          <div
+            className={styles.slidingIndicatorTrack}
+            style={{
+              transform: `translateX(${activeIndex * 100}%)`,
+            }}
+            aria-hidden="true"
+          >
+            <div className={styles.slidingIndicatorGlow} />
+            <div className={styles.slidingIndicatorBar} />
+          </div>
+        )}
+
         {navItems.map((item) => {
           const Icon = item.Icon;
           const isCart = item.label === "Cart";
+          const isActive = item.isActive;
 
           return (
             <Link
               key={item.label}
               href={item.href}
               id={isCart ? "bottom-nav-cart-btn" : undefined}
-              className={`${styles.navItem} ${item.isActive ? styles.active : ""}`}
+              className={`${styles.navItem} ${isActive ? styles.active : ""}`}
+              aria-current={isActive ? "page" : undefined}
             >
-              {item.isActive && <div className={styles.activeIndicator} />}
-              <div className={`${styles.iconWrapper} ${isCart && isCartBouncing ? styles.cartBounce : ''}`}>
-                <Icon size={20} strokeWidth={item.isActive ? 2.2 : 1.7} />
-                {isCart && cartCount > 0 && (
-                  <span className={styles.cartBadge}>{cartCount}</span>
-                )}
+              <div className={styles.itemContent}>
+                <div
+                  className={`${styles.iconWrapper} ${
+                    isActive ? styles.activeIconWrapper : ""
+                  } ${isCart && isCartBouncing ? styles.cartBounce : ""}`}
+                >
+                  <Icon
+                    size={20}
+                    strokeWidth={isActive ? 2.25 : 1.7}
+                    className={styles.navIcon}
+                  />
+                  {isCart && cartCount > 0 && (
+                    <span className={styles.cartBadge}>{cartCount}</span>
+                  )}
+                  {/* Subtle active radial ambient halo */}
+                  {isActive && <div className={styles.activeHalo} />}
+                </div>
+                <span className={styles.label}>{item.label}</span>
               </div>
-              <span className={styles.label}>{item.label}</span>
             </Link>
           );
         })}
