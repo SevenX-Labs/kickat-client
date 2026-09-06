@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { AnimatedOrderButton } from './AnimatedOrderButton';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Check, Truck, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, CreditCard, Smartphone, ChevronDown, User, MapPin, Lock, Edit3, X, Home, Shield, Plus, Loader2, Calendar, Mail, Package, ShoppingBag, Download, Heart, RotateCcw, Headphones } from 'lucide-react';
+import { Check, Truck, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, CreditCard, Smartphone, ChevronDown, User, MapPin, Lock, Edit3, X, Home, Shield, Plus, Loader2, Calendar, Mail, Package, ShoppingBag, Download, Heart, RotateCcw, Headphones, PawPrint, Sparkles } from 'lucide-react';
 import styles from './Checkout.module.css';
 
 // Mock Cart Data for Checkout
@@ -118,12 +118,12 @@ export default function CheckoutPage() {
   const handleAnimatedComplete = () => {
     setIsSubmitted(true);
     setOrderNumber(Math.floor(100000 + Math.random() * 900000));
-    setParticles(Array.from({ length: 24 }).map((_, i) => {
-      const angle = (i * 15) * (Math.PI / 180);
-      const velocity = 50 + Math.random() * 40;
+    setParticles(Array.from({ length: 60 }).map((_, i) => {
+      const angle = (i * 6) * (Math.PI / 180);
+      const velocity = 80 + Math.random() * 120;
       const tx = Math.cos(angle) * velocity;
       const ty = Math.sin(angle) * velocity;
-      const colors = ['#E7A03B', '#1B3C35', '#FBF7EE', '#4CAF50'];
+      const colors = ['#FD802E', '#10B981', '#F59E0B', '#3B82F6', '#EC4899', '#8B5CF6', '#F43F5E'];
       return { id: i, tx: `${tx}px`, ty: `${ty}px`, color: colors[i % colors.length] };
     }));
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -156,11 +156,45 @@ export default function CheckoutPage() {
             ))}
           </div>
 
-          {/* Animated Celebration Icon Badge */}
+          {/* Animated Celebration Icon Badge with Floating Paws & Aura */}
           <div className={styles.successIconBadgeWrapper}>
-            <span className={`${styles.sparkleIcon} ${styles.sparkle1}`}>✨</span>
-            <span className={`${styles.sparkleIcon} ${styles.sparkle2}`}>🐾</span>
-            <span className={`${styles.sparkleIcon} ${styles.sparkle3}`}>🎉</span>
+            <div className={styles.successAuraRing} />
+
+            {/* Orbiting Paws */}
+            <div className={`${styles.orbitItem} ${styles.pawTopRight}`}>
+              <PawPrint size={24} fill="#FD802E" color="#FD802E" />
+            </div>
+            <div className={`${styles.orbitItem} ${styles.pawBottomLeft}`}>
+              <PawPrint size={22} fill="#FD802E" color="#FD802E" />
+            </div>
+            <div className={`${styles.orbitItem} ${styles.pawTopLeft}`}>
+              <PawPrint size={18} fill="#FD802E" color="#FD802E" />
+            </div>
+            <div className={`${styles.orbitItem} ${styles.pawBottomRight}`}>
+              <PawPrint size={20} fill="#FD802E" color="#FD802E" />
+            </div>
+
+            {/* Spark Rays */}
+            <div className={`${styles.orbitItem} ${styles.sparkTop}`}>
+              <div className={styles.sparkRayPair}>
+                <span className={`${styles.sparkRay} ${styles.ray1}`} />
+                <span className={`${styles.sparkRay} ${styles.ray2}`} />
+              </div>
+            </div>
+            <div className={`${styles.orbitItem} ${styles.sparkRight}`}>
+              <div className={styles.sparkRayPair}>
+                <span className={`${styles.sparkRay} ${styles.ray1}`} />
+                <span className={`${styles.sparkRay} ${styles.ray2}`} />
+              </div>
+            </div>
+            <div className={`${styles.orbitItem} ${styles.sparkLeft}`}>
+              <div className={styles.sparkRayPair}>
+                <span className={`${styles.sparkRay} ${styles.ray1}`} />
+                <span className={`${styles.sparkRay} ${styles.ray2}`} />
+              </div>
+            </div>
+
+            {/* Central Green Checkmark Circle */}
             <div className={styles.successIconBadge}>
               <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={styles.animatedCheck}>
                 <polyline points="20 6 9 17 4 12"></polyline>

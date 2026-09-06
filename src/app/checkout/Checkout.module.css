@@ -1430,14 +1430,31 @@
   color: #6b7280;
 }
 
-/* Celebration & Sparkle Animations */
+/* Celebration & Orbiting Paws Animations */
 .successIconBadgeWrapper {
   position: relative;
-  margin-top: 1.5rem;
-  margin-bottom: 1.5rem;
-  display: inline-flex;
+  width: 140px;
+  height: 140px;
+  margin: 1rem auto 1.5rem auto;
+  display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.successAuraRing {
+  position: absolute;
+  width: 106px;
+  height: 106px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.16);
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.25);
+  z-index: 1;
+  animation: pulseAuraRing 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes pulseAuraRing {
+  0% { transform: scale(0.92); opacity: 0.6; }
+  100% { transform: scale(1.1); opacity: 1; }
 }
 
 .successIconBadge {
@@ -1448,29 +1465,107 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4), 0 0 0 8px rgba(16, 185, 129, 0.12);
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4), 0 0 0 6px rgba(16, 185, 129, 0.15);
   position: relative;
   z-index: 2;
   opacity: 0;
   animation: entranceFadeScale 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
-.sparkleIcon {
+.orbitItem {
   position: absolute;
-  font-size: 1.25rem;
   pointer-events: none;
   z-index: 3;
-  animation: floatSparkle 3s ease-in-out infinite alternate;
 }
 
-.sparkle1 { top: -10px; left: -14px; animation-delay: 0s; }
-.sparkle2 { top: -8px; right: -16px; animation-delay: 0.8s; }
-.sparkle3 { bottom: -6px; right: -12px; animation-delay: 1.6s; }
+.pawTopRight {
+  top: 4px;
+  right: 12px;
+  transform: rotate(20deg);
+  animation: floatPaw1 3s ease-in-out infinite alternate;
+}
 
-@keyframes floatSparkle {
-  0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 0.8; }
-  50% { transform: translateY(-6px) scale(1.15) rotate(12deg); opacity: 1; }
-  100% { transform: translateY(0) scale(1) rotate(0deg); opacity: 0.8; }
+.pawBottomLeft {
+  bottom: 8px;
+  left: 12px;
+  transform: rotate(-15deg);
+  animation: floatPaw2 3.4s ease-in-out infinite alternate 0.4s;
+}
+
+.pawTopLeft {
+  top: 14px;
+  left: 14px;
+  transform: rotate(-25deg);
+  animation: floatPaw1 2.8s ease-in-out infinite alternate 0.8s;
+}
+
+.pawBottomRight {
+  bottom: 10px;
+  right: 18px;
+  transform: rotate(25deg);
+  animation: floatPaw2 3.2s ease-in-out infinite alternate 1.2s;
+}
+
+@keyframes floatPaw1 {
+  0% { transform: translateY(0px) rotate(15deg) scale(0.95); opacity: 0.85; }
+  50% { transform: translateY(-7px) rotate(24deg) scale(1.1); opacity: 1; }
+  100% { transform: translateY(0px) rotate(15deg) scale(0.95); opacity: 0.85; }
+}
+
+@keyframes floatPaw2 {
+  0% { transform: translateY(0px) rotate(-15deg) scale(0.95); opacity: 0.85; }
+  50% { transform: translateY(-6px) rotate(-8deg) scale(1.08); opacity: 1; }
+  100% { transform: translateY(0px) rotate(-15deg) scale(0.95); opacity: 0.85; }
+}
+
+/* Spark Ray bursts */
+.sparkTop {
+  top: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.sparkRight {
+  top: 42%;
+  right: 0px;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.sparkLeft {
+  top: 42%;
+  left: 0px;
+  transform: translateY(-50%) rotate(-45deg);
+}
+
+.sparkRayPair {
+  display: flex;
+  gap: 3px;
+  align-items: flex-end;
+}
+
+.sparkRay {
+  width: 3px;
+  height: 9px;
+  background: #FD802E;
+  border-radius: 3px;
+  display: inline-block;
+  animation: sparkPulse 2s ease-in-out infinite alternate;
+}
+
+.ray1 {
+  height: 10px;
+  transform: rotate(-12deg);
+}
+
+.ray2 {
+  height: 7px;
+  transform: rotate(12deg);
+  animation-delay: 0.5s;
+}
+
+@keyframes sparkPulse {
+  0% { transform: scale(0.8); opacity: 0.7; }
+  100% { transform: scale(1.2); opacity: 1; }
 }
 
 .animatedCheck {
@@ -1956,17 +2051,25 @@
 
 .particle {
   position: absolute;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  animation: burst 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  opacity: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  animation: burst 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 @keyframes burst {
-  0% { transform: translate(0, 0) scale(0); opacity: 1; }
-  50% { opacity: 1; }
-  100% { transform: translate(var(--tx), var(--ty)) scale(1); opacity: 0; }
+  0% { 
+    transform: translate(0, 0) rotate(0deg) scale(0); 
+    opacity: 1; 
+  }
+  40% { 
+    opacity: 1; 
+  }
+  100% { 
+    transform: translate(var(--tx), calc(var(--ty) + 50px)) rotate(540deg) scale(0.3); 
+    opacity: 0; 
+  }
 }
 
 /* Responsive Breakpoints & Mobile Fixes */
@@ -2061,34 +2164,58 @@
 }
 
 @media (max-width: 640px) {
+  .container {
+    padding: 0.75rem 0.75rem 7.5rem 0.75rem !important;
+  }
+
   .successWrapper {
-    padding: 0.5rem 0.5rem 6.5rem 0.5rem;
+    padding: 0.25rem 0.25rem 2rem 0.25rem;
     margin: 0 auto;
   }
+
+  .successIconBadgeWrapper {
+    margin-top: 0.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .successIconBadge {
+    width: 58px;
+    height: 58px;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35), 0 0 0 6px rgba(16, 185, 129, 0.1);
+  }
+
+  .sparkleIcon {
+    font-size: 1rem;
+  }
+
   .successTitle {
-    font-size: 1.65rem;
+    font-size: 1.45rem;
     line-height: 1.2;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.35rem;
   }
+
   .successSubtitle {
-    font-size: 0.88rem;
+    font-size: 0.82rem;
     line-height: 1.4;
-    margin-bottom: 1.25rem;
+    margin-bottom: 0.85rem;
+    max-width: 320px;
   }
+
   .confirmationPill {
-    font-size: 0.8rem;
-    padding: 0.55rem 0.85rem;
-    border-radius: 12px;
-    margin-bottom: 1.25rem;
+    font-size: 0.78rem;
+    padding: 0.45rem 0.75rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
   }
+
   .mainCardHeader {
-    padding: 1.15rem 1rem;
+    padding: 1rem;
   }
 
   .mainCardHeaderInner {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.75rem;
+    gap: 0.5rem;
   }
 
   .editChangeBtn {
@@ -2096,46 +2223,47 @@
   }
 
   .stepBodyAlt {
-    padding: 1rem;
+    padding: 0.85rem;
   }
 
   .formGrid {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 0.85rem;
   }
 
   .paymentOptionHeader {
-    padding: 1rem;
-    gap: 0.75rem;
+    padding: 0.85rem;
+    gap: 0.65rem;
   }
 
   .paymentOptionTitle {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
   }
 
   .paymentOptionSubtitle {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
   }
 
   .paymentOptionBody {
-    padding: 0 1rem 1rem 1rem;
+    padding: 0 0.85rem 0.85rem 0.85rem;
   }
 
   .floatingSummaryCard {
-    padding: 1.15rem;
+    padding: 1rem;
   }
 
   .successCard {
-    padding: 1.15rem;
-    margin-bottom: 1.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 16px;
   }
 
   .successCardHeader {
     flex-direction: column;
     align-items: stretch;
-    gap: 0.75rem;
-    margin-bottom: 1.25rem;
-    padding-bottom: 1rem;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
   }
 
   .cardHeaderItem {
@@ -2147,70 +2275,149 @@
     padding-left: 0 !important;
     border-left: none !important;
     border-top: 1px dashed rgba(33, 28, 21, 0.12);
-    padding-top: 0.75rem;
+    padding-top: 0.6rem;
   }
 
   .cardHeaderItemRight {
     align-items: flex-start !important;
   }
 
-  .secondaryActionsRow {
-    flex-direction: column;
-    gap: 0.75rem;
+  .cardHeaderLabel {
+    font-size: 0.68rem;
   }
 
-  .featuresRow {
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
+  .cardHeaderValue, .cardHeaderValueMono, .cardHeaderValueOrange {
+    font-size: 0.95rem;
   }
 
-  .featureBox {
-    padding: 0.75rem;
-    gap: 0.5rem;
-  }
-
-  .featureIconCircle {
-    width: 34px;
-    height: 34px;
-  }
-
-  .featureBoxTitle {
-    font-size: 0.78rem;
-  }
-
-  .featureBoxDesc {
-    font-size: 0.7rem;
+  .trackerContainer {
+    padding: 0.85rem;
+    margin-bottom: 1rem;
+    border-radius: 12px;
   }
 
   .trackerStepsRow {
     overflow-x: auto;
     padding-bottom: 0.25rem;
+    gap: 0.25rem;
+  }
+
+  .trackerStep {
+    font-size: 0.7rem;
+  }
+
+  .trackerDot {
+    width: 18px;
+    height: 18px;
+  }
+
+  .trackerDotPulse, .trackerDotOutline {
+    width: 15px;
+    height: 15px;
+  }
+
+  .successItemsList {
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .successItemThumb {
+    width: 46px;
+    height: 46px;
+  }
+
+  .successItemName {
+    font-size: 0.82rem;
+  }
+
+  .successItemMeta {
+    font-size: 0.75rem;
+  }
+
+  .successItemPrice {
+    font-size: 0.85rem;
+  }
+
+  .deliveryEstimateCard {
+    padding: 0.75rem 0.85rem;
+    margin-top: 0.75rem;
+  }
+
+  .deliveryTitle {
+    font-size: 0.72rem;
+  }
+
+  .deliveryDate {
+    font-size: 0.85rem;
+  }
+
+  .secondaryActionsRow {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .featuresRow {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .featureBox {
+    padding: 0.65rem;
+    gap: 0.45rem;
+    border-radius: 10px;
+  }
+
+  .featureIconCircle {
+    width: 32px;
+    height: 32px;
+  }
+
+  .featureBoxTitle {
+    font-size: 0.75rem;
+  }
+
+  .featureBoxDesc {
+    font-size: 0.68rem;
+    line-height: 1.25;
+  }
+
+  .primarySuccessBtn {
+    padding: 0.9rem;
+    font-size: 0.95rem;
+    border-radius: 12px;
+  }
+
+  .outlineBtnAlt {
+    padding: 0.75rem;
+    font-size: 0.85rem;
+    border-radius: 10px;
   }
 }
 
 @media (max-width: 480px) {
   .title {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
   }
   .successTitle {
-    font-size: 1.45rem;
-    line-height: 1.25;
+    font-size: 1.3rem;
+    line-height: 1.2;
   }
   .mainCardTitle {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
   .mainCardSubtitle {
-    font-size: 0.82rem;
+    font-size: 0.8rem;
   }
   .phonePrefixAlt {
     padding-right: 0.4rem;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
   }
   .inputWithPrefixAlt {
-    padding-left: 5.5rem;
+    padding-left: 5.25rem;
   }
   .featuresRow {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
   }
 }

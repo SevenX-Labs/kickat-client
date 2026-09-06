@@ -22,11 +22,11 @@ export function AnimatedOrderButton({ onValidate, onComplete, className = '' }: 
       setIsAnimating(true);
       setTimeout(() => {
         if (onComplete) onComplete();
-      }, 8500); // Fire after success text fully appears (starts at 7s)
+      }, 3400); // 3.4s fast smooth completion
       
       setTimeout(() => {
         setIsAnimating(false);
-      }, 10000);
+      }, 4500);
     }
   };
 

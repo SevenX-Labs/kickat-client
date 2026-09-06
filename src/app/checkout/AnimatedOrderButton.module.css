@@ -241,34 +241,34 @@
 .order.animate .success {
   --offset: 0;
   --o: 1;
-  transition-delay: 7s;
+  transition-delay: 2.2s;
 }
 .order.animate .success svg {
-  transition-delay: 7.3s;
+  transition-delay: 2.4s;
 }
 .order.animate .truck {
-  -webkit-animation: truck 10s ease forwards;
-          animation: truck 10s ease forwards;
+  -webkit-animation: truck 3.4s ease forwards;
+          animation: truck 3.4s ease forwards;
 }
 .order.animate .truck:before {
-  -webkit-animation: door1 2.4s ease forwards 0.3s;
-          animation: door1 2.4s ease forwards 0.3s;
+  -webkit-animation: door1 1s ease forwards 0.15s;
+          animation: door1 1s ease forwards 0.15s;
 }
 .order.animate .truck:after {
-  -webkit-animation: door2 2.4s ease forwards 0.6s;
-          animation: door2 2.4s ease forwards 0.6s;
+  -webkit-animation: door2 1s ease forwards 0.25s;
+          animation: door2 1s ease forwards 0.25s;
 }
 .order.animate .truck .light:before, .order.animate .truck .light:after {
-  -webkit-animation: light 10s ease forwards;
-          animation: light 10s ease forwards;
+  -webkit-animation: light 3.4s ease forwards;
+          animation: light 3.4s ease forwards;
 }
 .order.animate .box {
-  -webkit-animation: box 10s ease forwards;
-          animation: box 10s ease forwards;
+  -webkit-animation: box 3.4s ease forwards;
+          animation: box 3.4s ease forwards;
 }
 .order.animate .lines {
-  -webkit-animation: lines 10s ease forwards;
-          animation: lines 10s ease forwards;
+  -webkit-animation: lines 3.4s ease forwards;
+          animation: lines 3.4s ease forwards;
 }
 
 @-webkit-keyframes truck {
