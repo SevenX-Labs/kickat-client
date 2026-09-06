@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
@@ -87,6 +88,22 @@ export function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [cartCount, setCartCount] = useState(2);
   const [isCartBouncing, setIsCartBouncing] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMenuOpen]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -398,54 +415,58 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Half-Width Side Drawer Overlay Backdrop */}
-      <div 
-        className={`${styles.sideDrawerBackdrop} ${isMenuOpen ? styles.sideDrawerBackdropOpen : ''}`}
-        onClick={() => setIsMenuOpen(false)}
-      />
-
-      {/* Half-Width Side Drawer Panel (Slides in from Left) */}
-      <div className={`${styles.sideDrawerPanel} ${isMenuOpen ? styles.sideDrawerPanelOpen : ''}`}>
-        <div className={styles.sideDrawerHeader}>
-          <Image
-            src="/logo-clean.png"
-            alt="KickAt Logo"
-            width={130}
-            height={42}
-            className={styles.sideDrawerLogo}
-          />
-          <button 
-            type="button" 
-            className={styles.sideDrawerCloseBtn} 
+      {/* Half-Width Side Drawer Overlay Backdrop & Panel (Rendered via Portal to document.body to avoid parent backdrop-filter clipping) */}
+      {mounted && createPortal(
+        <>
+          <div 
+            className={`${styles.sideDrawerBackdrop} ${isMenuOpen ? styles.sideDrawerBackdropOpen : ''}`}
             onClick={() => setIsMenuOpen(false)}
-            aria-label="Close drawer"
-          >
-            <X size={18} />
-          </button>
-        </div>
+          />
 
-        <div className={styles.sideDrawerNav}>
-          <span className={styles.sideDrawerNavGroupTitle}>Quick Navigation</span>
-          {sideDrawerLinks.map(({ label, href, Icon }) => (
-            <Link 
-              key={label} 
-              href={href} 
-              className={styles.sideDrawerItem}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              <Icon size={18} className={styles.sideDrawerItemIcon} />
-              <span>{label}</span>
-            </Link>
-          ))}
-        </div>
+          <div className={`${styles.sideDrawerPanel} ${isMenuOpen ? styles.sideDrawerPanelOpen : ''}`}>
+            <div className={styles.sideDrawerHeader}>
+              <Image
+                src="/logo-clean.png"
+                alt="KickAt Logo"
+                width={130}
+                height={42}
+                className={styles.sideDrawerLogo}
+              />
+              <button 
+                type="button" 
+                className={styles.sideDrawerCloseBtn} 
+                onClick={() => setIsMenuOpen(false)}
+                aria-label="Close drawer"
+              >
+                <X size={18} />
+              </button>
+            </div>
 
-        <div className={styles.sideDrawerFooter}>
-          <div className={styles.sideDrawerBadge}>
-            <Crown size={14} />
-            <span>KickAt VIP Pet Perks</span>
+            <div className={styles.sideDrawerNav}>
+              <span className={styles.sideDrawerNavGroupTitle}>Quick Navigation</span>
+              {sideDrawerLinks.map(({ label, href, Icon }) => (
+                <Link 
+                  key={label} 
+                  href={href} 
+                  className={styles.sideDrawerItem}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <Icon size={18} className={styles.sideDrawerItemIcon} />
+                  <span>{label}</span>
+                </Link>
+              ))}
+            </div>
+
+            <div className={styles.sideDrawerFooter}>
+              <div className={styles.sideDrawerBadge}>
+                <Crown size={14} />
+                <span>KickAt VIP Pet Perks</span>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </>,
+        document.body
+      )}
     </header>
   );
 }
