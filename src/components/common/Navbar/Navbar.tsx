@@ -89,6 +89,16 @@ export function Navbar() {
   const [cartCount, setCartCount] = useState(2);
   const [isCartBouncing, setIsCartBouncing] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      router.push('/search');
+    }
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -288,7 +298,7 @@ export function Navbar() {
                   </div>
 
                   {/* Promo Banner */}
-                  <div className={styles.megaPromoBanner}>
+                  <Link href="/contact" className={styles.megaPromoBanner} onClick={() => setMenuHoverAllowed(false)}>
                     <div className={styles.megaPromoIconWrap}>
                       <Sun size={20} strokeWidth={1.8} className={styles.megaPromoIcon} /> 
                     </div>
@@ -297,7 +307,7 @@ export function Navbar() {
                       <span className={styles.megaPromoSub}>Get expert recommendations</span>
                     </div>
                     <ArrowRight size={16} strokeWidth={2} className={styles.megaPromoArrow} />
-                  </div>
+                  </Link>
                 </div>
 
                 {/* Right Image */}
@@ -317,21 +327,25 @@ export function Navbar() {
 
         {/* Right Section: Search + Premium Actions */}
         <div className={styles.rightSection}>
-          <div className={styles.searchContainer}>
+          <form className={styles.searchContainer} onSubmit={handleSearchSubmit}>
             <div className={styles.searchWrapper}>
-              <Search className={styles.searchIcon} size={16} strokeWidth={1.5} />
+              <button type="submit" style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center' }} aria-label="Submit Search">
+                <Search className={styles.searchIcon} size={16} strokeWidth={1.5} />
+              </button>
               <input
                 type="text"
                 placeholder="Search products..."
                 className={styles.searchInput}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-          </div>
+          </form>
           
           <div className={styles.actions}>
-            <button className={`${styles.iconBtn} ${styles.wishlistBtn}`} aria-label="Wishlist" title="Wishlist">
+            <Link href="/wishlist" className={`${styles.iconBtn} ${styles.wishlistBtn}`} aria-label="Wishlist" title="Wishlist">
               <Heart size={20} strokeWidth={1.5} />
-            </button>
+            </Link>
 
             <div className={styles.accountWrapper}>
               <div 
