@@ -93,13 +93,18 @@ function HeroComponent() {
           <div className={styles.trustBar}>
             <div className={styles.trustItem}>
               <div className={styles.avatarStack} aria-hidden="true">
-                <span>🐶</span>
-                <span>🐱</span>
-                <span>🐰</span>
+                <span className={styles.avatar}>🐶</span>
+                <span className={styles.avatar}>🐱</span>
+                <span className={styles.avatar}>🐰</span>
               </div>
               <div className={styles.ratingGroup}>
-                <StarRow />
-                <span>4.9/5 from 25K+ happy pet parents</span>
+                <div className={styles.starsWrapper}>
+                  <StarRow />
+                  <span className={styles.ratingScore}>4.9/5</span>
+                </div>
+                <span className={styles.ratingText}>
+                  from <strong className={styles.ratingCount}>25K+</strong> happy pet parents
+                </span>
               </div>
             </div>
           </div>

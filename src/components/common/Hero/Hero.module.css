@@ -337,51 +337,110 @@
 .trustBar {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  flex-wrap: wrap;
+  margin-top: 0.5rem;
+  width: 100%;
 }
 
 .trustItem {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.9rem;
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: #556066;
-  letter-spacing: 0.01em;
+  gap: 0.85rem;
+  padding: 0.45rem 1.05rem 0.45rem 0.55rem;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(253, 128, 46, 0.2);
+  border-radius: 9999px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 18px rgba(35, 61, 76, 0.05);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  max-width: 100%;
+}
+
+.trustItem:hover {
+  transform: translateY(-2px);
+  border-color: rgba(253, 128, 46, 0.35);
+  box-shadow: 0 6px 22px rgba(253, 128, 46, 0.12);
 }
 
 .avatarStack {
   display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
-.avatarStack span {
-  width: 1.9rem;
-  height: 1.9rem;
+.avatar {
+  width: 2rem;
+  height: 2rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   margin-left: -0.45rem;
   border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0 0 2px rgba(252, 250, 246, 1);
-  font-size: 0.9rem;
+  background: #ffffff;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 5px rgba(35, 61, 76, 0.12);
+  font-size: 0.95rem;
+  line-height: 1;
+  position: relative;
+  transition: transform 0.2s ease;
+  user-select: none;
 }
 
-.avatarStack span:first-child {
+.avatar:first-child {
   margin-left: 0;
+  z-index: 3;
 }
+
+.avatar:nth-child(2) {
+  z-index: 2;
+}
+
+.avatar:nth-child(3) {
+  z-index: 1;
+}
+
+.trustItem:hover .avatar:nth-child(1) { transform: translateX(-2px); }
+.trustItem:hover .avatar:nth-child(3) { transform: translateX(2px); }
 
 .ratingGroup {
   display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.15rem;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.starsWrapper {
+  display: flex;
   align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
+  gap: 0.4rem;
+  line-height: 1;
 }
 
 .stars {
   display: inline-flex;
-  gap: 0.1rem;
+  align-items: center;
+  gap: 0.12rem;
+}
+
+.ratingScore {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #233D4C;
+  letter-spacing: -0.01em;
+}
+
+.ratingText {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #556066;
+  white-space: nowrap;
+}
+
+.ratingCount {
+  font-weight: 700;
+  color: #233D4C;
 }
 
 /* Glassmorphism Background Circle (Reduced Size) */
@@ -616,7 +675,11 @@
   }
 
   .trustBar {
-    display: none;
+    display: flex;
+    margin-top: 0.35rem;
+  }
+  .trustItem {
+    padding: 0.35rem 0.85rem 0.35rem 0.45rem;
   }
 
   .visualContent {
@@ -710,17 +773,63 @@
   }
 
   .trustItem {
-    align-items: flex-start;
-    gap: 0.65rem;
-  }
-
-  .ratingGroup {
-    align-items: flex-start;
-    flex-direction: column;
+    width: 100%;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.55rem 0.9rem;
   }
 
   .visualContent {
     height: 310px;
+  }
+}
+
+
+@media (max-width: 600px) {
+  .actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.35rem;
+  }
+
+  .primaryBtn,
+  .secondaryBtn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.95rem 1.35rem;
+  }
+
+  .trustBar {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .trustItem {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 360px) {
+  .trustItem {
+    padding: 0.42rem 0.6rem;
+    gap: 0.5rem;
+  }
+
+  .avatar {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.82rem;
+    margin-left: -0.4rem;
+  }
+
+  .ratingScore {
+    font-size: 0.8rem;
+  }
+
+  .ratingText {
+    font-size: 0.7rem;
   }
 }
 
