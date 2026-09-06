@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AnimatedOrderButton } from './AnimatedOrderButton';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -58,6 +58,10 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    document.title = isSubmitted ? "Order Placed Successfully! | KickAt" : "Checkout - Secure Payment | KickAt";
+  }, [isSubmitted]);
 
   // Form states for validation checkmarks (pre-filled with dummy data)
   const [firstName, setFirstName] = useState('Eduard');

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { 
   Bell, Shield, Trash2, Sparkles, AlertTriangle, X
 } from 'lucide-react';
@@ -22,6 +22,10 @@ function SettingsContent() {
   const [userData] = useState(initialUserData);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  useEffect(() => {
+    document.title = "Preferences & Settings | KickAt";
+  }, []);
 
   // Preference States
   const [notifications, setNotifications] = useState({

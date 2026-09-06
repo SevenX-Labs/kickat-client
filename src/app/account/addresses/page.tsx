@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   MapPin, Plus, Check, Trash2, X, Sparkles 
@@ -38,6 +38,10 @@ function SavedAddressesContent() {
   const [addresses, setAddresses] = useState(initialAddresses);
   const [isAddAddressOpen, setIsAddAddressOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    document.title = "Saved Addresses | KickAt";
+  }, []);
 
   const [addressForm, setAddressForm] = useState({
     type: 'Home',

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
@@ -72,6 +72,10 @@ function AccountOrdersContent() {
   const [dateFilter, setDateFilter] = useState('all'); // 'all', 'last30', '2026', '2025'
   const [searchQuery, setSearchQuery] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  useEffect(() => {
+    document.title = "My Orders | KickAt";
+  }, []);
 
   const isAnyFilterActive = orderFilter !== 'All' || sortBy !== 'newest' || dateFilter !== 'all';
 

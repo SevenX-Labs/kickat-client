@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, CreditCard, ShieldCheck, ShoppingBag, Trash2 } from 'lucide-react';
@@ -29,7 +29,7 @@ const initialCart = [
   {
     id: '3',
     name: 'Ultra Soft Pet Bed Cushion',
-    variant: 'Grey / Medium',
+    variant: 'Large / Grey',
     price: 1299,
     quantity: 1,
     image: '/hero-products/pet_bowl.png'
@@ -37,7 +37,7 @@ const initialCart = [
   {
     id: '4',
     name: 'Interactive Cat Teaser Toy',
-    variant: 'Multi-color',
+    variant: 'Feather Wand',
     price: 399,
     quantity: 3,
     image: '/hero-products/dog_food.png'
@@ -45,7 +45,7 @@ const initialCart = [
   {
     id: '5',
     name: 'Stainless Steel Non-Slip Pet Bowl',
-    variant: 'Silver / Large',
+    variant: 'Medium 800ml',
     price: 499,
     quantity: 2,
     image: '/hero-products/pet_bowl.png'
@@ -63,6 +63,10 @@ const initialCart = [
 export default function CartPage() {
   const router = useRouter();
   const [cartItems, setCartItems] = useState(initialCart);
+
+  useEffect(() => {
+    document.title = `Your Shopping Cart (${cartItems.length}) | KickAt`;
+  }, [cartItems.length]);
 
   const updateQuantity = (id: string, delta: number) => {
     setCartItems(items => items.map(item => {

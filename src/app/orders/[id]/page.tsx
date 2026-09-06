@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from 'react';
+import { use, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronRight, MapPin, User, Download, Phone, Truck, CheckCircle, Package, RotateCcw, Clock, Navigation, PackageCheck, CheckCircle2, FileCheck } from 'lucide-react';
@@ -9,6 +9,10 @@ import styles from './OrderDetails.module.css';
 export default function OrderDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const orderId = resolvedParams.id || "ORD-89241";
+
+  useEffect(() => {
+    document.title = `Order #${orderId} Details | KickAt`;
+  }, [orderId]);
   
   return (
     <div className={styles.pageWrapper}>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { Heart } from 'lucide-react';
 import styles from './wishlist.module.css';
 import accountStyles from '@/app/account/Account.module.css';
@@ -13,6 +13,10 @@ const MOCK_WISHLIST = CATALOG_PRODUCTS.slice(0, 5);
 
 function WishlistContent() {
   const [wishlistItems, setWishlistItems] = useState(MOCK_WISHLIST);
+
+  useEffect(() => {
+    document.title = `My Wishlist (${wishlistItems.length}) | KickAt`;
+  }, [wishlistItems.length]);
 
   const handleRemove = (id: string) => {
     setWishlistItems(prev => prev.filter(item => item.id !== id));

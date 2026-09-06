@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Search, ChevronRight, Package, ArrowRight, FileText, Truck, Star, RefreshCw, X, SlidersHorizontal } from 'lucide-react';
@@ -48,6 +48,10 @@ export default function OrdersPage() {
   const [activeTab, setActiveTab] = useState('All');
   const [timeFilter, setTimeFilter] = useState<string>('All Time');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  useEffect(() => {
+    document.title = "My Orders & History | KickAt";
+  }, []);
 
   const filterTabs = ['All', 'On the way', 'Delivered', 'Cancelled'];
 

@@ -44,6 +44,10 @@ function AccountProfileContent() {
 
   const [userData, setUserData] = useState(initialUserData);
 
+  useEffect(() => {
+    document.title = "Profile Details | KickAt";
+  }, []);
+
   // Modals & Toast State
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { 
   CreditCard, Plus, Check, Trash2, X, Sparkles, Smartphone, ShieldCheck, Lock, CheckCircle2
 } from 'lucide-react';
@@ -60,6 +60,10 @@ function PaymentMethodsContent() {
   const [userData] = useState(initialUserData);
   const [cards, setCards] = useState(initialCards);
   const [upiList, setUpiList] = useState(initialUpiList);
+
+  useEffect(() => {
+    document.title = "Payment Methods | KickAt";
+  }, []);
   
   // Modals & Toasts
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
