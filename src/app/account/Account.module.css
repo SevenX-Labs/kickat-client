@@ -2429,6 +2429,12 @@
   }
 }
 
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem 0.9rem 5.5rem;
+  }
+}
+
 
 
 

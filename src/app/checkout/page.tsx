@@ -138,7 +138,6 @@ export default function CheckoutPage() {
   };
 
   if (isSubmitted) {
-
     return (
       <main className={styles.container}>
         <div className={styles.successWrapper}>
@@ -157,42 +156,82 @@ export default function CheckoutPage() {
             ))}
           </div>
 
-          <div className={styles.successIconBadge}>
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1B3C35" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={styles.animatedCheck}>
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
+          {/* Animated Celebration Icon Badge */}
+          <div className={styles.successIconBadgeWrapper}>
+            <span className={`${styles.sparkleIcon} ${styles.sparkle1}`}>✨</span>
+            <span className={`${styles.sparkleIcon} ${styles.sparkle2}`}>🐾</span>
+            <span className={`${styles.sparkleIcon} ${styles.sparkle3}`}>🎉</span>
+            <div className={styles.successIconBadge}>
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={styles.animatedCheck}>
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
           </div>
           
-          <h1 className={styles.successTitle}>Order Placed <span className={styles.successTitleOrange}>Successfully!</span></h1>
+          <h1 className={styles.successTitle}>
+            Order Placed <span className={styles.successTitleOrange}>Successfully!</span>
+          </h1>
           <p className={styles.successSubtitle}>
-            Thank you for shopping with KickAt. We&apos;ve sent a confirmation email<br/>with tracking details to your inbox.
+            Thank you for shopping with KickAt. We&apos;ve sent a confirmation email with live tracking details to your inbox.
           </p>
           
           <div className={styles.confirmationPill}>
-            <Mail size={16} /> Confirmation sent to <strong>{email || 'sahil.hode@gmail.com'}</strong>
+            <Mail size={16} color="#10B981" style={{ flexShrink: 0 }} />
+            <span>Confirmation sent to <strong className={styles.pillEmail}>{email || 'sahil.hode@gmail.com'}</strong></span>
           </div>
 
+          {/* Ultra Premium Success Card */}
           <div className={styles.successCard}>
             <div className={styles.successCardHeader}>
               <div className={styles.cardHeaderItem}>
                 <span className={styles.cardHeaderLabel}>ORDER NUMBER</span>
                 <span className={styles.cardHeaderValueMono}>#KCK-{orderNumber}</span>
               </div>
-              <div className={styles.cardHeaderItem} style={{ paddingLeft: '2rem', borderLeft: '1px solid #e0dcd2' }}>
+              <div className={`${styles.cardHeaderItem} ${styles.cardHeaderItemBorder}`}>
                 <span className={styles.cardHeaderLabel}>ORDER DATE</span>
                 <span className={styles.cardHeaderValue}><Calendar size={14}/> 26 May, 2025 • 10:24 AM</span>
               </div>
-              <div className={styles.cardHeaderItem} style={{ alignItems: 'flex-end', borderLeft: '1px solid #e0dcd2' }}>
+              <div className={`${styles.cardHeaderItem} ${styles.cardHeaderItemBorder} ${styles.cardHeaderItemRight}`}>
                 <span className={styles.cardHeaderLabel}>TOTAL AMOUNT</span>
                 <span className={styles.cardHeaderValueOrange}>₹{total.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
               </div>
             </div>
 
+            {/* Live Order Progress Tracker */}
+            <div className={styles.trackerContainer}>
+              <div className={styles.trackerHeader}>
+                <span className={styles.trackerLabel}>LIVE ORDER STATUS</span>
+                <span className={styles.trackerStatusBadge}>Order Confirmed</span>
+              </div>
+              <div className={styles.trackerStepsRow}>
+                <div className={`${styles.trackerStep} ${styles.trackerStepCompleted}`}>
+                  <div className={styles.trackerDot}><Check size={12} strokeWidth={3} /></div>
+                  <span>Confirmed</span>
+                </div>
+                <div className={styles.trackerLineActive}></div>
+                <div className={`${styles.trackerStep} ${styles.trackerStepCurrent}`}>
+                  <div className={styles.trackerDotPulse}></div>
+                  <span>Processing</span>
+                </div>
+                <div className={styles.trackerLine}></div>
+                <div className={styles.trackerStep}>
+                  <div className={styles.trackerDotOutline}></div>
+                  <span>Shipped</span>
+                </div>
+                <div className={styles.trackerLine}></div>
+                <div className={styles.trackerStep}>
+                  <div className={styles.trackerDotOutline}></div>
+                  <span>Delivered</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Order Items List */}
             <div className={styles.successItemsList}>
               {checkoutItems.map((item) => (
                 <div key={item.id} className={styles.successItem}>
                   <div className={styles.successItemThumb}>
-                    <Image src={item.image} alt={item.name} fill style={{ objectFit: 'cover' }} />
+                    <Image src={item.image} alt={item.name} fill style={{ objectFit: 'contain' }} />
                   </div>
                   <div className={styles.successItemDetails}>
                     <div className={styles.successItemName}>{item.name}</div>
@@ -205,9 +244,10 @@ export default function CheckoutPage() {
               ))}
             </div>
 
+            {/* Delivery Estimate Box */}
             <div className={styles.deliveryEstimateCard}>
               <div className={styles.deliveryIconWrapper}>
-                <Truck size={18} color="#ea580c" />
+                <Truck size={20} color="#ea580c" />
               </div>
               <div className={styles.deliveryText}>
                 <div className={styles.deliveryTitle}>Estimated Delivery</div>
@@ -216,54 +256,57 @@ export default function CheckoutPage() {
             </div>
           </div>
           
+          {/* Trust Features Strip */}
           <div className={styles.featuresRow}>
             <div className={styles.featureBox}>
               <div className={styles.featureIconCircle}><Truck size={20} /></div>
               <div>
                 <div className={styles.featureBoxTitle}>Fast Delivery</div>
-                <div className={styles.featureBoxDesc}>On-time delivery<br/>guaranteed</div>
+                <div className={styles.featureBoxDesc}>On-time delivery guaranteed</div>
               </div>
             </div>
             <div className={styles.featureBox}>
               <div className={styles.featureIconCircle}><Shield size={20} /></div>
               <div>
                 <div className={styles.featureBoxTitle}>Secure Payment</div>
-                <div className={styles.featureBoxDesc}>100% safe & secure<br/>transactions</div>
+                <div className={styles.featureBoxDesc}>100% safe & encrypted</div>
               </div>
             </div>
             <div className={styles.featureBox}>
               <div className={styles.featureIconCircle}><RotateCcw size={20} /></div>
               <div>
                 <div className={styles.featureBoxTitle}>Easy Returns</div>
-                <div className={styles.featureBoxDesc}>Hassle-free returns<br/>within 7 days</div>
+                <div className={styles.featureBoxDesc}>30 day hassle-free returns</div>
               </div>
             </div>
             <div className={styles.featureBox}>
               <div className={styles.featureIconCircle}><Headphones size={20} /></div>
               <div>
                 <div className={styles.featureBoxTitle}>Customer Support</div>
-                <div className={styles.featureBoxDesc}>We're here to help<br/>24/7</div>
+                <div className={styles.featureBoxDesc}>24/7 dedicated assistance</div>
               </div>
             </div>
           </div>
 
+          {/* Action CTAs */}
           <div className={styles.successCtaGroup}>
-            <Link href="/account" className={styles.primarySuccessBtn}>
+            <Link href="/orders" className={styles.primarySuccessBtn}>
               <Package size={20} /> View Order Status <ArrowRight size={20} />
             </Link>
             <div className={styles.secondaryActionsRow}>
               <Link href="/shop" className={styles.outlineBtnAlt}>
                 <ShoppingBag size={16} /> Continue Shopping
               </Link>
-              <button className={styles.outlineBtnAlt}>
+              <button type="button" className={styles.outlineBtnAlt}>
                 <Download size={16} /> Download Invoice
               </button>
             </div>
           </div>
           
           <div className={styles.successFooter}>
-             <Heart size={14} fill="#ea580c" color="#ea580c" style={{ display: 'inline', verticalAlign: 'middle' }} /> Thanks for choosing KickAt!<br/>
-             <span style={{color: '#666'}}>Your pet's happiness is our priority.</span>
+            <Heart size={14} fill="#ea580c" color="#ea580c" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} />
+            Thanks for choosing KickAt!<br/>
+            <span style={{ color: '#888', fontSize: '0.85rem' }}>Your pet&apos;s happiness is our priority.</span>
           </div>
           
         </div>
@@ -309,7 +352,7 @@ export default function CheckoutPage() {
             <div className={styles.mainCard}>
               {currentStep === 1 && (
               <div className={styles.mainCardHeader}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                <div className={styles.mainCardHeaderInner}>
                   <div>
                     <h2 className={styles.mainCardTitle}>Delivery Address</h2>
                     <p className={styles.mainCardSubtitle}>Your order will be delivered to this address</p>

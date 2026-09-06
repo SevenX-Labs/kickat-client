@@ -164,7 +164,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
           </button>
         )}
 
-        <Link href={`/product/${product.id}`} prefetch={true} className={styles.cardImageLink}>
+        <Link href={`/product/${product.id}`} prefetch={true} target="_blank" rel="noopener noreferrer" className={styles.cardImageLink}>
           <Image
             src={product.image}
             alt={product.name}
@@ -182,7 +182,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
           <span className={styles.categoryText}>{product.brand || product.mainCategory || 'KickAt Essential'}</span>
         </div>
 
-        <Link href={`/product/${product.id}`} prefetch={true} className={styles.cardTitleLink}>
+        <Link href={`/product/${product.id}`} prefetch={true} target="_blank" rel="noopener noreferrer" className={styles.cardTitleLink}>
           <h3 className={styles.cardTitle}>{product.name}</h3>
         </Link>
 

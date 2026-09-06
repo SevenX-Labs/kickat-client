@@ -383,7 +383,7 @@
 
 @media (max-width: 720px) {
   .container {
-    padding: 1.25rem 0.9rem 0;
+    padding: 1.25rem 0.9rem 5.5rem 0.9rem;
   }
 
   .pageHeader {
