@@ -108,6 +108,20 @@
   flex: 1;
 }
 
+.categoryRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.2rem;
+}
+
+.categoryText {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #0284C7;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
 .cardTitleLink {
   text-decoration: none;
   color: inherit;
@@ -226,6 +240,11 @@
 .addToCartBtn:active {
   transform: translateY(0);
   box-shadow: 0 2px 5px rgba(249, 115, 22, 0.2);
+}
+
+.addedBtn {
+  background: linear-gradient(180deg, #16A34A 0%, #15803D 100%) !important;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.3) !important;
 }
 
 /* Mobile Overrides */

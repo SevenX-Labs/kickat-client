@@ -127,7 +127,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
   }, [isAdded, product.image, router]);
 
   return (
-    <div className={styles.card}>
+    <div className={styles.homeCard}>
       {/* Product Image Area */}
       <div className={styles.cardImageArea}>
         {product.badge && (
@@ -187,8 +187,8 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
         </Link>
 
         {/* Rating Row */}
-        <div className={styles.ratingRow}>
-          <div className={styles.stars}>
+        <div className={styles.cardRatingRow}>
+          <div className={styles.starsGroup}>
             {[1, 2, 3, 4, 5].map((star) => (
               <Star 
                 key={star} 
@@ -199,20 +199,20 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
               />
             ))}
           </div>
-          <span className={styles.ratingScore}>{rating.toFixed(1)}</span>
-          <span className={styles.reviewsCount}>({reviewsCount})</span>
+          <span className={styles.cardRatingScore}>{rating.toFixed(1)}</span>
+          <span className={styles.cardReviewsCount}>({reviewsCount})</span>
         </div>
 
         {/* Price Row */}
-        <div className={styles.priceRow}>
-          <div className={styles.priceGroup}>
-            <span className={styles.currentPrice}>₹{product.price.toLocaleString()}</span>
+        <div className={styles.priceContainer}>
+          <div className={styles.priceRowUpper}>
+            <span className={styles.cardPrice}>₹{product.price.toLocaleString()}</span>
             {product.originalPrice && (
               <span className={styles.originalPrice}>₹{product.originalPrice.toLocaleString()}</span>
             )}
           </div>
           {discountPercent && (
-            <span className={styles.discountBadge}>{discountPercent}% OFF</span>
+            <span className={styles.discountTag}>{discountPercent}% OFF</span>
           )}
         </div>
 
