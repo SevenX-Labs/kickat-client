@@ -324,16 +324,16 @@ export default function CheckoutPage() {
 
           {/* Action CTAs */}
           <div className={styles.successCtaGroup}>
-            <Link href="/orders" className={styles.primarySuccessBtn}>
+            <Link href={orderNumber ? `/orders/KCK-${orderNumber}` : "/orders"} className={styles.primarySuccessBtn}>
               <Package size={20} /> View Order Status <ArrowRight size={20} />
             </Link>
             <div className={styles.secondaryActionsRow}>
               <Link href="/shop" className={styles.outlineBtnAlt}>
                 <ShoppingBag size={16} /> Continue Shopping
               </Link>
-              <button type="button" className={styles.outlineBtnAlt}>
+              <Link href={orderNumber ? `/orders/KCK-${orderNumber}/invoice` : "/orders/ORD-89241/invoice"} className={styles.outlineBtnAlt} target="_blank">
                 <Download size={16} /> Download Invoice
-              </button>
+              </Link>
             </div>
           </div>
           
