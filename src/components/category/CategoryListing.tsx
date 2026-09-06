@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import ProductCard from '../common/ProductCard/ProductCard';
@@ -32,6 +32,17 @@ export function CategoryListing({ category }: CategoryListingProps) {
   const [sortBy, setSortBy] = useState<'featured' | 'price-low' | 'price-high' | 'rating'>('featured');
   const [gridCols, setGridCols] = useState<2 | 3 | 4>(3);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+
+  // Lock background scroll when mobile filter drawer is open
+  useEffect(() => {
+    if (mobileFilterOpen) {
+      const prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prevOverflow;
+      };
+    }
+  }, [mobileFilterOpen]);
 
   // Handlers
   const toggleSubcategory = (name: string, slug: string) => {
@@ -130,6 +141,7 @@ export function CategoryListing({ category }: CategoryListingProps) {
             </div>
           </div>
 
+          <div className={styles.sidebarBody}>
           {/* Sort By Filter Group */}
           <div className={styles.filterGroup}>
             <div className={styles.groupHeader}>
@@ -217,6 +229,18 @@ export function CategoryListing({ category }: CategoryListingProps) {
                 <span className={styles.checkText}>4.5★ & Above</span>
               </label>
             </div>
+          </div>
+          </div>
+
+          {/* Sticky Mobile Apply Footer */}
+          <div className={styles.mobileFilterFooter}>
+            <button
+              type="button"
+              onClick={() => setMobileFilterOpen(false)}
+              className={styles.applyFilterBtn}
+            >
+              Apply Filters ({filteredProducts.length})
+            </button>
           </div>
         </aside>
 
