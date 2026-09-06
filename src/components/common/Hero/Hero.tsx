@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import Link from 'next/link';
 import { Star, Bone, PawPrint, Fish, ArrowRight } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -9,17 +9,34 @@ import styles from './Hero.module.css';
 // Dynamic import of Three.js Canvas to prevent main-thread hydration delay
 const DynamicBottleCanvas = dynamic(() => import('./BottleModelCanvas').then(mod => mod.BottleModelCanvas), {
   ssr: false,
-  loading: () => <div style={{ width: '100%', height: '100%' }} />
+  loading: () => <div style={{ width: '100%', height: '100%' }} />,
 });
 
-export function Hero() {
+// Memoized star row to avoid re-renders
+const StarRow = memo(function StarRow() {
+  return (
+    <div className={styles.stars} aria-hidden="true">
+      {[1, 2, 3, 4, 5].map(i => (
+        <Star key={i} size={14} fill="#FD802E" color="#FD802E" strokeWidth={1} opacity={i === 5 ? 0.45 : 1} />
+      ))}
+    </div>
+  );
+});
+
+function HeroComponent() {
   const [show3D, setShow3D] = useState(false);
 
   useEffect(() => {
-    // Load 3D model canvas in background while splash loader is displaying
-    const timer = setTimeout(() => setShow3D(true), 400);
-    return () => clearTimeout(timer);
+    // Use requestIdleCallback where available for smoother initial load
+    if ('requestIdleCallback' in window) {
+      const id = (window as any).requestIdleCallback(() => setShow3D(true), { timeout: 600 });
+      return () => (window as any).cancelIdleCallback(id);
+    } else {
+      const timer = setTimeout(() => setShow3D(true), 400);
+      return () => clearTimeout(timer);
+    }
   }, []);
+
   return (
     <section className={styles.hero}>
       {/* Wavy Fluid Background Animations */}
@@ -81,13 +98,7 @@ export function Hero() {
                 <span>🐰</span>
               </div>
               <div className={styles.ratingGroup}>
-                <div className={styles.stars} aria-hidden="true">
-                  <Star size={14} fill="#FD802E" color="#FD802E" strokeWidth={1} />
-                  <Star size={14} fill="#FD802E" color="#FD802E" strokeWidth={1} />
-                  <Star size={14} fill="#FD802E" color="#FD802E" strokeWidth={1} />
-                  <Star size={14} fill="#FD802E" color="#FD802E" strokeWidth={1} />
-                  <Star size={14} fill="#FD802E" color="#FD802E" strokeWidth={1} opacity={0.45} />
-                </div>
+                <StarRow />
                 <span>4.9/5 from 25K+ happy pet parents</span>
               </div>
             </div>
@@ -118,3 +129,5 @@ export function Hero() {
     </section>
   );
 }
+
+export const Hero = memo(HeroComponent);

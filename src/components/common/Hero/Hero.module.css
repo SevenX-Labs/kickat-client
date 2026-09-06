@@ -489,10 +489,52 @@
   100% { transform: translate3d(85px, 0, 0); }
 }
 
+/* ══════════════════════════════════════════════════════════
+   MOBILE PERFORMANCE OVERRIDES (<= 768px)
+   - Disable GPU-intensive blur filters
+   - Remove continuous blob/icon animations
+   - Hide glass circle backdrop-filter
+   - Reduce wave layers
+   ══════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
   .hero {
     height: auto;
     min-height: auto;
+    /* Remove the noise SVG texture on mobile — it forces a rasterization pass */
+    background: linear-gradient(135deg, #FEFCF8 0%, #FFF5E8 50%, #FCFAF6 100%);
+  }
+
+  /* Kill blob animations & reduce blur for mobile GPU savings */
+  .blob1, .blob2, .blob3 {
+    animation: none !important;
+    will-change: auto;
+    filter: blur(20px); /* Reduced from 45px */
+  }
+
+  .blob3 {
+    display: none; /* Remove 3rd blob entirely */
+  }
+
+  .blob1 {
+    width: 350px;
+    height: 350px;
+  }
+
+  .blob2 {
+    width: 300px;
+    height: 300px;
+  }
+
+  /* Kill floating icon animations — static positioning only */
+  .floatIcon {
+    animation: none !important;
+    will-change: auto;
+    opacity: 0.08; /* Even subtler on mobile */
+  }
+
+  /* Hide glassmorphism circle — backdrop-filter is extremely expensive on mobile */
+  .glassCircle {
+    display: none !important;
   }
 
   .container {
@@ -523,16 +565,19 @@
     gap: 0.45rem;
   }
 
+  /* Reduce wave height and disable 2 of the 4 wave animations */
   .waves { height: 40px; min-height: 40px; }
 
-  .glassCircle {
-    top: auto;
-    right: auto;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 250px;
-    height: 250px;
+  .parallax > use:nth-child(2),
+  .parallax > use:nth-child(3) {
+    display: none; /* Only render 2 wave layers instead of 4 */
+  }
+
+  /* Disable button shimmer animations */
+  .primaryBtn::after,
+  .secondaryBtn::after {
+    animation: none !important;
+    display: none;
   }
 }
 
@@ -677,14 +722,19 @@
   .visualContent {
     height: 310px;
   }
+}
 
+/* Respect prefers-reduced-motion for accessibility + battery savings */
+@media (prefers-reduced-motion: reduce) {
+  .blob1, .blob2, .blob3,
+  .floatIcon,
+  .parallax > use,
   .glassCircle {
-    top: auto;
-    right: auto;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 220px;
-    height: 220px;
-    bottom: 2rem;
+    animation: none !important;
+  }
+
+  .primaryBtn::after,
+  .secondaryBtn::after {
+    animation: none !important;
   }
 }

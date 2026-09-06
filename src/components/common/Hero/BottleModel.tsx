@@ -31,14 +31,13 @@ function AnimatedBottle({
     targetPosition.set(0, baseY, 0);
     targetRotation = 0;
   } else if (state === 'next') {
-    targetScale = baseScale * 0.7; // Slightly smaller for depth
-    targetPosition.set(3.5, baseY, -2.5); // Right and pushed back
-    targetRotation = -0.2; // Slightly angled inward
+    targetScale = baseScale * 0.7;
+    targetPosition.set(3.5, baseY, -2.5);
+    targetRotation = -0.2;
   } else {
-    // prev (shrinking rapidly to avoid canvas clipping)
-    targetScale = 0; // Shrink to nothing
-    targetPosition.set(-1.5, baseY, -2); // Move only slightly left
-    targetRotation = 0.5; // Turn away
+    targetScale = 0;
+    targetPosition.set(-1.5, baseY, -2);
+    targetRotation = 0.5;
   }
 
   // Set initial position exactly once on mount to avoid popping
@@ -48,14 +47,16 @@ function AnimatedBottle({
     rotation: targetRotation
   }));
 
+  // Pre-allocate a reusable vector to avoid GC pressure in the render loop
+  const _tempVec3 = useRef(new THREE.Vector3());
+
   useFrame((_, delta) => {
     if (!modelRef.current) return;
     
-    // Clamp delta to strictly prevent massive overshoots on first load or lag spikes
     const alpha = Math.min(delta * 5, 1);
 
-    // Smooth interpolations
-    modelRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), alpha);
+    _tempVec3.current.set(targetScale, targetScale, targetScale);
+    modelRef.current.scale.lerp(_tempVec3.current, alpha);
     modelRef.current.position.lerp(targetPosition, alpha);
     modelRef.current.rotation.y = THREE.MathUtils.lerp(modelRef.current.rotation.y, targetRotation, alpha);
   });
@@ -72,42 +73,54 @@ function AnimatedBottle({
   );
 }
 
-export function BottleModel() {
+interface BottleModelProps {
+  isMobile?: boolean;
+}
+
+export function BottleModel({ isMobile = false }: BottleModelProps) {
   const { scene: catScene } = useGLTF("/cat-shampoo-bottle-3d-model.glb");
   const { scene: dogScene } = useGLTF("/dog-shampoo-bottle-3d-model.glb");
-  const { scene: birdScene } = useGLTF("/red-seed-feeder-3d-model.glb");
-  const { scene: filterScene } = useGLTF("/aquarium-filter-3d-model.glb");
+  // On mobile, skip the 2 heavier models (bird 3.5MB + filter 15MB) to save 18.5MB of downloads
+  const { scene: birdScene } = useGLTF(isMobile ? "/cat-shampoo-bottle-3d-model.glb" : "/red-seed-feeder-3d-model.glb");
+  const { scene: filterScene } = useGLTF(isMobile ? "/dog-shampoo-bottle-3d-model.glb" : "/aquarium-filter-3d-model.glb");
   
-  const [activeModel, setActiveModel] = useState<'cat' | 'dog' | 'bird' | 'filter'>('cat');
-  const models = ['cat', 'dog', 'bird', 'filter'];
+  const allModels = isMobile ? ['cat', 'dog'] : ['cat', 'dog', 'bird', 'filter'];
+  const [activeModel, setActiveModel] = useState<string>('cat');
 
-  // Defer secondary 3D model loading until after initial hydration
   useEffect(() => {
-    const timer = setTimeout(() => {
-      useGLTF.preload("/dog-shampoo-bottle-3d-model.glb");
-      useGLTF.preload("/red-seed-feeder-3d-model.glb");
-      useGLTF.preload("/aquarium-filter-3d-model.glb");
-    }, 1200);
+    if (!isMobile) {
+      // Defer secondary 3D model loading until after initial hydration (desktop only)
+      const timer = setTimeout(() => {
+        useGLTF.preload("/red-seed-feeder-3d-model.glb");
+        useGLTF.preload("/aquarium-filter-3d-model.glb");
+      }, 1200);
 
-    const interval = setInterval(() => {
-      setActiveModel(prev => {
-        if (prev === 'cat') return 'dog';
-        if (prev === 'dog') return 'bird';
-        if (prev === 'bird') return 'filter';
-        return 'cat';
-      });
-    }, 5000);
-    return () => {
-      clearTimeout(timer);
-      clearInterval(interval);
-    };
-  }, []);
+      const interval = setInterval(() => {
+        setActiveModel(prev => {
+          if (prev === 'cat') return 'dog';
+          if (prev === 'dog') return 'bird';
+          if (prev === 'bird') return 'filter';
+          return 'cat';
+        });
+      }, 5000);
+      return () => {
+        clearTimeout(timer);
+        clearInterval(interval);
+      };
+    } else {
+      // Mobile: only cycle between 2 models, longer interval for less CPU
+      const interval = setInterval(() => {
+        setActiveModel(prev => prev === 'cat' ? 'dog' : 'cat');
+      }, 6000);
+      return () => clearInterval(interval);
+    }
+  }, [isMobile]);
 
   function getState(modelName: string): 'active' | 'next' | 'prev' {
-    const activeIdx = models.indexOf(activeModel);
-    const modelIdx = models.indexOf(modelName);
+    const activeIdx = allModels.indexOf(activeModel);
+    const modelIdx = allModels.indexOf(modelName);
     if (activeIdx === modelIdx) return 'active';
-    if ((activeIdx + 1) % models.length === modelIdx) return 'next';
+    if ((activeIdx + 1) % allModels.length === modelIdx) return 'next';
     return 'prev';
   }
 
@@ -118,31 +131,40 @@ export function BottleModel() {
       polar={[-0.1, 0.1]}
       azimuth={[-Math.PI / 2, Math.PI / 2]}
     >
-      <Float speed={1.5} rotationIntensity={0.1} floatIntensity={0.5} floatingRange={[-0.05, 0.05]}>
+      <Float 
+        speed={isMobile ? 1 : 1.5} 
+        rotationIntensity={isMobile ? 0.05 : 0.1} 
+        floatIntensity={isMobile ? 0.3 : 0.5} 
+        floatingRange={[-0.05, 0.05]}
+      >
         <AnimatedBottle scene={catScene} state={getState('cat')} baseScale={5.7} baseY={-3.2} />
         <AnimatedBottle scene={dogScene} state={getState('dog')} baseScale={6.2} baseY={-3.2} />
-        <AnimatedBottle scene={birdScene} state={getState('bird')} baseScale={5.5} baseY={-2.6} modelRotationOffset={Math.PI} />
-        <AnimatedBottle scene={filterScene} state={getState('filter')} baseScale={5.0} baseY={-2.6} />
+        {!isMobile && (
+          <>
+            <AnimatedBottle scene={birdScene} state={getState('bird')} baseScale={5.5} baseY={-2.6} modelRotationOffset={Math.PI} />
+            <AnimatedBottle scene={filterScene} state={getState('filter')} baseScale={5.0} baseY={-2.6} />
+          </>
+        )}
       </Float>
         
-      {/* Baked contact shadows to avoid continuous repaints */}
+      {/* Contact shadows: baked (1 frame) on both, lower resolution on mobile */}
       <ContactShadows 
         position={[0, -2.6, 0]} 
-        opacity={0.3} 
+        opacity={isMobile ? 0.2 : 0.3} 
         scale={10} 
-        blur={2} 
+        blur={isMobile ? 1.5 : 2} 
         far={2} 
         color="#000000"
         frames={1}
-        resolution={256}
+        resolution={isMobile ? 128 : 256}
       />
       
-      <Environment preset="studio" />
-      <ambientLight intensity={0.6} />
+      {/* On mobile: skip heavy Environment map, use simple lighting only */}
+      {!isMobile && <Environment preset="studio" />}
+      <ambientLight intensity={isMobile ? 0.8 : 0.6} />
       <directionalLight position={[5, 5, 5]} intensity={1.5} />
-      <directionalLight position={[-5, 5, -5]} intensity={0.5} />
-      <spotLight position={[0, 10, 0]} intensity={1} angle={0.6} penumbra={1} />
+      {!isMobile && <directionalLight position={[-5, 5, -5]} intensity={0.5} />}
+      {!isMobile && <spotLight position={[0, 10, 0]} intensity={1} angle={0.6} penumbra={1} />}
     </PresentationControls>
   );
 }
-
