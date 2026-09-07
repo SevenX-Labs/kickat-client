@@ -15,10 +15,10 @@
 /* First Viewport Height for Desktop */
 @media (min-width: 1024px) {
   .hero {
-    height: calc(100svh - 105px);
-    min-height: 600px;
-    max-height: 860px;
-    padding-top: 0.5rem;
+    height: calc(100svh - 110px);
+    min-height: 540px;
+    max-height: 750px;
+    padding-top: 0;
   }
 }
 
@@ -73,12 +73,12 @@
 /* Main Hero Grid Container */
 .container {
   flex: 1;
-  max-width: 1440px;
+  max-width: 1560px;
   width: 100%;
   margin: 0 auto;
-  padding: 0 clamp(1.25rem, 3.5vw, 3.5rem);
+  padding: 0 clamp(1.25rem, 3vw, 3.5rem);
   display: grid;
-  grid-template-columns: 0.92fr 1.08fr;
+  grid-template-columns: 0.82fr 1.18fr;
   gap: clamp(1.5rem, 3vw, 3.5rem);
   align-items: center;
   position: relative;
@@ -425,7 +425,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 960px;
+  max-width: 1080px;
   animation: floatHero 6s ease-in-out infinite;
   transition: filter 0.35s ease;
 }

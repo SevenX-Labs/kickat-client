@@ -172,8 +172,8 @@ function HeroComponent() {
               <Image
                 src="/hero.png"
                 alt="Happier Pets, Brighter Days - Food & Treats, Toys & Playtime, Beds & Accessories, Health & Grooming"
-                width={1200}
-                height={674}
+                width={1400}
+                height={787}
                 priority
                 unoptimized
                 draggable={false}
