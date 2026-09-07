@@ -15,7 +15,7 @@ export default function ShippingPage() {
       
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
         <Truck size={36} color="#F99205" />
-        <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: '#233D4C' }}>Shipping & Returns</h1>
+        <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: '#111C24' }}>Shipping & Returns</h1>
       </div>
       <p style={{ color: '#6B7280', fontSize: '0.95rem', marginBottom: '2.5rem' }}>
         Everything you need to know about delivery timelines, tracking, and our 30-day return policy.
@@ -25,8 +25,8 @@ export default function ShippingPage() {
         {/* Delivery Options */}
         <section style={{ background: '#F9FAFB', padding: '1.5rem', borderRadius: '16px', border: '1px solid #E5E7EB' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-            <Clock size={20} color="#233D4C" />
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#233D4C' }}>Shipping Options & Timelines</h2>
+            <Clock size={20} color="#111C24" />
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111C24' }}>Shipping Options & Timelines</h2>
           </div>
           <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', color: '#4B5563', fontSize: '0.95rem', paddingLeft: '1.25rem' }}>
             <li><strong>Standard Shipping (2-4 business days):</strong> Free on all orders over ₹499. Flat ₹49 for orders under ₹499.</li>
@@ -38,8 +38,8 @@ export default function ShippingPage() {
         {/* Live Order Tracking */}
         <section style={{ background: '#F9FAFB', padding: '1.5rem', borderRadius: '16px', border: '1px solid #E5E7EB' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-            <MapPin size={20} color="#233D4C" />
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#233D4C' }}>Order Tracking</h2>
+            <MapPin size={20} color="#111C24" />
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111C24' }}>Order Tracking</h2>
           </div>
           <p style={{ color: '#4B5563', fontSize: '0.95rem', marginBottom: '1rem' }}>
             Once your package leaves our fulfillment warehouse, you will receive an SMS & Email containing your live tracking link. You can also view real-time tracking anytime from your KickAt account.
@@ -52,17 +52,17 @@ export default function ShippingPage() {
         {/* 30-Day Easy Returns */}
         <section style={{ background: '#F9FAFB', padding: '1.5rem', borderRadius: '16px', border: '1px solid #E5E7EB' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-            <RefreshCw size={20} color="#233D4C" />
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#233D4C' }}>30-Day Hassle-Free Returns</h2>
+            <RefreshCw size={20} color="#111C24" />
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111C24' }}>30-Day Hassle-Free Returns</h2>
           </div>
           <p style={{ color: '#4B5563', fontSize: '0.95rem', marginBottom: '1rem' }}>
             We want your pets to be 100% happy! If a product is unused, damaged, or not suitable, request a pickup within 30 days of delivery for a full refund or exchange.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-            <Link href="/returns" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#233D4C', color: '#fff', padding: '0.6rem 1.25rem', borderRadius: '8px', fontWeight: 600, textDecoration: 'none' }}>
+            <Link href="/returns" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#111C24', color: '#fff', padding: '0.6rem 1.25rem', borderRadius: '8px', fontWeight: 600, textDecoration: 'none' }}>
               Initiate a Return
             </Link>
-            <Link href="/faq" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#fff', color: '#233D4C', border: '1px solid #D1D5DB', padding: '0.6rem 1.25rem', borderRadius: '8px', fontWeight: 600, textDecoration: 'none' }}>
+            <Link href="/faq" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#fff', color: '#111C24', border: '1px solid #D1D5DB', padding: '0.6rem 1.25rem', borderRadius: '8px', fontWeight: 600, textDecoration: 'none' }}>
               View Return FAQs
             </Link>
           </div>

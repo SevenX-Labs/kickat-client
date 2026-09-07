@@ -16,7 +16,7 @@ export default function PrivacyPage() {
       
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
         <ShieldCheck size={36} color="#F99205" />
-        <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: '#233D4C' }}>Privacy Policy</h1>
+        <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: '#111C24' }}>Privacy Policy</h1>
       </div>
       <p style={{ color: '#6B7280', fontSize: '0.95rem', marginBottom: '2.5rem' }}>
         Last updated: September 2026
@@ -25,8 +25,8 @@ export default function PrivacyPage() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', lineHeight: '1.7', color: '#374151' }}>
         <section style={{ background: '#F9FAFB', padding: '1.5rem', borderRadius: '16px', border: '1px solid #E5E7EB' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-            <Lock size={20} color="#233D4C" />
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#233D4C' }}>1. Information We Collect</h2>
+            <Lock size={20} color="#111C24" />
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111C24' }}>1. Information We Collect</h2>
           </div>
           <p style={{ color: '#4B5563', fontSize: '0.95rem' }}>
             We collect personal information that you provide to us directly when creating an account, making a purchase, subscribing to our newsletter, or contacting customer support. This includes your name, email address, shipping address, payment details, and pet profiles.
@@ -35,8 +35,8 @@ export default function PrivacyPage() {
 
         <section style={{ background: '#F9FAFB', padding: '1.5rem', borderRadius: '16px', border: '1px solid #E5E7EB' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-            <Eye size={20} color="#233D4C" />
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#233D4C' }}>2. How We Use Your Information</h2>
+            <Eye size={20} color="#111C24" />
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111C24' }}>2. How We Use Your Information</h2>
           </div>
           <p style={{ color: '#4B5563', fontSize: '0.95rem' }}>
             Your information is used strictly to fulfill your orders, provide personalized pet product recommendations, communicate order updates, improve our services, and ensure security. We never sell your personal data to third parties.
@@ -45,8 +45,8 @@ export default function PrivacyPage() {
 
         <section style={{ background: '#F9FAFB', padding: '1.5rem', borderRadius: '16px', border: '1px solid #E5E7EB' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-            <FileText size={20} color="#233D4C" />
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#233D4C' }}>3. Data Security & Cookies</h2>
+            <FileText size={20} color="#111C24" />
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111C24' }}>3. Data Security & Cookies</h2>
           </div>
           <p style={{ color: '#4B5563', fontSize: '0.95rem' }}>
             We implement industry-standard SSL encryption and secure cloud infrastructure to safeguard your information. Cookies are used to maintain your active cart, save your preferences, and provide a seamless checkout experience.

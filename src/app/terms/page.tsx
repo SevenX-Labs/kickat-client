@@ -15,7 +15,7 @@ export default function TermsPage() {
       
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
         <Scale size={36} color="#F99205" />
-        <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: '#233D4C' }}>Terms of Service</h1>
+        <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: '#111C24' }}>Terms of Service</h1>
       </div>
       <p style={{ color: '#6B7280', fontSize: '0.95rem', marginBottom: '2.5rem' }}>
         Last updated: September 2026
@@ -24,8 +24,8 @@ export default function TermsPage() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', lineHeight: '1.7', color: '#374151' }}>
         <section style={{ background: '#F9FAFB', padding: '1.5rem', borderRadius: '16px', border: '1px solid #E5E7EB' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-            <FileCheck size={20} color="#233D4C" />
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#233D4C' }}>1. Agreement to Terms</h2>
+            <FileCheck size={20} color="#111C24" />
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111C24' }}>1. Agreement to Terms</h2>
           </div>
           <p style={{ color: '#4B5563', fontSize: '0.95rem' }}>
             By accessing or purchasing from KickAt, you agree to be bound by these Terms of Service. If you do not agree with any part of these terms, please refrain from using our services.
@@ -34,8 +34,8 @@ export default function TermsPage() {
 
         <section style={{ background: '#F9FAFB', padding: '1.5rem', borderRadius: '16px', border: '1px solid #E5E7EB' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-            <ShoppingBag size={20} color="#233D4C" />
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#233D4C' }}>2. Product Listings & Pricing</h2>
+            <ShoppingBag size={20} color="#111C24" />
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111C24' }}>2. Product Listings & Pricing</h2>
           </div>
           <p style={{ color: '#4B5563', fontSize: '0.95rem' }}>
             All product specifications, pricing, and availability are subject to change without notice. We make every effort to display accurate images and details of our pet products. Prices are listed in INR (₹) inclusive of applicable taxes.
@@ -44,8 +44,8 @@ export default function TermsPage() {
 
         <section style={{ background: '#F9FAFB', padding: '1.5rem', borderRadius: '16px', border: '1px solid #E5E7EB' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-            <ShieldAlert size={20} color="#233D4C" />
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#233D4C' }}>3. User Conduct & Accounts</h2>
+            <ShieldAlert size={20} color="#111C24" />
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111C24' }}>3. User Conduct & Accounts</h2>
           </div>
           <p style={{ color: '#4B5563', fontSize: '0.95rem' }}>
             You are responsible for maintaining the confidentiality of your account password and restricting access to your device. KickAt reserves the right to cancel orders or terminate accounts if unauthorized activity is suspected.

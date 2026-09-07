@@ -2,15 +2,15 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #233D4C;
+  --foreground: #111C24;
   
   /* Pumpkin & Charcoal Premium Color Palette */
   --brand-pumpkin: #F99205;
   --brand-pumpkin-hover: #E08304;
   --brand-pumpkin-light: #FFF5EE;
   
-  --brand-charcoal: #233D4C;
-  --brand-charcoal-dark: #192C37;
+  --brand-charcoal: #111C24;
+  --brand-charcoal-dark: #111C24;
   --brand-charcoal-light: #32556A;
   --brand-charcoal-surface: #F0F4F7;
   
@@ -26,12 +26,12 @@
   --color-pumpkin: #F99205;
   --color-pumpkin-hover: #E08304;
   --color-pumpkin-light: #FFF5EE;
-  --color-charcoal: #233D4C;
-  --color-charcoal-dark: #192C37;
+  --color-charcoal: #111C24;
+  --color-charcoal-dark: #111C24;
   --color-charcoal-light: #32556A;
   --color-charcoal-surface: #F0F4F7;
   --color-brand-orange: #F99205;
-  --color-brand-charcoal: #233D4C;
+  --color-brand-charcoal: #111C24;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

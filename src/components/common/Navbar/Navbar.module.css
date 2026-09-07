@@ -499,7 +499,7 @@
 }
 
 .announcementBar {
-  background: linear-gradient(90deg, #192C37, #233D4C, #192C37);
+  background: linear-gradient(90deg, #111C24, #111C24, #111C24);
   color: #F8F5F0;
   padding: 0.65rem 0;
   font-size: 0.75rem;
@@ -630,6 +630,8 @@
 }
 
 .accountDropdownHeader {
+  background-color: #111C24;
+  color: #ffffff;
   padding: 0.85rem 1.25rem 0.5rem;
   display: flex;
   flex-direction: column;

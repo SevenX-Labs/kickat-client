@@ -11,7 +11,9 @@
 .container {
   display: flex;
   align-items: center;
-  background-color: #ffffff;
+  background-color: #111C24;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   border-radius: 20px;
   padding: 1.75rem 2rem;
   width: 100%;
@@ -55,7 +57,7 @@
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: rgba(249, 146, 5, 0.08);
+  background: rgba(245, 143, 0, 0.15);
   color: #F99205;
   flex-shrink: 0;
 }
@@ -74,13 +76,13 @@
 .title {
   font-size: 0.9375rem;
   font-weight: 700;
-  color: #111827;
+  color: #FFFFFF;
   line-height: 1.25;
 }
 
 .subtitle {
   font-size: 0.8125rem;
-  color: #6B7280;
+  color: rgba(255, 255, 255, 0.7);
   margin-top: 0.15rem;
   font-weight: 400;
 }
@@ -88,7 +90,7 @@
 .divider {
   width: 1px;
   height: 40px;
-  background-color: rgba(0, 0, 0, 0.06);
+  background-color: rgba(255, 255, 255, 0.12);
 }
 
 .mobileOnlyDivider {

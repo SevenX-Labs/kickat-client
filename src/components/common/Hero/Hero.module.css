@@ -163,7 +163,7 @@
   font-size: 4.65rem;
   font-weight: 400;
   line-height: 0.95;
-  color: #233D4C;
+  color: #111C24;
   margin-bottom: 1.15rem;
   letter-spacing: 0;
   max-width: 10ch;
@@ -301,15 +301,15 @@
 
 .secondaryBtn {
   background-color: transparent;
-  color: #233D4C;
-  border: 1.5px solid #233D4C;
+  color: #111C24;
+  border: 1.5px solid #111C24;
   box-shadow: none;
 }
 
 .secondaryBtn:hover {
-  background-color: #233D4C;
+  background-color: #111C24;
   color: #ffffff;
-  border-color: #233D4C;
+  border-color: #111C24;
   box-shadow: 0 10px 24px rgba(35, 61, 76, 0.3);
 }
 
@@ -427,7 +427,7 @@
 .ratingScore {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #233D4C;
+  color: #111C24;
   letter-spacing: -0.01em;
 }
 
@@ -440,7 +440,7 @@
 
 .ratingCount {
   font-weight: 700;
-  color: #233D4C;
+  color: #111C24;
 }
 
 /* Glassmorphism Background Circle (Reduced Size) */

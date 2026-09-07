@@ -167,7 +167,7 @@
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   border-radius: 999px;
-  background-color: #233D4C;
+  background-color: #111C24;
   color: #fff;
   border: none;
   font-size: 0.85rem;
@@ -209,7 +209,7 @@
   font-family: var(--font-fraunces), serif;
   font-size: 2rem;
   font-weight: 700;
-  color: #233D4C;
+  color: #111C24;
   margin-bottom: 1rem;
 }
 
@@ -222,7 +222,7 @@
 
 .shopBtn {
   padding: 0.8rem 2rem;
-  background-color: #233D4C;
+  background-color: #111C24;
   color: #fff;
   border-radius: 999px;
   text-decoration: none;
