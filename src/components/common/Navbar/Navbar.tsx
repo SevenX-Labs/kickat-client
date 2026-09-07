@@ -164,7 +164,7 @@ export function Navbar() {
 
   const items = [
     { text: "Free Delivery on orders over $50", Icon: Truck },
-    { text: "Available on Amazon, Flipkart & Blinkit", Icon: ShoppingBag },
+    { text: "Available on Amazon, Flipkart, JioMart & Meesho", Icon: ShoppingBag },
     { text: "Get 20% off your first purchase", Icon: Percent },
     { text: "Premium pet accessories", Icon: Crown },
   ];
