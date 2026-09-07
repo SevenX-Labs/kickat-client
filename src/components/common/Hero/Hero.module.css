@@ -79,7 +79,7 @@
   padding: 0 clamp(1.25rem, 3vw, 3.5rem);
   display: grid;
   grid-template-columns: 0.82fr 1.18fr;
-  gap: clamp(1.5rem, 3vw, 3.5rem);
+  gap: clamp(1rem, 2vw, 2.25rem);
   align-items: center;
   position: relative;
   z-index: 2;
@@ -339,6 +339,7 @@
 /* ── 2. RIGHT HERO VISUAL (LIFESTYLE PHOTO + INTENTIONAL ORGANIC STAGE) ── */
 .rightVisual {
   position: relative;
+  transform: translateX(-35px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -425,7 +426,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 1080px;
+  max-width: 1180px;
   animation: floatHero 6s ease-in-out infinite;
   transition: filter 0.35s ease;
 }
@@ -663,6 +664,7 @@
   }
 
   .rightVisual {
+    transform: none;
     min-height: 380px;
     margin-bottom: 1rem;
   }
