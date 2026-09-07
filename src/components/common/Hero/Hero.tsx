@@ -4,10 +4,6 @@ import React, { memo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
-  Truck, 
-  ShieldCheck, 
-  RotateCcw, 
-  Headset, 
   ArrowRight, 
   ChevronRight,
   Dog,
@@ -59,8 +55,8 @@ function HeroComponent() {
       <div className={styles.bgGlowBottomLeft} aria-hidden="true" />
 
       {/* Scattered watermarks */}
-      <PawWatermark className={`${styles.watermark} ${styles.watermarkLowerLeft}`} size={64} />
-      <PawWatermark className={`${styles.watermark} ${styles.watermarkUpperRight}`} size={76} />
+      <PawWatermark className={styles.watermark + ' ' + styles.watermarkLowerLeft} size={64} />
+      <PawWatermark className={styles.watermark + ' ' + styles.watermarkUpperRight} size={76} />
 
       {/* Main Hero Content Area */}
       <div className={styles.container}>
@@ -68,7 +64,7 @@ function HeroComponent() {
         {/* ── 1. LEFT CONTENT AREA ── */}
         <div className={styles.leftContent}>
           
-          {/* Trust Pill */}
+          {/* Trust Badge */}
           <Link href="/testimonials" className={styles.trustPill} title="See customer reviews">
             <div className={styles.pillAvatars}>
               <span className={styles.avatarEmoji} role="img" aria-label="Dog">🐶</span>
@@ -80,7 +76,7 @@ function HeroComponent() {
             <ChevronRight size={15} strokeWidth={2.5} className={styles.pillArrow} />
           </Link>
 
-          {/* Main Headline with Proper Bigger Font */}
+          {/* Main Headline */}
           <h1 className={styles.headline}>
             <span className={styles.headlineNavy}>Everything Your</span>
             <span className={styles.headlineOrangeWrap}>
@@ -108,61 +104,21 @@ function HeroComponent() {
               <ArrowRight size={18} strokeWidth={2} className={styles.ctaArrow} />
             </Link>
           </div>
-
-          {/* Trust & Guarantee Benefit Badges */}
-          <div className={styles.benefitRow}>
-            <div className={styles.benefitItem}>
-              <div className={styles.benefitIconWrap}>
-                <Truck size={19} strokeWidth={2} />
-              </div>
-              <div className={styles.benefitText}>
-                <span className={styles.benefitTitle}>Free Delivery</span>
-                <span className={styles.benefitSub}>On orders over ₹599</span>
-              </div>
-            </div>
-
-            <div className={styles.benefitItem}>
-              <div className={styles.benefitIconWrap}>
-                <ShieldCheck size={19} strokeWidth={2} />
-              </div>
-              <div className={styles.benefitText}>
-                <span className={styles.benefitTitle}>100% Genuine</span>
-                <span className={styles.benefitSub}>Products</span>
-              </div>
-            </div>
-
-            <div className={styles.benefitItem}>
-              <div className={styles.benefitIconWrap}>
-                <RotateCcw size={19} strokeWidth={2} />
-              </div>
-              <div className={styles.benefitText}>
-                <span className={styles.benefitTitle}>Easy Returns</span>
-                <span className={styles.benefitSub}>Hassle-free</span>
-              </div>
-            </div>
-
-            <div className={styles.benefitItem}>
-              <div className={styles.benefitIconWrap}>
-                <Headset size={19} strokeWidth={2} />
-              </div>
-              <div className={styles.benefitText}>
-                <span className={styles.benefitTitle}>Dedicated Support</span>
-                <span className={styles.benefitSub}>For pet parents</span>
-              </div>
-            </div>
-          </div>
-
+          
         </div>
 
         {/* ── 2. RIGHT HERO VISUAL (SEAMLESS PAW ARTWORK) ── */}
         <div className={styles.rightVisual} aria-label="Pet Category Showcase">
           
+          {/* Ambient backdrop glow behind image */}
+          <div className={styles.pawBackdropGlow} aria-hidden="true" />
+
           {/* Dashed trajectory curve over paw */}
           <svg className={styles.dashedCurveTop} viewBox="0 0 170 70" fill="none" aria-hidden="true">
             <path d="M 10 55 C 60 10, 125 10, 160 45" stroke="#E89A5A" strokeWidth="1.8" strokeDasharray="4 4" opacity="0.65" />
           </svg>
 
-          {/* Diagonal motion accents matching reference */}
+          {/* Diagonal motion accents */}
           <MotionAccents className={styles.motionAccentsTop} />
           <MotionAccents className={styles.motionAccentsRight} />
 
@@ -184,42 +140,42 @@ function HeroComponent() {
               <Image
                 src="/hero.png"
                 alt="Happier Pets, Brighter Days - Food & Treats, Toys & Playtime, Beds & Accessories, Health & Grooming"
-                width={580}
-                height={387}
+                width={1400}
+                height={787}
                 priority
                 unoptimized
                 draggable={false}
                 className={styles.heroPawImage}
               />
 
-              {/* Invisible Interactive Category Hotspots for native UX */}
+              {/* Interactive Category Hotspots */}
               <Link 
                 href="/category/dogs/dog-accessories" 
-                className={`${styles.hotspot} ${styles.hotspotBeds}`}
+                className={styles.hotspot + ' ' + styles.hotspotBeds}
                 title="Shop Beds & Accessories"
                 aria-label="Shop Beds & Accessories"
               />
               <Link 
                 href="/category/dogs/dog-food-treats" 
-                className={`${styles.hotspot} ${styles.hotspotFood}`}
+                className={styles.hotspot + ' ' + styles.hotspotFood}
                 title="Shop Food & Treats"
                 aria-label="Shop Food & Treats"
               />
               <Link 
                 href="/category/dogs/dog-accessories" 
-                className={`${styles.hotspot} ${styles.hotspotToys}`}
+                className={styles.hotspot + ' ' + styles.hotspotToys}
                 title="Shop Toys & Playtime"
                 aria-label="Shop Toys & Playtime"
               />
               <Link 
                 href="/category/dogs/dog-grooming-hygiene" 
-                className={`${styles.hotspot} ${styles.hotspotHealth}`}
+                className={styles.hotspot + ' ' + styles.hotspotHealth}
                 title="Shop Health & Grooming"
                 aria-label="Shop Health & Grooming"
               />
               <Link 
                 href="/category" 
-                className={`${styles.hotspot} ${styles.hotspotPad}`}
+                className={styles.hotspot + ' ' + styles.hotspotPad}
                 title="Explore All Categories"
                 aria-label="Explore All Categories"
               />
