@@ -511,8 +511,6 @@
   align-items: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   position: relative;
-  mask-image: linear-gradient(to right, transparent, black 32px, black calc(100% - 32px), transparent);
-  -webkit-mask-image: linear-gradient(to right, transparent, black 32px, black calc(100% - 32px), transparent);
 }
 
 .marquee {
