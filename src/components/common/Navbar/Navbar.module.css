@@ -510,6 +510,9 @@
   display: flex;
   align-items: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  mask-image: linear-gradient(to right, transparent, black 32px, black calc(100% - 32px), transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 32px, black calc(100% - 32px), transparent);
 }
 
 .marquee {
@@ -527,7 +530,9 @@
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  animation: scroll 35s linear infinite;
+  min-width: 100%;
+  animation: scroll 32s linear infinite;
+  will-change: transform;
 }
 
 .marqueeItem {

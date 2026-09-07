@@ -4,7 +4,7 @@
 .hero {
   position: relative;
   width: 100%;
-  background: linear-gradient(180deg, #FAF5EE 0%, #FFF9F4 50%, #FAF2E8 100%);
+  background: radial-gradient(circle at 65% 30%, #FFFDF9 0%, #FAF5EE 45%, #F5ECE0 100%);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -15,10 +15,10 @@
 /* First Viewport Height for Desktop */
 @media (min-width: 1024px) {
   .hero {
-    height: calc(100svh - 110px);
-    min-height: 580px;
-    max-height: 840px;
-    padding-top: 0;
+    height: calc(100svh - 105px);
+    min-height: 600px;
+    max-height: 860px;
+    padding-top: 0.5rem;
   }
 }
 
@@ -30,7 +30,7 @@
   width: 650px;
   height: 650px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(253, 220, 190, 0.55) 0%, rgba(253, 220, 190, 0) 70%);
+  background: radial-gradient(circle, rgba(253, 220, 190, 0.45) 0%, rgba(253, 220, 190, 0) 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -42,12 +42,12 @@
   width: 600px;
   height: 600px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(254, 232, 212, 0.5) 0%, rgba(254, 232, 212, 0) 70%);
+  background: radial-gradient(circle, rgba(254, 232, 212, 0.4) 0%, rgba(254, 232, 212, 0) 70%);
   pointer-events: none;
   z-index: 0;
 }
 
-/* Repositioned Paw Watermarks */
+/* Watermarks */
 .watermark {
   position: absolute;
   color: #E6BFA0;
@@ -78,7 +78,7 @@
   margin: 0 auto;
   padding: 0 clamp(1.25rem, 3.5vw, 3.5rem);
   display: grid;
-  grid-template-columns: 0.78fr 1.22fr;
+  grid-template-columns: 0.92fr 1.08fr;
   gap: clamp(1.5rem, 3vw, 3.5rem);
   align-items: center;
   position: relative;
@@ -90,7 +90,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  max-width: 580px;
+  max-width: 600px;
   z-index: 3;
 }
 
@@ -98,12 +98,12 @@
 .trustPill {
   display: inline-flex;
   align-items: center;
-  gap: 0.7rem;
+  gap: 0.65rem;
   background-color: #FFF5ED;
   border: 1px solid #FCD9C0;
   border-radius: 9999px;
-  padding: 0.45rem 1.25rem;
-  margin-bottom: 1.25rem;
+  padding: 0.42rem 1.15rem;
+  margin-bottom: 1.4rem;
   box-shadow: 0 2px 10px rgba(238, 140, 50, 0.09);
   text-decoration: none;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -128,14 +128,14 @@
 }
 
 .avatarEmoji {
-  font-size: 1.05rem;
+  font-size: 1rem;
   line-height: 1;
   margin-right: -2px;
   filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
 }
 
 .pillText {
-  font-size: 0.93rem;
+  font-size: 0.91rem;
   font-weight: 600;
   color: #374151;
   letter-spacing: -0.01em;
@@ -153,11 +153,11 @@
 /* Main Headline */
 .headline {
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: clamp(2.75rem, 3.8vw, 4.2rem);
+  font-size: clamp(2.85rem, 3.9vw, 4.3rem);
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.025em;
-  margin-bottom: 1.15rem;
+  margin-bottom: 1.35rem;
   display: flex;
   flex-direction: column;
 }
@@ -185,11 +185,11 @@
 /* Supporting Subheadline */
 .supportingText {
   font-family: var(--font-geist-sans), Arial, sans-serif;
-  font-size: clamp(1.1rem, 1.22vw, 1.24rem);
+  font-size: clamp(1.08rem, 1.18vw, 1.2rem);
   line-height: 1.62;
   color: #4B5563;
-  margin-bottom: 1.85rem;
-  max-width: 520px;
+  margin-bottom: 1.45rem;
+  max-width: 530px;
 }
 
 .desktopBr {
@@ -201,31 +201,35 @@
   display: flex;
   align-items: center;
   gap: 1.15rem;
-  margin-bottom: 0;
+  margin-bottom: 1.5rem;
   flex-wrap: wrap;
 }
 
 .primaryCta {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.7rem;
   background-color: #EE8C32;
   color: #ffffff;
-  padding: 0.95rem 2.4rem;
+  border: 2px solid #EE8C32;
+  padding: 0.95rem 2.3rem;
   border-radius: 9999px;
   font-weight: 700;
-  font-size: 1.08rem;
+  font-size: 1.05rem;
   letter-spacing: -0.01em;
   text-decoration: none;
-  box-shadow: 0 8px 24px rgba(238, 140, 50, 0.36);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   min-height: 52px;
+  box-sizing: border-box;
+  box-shadow: 0 7px 22px rgba(238, 140, 50, 0.34);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .primaryCta:hover {
   background-color: #D87A24;
+  border-color: #D87A24;
   transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(238, 140, 50, 0.46);
+  box-shadow: 0 12px 28px rgba(238, 140, 50, 0.44);
 }
 
 .primaryCta:focus-visible {
@@ -236,25 +240,29 @@
 .secondaryCta {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.7rem;
   background-color: #FFFFFF;
   color: #111C24;
-  border: 1.8px solid #111C24;
-  padding: 0.92rem 2.3rem;
+  border: 2px solid #111C24;
+  padding: 0.95rem 2.3rem;
   border-radius: 9999px;
   font-weight: 700;
-  font-size: 1.08rem;
+  font-size: 1.05rem;
   letter-spacing: -0.01em;
   text-decoration: none;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   min-height: 52px;
+  box-sizing: border-box;
+  box-shadow: 0 3px 10px rgba(17, 28, 36, 0.05);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .secondaryCta:hover {
   background-color: #111C24;
-  color: #ffffff;
+  color: #FFFFFF;
+  border-color: #111C24;
   transform: translateY(-2px);
-  box-shadow: 0 8px 22px rgba(17, 28, 36, 0.16);
+  box-shadow: 0 8px 22px rgba(17, 28, 36, 0.18);
 }
 
 .secondaryCta:focus-visible {
@@ -271,7 +279,64 @@
   transform: translateX(4px);
 }
 
-/* ── 2. RIGHT HERO VISUAL (SEAMLESS PAW ARTWORK) ── */
+/* Trust & Guarantee Benefit Indicators Row */
+.benefitRow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: clamp(0.85rem, 1.4vw, 1.6rem);
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+.benefitItem {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.benefitIconWrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid #EE8C32;
+  background: rgba(238, 140, 50, 0.08);
+  color: #EE8C32;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.25s ease, background-color 0.25s ease;
+}
+
+.benefitItem:hover .benefitIconWrap {
+  transform: scale(1.06);
+  background-color: rgba(238, 140, 50, 0.16);
+}
+
+.benefitText {
+  display: flex;
+  flex-direction: column;
+}
+
+.benefitTitle {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #111C24;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.benefitSub {
+  font-size: 0.78rem;
+  color: #6B7280;
+  font-weight: 500;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
+/* ── 2. RIGHT HERO VISUAL (LIFESTYLE PHOTO + INTENTIONAL ORGANIC STAGE) ── */
 .rightVisual {
   position: relative;
   display: flex;
@@ -280,37 +345,26 @@
   width: 100%;
 }
 
-/* Rich ambient backdrop glow behind paw image */
+/* Intentional Organic Stage Backdrop */
 .pawBackdropGlow {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  width: 95%;
-  height: 95%;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(253, 218, 185, 0.75) 0%, rgba(253, 218, 185, 0) 70%);
-  filter: blur(35px);
+  transform: translate(-50%, -46%);
+  width: 92%;
+  height: 92%;
+  border-radius: 46% 54% 50% 50% / 48% 48% 52% 52%;
+  background: radial-gradient(circle at 50% 45%, rgba(254, 230, 206, 0.85) 0%, rgba(253, 222, 192, 0.55) 55%, rgba(253, 222, 192, 0) 75%);
+  filter: blur(28px);
   pointer-events: none;
   z-index: 1;
 }
 
-/* Dashed flight curve over paw */
-.dashedCurveTop {
-  position: absolute;
-  top: -16px;
-  left: 14%;
-  width: 180px;
-  height: 68px;
-  pointer-events: none;
-  z-index: 2;
-}
-
-/* Motion accents */
+/* Standardized Motion Accents */
 .motionAccentsTop {
   position: absolute;
-  top: 10px;
-  left: 50%;
+  top: 6px;
+  left: 48%;
   transform: translateX(-50%);
   pointer-events: none;
   z-index: 2;
@@ -318,17 +372,17 @@
 
 .motionAccentsRight {
   position: absolute;
-  right: -10px;
+  right: -5px;
   bottom: 34%;
   pointer-events: none;
   z-index: 2;
 }
 
-/* Side Note: 'For a kinder, happier world ♡' */
+/* Hand-written Note with Generous Clearance */
 .sideNoteWrapper {
   position: absolute;
-  right: -15px;
-  bottom: 12px;
+  right: 15px;
+  bottom: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -337,25 +391,25 @@
 }
 
 .sideDashedCurve {
-  width: 75px;
-  height: 48px;
-  margin-bottom: -4px;
+  width: 65px;
+  height: 40px;
+  margin-bottom: -2px;
   transform: rotate(-10deg);
 }
 
 .sideNote {
   font-family: 'Caveat', var(--font-lora), cursive;
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   font-weight: 600;
   color: #8A4E2A;
-  line-height: 1.1;
+  line-height: 1.15;
   text-align: center;
-  transform: rotate(6deg);
+  transform: rotate(4deg);
   display: flex;
   flex-direction: column;
 }
 
-/* Seamless Paw Illustration Container */
+/* Studio Pet & Product Image Container */
 .pawImageContainer {
   position: relative;
   display: flex;
@@ -371,7 +425,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 1120px;
+  max-width: 960px;
   animation: floatHero 6s ease-in-out infinite;
   transition: filter 0.35s ease;
 }
@@ -392,12 +446,12 @@
   display: block;
   user-select: none;
   -webkit-user-drag: none;
-  filter: drop-shadow(0 18px 42px rgba(238, 140, 50, 0.18));
+  filter: drop-shadow(0 20px 38px rgba(180, 110, 50, 0.2)) drop-shadow(0 6px 14px rgba(17, 28, 36, 0.08));
   pointer-events: none;
 }
 
 .pawImageWrapper:hover .heroPawImage {
-  filter: drop-shadow(0 26px 52px rgba(238, 140, 50, 0.26));
+  filter: drop-shadow(0 26px 48px rgba(180, 110, 50, 0.26)) drop-shadow(0 8px 18px rgba(17, 28, 36, 0.1));
 }
 
 /* Interactive Hotspots */
@@ -552,11 +606,15 @@
 /* Laptop / Mid Desktop */
 @media (max-width: 1280px) {
   .headline {
-    font-size: 3.3rem;
+    font-size: 3.2rem;
   }
 
   .pawImageWrapper {
-    max-width: 900px;
+    max-width: 780px;
+  }
+
+  .benefitRow {
+    gap: 0.9rem;
   }
 }
 
@@ -576,7 +634,6 @@
   }
 
   .leftContent {
-    transform: none;
     max-width: 100%;
     align-items: center;
     text-align: center;
@@ -595,8 +652,17 @@
     justify-content: center;
   }
 
+  /* Wrap trust indicators to 2x2 */
+  .benefitRow {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem 1.75rem;
+    justify-content: center;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
   .rightVisual {
-    transform: none;
     min-height: 380px;
     margin-bottom: 1rem;
   }
@@ -633,20 +699,20 @@
   }
 
   .trustPill {
-    margin-bottom: 1rem;
+    margin-bottom: 1.15rem;
     padding: 0.38rem 1rem;
   }
 
   .headline {
-    font-size: 2.4rem;
+    font-size: 2.35rem;
     line-height: 1.15;
-    margin-bottom: 0.75rem;
+    margin-bottom: 1.1rem;
   }
 
   .supportingText {
     font-size: 1.02rem;
     line-height: 1.55;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.35rem;
   }
 
   .ctaRow {
@@ -654,6 +720,7 @@
     width: 100%;
     gap: 0.75rem;
     align-items: center;
+    margin-bottom: 1.35rem;
   }
 
   .primaryCta, .secondaryCta {
@@ -664,12 +731,21 @@
     font-size: 1.02rem;
   }
 
+  /* Wrap trust indicators to 2x2 grid on mobile */
+  .benefitRow {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem 0.75rem;
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
+  }
+
   .pawImageWrapper {
     max-width: 100%;
     animation: none;
   }
 
-  .dashedCurveTop,
   .motionAccentsTop,
   .motionAccentsRight {
     opacity: 0.4;
@@ -711,5 +787,13 @@
   .primaryCta, .secondaryCta {
     font-size: 0.98rem;
     padding: 0.8rem 1.25rem;
+  }
+
+  .benefitTitle {
+    font-size: 0.82rem;
+  }
+
+  .benefitSub {
+    font-size: 0.72rem;
   }
 }

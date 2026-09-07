@@ -4,6 +4,9 @@ import React, { memo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
+  ShieldCheck,
+  RotateCcw,
+  Headset,
   ArrowRight, 
   ChevronRight,
   Dog,
@@ -32,11 +35,11 @@ const HeartDoodle = ({ className }: { className?: string }) => (
   </svg>
 );
 
-// Diagonal Sparkle / Motion Accent Cluster
+// Standardized Diagonal Sparkle / Motion Accent Cluster
 const MotionAccents = ({ className }: { className?: string }) => (
-  <svg className={className} width="30" height="24" viewBox="0 0 28 22" fill="none" aria-hidden="true">
-    <line x1="6" y1="18" x2="14" y2="4" stroke="#EE8C32" strokeWidth="2.8" strokeLinecap="round" />
-    <line x1="16" y1="20" x2="24" y2="6" stroke="#EE8C32" strokeWidth="2.8" strokeLinecap="round" />
+  <svg className={className} width="32" height="26" viewBox="0 0 32 26" fill="none" aria-hidden="true">
+    <line x1="6" y1="22" x2="16" y2="4" stroke="#EE8C32" strokeWidth="2.5" strokeLinecap="round" />
+    <line x1="18" y1="24" x2="28" y2="6" stroke="#EE8C32" strokeWidth="2.5" strokeLinecap="round" />
   </svg>
 );
 
@@ -64,7 +67,7 @@ function HeroComponent() {
         {/* ── 1. LEFT CONTENT AREA ── */}
         <div className={styles.leftContent}>
           
-          {/* Trust Badge */}
+          {/* Trust Badge Pill */}
           <Link href="/testimonials" className={styles.trustPill} title="See customer reviews">
             <div className={styles.pillAvatars}>
               <span className={styles.avatarEmoji} role="img" aria-label="Dog">🐶</span>
@@ -101,31 +104,60 @@ function HeroComponent() {
 
             <Link href="/category" className={styles.secondaryCta}>
               <span>Explore Categories</span>
-              <ArrowRight size={18} strokeWidth={2} className={styles.ctaArrow} />
+              <ArrowRight size={18} strokeWidth={2.5} className={styles.ctaArrow} />
             </Link>
+          </div>
+
+          {/* Trust & Guarantee Benefit Indicators Row */}
+          <div className={styles.benefitRow}>
+
+            <div className={styles.benefitItem}>
+              <div className={styles.benefitIconWrap}>
+                <ShieldCheck size={19} strokeWidth={2} />
+              </div>
+              <div className={styles.benefitText}>
+                <span className={styles.benefitTitle}>100% Genuine</span>
+                <span className={styles.benefitSub}>Products</span>
+              </div>
+            </div>
+
+            <div className={styles.benefitItem}>
+              <div className={styles.benefitIconWrap}>
+                <RotateCcw size={19} strokeWidth={2} />
+              </div>
+              <div className={styles.benefitText}>
+                <span className={styles.benefitTitle}>Easy Returns</span>
+                <span className={styles.benefitSub}>Hassle-free</span>
+              </div>
+            </div>
+
+            <div className={styles.benefitItem}>
+              <div className={styles.benefitIconWrap}>
+                <Headset size={19} strokeWidth={2} />
+              </div>
+              <div className={styles.benefitText}>
+                <span className={styles.benefitTitle}>Dedicated Support</span>
+                <span className={styles.benefitSub}>For pet parents</span>
+              </div>
+            </div>
           </div>
           
         </div>
 
-        {/* ── 2. RIGHT HERO VISUAL (SEAMLESS PAW ARTWORK) ── */}
+        {/* ── 2. RIGHT HERO VISUAL (LIFESTYLE PHOTO + INTENTIONAL ORGANIC STAGE) ── */}
         <div className={styles.rightVisual} aria-label="Pet Category Showcase">
           
-          {/* Ambient backdrop glow behind image */}
+          {/* Intentional Organic Stage Backdrop */}
           <div className={styles.pawBackdropGlow} aria-hidden="true" />
 
-          {/* Dashed trajectory curve over paw */}
-          <svg className={styles.dashedCurveTop} viewBox="0 0 170 70" fill="none" aria-hidden="true">
-            <path d="M 10 55 C 60 10, 125 10, 160 45" stroke="#E89A5A" strokeWidth="1.8" strokeDasharray="4 4" opacity="0.65" />
-          </svg>
-
-          {/* Diagonal motion accents */}
+          {/* Standardized decorative accents framing the photo */}
           <MotionAccents className={styles.motionAccentsTop} />
           <MotionAccents className={styles.motionAccentsRight} />
 
-          {/* Right trajectory note: 'For a kinder, happier world ♡' */}
+          {/* Right hand-written note: 'For a kinder, happier world ♡' */}
           <div className={styles.sideNoteWrapper} aria-hidden="true">
             <svg className={styles.sideDashedCurve} viewBox="0 0 70 45" fill="none">
-              <path d="M 5 10 C 35 8, 55 25, 40 40" stroke="#E89A5A" strokeWidth="1.6" strokeDasharray="3 3" opacity="0.6" />
+              <path d="M 5 10 C 35 8, 55 25, 40 40" stroke="#EE8C32" strokeWidth="1.6" strokeDasharray="3 3" opacity="0.65" />
             </svg>
             <div className={styles.sideNote}>
               <span>For a</span>
@@ -134,14 +166,14 @@ function HeroComponent() {
             </div>
           </div>
 
-          {/* Seamless Paw Illustration Container */}
+          {/* Studio Pet & Product Image Container */}
           <div className={styles.pawImageContainer}>
             <div className={styles.pawImageWrapper}>
               <Image
                 src="/hero.png"
                 alt="Happier Pets, Brighter Days - Food & Treats, Toys & Playtime, Beds & Accessories, Health & Grooming"
-                width={1400}
-                height={787}
+                width={1200}
+                height={674}
                 priority
                 unoptimized
                 draggable={false}
