@@ -151,7 +151,7 @@
 
 .upiRowCard:hover {
   background: #ffffff;
-  border-color: rgba(253, 128, 46, 0.3);
+  border-color: rgba(249, 146, 5, 0.3);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.025);
 }
 
@@ -246,7 +246,7 @@
 
 .segmentActive {
   background: #ffffff !important;
-  color: #FD802E !important;
+  color: #F99205 !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 

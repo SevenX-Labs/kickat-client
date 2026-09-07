@@ -5,8 +5,8 @@
   --foreground: #233D4C;
   
   /* Pumpkin & Charcoal Premium Color Palette */
-  --brand-pumpkin: #FD802E;
-  --brand-pumpkin-hover: #E56E1D;
+  --brand-pumpkin: #F99205;
+  --brand-pumpkin-hover: #E08304;
   --brand-pumpkin-light: #FFF5EE;
   
   --brand-charcoal: #233D4C;
@@ -23,14 +23,14 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-pumpkin: #FD802E;
-  --color-pumpkin-hover: #E56E1D;
+  --color-pumpkin: #F99205;
+  --color-pumpkin-hover: #E08304;
   --color-pumpkin-light: #FFF5EE;
   --color-charcoal: #233D4C;
   --color-charcoal-dark: #192C37;
   --color-charcoal-light: #32556A;
   --color-charcoal-surface: #F0F4F7;
-  --color-brand-orange: #FD802E;
+  --color-brand-orange: #F99205;
   --color-brand-charcoal: #233D4C;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);

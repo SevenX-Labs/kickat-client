@@ -42,7 +42,7 @@
 }
 
 .crumbLink:hover {
-  color: #FD802E;
+  color: #F99205;
 }
 
 .crumbChevron {
@@ -241,8 +241,8 @@
 
 .offerBadge {
   background-color: #FFF5EE;
-  color: #FD802E;
-  border: 1px solid rgba(253, 128, 46, 0.2);
+  color: #F99205;
+  border: 1px solid rgba(249, 146, 5, 0.2);
   padding: 0.15rem 0.6rem;
   border-radius: 6px;
   font-size: 0.725rem;
@@ -263,7 +263,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
-  background-color: #FD802E;
+  background-color: #F99205;
   color: #ffffff;
   padding: 0.7rem 1rem;
   border-radius: 12px;
@@ -271,11 +271,11 @@
   font-weight: 700;
   text-decoration: none;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(253, 128, 46, 0.28);
+  box-shadow: 0 4px 14px rgba(249, 146, 5, 0.28);
 }
 
 .primaryTrackBtn:hover {
-  background-color: #E56E1D;
+  background-color: #E08304;
   transform: translateY(-1px);
 }
 
@@ -297,8 +297,8 @@
 }
 
 .secondaryReturnBtn:hover {
-  border-color: #FD802E;
-  color: #FD802E;
+  border-color: #F99205;
+  color: #F99205;
   background-color: #FFF9F4;
 }
 
@@ -334,7 +334,7 @@
 }
 
 .sectionTitleIcon {
-  color: #FD802E;
+  color: #F99205;
   flex-shrink: 0;
 }
 
@@ -367,7 +367,7 @@
   gap: 0.15rem;
   font-size: 0.75rem;
   font-weight: 700;
-  color: #FD802E;
+  color: #F99205;
   text-decoration: none;
   transition: opacity 0.2s ease;
   white-space: nowrap;
@@ -423,8 +423,8 @@
 }
 
 .activeNodePulse {
-  background: linear-gradient(135deg, #FD802E, #E56E1D) !important;
-  box-shadow: 0 0 0 4px rgba(253, 128, 46, 0.25), 0 4px 14px rgba(253, 128, 46, 0.4) !important;
+  background: linear-gradient(135deg, #F99205, #E08304) !important;
+  box-shadow: 0 0 0 4px rgba(249, 146, 5, 0.25), 0 4px 14px rgba(249, 146, 5, 0.4) !important;
   position: relative;
   animation: nodePulseGlow 2.5s infinite ease-in-out;
 }
@@ -436,7 +436,7 @@
   right: -2px;
   bottom: -2px;
   border-radius: 50%;
-  border: 2px solid #FD802E;
+  border: 2px solid #F99205;
   opacity: 0;
   animation: beaconPing 2.2s infinite cubic-bezier(0, 0.2, 0.8, 1);
   pointer-events: none;
@@ -477,15 +477,15 @@
 
 .timelineContentCard:hover {
   background: #ffffff;
-  border-color: #FD802E;
+  border-color: #F99205;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
   transform: translateX(3px);
 }
 
 .activeContentCard {
   background: #FFF9F4 !important;
-  border-color: rgba(253, 128, 46, 0.35) !important;
-  box-shadow: 0 4px 18px rgba(253, 128, 46, 0.1) !important;
+  border-color: rgba(249, 146, 5, 0.35) !important;
+  box-shadow: 0 4px 18px rgba(249, 146, 5, 0.1) !important;
 }
 
 .timelineStepHeader {
@@ -513,7 +513,7 @@
 }
 
 .latestUpdatePill {
-  background-color: #FD802E;
+  background-color: #F99205;
   color: #ffffff;
   font-size: 0.6rem;
   font-weight: 800;
@@ -521,7 +521,7 @@
   letter-spacing: 0.03em;
   padding: 0.12rem 0.45rem;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(253, 128, 46, 0.3);
+  box-shadow: 0 2px 8px rgba(249, 146, 5, 0.3);
   white-space: nowrap;
   display: inline-block;
   animation: pillPulse 2.2s infinite ease-in-out;
@@ -550,8 +550,8 @@
 }
 
 @keyframes nodePulseGlow {
-  0%, 100% { box-shadow: 0 0 0 4px rgba(253, 128, 46, 0.25), 0 4px 14px rgba(253, 128, 46, 0.3); }
-  50% { box-shadow: 0 0 0 7px rgba(253, 128, 46, 0.4), 0 6px 20px rgba(253, 128, 46, 0.55); }
+  0%, 100% { box-shadow: 0 0 0 4px rgba(249, 146, 5, 0.25), 0 4px 14px rgba(249, 146, 5, 0.3); }
+  50% { box-shadow: 0 0 0 7px rgba(249, 146, 5, 0.4), 0 6px 20px rgba(249, 146, 5, 0.55); }
 }
 
 @keyframes lineShimmer {
@@ -658,7 +658,7 @@
 
 .priceTotalRow {
   background-color: #FFF9F4;
-  border: 1px solid rgba(253, 128, 46, 0.2);
+  border: 1px solid rgba(249, 146, 5, 0.2);
   border-radius: 12px;
   padding: 0.85rem 1rem;
   display: flex;
@@ -681,7 +681,7 @@
 .totalAmountText {
   font-size: 1.35rem;
   font-weight: 800;
-  color: #FD802E;
+  color: #F99205;
 }
 
 .secondaryInvoiceBtn {
@@ -702,8 +702,8 @@
 }
 
 .secondaryInvoiceBtn:hover {
-  border-color: #FD802E;
-  color: #FD802E;
+  border-color: #F99205;
+  color: #F99205;
   background: #FFF9F4;
 }
 

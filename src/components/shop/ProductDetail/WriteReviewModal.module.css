@@ -173,8 +173,8 @@
 
 .ratingLabelBadge {
   background: #FFF0E5;
-  color: #FD802E;
-  border: 1px solid rgba(253, 128, 46, 0.25);
+  color: #F99205;
+  border: 1px solid rgba(249, 146, 5, 0.25);
   font-size: 0.775rem;
   font-weight: 700;
   padding: 0.25rem 0.65rem;
@@ -200,8 +200,8 @@
 
 .textarea:focus {
   outline: none;
-  border-color: #FD802E;
-  box-shadow: 0 0 0 3px rgba(253, 128, 46, 0.15);
+  border-color: #F99205;
+  box-shadow: 0 0 0 3px rgba(249, 146, 5, 0.15);
 }
 
 .textarea::placeholder {
@@ -216,7 +216,7 @@
 
 .uploadDragging {
   background: #FFF0E5;
-  outline: 2px dashed #FD802E;
+  outline: 2px dashed #F99205;
 }
 
 .uploadOptionsRow {
@@ -245,7 +245,7 @@
 }
 
 .uploadOptionBtn:hover {
-  border-color: #FD802E;
+  border-color: #F99205;
   background: #FFF7EE;
   transform: translateY(-1px);
 }
@@ -255,7 +255,7 @@
   height: 32px;
   border-radius: 50%;
   background: #FFF0E5;
-  color: #FD802E;
+  color: #F99205;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -264,7 +264,7 @@
 }
 
 .uploadOptionBtn:hover .optionIconBadge {
-  background: #FD802E;
+  background: #F99205;
   color: #FFFFFF;
   transform: scale(1.1);
 }
@@ -378,12 +378,12 @@
   padding: 0.55rem 1.45rem;
   border-radius: 10px;
   border: none;
-  background: #FD802E;
+  background: #F99205;
   color: #FFFFFF;
   font-size: 0.8rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 3px 12px rgba(253, 128, 46, 0.35);
+  box-shadow: 0 3px 12px rgba(249, 146, 5, 0.35);
   transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
@@ -393,7 +393,7 @@
 .submitBtn:hover {
   background: #E06C1E;
   transform: translateY(-1px);
-  box-shadow: 0 5px 15px rgba(253, 128, 46, 0.45);
+  box-shadow: 0 5px 15px rgba(249, 146, 5, 0.45);
 }
 
 /* Success State */

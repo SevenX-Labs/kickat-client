@@ -13,7 +13,7 @@
     background: rgba(255, 253, 250, 0.92);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border-top: 1px solid rgba(253, 128, 46, 0.12);
+    border-top: 1px solid rgba(249, 146, 5, 0.12);
     box-shadow: 0 -8px 28px rgba(33, 28, 21, 0.07);
     padding-bottom: max(6px, env(safe-area-inset-bottom));
     transition: background 0.3s ease;
@@ -29,7 +29,7 @@
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(253, 128, 46, 0.35) 50%,
+      rgba(249, 146, 5, 0.35) 50%,
       transparent 100%
     );
     pointer-events: none;
@@ -65,9 +65,9 @@
   .slidingIndicatorBar {
     width: 32px;
     height: 3.5px;
-    background: linear-gradient(90deg, #FFA54F 0%, #FD802E 50%, #FF6B35 100%);
+    background: linear-gradient(90deg, #FFA54F 0%, #F99205 50%, #FF6B35 100%);
     border-radius: 0 0 4px 4px;
-    box-shadow: 0 2px 8px rgba(253, 128, 46, 0.65), 0 0 14px rgba(253, 128, 46, 0.35);
+    box-shadow: 0 2px 8px rgba(249, 146, 5, 0.65), 0 0 14px rgba(249, 146, 5, 0.35);
   }
 
   .slidingIndicatorGlow {
@@ -77,8 +77,8 @@
     height: 24px;
     background: radial-gradient(
       ellipse at top,
-      rgba(253, 128, 46, 0.26) 0%,
-      rgba(253, 128, 46, 0) 75%
+      rgba(249, 146, 5, 0.26) 0%,
+      rgba(249, 146, 5, 0) 75%
     );
     pointer-events: none;
   }
@@ -128,12 +128,12 @@
 
   /* Active state animations */
   .active {
-    color: #FD802E !important;
+    color: #F99205 !important;
   }
 
   .active .label {
     font-weight: 700;
-    color: #FD802E;
+    color: #F99205;
     letter-spacing: 0.01em;
   }
 
@@ -159,7 +159,7 @@
     position: absolute;
     inset: -3px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(253, 128, 46, 0.18) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(249, 146, 5, 0.18) 0%, transparent 70%);
     pointer-events: none;
     animation: haloBreathe 3s ease-in-out infinite alternate;
   }
@@ -180,7 +180,7 @@
     position: absolute;
     top: -4px;
     right: -7px;
-    background: linear-gradient(135deg, #FF6B35 0%, #FD802E 100%);
+    background: linear-gradient(135deg, #FF6B35 0%, #F99205 100%);
     color: #ffffff;
     font-family: var(--font-sans), sans-serif;
     font-size: 0.625rem;
@@ -193,7 +193,7 @@
     justify-content: center;
     border-radius: 9999px;
     border: 1.5px solid #FFFDFB;
-    box-shadow: 0 2px 8px rgba(253, 128, 46, 0.45);
+    box-shadow: 0 2px 8px rgba(249, 146, 5, 0.45);
     pointer-events: none;
     line-height: 1;
     z-index: 5;

@@ -9,12 +9,12 @@ export const metadata = {
 export default function TermsPage() {
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '3rem 1.5rem 6rem', minHeight: '70vh' }}>
-      <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: '#FD802E', fontWeight: 600, marginBottom: '2rem', textDecoration: 'none' }}>
+      <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: '#F99205', fontWeight: 600, marginBottom: '2rem', textDecoration: 'none' }}>
         <ArrowLeft size={18} /> Back to Home
       </Link>
       
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-        <Scale size={36} color="#FD802E" />
+        <Scale size={36} color="#F99205" />
         <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: '#233D4C' }}>Terms of Service</h1>
       </div>
       <p style={{ color: '#6B7280', fontSize: '0.95rem', marginBottom: '2.5rem' }}>

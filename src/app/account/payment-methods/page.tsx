@@ -215,7 +215,7 @@ function PaymentMethodsContent() {
               {/* ── SAVED CARDS SECTION ── */}
               <div className={cardStyles.sectionGroup}>
                 <div className={cardStyles.groupTitleRow}>
-                  <CreditCard size={18} color="#FD802E" />
+                  <CreditCard size={18} color="#F99205" />
                   <h2 className={cardStyles.groupTitle}>Saved Cards</h2>
                 </div>
 
@@ -276,7 +276,7 @@ function PaymentMethodsContent() {
               {/* ── SAVED UPI HANDLES SECTION ── */}
               <div className={cardStyles.sectionGroup}>
                 <div className={cardStyles.groupTitleRow}>
-                  <Smartphone size={18} color="#FD802E" />
+                  <Smartphone size={18} color="#F99205" />
                   <h2 className={cardStyles.groupTitle}>UPI Handles &amp; VPA</h2>
                 </div>
 
@@ -284,7 +284,7 @@ function PaymentMethodsContent() {
                   {upiList.map(upi => (
                     <div key={upi.id} className={cardStyles.upiRowCard}>
                       <div className={cardStyles.upiIconBadge}>
-                        <Smartphone size={18} color="#FD802E" />
+                        <Smartphone size={18} color="#F99205" />
                       </div>
                       <div className={cardStyles.upiMetaInfo}>
                         <span className={cardStyles.vpaText}>{upi.vpa}</span>
@@ -360,7 +360,7 @@ function PaymentMethodsContent() {
           <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <div className={styles.modalTitleGroup}>
-                <CreditCard size={20} color="#FD802E" />
+                <CreditCard size={20} color="#F99205" />
                 <h2>Add Payment Method</h2>
               </div>
               <button type="button" className={styles.modalCloseBtn} onClick={() => setIsAddModalOpen(false)}>

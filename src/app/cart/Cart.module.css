@@ -28,7 +28,7 @@
 
 .eyebrow {
   margin: 0 0 0.25rem;
-  color: #F5821F;
+  color: #F99205;
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -114,7 +114,7 @@
 }
 
 .itemName:hover {
-  color: #FD802E;
+  color: #F99205;
 }
 
 .itemPrice {
@@ -175,7 +175,7 @@
 }
 
 .qtyBtn:hover {
-  background: rgba(253, 128, 46, 0.08);
+  background: rgba(249, 146, 5, 0.08);
 }
 
 .qtyValue {
@@ -283,16 +283,16 @@
 }
 
 .checkoutBtn:hover {
-  background: #FD802E;
+  background: #F99205;
   transform: translateY(-1px);
-  box-shadow: 0 12px 26px rgba(253, 128, 46, 0.25);
+  box-shadow: 0 12px 26px rgba(249, 146, 5, 0.25);
 }
 
 .stepItemActive .stepNumber {
-  background: #FD802E;
+  background: #F99205;
   color: #ffffff;
-  border-color: #FD802E;
-  box-shadow: 0 4px 12px rgba(253, 128, 46, 0.25);
+  border-color: #F99205;
+  box-shadow: 0 4px 12px rgba(249, 146, 5, 0.25);
 }
 
 .shippingTracker {
@@ -311,7 +311,7 @@
 }
 
 .trackerHighlight {
-  color: #F5821F;
+  color: #F99205;
   font-weight: 900;
 }
 
@@ -325,7 +325,7 @@
 .trackerFill {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #F5821F, #E7A03B);
+  background: linear-gradient(90deg, #F99205, #E7A03B);
   transition: width 0.5s ease;
 }
 
@@ -341,7 +341,7 @@
 }
 
 .secureNote svg {
-  color: #F5821F;
+  color: #F99205;
 }
 
 .emptyState {
@@ -352,7 +352,7 @@
 }
 
 .emptyState svg {
-  color: #F5821F;
+  color: #F99205;
 }
 
 .emptyState h2 {

@@ -46,14 +46,14 @@ export default function BlogsPage() {
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-12 md:py-16">
         
         {/* Temporary Notice Banner */}
-        <div className="bg-gradient-to-r from-[#FFF5ED] via-[#FFF9F2] to-[#FFF5ED] border border-[#FD802E]/30 rounded-3xl p-8 md:p-12 text-center max-w-3xl mx-auto shadow-sm mb-16 relative overflow-hidden">
-          <div className="inline-flex items-center gap-2 bg-[#FD802E]/10 text-[#FD802E] font-bold text-xs md:text-sm px-4 py-1.5 rounded-full mb-6">
+        <div className="bg-gradient-to-r from-[#FFF5ED] via-[#FFF9F2] to-[#FFF5ED] border border-[#F99205]/30 rounded-3xl p-8 md:p-12 text-center max-w-3xl mx-auto shadow-sm mb-16 relative overflow-hidden">
+          <div className="inline-flex items-center gap-2 bg-[#F99205]/10 text-[#F99205] font-bold text-xs md:text-sm px-4 py-1.5 rounded-full mb-6">
             <Sparkles size={16} />
             <span>New Blogs Will Come Soon</span>
           </div>
 
           <h1 className="text-3xl md:text-5xl font-extrabold text-[#1A1612] tracking-tight mb-4 font-serif">
-            The <em className="italic text-[#FD802E]">KickAt</em> Journal
+            The <em className="italic text-[#F99205]">KickAt</em> Journal
           </h1>
 
           <p className="text-sm md:text-base text-[#666055] max-w-xl mx-auto leading-relaxed">
@@ -81,7 +81,7 @@ export default function BlogsPage() {
                 href={`/blogs/${blog.slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group bg-[#FFFFFF] border border-[#EBE5DB] rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:border-[#FD802E] transition-all duration-300 flex flex-col cursor-pointer"
+                className="group bg-[#FFFFFF] border border-[#EBE5DB] rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:border-[#F99205] transition-all duration-300 flex flex-col cursor-pointer"
               >
                 {/* Thumbnail Image */}
                 <div className="relative h-48 w-full bg-[#FAF6F0] overflow-hidden">
@@ -105,10 +105,10 @@ export default function BlogsPage() {
                         <Clock size={13} /> {blog.readTime}
                       </span>
                       <span>•</span>
-                      <span className="text-[#FD802E] font-semibold">{blog.date}</span>
+                      <span className="text-[#F99205] font-semibold">{blog.date}</span>
                     </div>
 
-                    <h3 className="text-lg font-bold text-[#1A1612] group-hover:text-[#FD802E] transition-colors leading-snug mb-3 font-serif">
+                    <h3 className="text-lg font-bold text-[#1A1612] group-hover:text-[#F99205] transition-colors leading-snug mb-3 font-serif">
                       {blog.title}
                     </h3>
 
@@ -117,7 +117,7 @@ export default function BlogsPage() {
                     </p>
                   </div>
 
-                  <div className="mt-6 pt-4 border-t border-[#F3ECE1] flex items-center justify-between text-xs font-bold text-[#FD802E]">
+                  <div className="mt-6 pt-4 border-t border-[#F3ECE1] flex items-center justify-between text-xs font-bold text-[#F99205]">
                     <span>Read Preview</span>
                     <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                   </div>

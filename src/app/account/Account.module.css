@@ -32,12 +32,12 @@
   font-size: 0.875rem;
   font-weight: 600;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(253, 128, 46, 0.3);
+  border: 1px solid rgba(249, 146, 5, 0.3);
   animation: slideInToast 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .toastIcon {
-  color: #FD802E;
+  color: #F99205;
 }
 
 @keyframes slideInToast {
@@ -96,10 +96,10 @@
 }
 
 .mobileTabActive {
-  background-color: #FD802E !important;
+  background-color: #F99205 !important;
   color: #ffffff !important;
-  border-color: #FD802E !important;
-  box-shadow: 0 4px 14px rgba(253, 128, 46, 0.3);
+  border-color: #F99205 !important;
+  box-shadow: 0 4px 14px rgba(249, 146, 5, 0.3);
 }
 
 .mobileStatsRow {
@@ -179,15 +179,15 @@
   height: 72px;
   border-radius: 50%;
   background: linear-gradient(135deg, #FFF9F4 0%, #F5EFE6 100%);
-  border: 2.5 solid #FD802E;
-  color: #FD802E;
+  border: 2.5 solid #F99205;
+  color: #F99205;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-fraunces), Georgia, serif;
   font-size: 1.65rem;
   font-weight: 700;
-  box-shadow: 0 6px 20px rgba(253, 128, 46, 0.22);
+  box-shadow: 0 6px 20px rgba(249, 146, 5, 0.22);
 }
 
 .avatarEditBtn {
@@ -209,7 +209,7 @@
 }
 
 .avatarEditBtn:hover {
-  background: #FD802E;
+  background: #F99205;
   transform: scale(1.1);
 }
 
@@ -218,12 +218,12 @@
   align-items: center;
   gap: 0.3rem;
   background: #FFF5EE;
-  border: 1px solid rgba(253, 128, 46, 0.25);
+  border: 1px solid rgba(249, 146, 5, 0.25);
   border-radius: 20px;
   padding: 0.2rem 0.55rem;
   font-size: 0.65rem;
   font-weight: 800;
-  color: #FD802E;
+  color: #F99205;
   letter-spacing: 0.05em;
   margin-top: 0.35rem;
 }
@@ -303,23 +303,23 @@
 
 .navLink:hover {
   background-color: #FAF7F2;
-  color: #FD802E;
+  color: #F99205;
 }
 
 .navLink:hover .navIconWrapper {
-  color: #FD802E;
+  color: #F99205;
 }
 
 .navLink.active {
   background-color: #FFF9F4 !important;
-  color: #FD802E !important;
+  color: #F99205 !important;
   font-weight: 700 !important;
-  border-color: rgba(253, 128, 46, 0.25);
-  box-shadow: 0 4px 14px rgba(253, 128, 46, 0.1);
+  border-color: rgba(249, 146, 5, 0.25);
+  box-shadow: 0 4px 14px rgba(249, 146, 5, 0.1);
 }
 
 .navLink.active .navIconWrapper {
-  color: #FD802E !important;
+  color: #F99205 !important;
 }
 
 .activePillDot {
@@ -328,8 +328,8 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: #FD802E;
-  box-shadow: 0 0 8px rgba(253, 128, 46, 0.6);
+  background-color: #F99205;
+  box-shadow: 0 0 8px rgba(249, 146, 5, 0.6);
 }
 
 .logoutBtn {
@@ -410,12 +410,12 @@
   align-items: center;
   gap: 0.4rem;
   background: #FFF9F4;
-  border: 1px solid rgba(253, 128, 46, 0.25);
+  border: 1px solid rgba(249, 146, 5, 0.25);
   padding: 0.4rem 0.85rem;
   border-radius: 20px;
   font-size: 0.775rem;
   font-weight: 700;
-  color: #FD802E;
+  color: #F99205;
 }
 
 /* Controls Bar (Filter Tabs & Search) */
@@ -450,15 +450,15 @@
 }
 
 .tabBtn:hover {
-  border-color: #FD802E;
-  color: #FD802E;
+  border-color: #F99205;
+  color: #F99205;
 }
 
 .tabBtn.active {
-  background-color: #FD802E !important;
+  background-color: #F99205 !important;
   color: #ffffff !important;
-  border-color: #FD802E !important;
-  box-shadow: 0 4px 12px rgba(253, 128, 46, 0.25);
+  border-color: #F99205 !important;
+  box-shadow: 0 4px 12px rgba(249, 146, 5, 0.25);
 }
 
 .searchBox {
@@ -487,8 +487,8 @@
 }
 
 .searchInput:focus {
-  border-color: #FD802E;
-  box-shadow: 0 0 0 3px rgba(253, 128, 46, 0.15);
+  border-color: #F99205;
+  box-shadow: 0 0 0 3px rgba(249, 146, 5, 0.15);
 }
 
 /* ── ORDERS LIST ── */
@@ -552,7 +552,7 @@
 }
 
 .metaValue.mono {
-  color: #FD802E;
+  color: #F99205;
   font-weight: 800;
 }
 
@@ -626,8 +626,8 @@
   align-items: center;
   gap: 0.35rem;
   background: #FFF9F4;
-  border: 1px solid rgba(253, 128, 46, 0.25);
-  color: #FD802E;
+  border: 1px solid rgba(249, 146, 5, 0.25);
+  color: #F99205;
   font-size: 0.725rem;
   font-weight: 700;
   padding: 0.2rem 0.6rem;
@@ -668,7 +668,7 @@
   top: 24px;
   left: 10%;
   height: 3px;
-  background: linear-gradient(90deg, #FD802E 0%, #FF9D52 100%);
+  background: linear-gradient(90deg, #F99205 0%, #FF9D52 100%);
   border-radius: 10px;
   z-index: 1;
   transition: width 0.4s ease-out;
@@ -716,16 +716,16 @@
 
 /* Completed Step */
 .stepContainer.completed .nodeCircle {
-  background: #FD802E;
+  background: #F99205;
   color: #ffffff;
-  box-shadow: 0 4px 12px rgba(253, 128, 46, 0.3);
+  box-shadow: 0 4px 12px rgba(249, 146, 5, 0.3);
 }
 
 /* Active Step (Current in-progress step) */
 .stepContainer.activeStep .nodeCircle {
-  background: #FD802E;
+  background: #F99205;
   color: #ffffff;
-  box-shadow: 0 0 0 5px rgba(253, 128, 46, 0.22);
+  box-shadow: 0 0 0 5px rgba(249, 146, 5, 0.22);
 }
 
 .pulseBeacon {
@@ -733,7 +733,7 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  border: 2px solid #FD802E;
+  border: 2px solid #F99205;
   animation: beaconPulse 2s infinite;
   z-index: 1;
 }
@@ -882,8 +882,8 @@
 }
 
 .actionBtn:hover {
-  border-color: #FD802E;
-  color: #FD802E;
+  border-color: #F99205;
+  color: #F99205;
   background: #FFF9F4;
 }
 
@@ -892,23 +892,23 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background-color: #FD802E;
+  background-color: #F99205;
   color: #ffffff;
-  border: 1px solid #FD802E;
+  border: 1px solid #F99205;
   padding: 0.6rem 1.25rem;
   border-radius: 12px;
   font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(253, 128, 46, 0.28);
+  box-shadow: 0 4px 14px rgba(249, 146, 5, 0.28);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .primaryBtn:hover {
-  background-color: #E56E1D;
-  border-color: #E56E1D;
+  background-color: #E08304;
+  border-color: #E08304;
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(253, 128, 46, 0.35);
+  box-shadow: 0 6px 18px rgba(249, 146, 5, 0.35);
 }
 
 /* ── TOP BREADCRUMB & GREETING BAR ── */
@@ -936,7 +936,7 @@
 }
 
 .crumbLink:hover {
-  color: #FD802E;
+  color: #F99205;
 }
 
 .crumbSep {
@@ -1014,8 +1014,8 @@
 }
 
 .editSectionBtn:hover {
-  border-color: #FD802E;
-  color: #FD802E;
+  border-color: #F99205;
+  color: #F99205;
   background: #FFF9F4;
 }
 
@@ -1040,7 +1040,7 @@
   height: 36px;
   border-radius: 10px;
   background: #FFF5EE;
-  color: #FD802E;
+  color: #F99205;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1101,7 +1101,7 @@
   height: 36px;
   border-radius: 10px;
   background: #FFF5EE;
-  color: #FD802E;
+  color: #F99205;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1140,7 +1140,7 @@
 }
 
 .toggleOn {
-  background-color: #FD802E !important;
+  background-color: #F99205 !important;
 }
 
 .toggleKnob {
@@ -1182,8 +1182,8 @@
 }
 
 .addressCardActive {
-  border: 2px solid #FD802E !important;
-  box-shadow: 0 6px 20px rgba(253, 128, 46, 0.1) !important;
+  border: 2px solid #F99205 !important;
+  box-shadow: 0 6px 20px rgba(249, 146, 5, 0.1) !important;
   background: #FFFDFB !important;
 }
 
@@ -1199,7 +1199,7 @@
   align-items: center;
   gap: 0.35rem;
   background-color: #FFF5EE;
-  color: #FD802E;
+  color: #F99205;
   font-size: 0.725rem;
   font-weight: 700;
   padding: 0.25rem 0.65rem;
@@ -1231,7 +1231,7 @@
 }
 
 .makeDefaultBtn:hover {
-  color: #FD802E;
+  color: #F99205;
 }
 
 .addressName {
@@ -1300,7 +1300,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 14px rgba(253, 128, 46, 0.15);
+  box-shadow: 0 4px 14px rgba(249, 146, 5, 0.15);
 }
 
 .emptyStateTitle {
@@ -1370,7 +1370,7 @@
   font-family: var(--font-fraunces), Georgia, serif;
   font-size: 2.1rem;
   font-weight: 700;
-  color: #FD802E;
+  color: #F99205;
   line-height: 1.1;
 }
 
@@ -1390,7 +1390,7 @@
 
 .tierProgressBarFill {
   height: 100%;
-  background: linear-gradient(90deg, #FD802E 0%, #FFD700 100%);
+  background: linear-gradient(90deg, #F99205 0%, #FFD700 100%);
   border-radius: 10px;
 }
 
@@ -1438,8 +1438,8 @@
 }
 
 .perksBanner {
-  background: rgba(253, 128, 46, 0.12);
-  border: 1px solid rgba(253, 128, 46, 0.25);
+  background: rgba(249, 146, 5, 0.12);
+  border: 1px solid rgba(249, 146, 5, 0.25);
   border-radius: 12px;
   padding: 0.65rem 0.75rem;
   display: flex;
@@ -1573,8 +1573,8 @@
 .modalInput:focus,
 .modalSelect:focus {
   background: #ffffff;
-  border-color: #FD802E;
-  box-shadow: 0 0 0 3px rgba(253, 128, 46, 0.15);
+  border-color: #F99205;
+  box-shadow: 0 0 0 3px rgba(249, 146, 5, 0.15);
 }
 
 .pwInputWrapper {
@@ -1596,7 +1596,7 @@
 }
 
 .pwToggleBtn:hover {
-  color: #FD802E;
+  color: #F99205;
 }
 
 .checkboxGroup {
@@ -1609,7 +1609,7 @@
 .checkboxGroup input[type="checkbox"] {
   width: 16px;
   height: 16px;
-  accent-color: #FD802E;
+  accent-color: #F99205;
   cursor: pointer;
 }
 
@@ -1676,7 +1676,7 @@
 }
 
 .madeWithLoveFooter strong {
-  color: #FD802E;
+  color: #F99205;
   font-weight: 800;
   margin-left: 0.25rem;
 }
@@ -1899,8 +1899,8 @@
 }
 
 .ordersSearchInput:focus {
-  border-color: #FD802E;
-  box-shadow: 0 0 0 3px rgba(253, 128, 46, 0.15);
+  border-color: #F99205;
+  box-shadow: 0 0 0 3px rgba(249, 146, 5, 0.15);
 }
 
 .clearSearchBtn {
@@ -1917,7 +1917,7 @@
 }
 
 .clearSearchBtn:hover {
-  color: #FD802E;
+  color: #F99205;
 }
 
 .ordersFilterIconButton {
@@ -1938,16 +1938,16 @@
 }
 
 .ordersFilterIconButton:hover {
-  border-color: #FD802E;
-  color: #FD802E;
+  border-color: #F99205;
+  color: #F99205;
   background: #FFF9F4;
 }
 
 .activeFilterIconBtn {
-  border-color: #FD802E !important;
-  color: #FD802E !important;
+  border-color: #F99205 !important;
+  color: #F99205 !important;
   background-color: #FFF9F4 !important;
-  box-shadow: 0 4px 12px rgba(253, 128, 46, 0.18) !important;
+  box-shadow: 0 4px 12px rgba(249, 146, 5, 0.18) !important;
 }
 
 .filterDotBeacon {
@@ -1957,8 +1957,8 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #FD802E;
-  box-shadow: 0 0 6px rgba(253, 128, 46, 0.8);
+  background-color: #F99205;
+  box-shadow: 0 0 6px rgba(249, 146, 5, 0.8);
 }
 
 /* Filter Bottom Sheet Drawer (Slides Up From Bottom) */
@@ -2013,7 +2013,7 @@
   flex-wrap: wrap;
   margin-bottom: 1.15rem;
   background: #FFF9F4;
-  border: 1px solid rgba(253, 128, 46, 0.25);
+  border: 1px solid rgba(249, 146, 5, 0.25);
   border-radius: 14px;
   padding: 0.5rem 0.85rem;
 }
@@ -2021,15 +2021,15 @@
 .activeFiltersLabel {
   font-size: 0.75rem;
   font-weight: 800;
-  color: #FD802E;
+  color: #F99205;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
 .activeFilterChipTag {
   background: #ffffff;
-  border: 1px solid rgba(253, 128, 46, 0.3);
-  color: #FD802E;
+  border: 1px solid rgba(249, 146, 5, 0.3);
+  color: #F99205;
   font-size: 0.75rem;
   font-weight: 700;
   padding: 0.2rem 0.6rem;
@@ -2049,7 +2049,7 @@
 }
 
 .resetFiltersLink:hover {
-  color: #FD802E;
+  color: #F99205;
 }
 
 .filterModalScrollBody {
@@ -2114,16 +2114,16 @@
 }
 
 .filterOptionChip:hover {
-  border-color: #FD802E;
-  color: #FD802E;
+  border-color: #F99205;
+  color: #F99205;
   background: #FFF9F4;
 }
 
 .filterOptionActive {
-  background-color: #FD802E !important;
+  background-color: #F99205 !important;
   color: #ffffff !important;
-  border-color: #FD802E !important;
-  box-shadow: 0 4px 12px rgba(253, 128, 46, 0.25);
+  border-color: #F99205 !important;
+  box-shadow: 0 4px 12px rgba(249, 146, 5, 0.25);
 }
 
 
@@ -2284,7 +2284,7 @@
 }
 
 .cardProductName:hover {
-  color: #FD802E;
+  color: #F99205;
 }
 
 .cardProductVariant {
@@ -2380,8 +2380,8 @@
 }
 
 .cardOutlineBtn:hover {
-  border-color: #FD802E;
-  color: #FD802E;
+  border-color: #F99205;
+  color: #F99205;
   background: #FFF9F4;
 }
 
@@ -2391,22 +2391,22 @@
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
-  background-color: #FD802E;
+  background-color: #F99205;
   color: #ffffff;
-  border: 1.5px solid #FD802E;
+  border: 1.5px solid #F99205;
   padding: 0 0.85rem;
   border-radius: 14px;
   font-size: 0.85rem;
   font-weight: 700;
   text-decoration: none;
-  box-shadow: 0 4px 12px rgba(253, 128, 46, 0.25);
+  box-shadow: 0 4px 12px rgba(249, 146, 5, 0.25);
   box-sizing: border-box;
   transition: all 0.2s ease;
 }
 
 .cardSolidBtn:hover {
-  background-color: #E56E1D;
-  border-color: #E56E1D;
+  background-color: #E08304;
+  border-color: #E08304;
 }
 
 @media (max-width: 640px) {

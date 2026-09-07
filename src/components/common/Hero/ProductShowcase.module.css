@@ -109,7 +109,7 @@
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #F5821F;
+  color: #F99205;
   font-weight: 700;
   margin-bottom: 0.25rem;
 }
@@ -143,7 +143,7 @@
 }
 
 .slide.active .productWrapper:hover .tooltipAction {
-  color: #F5821F;
+  color: #F99205;
 }
 
 /* Carousel Indicators */
@@ -183,6 +183,6 @@
 }
 
 .progressActive {
-  background: #F5821F;
+  background: #F99205;
   width: 36px;
 }

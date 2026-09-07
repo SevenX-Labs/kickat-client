@@ -29,7 +29,7 @@
   border: none;
   font-size: 0.875rem;
   font-weight: 700;
-  color: #FD802E;
+  color: #F99205;
   text-decoration: none;
   box-shadow: none;
   transition: opacity 0.2s ease;
@@ -89,12 +89,12 @@
   align-items: center;
   gap: 0.3rem;
   background: #FFF5EE;
-  border: 1px solid rgba(253, 128, 46, 0.25);
+  border: 1px solid rgba(249, 146, 5, 0.25);
   border-radius: 12px;
   padding: 0.15rem 0.5rem;
   font-size: 0.65rem;
   font-weight: 800;
-  color: #FD802E;
+  color: #F99205;
   width: fit-content;
   white-space: nowrap;
 }
@@ -154,7 +154,7 @@
 
 .navItemLink:hover {
   background-color: #FAF7F2;
-  color: #FD802E;
+  color: #F99205;
 }
 
 .navIcon {
@@ -164,7 +164,7 @@
 }
 
 .navItemLink:hover .navIcon {
-  color: #FD802E;
+  color: #F99205;
 }
 
 .navTitle {
@@ -180,20 +180,20 @@
 
 .navItemLink:hover .navChevron {
   transform: translateX(3px);
-  color: #FD802E;
+  color: #F99205;
 }
 
 /* Active Item Style */
 .activeNavItem {
   background-color: #FFF9F4 !important;
-  color: #FD802E !important;
+  color: #F99205 !important;
   font-weight: 700 !important;
-  border-color: rgba(253, 128, 46, 0.25) !important;
+  border-color: rgba(249, 146, 5, 0.25) !important;
 }
 
 .activeNavItem .navIcon,
 .activeNavItem .navChevron {
-  color: #FD802E !important;
+  color: #F99205 !important;
 }
 
 /* Sign Out Item */
@@ -242,7 +242,7 @@
   height: 52px;
   border-radius: 50%;
   background: #FFF5EE;
-  border: 1px solid rgba(253, 128, 46, 0.2);
+  border: 1px solid rgba(249, 146, 5, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -279,9 +279,9 @@
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
-  border: 1.5px solid #FD802E;
+  border: 1.5px solid #F99205;
   background: #ffffff;
-  color: #FD802E;
+  color: #F99205;
   padding: 0.35rem 0.95rem;
   border-radius: 20px;
   font-size: 0.775rem;
@@ -290,11 +290,11 @@
   width: fit-content;
   margin: 0 auto;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(253, 128, 46, 0.1);
+  box-shadow: 0 2px 6px rgba(249, 146, 5, 0.1);
 }
 
 .contactSupportBtn:hover {
-  background: #FD802E;
+  background: #F99205;
   color: #ffffff;
 }
 
@@ -312,7 +312,7 @@
 }
 
 .madeWithLoveFooter strong {
-  color: #FD802E;
+  color: #F99205;
   font-weight: 800;
   margin-left: 0.25rem;
 }

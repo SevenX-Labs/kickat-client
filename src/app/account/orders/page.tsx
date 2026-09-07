@@ -397,7 +397,7 @@ function AccountOrdersContent() {
                 )) : (
                   <div className={styles.emptyStateCard}>
                     <div className={styles.emptyIconCircle}>
-                      <Package size={30} color="#FD802E" />
+                      <Package size={30} color="#F99205" />
                     </div>
                     <h3 className={styles.emptyStateTitle}>No Orders Found</h3>
                     <p className={styles.emptyStateDesc}>We couldn't find any orders matching your selected criteria.</p>
@@ -438,7 +438,7 @@ function AccountOrdersContent() {
 
             <div className={styles.modalHeader}>
               <div className={styles.modalTitleGroup}>
-                <SlidersHorizontal size={18} color="#FD802E" />
+                <SlidersHorizontal size={18} color="#F99205" />
                 <h2>Filter & Sort Orders</h2>
               </div>
               <button 

@@ -94,7 +94,7 @@ export function ProductTabs({ product }: ProductTabsProps) {
 
                 {/* Bottom Right Badge */}
                 <div className={styles.lifestyleBadgeBottom}>
-                  <PawPrint size={16} fill="#FD802E" color="#FD802E" />
+                  <PawPrint size={16} fill="#F99205" color="#F99205" />
                   <span>Happier Pets, Healthier Lives</span>
                 </div>
               </div>

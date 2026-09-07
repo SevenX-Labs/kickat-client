@@ -17,7 +17,7 @@ const StarRow = memo(function StarRow() {
   return (
     <div className={styles.stars} aria-hidden="true">
       {[1, 2, 3, 4, 5].map(i => (
-        <Star key={i} size={14} fill="#FD802E" color="#FD802E" strokeWidth={1} opacity={i === 5 ? 0.45 : 1} />
+        <Star key={i} size={14} fill="#F99205" color="#F99205" strokeWidth={1} opacity={i === 5 ? 0.45 : 1} />
       ))}
     </div>
   );

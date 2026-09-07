@@ -9,12 +9,12 @@ export const metadata = {
 export default function ShippingPage() {
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '3rem 1.5rem 6rem', minHeight: '70vh' }}>
-      <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: '#FD802E', fontWeight: 600, marginBottom: '2rem', textDecoration: 'none' }}>
+      <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: '#F99205', fontWeight: 600, marginBottom: '2rem', textDecoration: 'none' }}>
         <ArrowLeft size={18} /> Back to Home
       </Link>
       
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-        <Truck size={36} color="#FD802E" />
+        <Truck size={36} color="#F99205" />
         <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: '#233D4C' }}>Shipping & Returns</h1>
       </div>
       <p style={{ color: '#6B7280', fontSize: '0.95rem', marginBottom: '2.5rem' }}>
@@ -44,7 +44,7 @@ export default function ShippingPage() {
           <p style={{ color: '#4B5563', fontSize: '0.95rem', marginBottom: '1rem' }}>
             Once your package leaves our fulfillment warehouse, you will receive an SMS & Email containing your live tracking link. You can also view real-time tracking anytime from your KickAt account.
           </p>
-          <Link href="/orders" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#FD802E', color: '#fff', padding: '0.6rem 1.25rem', borderRadius: '8px', fontWeight: 600, textDecoration: 'none' }}>
+          <Link href="/orders" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#F99205', color: '#fff', padding: '0.6rem 1.25rem', borderRadius: '8px', fontWeight: 600, textDecoration: 'none' }}>
             Track Your Order
           </Link>
         </section>

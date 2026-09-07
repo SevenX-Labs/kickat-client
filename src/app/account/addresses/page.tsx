@@ -212,7 +212,7 @@ function SavedAddressesContent() {
           <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <div className={styles.modalTitleGroup}>
-                <MapPin size={20} color="#FD802E" />
+                <MapPin size={20} color="#F99205" />
                 <h2>Add Delivery Address</h2>
               </div>
               <button type="button" className={styles.modalCloseBtn} onClick={() => setIsAddAddressOpen(false)}>

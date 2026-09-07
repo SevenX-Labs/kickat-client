@@ -33,7 +33,7 @@
 }
 
 .breadcrumbs a:hover {
-  color: #FD802E;
+  color: #F99205;
 }
 
 .crumbChevron {
@@ -104,9 +104,9 @@
 }
 
 .searchInput:focus {
-  border-color: #FD802E;
+  border-color: #F99205;
   background-color: #ffffff;
-  box-shadow: 0 0 0 3px rgba(253, 128, 46, 0.15);
+  box-shadow: 0 0 0 3px rgba(249, 146, 5, 0.15);
 }
 
 .searchClearBtn {
@@ -144,16 +144,16 @@
 }
 
 .filterToggleBtn:hover {
-  border-color: #FD802E;
-  color: #FD802E;
+  border-color: #F99205;
+  color: #F99205;
   background: #FFF9F4;
 }
 
 .filterActiveBtn {
-  background: #FD802E !important;
+  background: #F99205 !important;
   color: #ffffff !important;
-  border-color: #FD802E !important;
-  box-shadow: 0 4px 14px rgba(253, 128, 46, 0.3);
+  border-color: #F99205 !important;
+  box-shadow: 0 4px 14px rgba(249, 146, 5, 0.3);
 }
 
 .activeFilterDot {
@@ -164,7 +164,7 @@
   height: 8px;
   border-radius: 50%;
   background-color: #ffffff;
-  box-shadow: 0 0 0 2px #FD802E;
+  box-shadow: 0 0 0 2px #F99205;
 }
 
 .filterExpandPanel {
@@ -226,15 +226,15 @@
 }
 
 .statusPillBtn:hover {
-  border-color: #FD802E;
-  color: #FD802E;
+  border-color: #F99205;
+  color: #F99205;
 }
 
 .statusPillActive {
-  background-color: #FD802E !important;
+  background-color: #F99205 !important;
   color: #ffffff !important;
-  border-color: #FD802E !important;
-  box-shadow: 0 3px 10px rgba(253, 128, 46, 0.25);
+  border-color: #F99205 !important;
+  box-shadow: 0 3px 10px rgba(249, 146, 5, 0.25);
 }
 
 .pillCountBadge {
@@ -293,7 +293,7 @@
 }
 
 .orderCardContainer:hover {
-  border-color: rgba(253, 128, 46, 0.3);
+  border-color: rgba(249, 146, 5, 0.3);
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.05);
 }
 
@@ -323,7 +323,7 @@
 
 .orderIdValue {
   font-weight: 700;
-  color: #FD802E;
+  color: #F99205;
 }
 
 .headerDotSeparator {
@@ -363,8 +363,8 @@
 }
 
 .invoiceBtn:hover {
-  border-color: #FD802E;
-  color: #FD802E;
+  border-color: #F99205;
+  color: #F99205;
   background: #FFF5EE;
 }
 
@@ -466,7 +466,7 @@
 }
 
 .cardProductTitle:hover {
-  color: #FD802E;
+  color: #F99205;
 }
 
 .cardProductVariant {
@@ -505,7 +505,7 @@
 }
 
 .cardDetailsLink:hover {
-  color: #FD802E;
+  color: #F99205;
 }
 
 .primaryActionBtn {
@@ -513,7 +513,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  background-color: #FD802E;
+  background-color: #F99205;
   color: #ffffff;
   border: none;
   padding: 0.55rem 1.15rem;
@@ -523,11 +523,11 @@
   text-decoration: none;
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.2s ease;
-  box-shadow: 0 3px 10px rgba(253, 128, 46, 0.25);
+  box-shadow: 0 3px 10px rgba(249, 146, 5, 0.25);
 }
 
 .primaryActionBtn:hover {
-  background-color: #E56E1D;
+  background-color: #E08304;
   transform: translateY(-1px);
 }
 
@@ -575,7 +575,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  background-color: #FD802E;
+  background-color: #F99205;
   color: #ffffff;
   padding: 0.7rem 1.5rem;
   border-radius: 12px;
@@ -583,11 +583,11 @@
   font-weight: 700;
   text-decoration: none;
   transition: background-color 0.2s ease;
-  box-shadow: 0 4px 14px rgba(253, 128, 46, 0.3);
+  box-shadow: 0 4px 14px rgba(249, 146, 5, 0.3);
 }
 
 .emptyShopBtn:hover {
-  background-color: #E56E1D;
+  background-color: #E08304;
 }
 
 /* ── MOBILE RESPONSIVENESS (375px & SMALL SCREENS) ── */
@@ -765,7 +765,7 @@
 .resetFilterBtn {
   background: transparent;
   border: none;
-  color: #FD802E;
+  color: #F99205;
   font-size: 0.8rem;
   font-weight: 700;
   cursor: pointer;
@@ -775,7 +775,7 @@
 }
 
 .resetFilterBtn:hover {
-  background-color: rgba(253, 128, 46, 0.1);
+  background-color: rgba(249, 146, 5, 0.1);
 }
 
 .filterModalCloseBtn {
@@ -793,7 +793,7 @@
 }
 
 .filterModalCloseBtn:hover {
-  background: #FD802E;
+  background: #F99205;
   color: #ffffff;
 }
 
@@ -836,7 +836,7 @@
 .applyFilterBtn {
   width: 100%;
   padding: 0.8rem;
-  background-color: #FD802E;
+  background-color: #F99205;
   color: #ffffff;
   border: none;
   border-radius: 12px;
@@ -844,11 +844,11 @@
   font-weight: 700;
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.15s ease;
-  box-shadow: 0 4px 14px rgba(253, 128, 46, 0.3);
+  box-shadow: 0 4px 14px rgba(249, 146, 5, 0.3);
 }
 
 .applyFilterBtn:hover {
-  background-color: #E56E1D;
+  background-color: #E08304;
   transform: translateY(-1px);
 }
 

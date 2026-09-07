@@ -127,7 +127,7 @@ export default function CheckoutPage() {
       const velocity = 80 + Math.random() * 120;
       const tx = Math.cos(angle) * velocity;
       const ty = Math.sin(angle) * velocity;
-      const colors = ['#FD802E', '#10B981', '#F59E0B', '#3B82F6', '#EC4899', '#8B5CF6', '#F43F5E'];
+      const colors = ['#F99205', '#10B981', '#F59E0B', '#3B82F6', '#EC4899', '#8B5CF6', '#F43F5E'];
       return { id: i, tx: `${tx}px`, ty: `${ty}px`, color: colors[i % colors.length] };
     }));
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -166,16 +166,16 @@ export default function CheckoutPage() {
 
             {/* Orbiting Paws */}
             <div className={`${styles.orbitItem} ${styles.pawTopRight}`}>
-              <PawPrint size={24} fill="#FD802E" color="#FD802E" />
+              <PawPrint size={24} fill="#F99205" color="#F99205" />
             </div>
             <div className={`${styles.orbitItem} ${styles.pawBottomLeft}`}>
-              <PawPrint size={22} fill="#FD802E" color="#FD802E" />
+              <PawPrint size={22} fill="#F99205" color="#F99205" />
             </div>
             <div className={`${styles.orbitItem} ${styles.pawTopLeft}`}>
-              <PawPrint size={18} fill="#FD802E" color="#FD802E" />
+              <PawPrint size={18} fill="#F99205" color="#F99205" />
             </div>
             <div className={`${styles.orbitItem} ${styles.pawBottomRight}`}>
-              <PawPrint size={20} fill="#FD802E" color="#FD802E" />
+              <PawPrint size={20} fill="#F99205" color="#F99205" />
             </div>
 
             {/* Spark Rays */}

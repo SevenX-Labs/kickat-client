@@ -212,8 +212,8 @@ export function WriteReviewModal({ product, isOpen, onClose, onSubmitSuccess }: 
                       >
                         <Star
                           size={28}
-                          fill={isFilled ? '#FD802E' : 'transparent'}
-                          color={isFilled ? '#FD802E' : '#C2BEB6'}
+                          fill={isFilled ? '#F99205' : 'transparent'}
+                          color={isFilled ? '#F99205' : '#C2BEB6'}
                           strokeWidth={isFilled ? 0 : 1.5}
                         />
                       </button>

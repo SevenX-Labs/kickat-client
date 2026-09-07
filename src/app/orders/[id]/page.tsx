@@ -188,7 +188,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
             <div className={styles.deliveryDetailsBody}>
               <div className={styles.infoTile}>
                 <div className={styles.tileIconCircle}>
-                  <User size={16} color="#FD802E" />
+                  <User size={16} color="#F99205" />
                 </div>
                 <div className={styles.tileContent}>
                   <div className={styles.tileLabel}>Recipient</div>
@@ -198,7 +198,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
 
               <div className={styles.infoTile}>
                 <div className={styles.tileIconCircle}>
-                  <MapPin size={16} color="#FD802E" />
+                  <MapPin size={16} color="#F99205" />
                 </div>
                 <div className={styles.tileContent}>
                   <div className={styles.tileLabel}>Delivery Address</div>
@@ -208,7 +208,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
 
               <div className={styles.infoTile}>
                 <div className={styles.tileIconCircle}>
-                  <Phone size={16} color="#FD802E" />
+                  <Phone size={16} color="#F99205" />
                 </div>
                 <div className={styles.tileContent}>
                   <div className={styles.tileLabel}>Contact Phone</div>

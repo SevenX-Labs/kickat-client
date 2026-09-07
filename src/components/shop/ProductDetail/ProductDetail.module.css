@@ -36,7 +36,7 @@
 }
 
 .breadcrumbLink:hover {
-  color: #FD802E;
+  color: #F99205;
 }
 
 .breadcrumbDivider {
@@ -110,12 +110,12 @@
 }
 
 .thumbnailBtn:hover {
-  border-color: #FD802E;
+  border-color: #F99205;
 }
 
 .thumbnailActive {
-  border-color: #FD802E !important;
-  box-shadow: 0 0 0 2px rgba(253, 128, 46, 0.2);
+  border-color: #F99205 !important;
+  box-shadow: 0 0 0 2px rgba(249, 146, 5, 0.2);
 }
 
 .thumbnailImage {
@@ -185,11 +185,11 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: rgba(253, 128, 46, 0.9);
+  background: rgba(249, 146, 5, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 24px rgba(253, 128, 46, 0.4);
+  box-shadow: 0 8px 24px rgba(249, 146, 5, 0.4);
 }
 
 .mainImageBottomCaption {
@@ -337,7 +337,7 @@
 }
 
 .bestSellerBadge {
-  background-color: #FD802E;
+  background-color: #F99205;
   color: #ffffff;
   font-size: 0.75rem;
   font-weight: 700;
@@ -393,7 +393,7 @@
 }
 
 .reviewsLink:hover {
-  color: #FD802E;
+  color: #F99205;
 }
 
 .socialProofText {
@@ -498,7 +498,7 @@
 }
 
 .colorSwatchActive {
-  box-shadow: 0 0 0 2px #FFFCF9, 0 0 0 4px #FD802E, 0 4px 12px rgba(253, 128, 46, 0.2) !important;
+  box-shadow: 0 0 0 2px #FFFCF9, 0 0 0 4px #F99205, 0 4px 12px rgba(249, 146, 5, 0.2) !important;
   transform: scale(1.1);
 }
 
@@ -526,16 +526,16 @@
 }
 
 .sizePillBtn:hover {
-  border-color: #FD802E;
-  color: #FD802E;
+  border-color: #F99205;
+  color: #F99205;
   background-color: #FFF9F4;
 }
 
 .sizePillActive {
-  background-color: #FD802E !important;
+  background-color: #F99205 !important;
   color: #ffffff !important;
-  border-color: #FD802E !important;
-  box-shadow: 0 4px 14px rgba(253, 128, 46, 0.35);
+  border-color: #F99205 !important;
+  box-shadow: 0 4px 14px rgba(249, 146, 5, 0.35);
   transform: translateY(-1px);
 }
 
@@ -543,9 +543,9 @@
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  border: 1px solid rgba(253, 128, 46, 0.25);
+  border: 1px solid rgba(249, 146, 5, 0.25);
   background: #FFF8F2;
-  color: #FD802E;
+  color: #F99205;
   padding: 0.3rem 0.75rem;
   border-radius: 20px;
   font-size: 0.775rem;
@@ -555,10 +555,10 @@
 }
 
 .sizeGuideRowLink:hover {
-  background: #FD802E;
+  background: #F99205;
   color: #ffffff;
-  border-color: #FD802E;
-  box-shadow: 0 3px 10px rgba(253, 128, 46, 0.25);
+  border-color: #F99205;
+  box-shadow: 0 3px 10px rgba(249, 146, 5, 0.25);
 }
 
 .quantityStockRow {
@@ -594,7 +594,7 @@
 
 .stepperBtn:hover {
   background-color: #FFF5EE;
-  color: #FD802E;
+  color: #F99205;
 }
 
 .stepperValue {
@@ -671,7 +671,7 @@
   flex: 1;
   height: 48px;
   border-radius: 12px;
-  background-color: #FD802E;
+  background-color: #F99205;
   color: #ffffff;
   border: none;
   font-size: 0.925rem;
@@ -710,8 +710,8 @@
 }
 
 .secondaryPillBtn:hover {
-  border-color: #FD802E;
-  color: #FD802E;
+  border-color: #F99205;
+  color: #F99205;
 }
 
 /* ── 3. TRUST STRIP ── */
@@ -754,7 +754,7 @@
 }
 
 .trustIcon {
-  color: #FD802E;
+  color: #F99205;
 }
 
 .trustTitle {
@@ -799,11 +799,11 @@
 }
 
 .tabNavBtn:hover {
-  color: #FD802E;
+  color: #F99205;
 }
 
 .tabNavBtnActive {
-  color: #FD802E !important;
+  color: #F99205 !important;
 }
 
 .tabNavBtnActive::after {
@@ -813,7 +813,7 @@
   left: 0;
   right: 0;
   height: 3px;
-  background-color: #FD802E;
+  background-color: #F99205;
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
 }
@@ -874,7 +874,7 @@
 }
 
 .calloutIcon {
-  color: #FD802E;
+  color: #F99205;
 }
 
 .calloutTitle {
@@ -917,7 +917,7 @@
 }
 
 .cursiveHeart {
-  color: #FD802E;
+  color: #F99205;
 }
 
 .lifestyleBadgeBottom {
@@ -1046,9 +1046,9 @@
 }
 
 .sizeCardActive {
-  border-color: #FD802E !important;
+  border-color: #F99205 !important;
   background: #FFF7EE !important;
-  box-shadow: 0 0 0 1px #FD802E;
+  box-shadow: 0 0 0 1px #F99205;
 }
 
 .sizeCardLetter {
@@ -1072,7 +1072,7 @@
 }
 
 .dogIconActive {
-  color: #FD802E;
+  color: #F99205;
 }
 
 .viewDetailedSizeGuideLink {
@@ -1081,7 +1081,7 @@
   gap: 0.35rem;
   border: none;
   background: transparent;
-  color: #FD802E;
+  color: #F99205;
   font-size: 0.825rem;
   font-weight: 600;
   cursor: pointer;
@@ -1116,7 +1116,7 @@
 }
 
 .careIcon {
-  color: #FD802E;
+  color: #F99205;
 }
 
 /* ── 6. CUSTOMER REVIEWS ── */
@@ -1210,7 +1210,7 @@
 
 .progressFill {
   height: 100%;
-  background: #FD802E;
+  background: #F99205;
   border-radius: 4px;
 }
 
@@ -1323,7 +1323,7 @@
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  color: #FD802E;
+  color: #F99205;
   font-weight: 700;
   font-size: 0.875rem;
   text-decoration: none;
@@ -1503,7 +1503,7 @@
 }
 
 .submitBtn {
-  background: #FD802E;
+  background: #F99205;
   color: #fff;
   border: none;
   padding: 0.5rem 1rem;
@@ -1541,7 +1541,7 @@
 }
 
 .faqItemOpen {
-  border-color: #FD802E;
+  border-color: #F99205;
   background: #ffffff;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
 }
@@ -1572,7 +1572,7 @@
 
 .faqChevronRotate {
   transform: rotate(180deg);
-  color: #FD802E;
+  color: #F99205;
 }
 
 .faqAnswerContent {

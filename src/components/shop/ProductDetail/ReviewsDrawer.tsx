@@ -155,7 +155,7 @@ export function ReviewsDrawer({ product, isOpen, onClose, onWriteReview }: Revie
           <div className={styles.headerTitleGroup}>
             <h2 className={styles.title}>All Customer Reviews</h2>
             <div className={styles.badgeRating}>
-              <Star size={13} fill="#FD802E" color="#FD802E" />
+              <Star size={13} fill="#F99205" color="#F99205" />
               <span>{product.rating || 4.8}</span>
             </div>
           </div>
@@ -181,7 +181,7 @@ export function ReviewsDrawer({ product, isOpen, onClose, onWriteReview }: Revie
               <div className={styles.scoreSub}>
                 <div className={styles.starsRow}>
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={14} fill="#FD802E" color="#FD802E" strokeWidth={1} />
+                    <Star key={i} size={14} fill="#F99205" color="#F99205" strokeWidth={1} />
                   ))}
                 </div>
                 <span className={styles.totalText}>Based on {product.reviewsCount || 142} reviews</span>
@@ -280,8 +280,8 @@ export function ReviewsDrawer({ product, isOpen, onClose, onWriteReview }: Revie
                         <Star 
                           key={i} 
                           size={13} 
-                          fill={i < rev.rating ? "#FD802E" : "#E0DCD4"} 
-                          color={i < rev.rating ? "#FD802E" : "#E0DCD4"} 
+                          fill={i < rev.rating ? "#F99205" : "#E0DCD4"} 
+                          color={i < rev.rating ? "#F99205" : "#E0DCD4"} 
                           strokeWidth={0} 
                         />
                       ))}

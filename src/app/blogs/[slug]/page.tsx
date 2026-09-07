@@ -22,14 +22,14 @@ export default function SingleBlogPage({ params }: SingleBlogPageProps) {
         {/* Back Link */}
         <Link
           href="/blogs"
-          className="inline-flex items-center gap-2 text-xs md:text-sm font-bold text-[#78746D] hover:text-[#FD802E] mb-8 transition-colors"
+          className="inline-flex items-center gap-2 text-xs md:text-sm font-bold text-[#78746D] hover:text-[#F99205] mb-8 transition-colors"
         >
           <ArrowLeft size={16} /> Back to KickAt Journal
         </Link>
 
         {/* Temporary Notice Banner */}
-        <div className="bg-[#FFF5ED] border border-[#FD802E]/30 rounded-2xl p-6 mb-10 text-center shadow-sm">
-          <div className="inline-flex items-center gap-2 text-[#FD802E] font-bold text-xs md:text-sm mb-2">
+        <div className="bg-[#FFF5ED] border border-[#F99205]/30 rounded-2xl p-6 mb-10 text-center shadow-sm">
+          <div className="inline-flex items-center gap-2 text-[#F99205] font-bold text-xs md:text-sm mb-2">
             <Sparkles size={16} />
             <span>New Blogs Will Come Soon</span>
           </div>
@@ -84,15 +84,15 @@ export default function SingleBlogPage({ params }: SingleBlogPageProps) {
 
             {/* Sub-Article / Related Post Link (Opens in New Tab) */}
             <div className="my-8 p-6 bg-[#FAF6F0] rounded-2xl border border-[#EBE5DB]">
-              <span className="text-xs font-bold text-[#FD802E] uppercase tracking-wider block mb-2">Read Next</span>
+              <span className="text-xs font-bold text-[#F99205] uppercase tracking-wider block mb-2">Read Next</span>
               <a
                 href="/blogs/understanding-cat-nutrition"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-center justify-between text-base font-bold text-[#1A1612] hover:text-[#FD802E] transition-colors"
+                className="group flex items-center justify-between text-base font-bold text-[#1A1612] hover:text-[#F99205] transition-colors"
               >
                 <span>Understanding Cat Nutrition: How to Choose the Right Food</span>
-                <ExternalLink size={16} className="text-[#FD802E] group-hover:translate-x-1 transition-transform" />
+                <ExternalLink size={16} className="text-[#F99205] group-hover:translate-x-1 transition-transform" />
               </a>
             </div>
 

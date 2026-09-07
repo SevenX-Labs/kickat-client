@@ -90,7 +90,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
         height: `${height}px`,
         objectFit: 'cover',
         borderRadius: '14px',
-        boxShadow: '0 10px 25px rgba(253, 128, 46, 0.45), 0 4px 12px rgba(0, 0, 0, 0.2)',
+        boxShadow: '0 10px 25px rgba(249, 146, 5, 0.45), 0 4px 12px rgba(0, 0, 0, 0.2)',
         border: '2px solid #ffffff',
         zIndex: '99999',
         pointerEvents: 'none',
@@ -158,7 +158,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
             <Heart
               size={16}
               className={isWishlisted ? styles.heartFilled : ''}
-              color={isWishlisted ? '#FD802E' : '#111827'}
+              color={isWishlisted ? '#F99205' : '#111827'}
               strokeWidth={1.8}
             />
           </button>
@@ -193,8 +193,8 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
               <Star 
                 key={star} 
                 size={12} 
-                fill={star <= Math.floor(rating) ? "#FD802E" : "#E5E7EB"} 
-                color={star <= Math.floor(rating) ? "#FD802E" : "#E5E7EB"} 
+                fill={star <= Math.floor(rating) ? "#F99205" : "#E5E7EB"} 
+                color={star <= Math.floor(rating) ? "#F99205" : "#E5E7EB"} 
                 strokeWidth={0} 
               />
             ))}

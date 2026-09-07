@@ -93,7 +93,7 @@ function SettingsContent() {
               <div className={styles.settingBlock}>
                 <div className={styles.blockTitleRow}>
                   <div className={styles.iconCircle}>
-                    <Bell size={18} color="#FD802E" />
+                    <Bell size={18} color="#F99205" />
                   </div>
                   <div>
                     <h2 className={styles.blockTitle}>Notifications &amp; Alerts</h2>

@@ -126,7 +126,7 @@ function AccountProfileContent() {
                     <p className={styles.subtitle}>Manage your personal identity, contact preferences, and security settings.</p>
                   </div>
                   <div className={styles.vipBadgeHeader}>
-                    <Crown size={14} fill="#FD802E" color="#FD802E" />
+                    <Crown size={14} fill="#F99205" color="#F99205" />
                     <span>{userData.tier}</span>
                   </div>
                 </div>
@@ -297,7 +297,7 @@ function AccountProfileContent() {
           <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <div className={styles.modalTitleGroup}>
-                <Edit3 size={20} color="#FD802E" />
+                <Edit3 size={20} color="#F99205" />
                 <h2>Edit Personal Details</h2>
               </div>
               <button type="button" className={styles.modalCloseBtn} onClick={() => setIsEditProfileOpen(false)}>

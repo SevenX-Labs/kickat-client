@@ -56,7 +56,7 @@ const COLOR_SWATCHES = [
   { name: 'Amber', hex: '#E7A03B' },
   { name: 'Forest', hex: '#333F2B' },
   { name: 'Ink', hex: '#211C15' },
-  { name: 'Orange', hex: '#F5821F' },
+  { name: 'Orange', hex: '#F99205' },
 ];
 
 interface CategoryExplorerProps {

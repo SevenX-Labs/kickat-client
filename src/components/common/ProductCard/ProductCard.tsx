@@ -31,7 +31,7 @@ interface ProductCardProps {
   onRemoveFromWishlist?: (id: string) => void;
 }
 
-const defaultSwatches = ['#FD802E', '#F0E6D8', '#6B7280', '#2D2D2D'];
+const defaultSwatches = ['#F99205', '#F0E6D8', '#6B7280', '#2D2D2D'];
 
 const productDescriptions: Record<string, string> = {
   'd-1': 'Grain-free organic kibble formulated for optimal nutrition, digestion, and coat health.',
@@ -112,7 +112,7 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
         height: `${height}px`,
         objectFit: 'cover',
         borderRadius: '14px',
-        boxShadow: '0 10px 25px rgba(253, 128, 46, 0.45), 0 4px 12px rgba(0, 0, 0, 0.2)',
+        boxShadow: '0 10px 25px rgba(249, 146, 5, 0.45), 0 4px 12px rgba(0, 0, 0, 0.2)',
         border: '2px solid #ffffff',
         zIndex: '99999',
         pointerEvents: 'none',
@@ -210,8 +210,8 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
               <Star 
                 key={star} 
                 size={13} 
-                fill={star <= Math.floor(rating) ? "#FD802E" : star - rating < 1 ? "#FD802E" : "#E5E7EB"} 
-                color={star <= Math.floor(rating) ? "#FD802E" : star - rating < 1 ? "#FD802E" : "#E5E7EB"} 
+                fill={star <= Math.floor(rating) ? "#F99205" : star - rating < 1 ? "#F99205" : "#E5E7EB"} 
+                color={star <= Math.floor(rating) ? "#F99205" : star - rating < 1 ? "#F99205" : "#E5E7EB"} 
                 strokeWidth={0} 
               />
             ))}

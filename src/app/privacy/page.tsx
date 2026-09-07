@@ -10,12 +10,12 @@ export const metadata = {
 export default function PrivacyPage() {
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '3rem 1.5rem 6rem', minHeight: '70vh' }}>
-      <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: '#FD802E', fontWeight: 600, marginBottom: '2rem', textDecoration: 'none' }}>
+      <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: '#F99205', fontWeight: 600, marginBottom: '2rem', textDecoration: 'none' }}>
         <ArrowLeft size={18} /> Back to Home
       </Link>
       
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-        <ShieldCheck size={36} color="#FD802E" />
+        <ShieldCheck size={36} color="#F99205" />
         <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: '#233D4C' }}>Privacy Policy</h1>
       </div>
       <p style={{ color: '#6B7280', fontSize: '0.95rem', marginBottom: '2.5rem' }}>
@@ -55,7 +55,7 @@ export default function PrivacyPage() {
 
         <div style={{ marginTop: '1rem', padding: '1.25rem', background: '#FFF5EE', borderRadius: '12px', border: '1px solid #FDBA74' }}>
           <p style={{ color: '#C2410C', fontWeight: 600, fontSize: '0.9rem' }}>
-            Have questions about your privacy rights? Reach out to our Data Privacy Officer at <Link href="/contact" style={{ color: '#FD802E', textDecoration: 'underline' }}>support@kickat.com</Link>.
+            Have questions about your privacy rights? Reach out to our Data Privacy Officer at <Link href="/contact" style={{ color: '#F99205', textDecoration: 'underline' }}>support@kickat.com</Link>.
           </p>
         </div>
       </div>

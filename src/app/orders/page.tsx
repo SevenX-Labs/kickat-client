@@ -142,7 +142,7 @@ export default function OrdersPage() {
             <div className={styles.filterModalCard} onClick={(e) => e.stopPropagation()}>
               <div className={styles.filterModalHeader}>
                 <div className={styles.filterModalTitleGroup}>
-                  <SlidersHorizontal size={18} color="#FD802E" />
+                  <SlidersHorizontal size={18} color="#F99205" />
                   <h3 className={styles.filterModalTitle}>Filter Orders</h3>
                 </div>
                 <div className={styles.modalHeaderActions}>
@@ -241,7 +241,7 @@ export default function OrdersPage() {
           {filteredOrders.length === 0 ? (
             <div className={styles.emptyStateCard}>
               <div className={styles.emptyIconCircle}>
-                <Package size={32} color="#FD802E" />
+                <Package size={32} color="#F99205" />
               </div>
               <h3 className={styles.emptyTitle}>No Orders Found</h3>
               <p className={styles.emptySubtext}>

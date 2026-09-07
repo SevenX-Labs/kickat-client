@@ -82,11 +82,11 @@
   opacity: 0.6;
 }
 
-.petIcon:nth-child(1) { animation-delay: 0s; color: #F5821F; }
+.petIcon:nth-child(1) { animation-delay: 0s; color: #F99205; }
 .petIcon:nth-child(2) { animation-delay: 0.2s; color: #E7A03B; }
 .petIcon:nth-child(3) { animation-delay: 0.4s; color: #333F2B; }
 .petIcon:nth-child(4) { animation-delay: 0.6s; color: #1A2E26; }
-.petIcon:nth-child(5) { animation-delay: 0.8s; color: #F5821F; }
+.petIcon:nth-child(5) { animation-delay: 0.8s; color: #F99205; }
 
 @keyframes premiumBounce {
   0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; filter: none; }

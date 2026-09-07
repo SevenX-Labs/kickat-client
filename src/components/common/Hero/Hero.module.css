@@ -30,7 +30,7 @@
   right: -5%;
   width: 700px;
   height: 700px;
-  background: radial-gradient(circle, rgba(253, 128, 46, 0.15) 0%, rgba(253, 128, 46, 0) 70%);
+  background: radial-gradient(circle, rgba(249, 146, 5, 0.15) 0%, rgba(249, 146, 5, 0) 70%);
   animation: morphWavy 14s ease-in-out infinite, spinBlob 25s linear infinite;
 }
 
@@ -170,7 +170,7 @@
 }
 
 .highlight {
-  color: #FD802E;
+  color: #F99205;
   font-style: italic;
   font-weight: 500;
   position: relative;
@@ -183,7 +183,7 @@
   left: 0;
   width: 100%;
   height: 3px;
-  background: linear-gradient(90deg, rgba(253, 128, 46, 0.4), rgba(253, 128, 46, 0));
+  background: linear-gradient(90deg, rgba(249, 146, 5, 0.4), rgba(249, 146, 5, 0));
   border-radius: 2px;
 }
 
@@ -219,10 +219,10 @@
 }
 
 .primaryBtn {
-  background: #FD802E;
+  background: #F99205;
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 6px 20px rgba(253, 128, 46, 0.35);
+  box-shadow: 0 6px 20px rgba(249, 146, 5, 0.35);
 }
 
 @keyframes gradientLiquid {
@@ -283,8 +283,8 @@
 }
 
 .primaryBtn:hover {
-  background: #E56E1D;
-  box-shadow: 0 12px 28px rgba(253, 128, 46, 0.45);
+  background: #E08304;
+  box-shadow: 0 12px 28px rgba(249, 146, 5, 0.45);
 }
 
 .primaryBtn:hover::before, .secondaryBtn:hover::before {
@@ -296,7 +296,7 @@
 }
 
 .primaryBtn:active {
-  box-shadow: 0 6px 12px rgba(253, 128, 46, 0.3);
+  box-shadow: 0 6px 12px rgba(249, 146, 5, 0.3);
 }
 
 .secondaryBtn {
@@ -347,7 +347,7 @@
   gap: 0.85rem;
   padding: 0.45rem 1.05rem 0.45rem 0.55rem;
   background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(253, 128, 46, 0.2);
+  border: 1px solid rgba(249, 146, 5, 0.2);
   border-radius: 9999px;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -358,8 +358,8 @@
 
 .trustItem:hover {
   transform: translateY(-2px);
-  border-color: rgba(253, 128, 46, 0.35);
-  box-shadow: 0 6px 22px rgba(253, 128, 46, 0.12);
+  border-color: rgba(249, 146, 5, 0.35);
+  box-shadow: 0 6px 22px rgba(249, 146, 5, 0.12);
 }
 
 .avatarStack {

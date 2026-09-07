@@ -30,8 +30,8 @@ export function ProductInfo({ product }: ProductInfoProps) {
   const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
 
   const colorSwatches = [
-    { name: 'Charcoal & Pumpkin', hex: '#2B2E33', hex2: '#FD802E' },
-    { name: 'Pumpkin', hex: '#FD802E' },
+    { name: 'Charcoal & Pumpkin', hex: '#2B2E33', hex2: '#F99205' },
+    { name: 'Pumpkin', hex: '#F99205' },
     { name: 'Charcoal', hex: '#2B2E33' },
     { name: 'Beige', hex: '#E6DEC9' },
   ];
@@ -73,7 +73,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
       height: `${height}px`,
       objectFit: 'cover',
       borderRadius: '16px',
-      boxShadow: '0 12px 30px rgba(253, 128, 46, 0.45), 0 4px 12px rgba(0, 0, 0, 0.2)',
+      boxShadow: '0 12px 30px rgba(249, 146, 5, 0.45), 0 4px 12px rgba(0, 0, 0, 0.2)',
       border: '2.5px solid #ffffff',
       zIndex: '99999',
       pointerEvents: 'none',
@@ -156,7 +156,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
       <div className={styles.ratingRow}>
         <div className={styles.starsGroup}>
           {[...Array(5)].map((_, i) => (
-            <Star key={i} size={15} fill="#FD802E" color="#FD802E" strokeWidth={1} />
+            <Star key={i} size={15} fill="#F99205" color="#F99205" strokeWidth={1} />
           ))}
           <span className={styles.ratingScore}>{rating}</span>
         </div>

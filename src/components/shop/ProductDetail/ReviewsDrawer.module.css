@@ -74,8 +74,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  background: rgba(253, 128, 46, 0.1);
-  color: #FD802E;
+  background: rgba(249, 146, 5, 0.1);
+  color: #F99205;
   font-weight: 700;
   font-size: 0.8rem;
   padding: 0.25rem 0.6rem;
@@ -160,7 +160,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  background: #FD802E;
+  background: #F99205;
   color: #ffffff;
   border: none;
   padding: 0.6rem 1.1rem;
@@ -241,8 +241,8 @@
 }
 
 .filterPill:hover {
-  border-color: #FD802E;
-  color: #FD802E;
+  border-color: #F99205;
+  color: #F99205;
 }
 
 .activeFilterPill {
@@ -295,7 +295,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #FD802E;
+  background: #F99205;
   color: #ffffff;
   font-weight: 700;
   font-size: 0.85rem;
@@ -386,9 +386,9 @@
 }
 
 .helpfulActive {
-  background: rgba(253, 128, 46, 0.1);
-  border-color: #FD802E;
-  color: #FD802E;
+  background: rgba(249, 146, 5, 0.1);
+  border-color: #F99205;
+  color: #F99205;
 }
 
 /* Image Full Preview Modal */

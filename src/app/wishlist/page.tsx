@@ -49,7 +49,7 @@ function WishlistContent() {
               ) : (
                 <div className={styles.emptyState}>
                   <div className={styles.emptyIcon}>
-                    <Heart size={40} fill="#FD802E" strokeWidth={0} />
+                    <Heart size={40} fill="#F99205" strokeWidth={0} />
                   </div>
                   <h2 className={styles.emptyTitle}>Your wishlist is empty</h2>
                   <p className={styles.emptyDesc}>

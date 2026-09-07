@@ -31,7 +31,7 @@
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  color: #FD802E;
+  color: #F99205;
 }
 
 .eyebrow {
@@ -40,7 +40,7 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-weight: 700;
-  color: #FD802E;
+  color: #F99205;
 }
 
 .title {
@@ -65,9 +65,9 @@
   gap: 0.45rem;
   font-weight: 600;
   font-size: 0.8125rem;
-  color: #FD802E;
+  color: #F99205;
   text-decoration: none;
-  border: 1.5px solid rgba(253, 128, 46, 0.3);
+  border: 1.5px solid rgba(249, 146, 5, 0.3);
   background-color: transparent;
   padding: 0.45rem 1.1rem;
   border-radius: 9999px;
@@ -76,11 +76,11 @@
 }
 
 .viewAllBtn:hover { 
-  background-color: #FD802E;
+  background-color: #F99205;
   color: #ffffff;
-  border-color: #FD802E;
+  border-color: #F99205;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(253, 128, 46, 0.25);
+  box-shadow: 0 4px 12px rgba(249, 146, 5, 0.25);
 }
 
 /* ── Compact 4-Column Grid ── */

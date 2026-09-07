@@ -45,9 +45,9 @@ export function ProductReviews({ product }: ProductReviewsProps) {
             display: 'inline-flex',
             alignItems: 'center',
             gap: '0.4rem',
-            background: 'rgba(253, 128, 46, 0.08)',
-            color: '#FD802E',
-            border: '1px solid rgba(253, 128, 46, 0.2)',
+            background: 'rgba(249, 146, 5, 0.08)',
+            color: '#F99205',
+            border: '1px solid rgba(249, 146, 5, 0.2)',
             padding: '0.5rem 1rem',
             borderRadius: '20px',
             fontSize: '0.85rem',
@@ -73,8 +73,8 @@ export function ProductReviews({ product }: ProductReviewsProps) {
                 <Star
                   key={i}
                   size={18}
-                  fill="#FD802E"
-                  color="#FD802E"
+                  fill="#F99205"
+                  color="#F99205"
                   strokeWidth={1}
                 />
               ))}
@@ -122,7 +122,7 @@ export function ProductReviews({ product }: ProductReviewsProps) {
             style={{
               background: 'none',
               border: 'none',
-              color: '#FD802E',
+              color: '#F99205',
               fontWeight: '700',
               fontSize: '0.825rem',
               cursor: 'pointer'

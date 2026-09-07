@@ -70,7 +70,7 @@
 }
 
 .socialLink:hover {
-  color: #FD802E;
+  color: #F99205;
 }
 
 .linksCol {
@@ -94,7 +94,7 @@
 }
 
 .link:hover {
-  color: #FD802E;
+  color: #F99205;
 }
 
 .newsletterCol {
@@ -133,11 +133,11 @@
 }
 
 .input:focus {
-  border-color: #FD802E;
+  border-color: #F99205;
 }
 
 .submitBtn {
-  background-color: #FD802E;
+  background-color: #F99205;
   color: white;
   border: none;
   border-radius: 8px;
@@ -148,7 +148,7 @@
 }
 
 .submitBtn:hover {
-  background-color: #E56E1D;
+  background-color: #E08304;
 }
 
 .bottomSection {

@@ -76,7 +76,7 @@ export function ProductGallery({ images }: ProductGalleryProps) {
             aria-label="Add to Wishlist"
             onClick={() => setIsWishlisted(!isWishlisted)}
           >
-            <Heart size={16} fill={isWishlisted ? "#FD802E" : "none"} color={isWishlisted ? "#FD802E" : "#211C15"} />
+            <Heart size={16} fill={isWishlisted ? "#F99205" : "none"} color={isWishlisted ? "#F99205" : "#211C15"} />
           </button>
           <button
             type="button"

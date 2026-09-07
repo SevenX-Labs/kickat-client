@@ -177,8 +177,8 @@
 }
 
 .addToCartBtn:hover {
-  background-color: #FD802E;
-  box-shadow: 0 4px 14px rgba(253, 128, 46, 0.35);
+  background-color: #F99205;
+  box-shadow: 0 4px 14px rgba(249, 146, 5, 0.35);
 }
 
 .emptyState {
@@ -201,7 +201,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #FD802E;
+  color: #F99205;
   margin-bottom: 1.5rem;
 }
 
@@ -231,9 +231,9 @@
 }
 
 .shopBtn:hover {
-  background-color: #FD802E;
+  background-color: #F99205;
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(253, 128, 46, 0.25);
+  box-shadow: 0 8px 20px rgba(249, 146, 5, 0.25);
 }
 
 @media (max-width: 768px) {

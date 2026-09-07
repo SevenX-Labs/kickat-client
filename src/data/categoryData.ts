@@ -125,7 +125,7 @@ export const CATALOG_PRODUCTS: CatalogProduct[] = [
     badge: 'Best Seller',
     tags: ['Organic', 'High Protein', 'Grain Free'],
     sizes: ['1kg', '3kg', '5kg'],
-    color: '#FD802E',
+    color: '#F99205',
     isTopRated: true,
     description: 'Grain-free organic kibble for a healthier, happier pup.',
   },
@@ -159,7 +159,7 @@ export const CATALOG_PRODUCTS: CatalogProduct[] = [
     badge: 'Sale',
     tags: ['Durable', 'Teething', 'Eco Friendly'],
     sizes: ['S', 'M', 'L'],
-    color: '#FD802E',
+    color: '#F99205',
   },
   {
     id: 'd-4',
@@ -205,7 +205,7 @@ export const CATALOG_PRODUCTS: CatalogProduct[] = [
     brand: 'KittyHaus',
     badge: 'Popular',
     tags: ['Salmon', 'Grain Free', 'Crunchy'],
-    color: '#FD802E',
+    color: '#F99205',
     isTopRated: true,
   },
   {

@@ -119,7 +119,7 @@ export default function AccountSidebarNav({
             </div>
             <div className={styles.profileMeta}>
               <div className={styles.vipBadgePill}>
-                <Crown size={11} fill="#FD802E" color="#FD802E" />
+                <Crown size={11} fill="#F99205" color="#F99205" />
                 <span>{user.tier || 'Gold Paw VIP'}</span>
               </div>
               <h2 className={styles.userName}>{user.firstName} {user.lastName}</h2>
