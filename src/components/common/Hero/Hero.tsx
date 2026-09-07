@@ -75,7 +75,7 @@ function HeroComponent() {
               <span className={styles.avatarEmoji} role="img" aria-label="Rabbit">🐰</span>
               <span className={styles.avatarEmoji} role="img" aria-label="Bird">🐦</span>
             </div>
-            <span className={styles.pillText}>Trusted by 25K+ Pet Parents</span>
+            <span className={styles.pillText}>Trusted by 5 Lakh+ Pet Parents</span>
             <ChevronRight size={15} strokeWidth={2.5} className={styles.pillArrow} />
           </Link>
 
