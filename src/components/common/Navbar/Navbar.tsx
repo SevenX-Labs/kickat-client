@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { ChevronDown, Search, Heart, User, ShoppingBag, Package, Tag, MapPin, Bell, LogOut, Star, Truck, Percent, Crown, Menu, X, Dog, Cat, Fish, Bird, MessageCircle, BookOpen, Phone, ShieldQuestion, Headset, ArrowRight, Sun, Sparkles } from "lucide-react";
+import { ChevronDown, Search, Heart, User, ShoppingBag, Package, Tag, MapPin, Bell, LogOut, Star, Truck, Percent, Crown, Menu, X, Dog, Cat, Fish, Bird, MessageCircle, BookOpen, Phone, ShieldQuestion, Headset, ArrowRight, Sun, Sparkles, ChevronRight } from "lucide-react";
 import styles from "./Navbar.module.css";
 import { megaMenuData } from "@/data/megaMenuData";
 
@@ -361,58 +361,123 @@ export function Navbar() {
                 {isLoggedIn ? (
                   <>
                     <div className={styles.accountDropdownHeader}>
-                      <span className={styles.greetingTitle}>Welcome Back!</span>
-                      <span className={styles.greetingSub}>Manage your account & orders</span>
+                      <div className={styles.headerUserRow}>
+                        <div className={styles.headerAvatar}>
+                          <User size={18} strokeWidth={2.2} />
+                        </div>
+                        <div className={styles.headerTextCol}>
+                          <span className={styles.greetingTitle}>Welcome Back!</span>
+                          <span className={styles.greetingSub}>Manage your account & orders</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className={styles.divider} />
                     <div className={styles.accountDropdownList}>
                       <Link href="/account?tab=profile" className={styles.accountDropdownItem}>
-                        <User size={18} strokeWidth={1.5} /> My Profile
+                        <div className={styles.itemLeft}>
+                          <span className={styles.itemIconWrap}>
+                            <User size={16} strokeWidth={1.8} />
+                          </span>
+                          <span className={styles.itemLabel}>My Profile</span>
+                        </div>
+                        <ChevronRight size={14} strokeWidth={2.2} className={styles.itemArrow} />
                       </Link>
                       <Link href="/orders" className={styles.accountDropdownItem}>
-                        <Package size={18} strokeWidth={1.5} /> Orders & Tracking
+                        <div className={styles.itemLeft}>
+                          <span className={styles.itemIconWrap}>
+                            <Package size={16} strokeWidth={1.8} />
+                          </span>
+                          <span className={styles.itemLabel}>Orders & Tracking</span>
+                        </div>
+                        <ChevronRight size={14} strokeWidth={2.2} className={styles.itemArrow} />
                       </Link>
                       <Link href="/account?tab=addresses" className={styles.accountDropdownItem}>
-                        <MapPin size={18} strokeWidth={1.5} /> Saved Addresses
+                        <div className={styles.itemLeft}>
+                          <span className={styles.itemIconWrap}>
+                            <MapPin size={16} strokeWidth={1.8} />
+                          </span>
+                          <span className={styles.itemLabel}>Saved Addresses</span>
+                        </div>
+                        <ChevronRight size={14} strokeWidth={2.2} className={styles.itemArrow} />
                       </Link>
                       <Link href="/account?tab=wishlist" className={styles.accountDropdownItem}>
-                        <Heart size={18} strokeWidth={1.5} /> Wishlist
+                        <div className={styles.itemLeft}>
+                          <span className={styles.itemIconWrap}>
+                            <Heart size={16} strokeWidth={1.8} />
+                          </span>
+                          <span className={styles.itemLabel}>Wishlist</span>
+                        </div>
+                        <ChevronRight size={14} strokeWidth={2.2} className={styles.itemArrow} />
                       </Link>
                       <Link href="/notifications" className={styles.accountDropdownItem}>
-                        <Bell size={18} strokeWidth={1.5} /> Notifications
+                        <div className={styles.itemLeft}>
+                          <span className={styles.itemIconWrap}>
+                            <Bell size={16} strokeWidth={1.8} />
+                          </span>
+                          <span className={styles.itemLabel}>Notifications</span>
+                        </div>
+                        <span className={styles.notifBadge}>2</span>
                       </Link>
                       <div className={styles.divider} />
                       <button className={`${styles.accountDropdownItem} ${styles.logoutItem}`} onClick={handleLogout}>
-                        <LogOut size={18} strokeWidth={1.5} /> Logout
+                        <div className={styles.itemLeft}>
+                          <span className={`${styles.itemIconWrap} ${styles.logoutIconWrap}`}>
+                            <LogOut size={16} strokeWidth={1.8} />
+                          </span>
+                          <span className={styles.itemLabel}>Logout</span>
+                        </div>
                       </button>
                     </div>
                   </>
                 ) : (
                   <>
                     <div className={styles.accountDropdownHeader}>
-                      <span className={styles.greetingTitle}>Welcome to KickAt</span>
-                      <span className={styles.greetingSub}>Access account & track orders</span>
+                      <div className={styles.headerUserRow}>
+                        <div className={styles.headerAvatar}>
+                          <Sparkles size={18} strokeWidth={2.2} />
+                        </div>
+                        <div className={styles.headerTextCol}>
+                          <span className={styles.greetingTitle}>Welcome to KickAt</span>
+                          <span className={styles.greetingSub}>Access account & track orders</span>
+                        </div>
+                      </div>
                     </div>
                     <div className={styles.authBox}>
                       <Link href="/login" className={styles.signInBtn}>
-                        Sign In / Register
+                        <span>Sign In / Register</span>
+                        <ArrowRight size={15} strokeWidth={2} />
                       </Link>
                     </div>
-                    <div className={styles.divider} />
                     <div className={styles.accountDropdownList}>
                       <Link href="/orders" className={styles.accountDropdownItem}>
-                        <Package size={18} strokeWidth={1.5} /> Track Orders
+                        <div className={styles.itemLeft}>
+                          <span className={styles.itemIconWrap}>
+                            <Package size={16} strokeWidth={1.8} />
+                          </span>
+                          <span className={styles.itemLabel}>Track Orders</span>
+                        </div>
+                        <ChevronRight size={14} strokeWidth={2.2} className={styles.itemArrow} />
                       </Link>
                       <Link href="/wishlist" className={styles.accountDropdownItem}>
-                        <Heart size={18} strokeWidth={1.5} /> Wishlist
+                        <div className={styles.itemLeft}>
+                          <span className={styles.itemIconWrap}>
+                            <Heart size={16} strokeWidth={1.8} />
+                          </span>
+                          <span className={styles.itemLabel}>Wishlist</span>
+                        </div>
+                        <ChevronRight size={14} strokeWidth={2.2} className={styles.itemArrow} />
                       </Link>
                       <Link href="/contact" className={styles.accountDropdownItem}>
-                        <Tag size={18} strokeWidth={1.5} /> Help & Support
+                        <div className={styles.itemLeft}>
+                          <span className={styles.itemIconWrap}>
+                            <Tag size={16} strokeWidth={1.8} />
+                          </span>
+                          <span className={styles.itemLabel}>Help & Support</span>
+                        </div>
+                        <ChevronRight size={14} strokeWidth={2.2} className={styles.itemArrow} />
                       </Link>
                     </div>
                   </>
-                )}
-              </div>
+                )}</div>
             </div>
 
             <Link

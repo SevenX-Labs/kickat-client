@@ -593,85 +593,123 @@
 
 .accountDropdown {
   position: absolute;
-  top: calc(100% + 20px);
-  right: -10px;
-  width: 260px;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(12px);
-  border-radius: 16px;
-  box-shadow: 0 12px 48px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
-  border: 1px solid rgba(0,0,0,0.06);
+  top: calc(100% + 14px);
+  right: -8px;
+  width: 275px;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 16px 42px rgba(17, 28, 36, 0.12), 0 4px 14px rgba(17, 28, 36, 0.05);
+  border: 1px solid rgba(238, 140, 50, 0.16);
   opacity: 0;
   visibility: hidden;
-  transform: translateY(12px);
-  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform: translateY(8px) scale(0.98);
+  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.22s;
   z-index: 100;
   display: flex;
   flex-direction: column;
-  padding: 8px 0;
+  padding: 0;
+  overflow: hidden;
 }
 
-/* Arrow pointing up towards the avatar */
+/* Caret Arrow pointing up towards the user icon */
 .accountDropdown::before {
   content: '';
   position: absolute;
   top: -6px;
-  right: 28px;
+  right: 22px;
   width: 12px;
   height: 12px;
-  background: #ffffff;
+  background: #111C24;
   transform: rotate(45deg);
-  border-left: 1px solid rgba(0,0,0,0.06);
-  border-top: 1px solid rgba(0,0,0,0.06);
+  border-left: 1px solid rgba(238, 140, 50, 0.25);
+  border-top: 1px solid rgba(238, 140, 50, 0.25);
   border-top-left-radius: 2px;
+  z-index: 1;
 }
 
 .accountWrapper:hover .accountDropdown {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
 .accountDropdownHeader {
-  background-color: #111C24;
+  background: linear-gradient(135deg, #111C24 0%, #1B2936 100%);
+  padding: 1rem 1.15rem 0.95rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border-bottom: 1px solid rgba(238, 140, 50, 0.18);
+}
+
+.headerUserRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.headerAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #EE8C32 0%, #F59E0B 100%);
   color: #ffffff;
-  padding: 0.85rem 1.25rem 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 3px 10px rgba(238, 140, 50, 0.35);
+}
+
+.headerTextCol {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  overflow: hidden;
 }
 
 .greetingTitle {
   font-weight: 700;
-  font-size: 0.95rem;
-  color: #111111;
+  font-size: 0.96rem;
+  color: #FFFFFF;
   letter-spacing: -0.01em;
+  line-height: 1.25;
 }
 
 .greetingSub {
-  font-size: 0.78rem;
-  color: #777777;
-  font-weight: 400;
+  font-size: 0.75rem;
+  color: #FCD9C0;
+  font-weight: 500;
+  line-height: 1.25;
 }
 
 .authBox {
-  padding: 0.4rem 1.25rem 0.6rem;
+  padding: 0.8rem 0.85rem 0.35rem;
+  background: #ffffff;
 }
 
 .signInBtn {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
   width: 100%;
-  padding: 0.65rem 1rem;
-  background: #F99205;
+  padding: 0.72rem 1rem;
+  background: linear-gradient(135deg, #EE8C32 0%, #D87A24 100%);
   color: #ffffff;
-  font-weight: 600;
-  font-size: 0.88rem;
-  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-radius: 12px;
   text-decoration: none;
-  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-  box-shadow: 0 4px 14px rgba(245, 130, 31, 0.35);
+  box-sizing: border-box;
+  box-shadow: 0 4px 14px rgba(238, 140, 50, 0.35);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.signInBtn:hover {
+  background: linear-gradient(135deg, #D87A24 0%, #C0681B 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(238, 140, 50, 0.45);
 }
 
 .drawerCheckoutBtn {
@@ -684,66 +722,119 @@
   color: #ffffff;
 }
 
-.signInBtn:hover {
-  background: #E06D0C;
-  color: #ffffff;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(245, 130, 31, 0.45);
-}
-
 .accountDropdownList {
   display: flex;
   flex-direction: column;
+  padding: 6px;
+  background: #ffffff;
 }
 
 .accountDropdownItem {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
-  padding: 0.7rem 1rem;
-  margin: 2px 10px;
+  justify-content: space-between;
+  padding: 0.58rem 0.7rem;
   border-radius: 10px;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #38342E;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #334155;
   text-decoration: none;
-  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   border: none;
   background: transparent;
   font-family: inherit;
-  text-align: left;
   cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.itemLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.itemIconWrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #FFF8F1;
+  color: #EE8C32;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.itemLabel {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #334155;
+  transition: color 0.2s ease;
+}
+
+.itemArrow {
+  color: #CBD5E1;
+  transition: transform 0.2s ease, color 0.2s ease;
 }
 
 .accountDropdownItem:hover {
-  background-color: #FFF7F0;
-  color: #F99205;
-  transform: translateX(4px);
+  background-color: #FFF7ED;
 }
 
-.accountDropdownItem svg {
-  color: #A39E94;
-  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+.accountDropdownItem:hover .itemLabel {
+  color: #EE8C32;
 }
 
-.accountDropdownItem:hover svg {
-  color: #F99205;
-  transform: scale(1.1);
+.accountDropdownItem:hover .itemIconWrap {
+  background: #EE8C32;
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+.accountDropdownItem:hover .itemArrow {
+  color: #EE8C32;
+  transform: translateX(3px);
+}
+
+.notifBadge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: #EE8C32;
+  border-radius: 9999px;
+  padding: 1px 7px;
+  line-height: 1.3;
 }
 
 .divider {
   height: 1px;
-  background-color: rgba(0,0,0,0.06);
-  margin: 6px 16px;
+  background-color: rgba(0, 0, 0, 0.06);
+  margin: 4px 8px;
+}
+
+.logoutItem {
+  margin-top: 2px;
+}
+
+.logoutIconWrap {
+  background: #FEF2F2;
+  color: #DC2626;
 }
 
 .logoutItem:hover {
   background-color: #FEF2F2;
+}
+
+.logoutItem:hover .itemLabel {
   color: #DC2626;
 }
 
-.logoutItem:hover svg {
-  color: #DC2626;
+.logoutItem:hover .logoutIconWrap {
+  background: #DC2626;
+  color: #ffffff;
+  transform: scale(1.05);
 }
 
 .mobilePanel {
