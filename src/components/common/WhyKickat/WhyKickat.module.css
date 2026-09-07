@@ -188,8 +188,8 @@
 }
 
 .quoteCard {
-  background: #111C24;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #ffffff;
+  border: 1px solid rgba(33, 28, 21, 0.06);
   border-radius: 20px;
   padding: 2.5rem 2rem;
   display: flex;
@@ -227,7 +227,7 @@
   font-size: 1.1rem;
   font-weight: 400;
   font-style: italic;
-  color: #FCFAF6;
+  color: #211C15;
   line-height: 1.6;
   margin: 0;
 }
@@ -263,7 +263,7 @@
 .authorName {
   font-weight: 600;
   font-size: 0.9rem;
-  color: #FFFFFF;
+  color: #211C15;
 }
 
 .authorRole {
@@ -280,7 +280,7 @@
   z-index: 1;
   margin-top: 4rem;
   padding: 2rem 2rem;
-  background: #111C24;
+  background: rgba(33, 28, 21, 0.02);
   border-top: 1px solid rgba(33, 28, 21, 0.06);
   border-bottom: 1px solid rgba(33, 28, 21, 0.06);
 }
@@ -310,7 +310,7 @@
   transform: translateY(-50%);
   width: 1px;
   height: 28px;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(33, 28, 21, 0.12);
 }
 
 .secondaryIconWrap {
@@ -339,7 +339,7 @@
   font-family: var(--font-fraunces), serif;
   font-size: 1.05rem;
   font-weight: 500;
-  color: #FFFFFF;
+  color: #211C15;
   line-height: 1.2;
 }
 
@@ -349,7 +349,7 @@
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(33, 28, 21, 0.35);
 }
 
 @media (max-width: 768px) {
