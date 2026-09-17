@@ -92,7 +92,7 @@ export function ProductGallery({ images }: ProductGalleryProps) {
         {/* Center Product Image */}
         <div className={styles.mainImageCenterWrap}>
           <Image
-            src={thumbnails[activeIndex]?.src || defaultImages[0]}
+            src={thumbnails[activeIndex]?.src || currentImages[0]}
             alt="Product Image"
             fill
             className={styles.mainProductImage}
@@ -136,7 +136,7 @@ export function ProductGallery({ images }: ProductGalleryProps) {
             </button>
             <div className={styles.lightboxImageWrap}>
               <Image
-                src={thumbnails[activeIndex]?.src || defaultImages[0]}
+                src={thumbnails[activeIndex]?.src || currentImages[0]}
                 alt="Enlarged Product View"
                 fill
                 className={styles.lightboxImage}

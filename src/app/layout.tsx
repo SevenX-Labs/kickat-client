@@ -4,6 +4,7 @@ import { Navbar } from "@/components/common/Navbar";
 import { BottomNav } from "@/components/common/BottomNav";
 import { SmoothScrollProvider } from "@/components/common/SmoothScrollProvider";
 import { SplashScreen } from "@/components/common/SplashScreen";
+import { AuthProvider } from "@/context/AuthContext";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -54,11 +55,13 @@ export default function RootLayout({
     >
       <body className="flex flex-col min-h-screen">
         <SplashScreen />
-        <SmoothScrollProvider>
-          <Navbar />
-          {children}
-          <BottomNav />
-        </SmoothScrollProvider>
+        <AuthProvider>
+          <SmoothScrollProvider>
+            <Navbar />
+            {children}
+            <BottomNav />
+          </SmoothScrollProvider>
+        </AuthProvider>
       </body>
     </html>
   );

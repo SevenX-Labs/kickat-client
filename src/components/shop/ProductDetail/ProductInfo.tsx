@@ -4,13 +4,17 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Star, ShoppingBag, Zap, Ruler, Minus, Plus, Check, X, Dog, Droplets, Waves, Sun } from 'lucide-react';
 import styles from './ProductDetail.module.css';
-import { Product } from './ProductDetail';
+ // import Product
+
+import { Product, ProductVariant } from './ProductDetail';
 
 interface ProductInfoProps {
+  selectedVariant?: ProductVariant | null;
+  onSelectVariant?: (variant: ProductVariant) => void;
   product: Product;
 }
 
-export function ProductInfo({ product }: ProductInfoProps) {
+export function ProductInfo({ product, selectedVariant, onSelectVariant }: ProductInfoProps) {
   const router = useRouter();
   const [selectedColor, setSelectedColor] = useState('Charcoal & Pumpkin');
   const [selectedSize, setSelectedSize] = useState('M');
