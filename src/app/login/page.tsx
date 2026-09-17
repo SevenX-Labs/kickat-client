@@ -31,10 +31,10 @@ function LoginContent() {
     }
   }, [searchParams]);
 
-  // If already authenticated and success modal is not active, redirect
+  // If already authenticated and success modal is not active, redirect to homepage
   useEffect(() => {
     if (isAuthenticated && !isSuccessModalOpen) {
-      const redirectTo = searchParams.get("redirect") || "/account";
+      const redirectTo = searchParams.get("redirect") || "/";
       router.push(redirectTo);
     }
   }, [isAuthenticated, isSuccessModalOpen, router, searchParams]);
@@ -92,9 +92,9 @@ function LoginContent() {
       const res = await verifyMobileOtp(phoneNumber, otp);
       if (res.success) {
         setIsSuccessModalOpen(true);
-        const redirectTo = searchParams.get("redirect") || "/account";
+        const redirectTo = searchParams.get("redirect") || "/";
         
-        // Show 2.5s animated success modal before navigating
+        // Show 2.5s animated success modal before navigating to homepage
         setTimeout(() => {
           router.push(redirectTo);
         }, 2500);
@@ -117,6 +117,7 @@ function LoginContent() {
         isOpen={isSuccessModalOpen} 
         phone={phoneNumber} 
         userName={user?.name}
+        title="OTP Verified Successfully!"
       />
 
       {/* Left Branding Section (Desktop only) */}

@@ -9,23 +9,13 @@ import {
 } from 'lucide-react';
 import styles from './Account.module.css';
 import AccountSidebarNav from '@/components/account/AccountSidebarNav';
-
-const initialUserData = {
-  firstName: 'Sarah',
-  lastName: 'Jenkins',
-  email: 'sarah.j@example.com',
-  phone: '+91 98765 43210',
-  memberSince: '2025',
-  totalOrders: 12,
-  points: 1240,
-  tier: 'Gold Paw VIP',
-  currency: 'INR (₹)'
-};
+import { useAuth } from '@/context/AuthContext';
 
 function AccountProfileContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const tab = searchParams.get('tab');
+  const { user } = useAuth();
 
   // Handle URL redirects for tab search params
   useEffect(() => {
@@ -42,11 +32,34 @@ function AccountProfileContent() {
     }
   }, [tab, router]);
 
-  const [userData, setUserData] = useState(initialUserData);
+  const [userData, setUserData] = useState({
+    firstName: 'KickAt',
+    lastName: 'Member',
+    email: '',
+    phone: '',
+    memberSince: '2025',
+    totalOrders: 0,
+    points: 100,
+    tier: 'KickAt VIP',
+    currency: 'INR (₹)'
+  });
 
   useEffect(() => {
     document.title = "Profile Details | KickAt";
-  }, []);
+    if (user) {
+      const nameParts = (user.name || '').trim().split(' ');
+      const firstName = nameParts[0] || (user.email ? user.email.split('@')[0] : (user.phone ? `User_${user.phone.slice(-4)}` : 'KickAt'));
+      const lastName = nameParts.slice(1).join(' ') || 'Member';
+
+      setUserData(prev => ({
+        ...prev,
+        firstName,
+        lastName,
+        email: user.email || 'Not provided',
+        phone: user.phone ? (user.phone.startsWith('+91') ? user.phone : `+91 ${user.phone}`) : 'Not provided',
+      }));
+    }
+  }, [user]);
 
   // Modals & Toast State
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
@@ -63,6 +76,15 @@ function AccountProfileContent() {
     email: userData.email,
     phone: userData.phone,
   });
+
+  useEffect(() => {
+    setProfileForm({
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      email: userData.email,
+      phone: userData.phone,
+    });
+  }, [userData]);
 
   const triggerToast = (msg: string) => {
     setToastMsg(msg);
@@ -98,40 +120,50 @@ function AccountProfileContent() {
         <div className={styles.topBarWrapper}>
           <div className={styles.topBreadcrumbGroup}>
             <Link href="/" className={styles.crumbLink}>Home</Link>
-            <ChevronRight size={13} className={styles.crumbSep} />
-            <Link href="/account" className={styles.crumbLink}>My Account</Link>
-            <ChevronRight size={13} className={styles.crumbSep} />
-            <span className={styles.crumbCurrent}>Profile Details</span>
+            <span className={styles.crumbSeparator}>›</span>
+            <span className={styles.crumbActive}>My Account</span>
+            <span className={styles.crumbSeparator}>›</span>
+            <span className={styles.crumbActive}>Profile Details</span>
           </div>
-          <div className={styles.topGreetingGroup}>
-            <span>Welcome back, <strong>Sarah!</strong></span>
-            <span className={styles.pawIcon}>🐾</span>
+
+          <div className={styles.welcomePill}>
+            <span>Welcome back, <strong>{userData.firstName}!</strong> 🐾</span>
           </div>
         </div>
 
-        <div className={styles.accountLayout}>
-          
-          {/* Shared Account Navigation */}
-          <AccountSidebarNav user={userData} />
+        {/* Layout Grid: Sidebar + Main Content */}
+        <div className={styles.accountLayoutGrid}>
+          {/* Left Navigation Sidebar */}
+          <AccountSidebarNav 
+            user={{
+              firstName: userData.firstName,
+              lastName: userData.lastName,
+              email: userData.email,
+              totalOrders: userData.totalOrders,
+              points: userData.points,
+              tier: userData.tier,
+            }} 
+          />
 
-          {/* Profile Details Content Card */}
-          <div className={`${styles.contentArea} ${!tab ? styles.hideOnMobileMain : ''}`}>
-            <div className={styles.tabContentCard}>
-              
-              {/* Header Title & VIP Tier Badge */}
-              <div className={styles.sectionHeader}>
-                <div className={styles.headerTitleRow}>
-                  <div>
-                    <h1 className={styles.title}>Profile Details</h1>
-                    <p className={styles.subtitle}>Manage your personal identity, contact preferences, and security settings.</p>
-                  </div>
-                  <div className={styles.vipBadgeHeader}>
-                    <Crown size={14} fill="#F99205" color="#F99205" />
-                    <span>{userData.tier}</span>
-                  </div>
-                </div>
+          {/* Right Content Body Panel */}
+          <div className={styles.mainContentPanel}>
+            
+            {/* Header Title Section */}
+            <div className={styles.panelHeaderBlock}>
+              <div>
+                <h1 className={styles.pageHeading}>Profile Details</h1>
+                <p className={styles.pageSubheading}>
+                  Manage your personal identity, contact preferences, and security settings.
+                </p>
               </div>
+              <div className={styles.vipBadgePill}>
+                <Crown size={14} fill="#F99205" color="#F99205" />
+                <span>{userData.tier}</span>
+              </div>
+            </div>
 
+            <div className={styles.sectionsContainer}>
+              
               {/* 1. PERSONAL INFORMATION BLOCK */}
               <div className={styles.sectionBlockCard}>
                 <div className={styles.sectionBlockHeader}>
@@ -142,22 +174,14 @@ function AccountProfileContent() {
                   <button 
                     type="button" 
                     className={styles.editSectionBtn}
-                    onClick={() => {
-                      setProfileForm({
-                        firstName: userData.firstName,
-                        lastName: userData.lastName,
-                        email: userData.email,
-                        phone: userData.phone
-                      });
-                      setIsEditProfileOpen(true);
-                    }}
+                    onClick={() => setIsEditProfileOpen(true)}
                   >
-                    <Edit3 size={14} />
+                    <Edit3 size={15} />
                     <span>Edit</span>
                   </button>
                 </div>
 
-                <div className={styles.personalInfoGrid}>
+                <div className={styles.infoFieldsGrid}>
                   {/* Full Name */}
                   <div className={styles.infoFieldItem}>
                     <div className={styles.infoFieldIconBox}>
@@ -286,7 +310,6 @@ function AccountProfileContent() {
               </div>
             </div>
           </div>
-
 
         </div>
       </main>

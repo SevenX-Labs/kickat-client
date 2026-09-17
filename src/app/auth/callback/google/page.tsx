@@ -49,11 +49,13 @@ function GoogleCallbackContent() {
         const isNewUser = isNewUserStr === 'true';
         const isProfileIncomplete = !user?.name || (!user?.phone && !user?.isPhoneVerified);
 
+        const targetRedirect = searchParams.get('redirect') || '/';
+
         setTimeout(() => {
           if (isNewUser || isProfileIncomplete) {
             router.replace('/onboarding');
           } else {
-            router.replace('/account');
+            router.replace(targetRedirect);
           }
         }, 2500);
       } catch (err: any) {

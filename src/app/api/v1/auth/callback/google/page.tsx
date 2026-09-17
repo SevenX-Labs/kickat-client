@@ -27,6 +27,7 @@ function GoogleCallbackContent() {
       const codeParam = searchParams.get("code");
       const tokenParam = searchParams.get("token");
       const isNewUser = searchParams.get("isNewUser") === "true";
+      const customRedirect = searchParams.get("redirect");
 
       if (errorParam) {
         router.push(`/login?error=${encodeURIComponent(errorParam)}`);
@@ -39,7 +40,7 @@ function GoogleCallbackContent() {
           const user = await loginWithToken(tokenParam);
           setLoggedInUser(user);
           setIsSuccessModalOpen(true);
-          const redirectTarget = isNewUser ? "/onboarding" : "/account";
+          const redirectTarget = isNewUser ? "/onboarding" : (customRedirect || "/");
           setTimeout(() => {
             router.push(redirectTarget);
           }, 2500);
@@ -67,7 +68,7 @@ function GoogleCallbackContent() {
             setLoggedInUser(res.user);
             setIsSuccessModalOpen(true);
             
-            const redirectTarget = res.isNewUser ? "/onboarding" : "/account";
+            const redirectTarget = res.isNewUser ? "/onboarding" : (customRedirect || "/");
             setTimeout(() => {
               router.push(redirectTarget);
             }, 2500);
