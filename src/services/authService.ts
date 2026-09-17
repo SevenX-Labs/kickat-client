@@ -75,7 +75,7 @@ export const authService = {
   async googleAuth(code: string, redirectUri?: string): Promise<AuthResponse> {
     const defaultRedirectUri = typeof window !== 'undefined'
       ? `${window.location.origin}/auth/callback/google`
-      : 'http://localhost:3001/auth/callback/google';
+      : '/auth/callback/google';
 
     const res = await api<AuthResponse>('/auth/google', {
       method: 'POST',
