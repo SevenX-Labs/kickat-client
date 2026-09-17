@@ -105,10 +105,10 @@ export const authService = {
    * Get Current Authenticated User Profile (GET /users/me)
    */
   async getMe(): Promise<AuthUser> {
-    const res = await api<{ success?: boolean; data?: AuthUser } | AuthUser>('/users/me', {
+    const res = await api<any>('/users/me', {
       method: 'GET',
     });
-    const user = (res as any).data || res;
+    const user = res?.profile?.user || res?.data || res?.user || res;
     if (typeof window !== 'undefined' && user) {
       localStorage.setItem('user', JSON.stringify(user));
     }
@@ -119,19 +119,26 @@ export const authService = {
    * Rotate 30-day refreshToken cookie & issue new Bearer accessToken (POST /auth/refresh)
    */
   async refreshToken(): Promise<RefreshTokenResponse> {
-    const res = await api<RefreshTokenResponse>('/auth/refresh', {
+    const res = await api<any>('/auth/refresh', {
       method: 'POST',
     });
 
-    if (res.accessToken && typeof window !== 'undefined') {
-      localStorage.setItem('accessToken', res.accessToken);
-      if (res.user) {
-        localStorage.setItem('user', JSON.stringify(res.user));
+    const user = res?.profile?.user || res?.data || res?.user;
+    const token = res?.accessToken;
+
+    if (token && typeof window !== 'undefined') {
+      localStorage.setItem('accessToken', token);
+      if (user) {
+        localStorage.setItem('user', JSON.stringify(user));
       }
       localStorage.setItem('isLoggedIn', 'true');
     }
 
-    return res;
+    return {
+      success: Boolean(res?.success ?? true),
+      accessToken: token,
+      user,
+    };
   },
 
   /**

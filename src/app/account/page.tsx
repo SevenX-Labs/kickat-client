@@ -11,13 +11,19 @@ import styles from './Account.module.css';
 import AccountSidebarNav from '@/components/account/AccountSidebarNav';
 import { useAuth } from '@/context/AuthContext';
 import { profileService } from '@/services/profileService';
-import { authService } from '@/services/authService';
 
 function AccountProfileContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const tab = searchParams.get('tab');
-  const { user, setUser } = useAuth();
+  const { user, setUser, isAuthenticated, isLoading } = useAuth();
+
+  // Redirect to login if user is not logged in
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.replace(`/login?redirect=${encodeURIComponent('/account')}`);
+    }
+  }, [isLoading, isAuthenticated, router]);
 
   // Handle URL redirects for tab search params
   useEffect(() => {
@@ -34,6 +40,8 @@ function AccountProfileContent() {
     }
   }, [tab, router]);
 
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+
   const [userData, setUserData] = useState({
     firstName: 'KickAt',
     lastName: 'Member',
@@ -46,10 +54,47 @@ function AccountProfileContent() {
     currency: 'INR (₹)'
   });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
+  // Fetch complete profile details from backend on mount
   useEffect(() => {
     document.title = "Profile Details | KickAt";
+
+    if (!isAuthenticated && !isLoading) return;
+
+    const fetchFullProfile = async () => {
+      setIsLoadingProfile(true);
+      try {
+        const res: any = await profileService.getProfile();
+        const profileUser = res?.profile?.user || res?.user || res?.data || res;
+        
+        if (profileUser) {
+          setUser(profileUser);
+          const nameParts = (profileUser.name || '').trim().split(' ');
+          const firstName = nameParts[0] || (profileUser.email ? profileUser.email.split('@')[0] : (profileUser.phone ? `User_${profileUser.phone.slice(-4)}` : 'KickAt'));
+          const lastName = nameParts.slice(1).join(' ') || 'Member';
+
+          setUserData(prev => ({
+            ...prev,
+            firstName,
+            lastName,
+            email: profileUser.email || 'Not provided',
+            phone: profileUser.phone ? (profileUser.phone.startsWith('+91') ? profileUser.phone : `+91 ${profileUser.phone}`) : 'Not provided',
+          }));
+        }
+      } catch (err: any) {
+        console.error("Failed to load profile details:", err);
+        if (err?.message?.includes('Unauthorized') || err?.message?.includes('401')) {
+          router.replace(`/login?redirect=${encodeURIComponent('/account')}`);
+        }
+      } finally {
+        setIsLoadingProfile(false);
+      }
+    };
+
+    fetchFullProfile();
+  }, [isAuthenticated, isLoading, router, setUser]);
+
+  // Sync user state from AuthContext when available
+  useEffect(() => {
     if (user) {
       const nameParts = (user.name || '').trim().split(' ');
       const firstName = nameParts[0] || (user.email ? user.email.split('@')[0] : (user.phone ? `User_${user.phone.slice(-4)}` : 'KickAt'));
@@ -67,6 +112,7 @@ function AccountProfileContent() {
 
   // Modals & Toast State
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   // Toggle Preferences State
@@ -83,10 +129,10 @@ function AccountProfileContent() {
 
   useEffect(() => {
     setProfileForm({
-      firstName: userData.firstName,
-      lastName: userData.lastName,
-      email: userData.email,
-      phone: userData.phone,
+      firstName: userData.firstName === 'KickAt' ? '' : userData.firstName,
+      lastName: userData.lastName === 'Member' ? '' : userData.lastName,
+      email: userData.email === 'Not provided' ? '' : userData.email,
+      phone: userData.phone === 'Not provided' ? '' : userData.phone,
     });
   }, [userData]);
 
@@ -99,39 +145,46 @@ function AccountProfileContent() {
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    setIsSaving(true);
 
     try {
       const fullName = `${profileForm.firstName} ${profileForm.lastName}`.trim();
-      await profileService.updateBasicProfile({
-        name: fullName,
-        email: profileForm.email,
-        phone: profileForm.phone,
+      const updatedRes: any = await profileService.updateBasicProfile({
+        name: fullName || undefined,
+        email: profileForm.email || undefined,
+        phone: profileForm.phone || undefined,
       });
 
-      // Refetch user context profile
-      try {
-        const freshUser = await authService.getMe();
-        if (setUser) setUser(freshUser);
-      } catch {
-        // Fallback local update
+      const updatedUser = updatedRes?.profile?.user || updatedRes?.user || updatedRes;
+      if (updatedUser) {
+        setUser(updatedUser);
       }
 
       setUserData(prev => ({
         ...prev,
-        firstName: profileForm.firstName,
-        lastName: profileForm.lastName,
-        email: profileForm.email,
-        phone: profileForm.phone
+        firstName: profileForm.firstName || 'KickAt',
+        lastName: profileForm.lastName || 'Member',
+        email: profileForm.email || 'Not provided',
+        phone: profileForm.phone || 'Not provided',
       }));
+
       setIsEditProfileOpen(false);
       triggerToast('Profile information updated successfully!');
     } catch (err: any) {
-      triggerToast(err?.message || 'Failed to update profile details.');
+      triggerToast(err?.message || 'Failed to update profile. Please try again.');
     } finally {
-      setIsSubmitting(false);
+      setIsSaving(false);
     }
   };
+
+  if (isLoading || (!isAuthenticated && !user)) {
+    return (
+      <div style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem', color: '#78746D' }}>
+        <Loader2 size={32} className="animate-spin" style={{ color: '#F99205' }} />
+        <p style={{ fontSize: '0.95rem', fontWeight: 600 }}>Loading account details...</p>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.pageWrapper}>
@@ -159,7 +212,7 @@ function AccountProfileContent() {
         </div>
 
         {/* Layout Grid: Sidebar + Main Content */}
-        <div className={styles.accountLayoutGrid}>
+        <div className={`${styles.accountLayout} ${styles.accountLayoutGrid}`}>
           {/* Left Navigation Sidebar */}
           <AccountSidebarNav 
             user={{
@@ -208,51 +261,58 @@ function AccountProfileContent() {
                   </button>
                 </div>
 
-                <div className={styles.infoFieldsGrid}>
-                  {/* Full Name */}
-                  <div className={styles.infoFieldItem}>
-                    <div className={styles.infoFieldIconBox}>
-                      <User size={18} />
-                    </div>
-                    <div className={styles.infoFieldTextGroup}>
-                      <span className={styles.infoFieldLabel}>Full Name</span>
-                      <span className={styles.infoFieldValue}>{userData.firstName} {userData.lastName}</span>
-                    </div>
+                {isLoadingProfile ? (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', gap: '0.5rem', color: '#78746D' }}>
+                    <Loader2 size={20} className="animate-spin" />
+                    <span>Loading profile details...</span>
                   </div>
+                ) : (
+                  <div className={styles.infoFieldsGrid}>
+                    {/* Full Name */}
+                    <div className={styles.infoFieldItem}>
+                      <div className={styles.infoFieldIconBox}>
+                        <User size={18} />
+                      </div>
+                      <div className={styles.infoFieldTextGroup}>
+                        <span className={styles.infoFieldLabel}>Full Name</span>
+                        <span className={styles.infoFieldValue}>{userData.firstName} {userData.lastName}</span>
+                      </div>
+                    </div>
 
-                  {/* Email Address */}
-                  <div className={styles.infoFieldItem}>
-                    <div className={styles.infoFieldIconBox}>
-                      <Mail size={18} />
+                    {/* Email Address */}
+                    <div className={styles.infoFieldItem}>
+                      <div className={styles.infoFieldIconBox}>
+                        <Mail size={18} />
+                      </div>
+                      <div className={styles.infoFieldTextGroup}>
+                        <span className={styles.infoFieldLabel}>Email Address</span>
+                        <span className={styles.infoFieldValue}>{userData.email}</span>
+                      </div>
                     </div>
-                    <div className={styles.infoFieldTextGroup}>
-                      <span className={styles.infoFieldLabel}>Email Address</span>
-                      <span className={styles.infoFieldValue}>{userData.email}</span>
-                    </div>
-                  </div>
 
-                  {/* Phone Number */}
-                  <div className={styles.infoFieldItem}>
-                    <div className={styles.infoFieldIconBox}>
-                      <Phone size={18} />
+                    {/* Phone Number */}
+                    <div className={styles.infoFieldItem}>
+                      <div className={styles.infoFieldIconBox}>
+                        <Phone size={18} />
+                      </div>
+                      <div className={styles.infoFieldTextGroup}>
+                        <span className={styles.infoFieldLabel}>Phone Number</span>
+                        <span className={styles.infoFieldValue}>{userData.phone}</span>
+                      </div>
                     </div>
-                    <div className={styles.infoFieldTextGroup}>
-                      <span className={styles.infoFieldLabel}>Phone Number</span>
-                      <span className={styles.infoFieldValue}>{userData.phone}</span>
-                    </div>
-                  </div>
 
-                  {/* Member Since */}
-                  <div className={styles.infoFieldItem}>
-                    <div className={styles.infoFieldIconBox}>
-                      <Calendar size={18} />
-                    </div>
-                    <div className={styles.infoFieldTextGroup}>
-                      <span className={styles.infoFieldLabel}>Member Since</span>
-                      <span className={styles.infoFieldValue}>{userData.memberSince}</span>
+                    {/* Member Since */}
+                    <div className={styles.infoFieldItem}>
+                      <div className={styles.infoFieldIconBox}>
+                        <Calendar size={18} />
+                      </div>
+                      <div className={styles.infoFieldTextGroup}>
+                        <span className={styles.infoFieldLabel}>Member Since</span>
+                        <span className={styles.infoFieldValue}>{userData.memberSince}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* 2. ACCOUNT PREFERENCES BLOCK */}
@@ -343,14 +403,19 @@ function AccountProfileContent() {
 
       {/* Edit Profile Modal */}
       {isEditProfileOpen && (
-        <div className={styles.modalBackdrop} onClick={() => setIsEditProfileOpen(false)}>
+        <div className={styles.modalBackdrop} onClick={() => !isSaving && setIsEditProfileOpen(false)}>
           <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <div className={styles.modalTitleGroup}>
                 <Edit3 size={20} color="#F99205" />
                 <h2>Edit Personal Details</h2>
               </div>
-              <button type="button" className={styles.modalCloseBtn} onClick={() => setIsEditProfileOpen(false)}>
+              <button 
+                type="button" 
+                className={styles.modalCloseBtn} 
+                onClick={() => setIsEditProfileOpen(false)}
+                disabled={isSaving}
+              >
                 <X size={20} />
               </button>
             </div>
@@ -365,6 +430,7 @@ function AccountProfileContent() {
                     className={styles.modalInput}
                     value={profileForm.firstName}
                     onChange={(e) => setProfileForm({ ...profileForm, firstName: e.target.value })}
+                    disabled={isSaving}
                   />
                 </div>
                 <div className={styles.inputGroup}>
@@ -375,6 +441,7 @@ function AccountProfileContent() {
                     className={styles.modalInput}
                     value={profileForm.lastName}
                     onChange={(e) => setProfileForm({ ...profileForm, lastName: e.target.value })}
+                    disabled={isSaving}
                   />
                 </div>
               </div>
@@ -387,6 +454,7 @@ function AccountProfileContent() {
                   className={styles.modalInput}
                   value={profileForm.email}
                   onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
+                  disabled={isSaving}
                 />
               </div>
 
@@ -398,20 +466,31 @@ function AccountProfileContent() {
                   className={styles.modalInput}
                   value={profileForm.phone}
                   onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
+                  disabled={isSaving}
                 />
               </div>
 
               <div className={styles.modalFooterActions}>
-                <button type="button" className={styles.actionBtn} onClick={() => setIsEditProfileOpen(false)} disabled={isSubmitting}>
+                <button 
+                  type="button" 
+                  className={styles.actionBtn} 
+                  onClick={() => setIsEditProfileOpen(false)}
+                  disabled={isSaving}
+                >
                   Cancel
                 </button>
-                <button type="submit" className={`${styles.actionBtn} ${styles.primaryBtn}`} disabled={isSubmitting}>
-                  {isSubmitting ? (
+                <button 
+                  type="submit" 
+                  className={`${styles.actionBtn} ${styles.primaryBtn}`}
+                  disabled={isSaving}
+                >
+                  {isSaving ? (
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
-                      <Loader2 size={16} className="animate-spin" /> Saving...
+                      <Loader2 size={16} className="animate-spin" />
+                      Saving...
                     </span>
                   ) : (
-                    "Save Changes"
+                    'Save Changes'
                   )}
                 </button>
               </div>

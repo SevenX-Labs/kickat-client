@@ -1,23 +1,23 @@
 @import "tailwindcss";
 
+@layer utilities {
+  .animate-spin-slow {
+    animation: spin 3s linear infinite;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 :root {
   --background: #ffffff;
-  --foreground: #111C24;
-  
-  /* Pumpkin & Charcoal Premium Color Palette */
-  --brand-pumpkin: #F99205;
-  --brand-pumpkin-hover: #E08304;
-  --brand-pumpkin-light: #FFF5EE;
-  
-  --brand-charcoal: #111C24;
-  --brand-charcoal-dark: #111C24;
-  --brand-charcoal-light: #32556A;
-  --brand-charcoal-surface: #F0F4F7;
-  
-  /* Legacy brand variables mapped to new palette */
-  --brand-orange: var(--brand-pumpkin);
-  --brand-orange-hover: var(--brand-pumpkin-hover);
-  --brand-orange-light: var(--brand-pumpkin-light);
+  --foreground: #171717;
 }
 
 @theme inline {
@@ -46,8 +46,6 @@ html, body {
 
 @media (max-width: 768px) {
   body {
-    padding-bottom: 68px;
+    padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
-
-

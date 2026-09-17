@@ -2,11 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Camera, Check, ChevronRight, CheckCircle2, User, MapPin, Bone, Loader2 } from 'lucide-react';
+import { Check, ChevronRight, CheckCircle2, User, MapPin, Bone, Loader2, AlertCircle } from 'lucide-react';
 import styles from './Onboarding.module.css';
 import { profileService } from '@/services/profileService';
 import { useAuth } from '@/context/AuthContext';
-import { authService } from '@/services/authService';
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -20,14 +19,19 @@ export default function OnboardingPage() {
     lastName: '',
     email: '',
     phone: '',
+    gender: 'MALE' as 'MALE' | 'FEMALE' | 'OTHER',
+    dob: '',
+    houseFlat: '',
     address: '',
     city: '',
     state: '',
     pincode: '',
+    addressType: 'HOME' as 'HOME' | 'WORK' | 'OTHER',
     petName: '',
-    petType: 'Dog',
+    petType: 'DOG' as 'DOG' | 'CAT' | 'BIRD' | 'FISH' | 'OTHER',
     petBreed: '',
-    petAge: ''
+    petAge: '',
+    petGender: 'MALE' as 'MALE' | 'FEMALE' | 'UNKNOWN'
   });
 
   useEffect(() => {
@@ -43,6 +47,11 @@ export default function OnboardingPage() {
     }
   }, [user]);
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
   const handleNext = async () => {
     setIsSubmitting(true);
     setErrorMessage(null);
@@ -50,66 +59,84 @@ export default function OnboardingPage() {
     try {
       if (step === 1) {
         const fullName = `${formData.firstName} ${formData.lastName}`.trim();
-        if (fullName || formData.email || formData.phone) {
-          await profileService.updateBasicProfile({
-            name: fullName,
-            email: formData.email || undefined,
-            phone: formData.phone || undefined,
-          });
-        }
-      } else if (step === 2) {
-        if (formData.address && formData.city && formData.pincode) {
-          await profileService.addAddress({
-            street: formData.address,
-            city: formData.city,
-            state: formData.state || 'State',
-            pincode: formData.pincode,
-          });
-        }
-      } else if (step === 3) {
-        if (formData.petName) {
-          await profileService.addPet({
-            name: formData.petName,
-            type: formData.petType,
-            breed: formData.petBreed || undefined,
-            age: formData.petAge ? parseInt(formData.petAge) : undefined,
-          });
-        }
-        // Fetch fresh profile state into context
-        try {
-          const freshUser = await authService.getMe();
-          if (setUser) setUser(freshUser);
-        } catch {
-          // Ignore fetch error
-        }
-      }
+        const res: any = await profileService.updateBasicProfile({
+          name: fullName || undefined,
+          email: formData.email || undefined,
+          phone: formData.phone || undefined,
+          gender: formData.gender,
+          dob: formData.dob || undefined,
+        });
 
-      if (step < 4) {
-        setStep(prev => prev + 1);
+        const updatedUser = res?.profile?.user || res?.user || res;
+        if (updatedUser) {
+          setUser(updatedUser);
+        }
+
+        setStep(2);
+      } else if (step === 2) {
+        if (!formData.city || !formData.pincode) {
+          setErrorMessage('Please enter at least City and Pincode for delivery address.');
+          setIsSubmitting(false);
+          return;
+        }
+
+        await profileService.addAddress({
+          type: formData.addressType,
+          houseFlat: formData.houseFlat || undefined,
+          buildingStreet: formData.address || undefined,
+          city: formData.city,
+          state: formData.state || 'Maharashtra',
+          pincode: formData.pincode,
+          isDefault: true,
+        });
+
+        setStep(3);
+      } else if (step === 3) {
+        if (!formData.petName) {
+          setErrorMessage("Please enter your pet's name.");
+          setIsSubmitting(false);
+          return;
+        }
+
+        await profileService.addPet({
+          species: formData.petType,
+          name: formData.petName,
+          breed: formData.petBreed || undefined,
+          age: formData.petAge ? Number(formData.petAge) : 1,
+          ageUnit: 'YEARS',
+          gender: formData.petGender,
+        });
+
+        // Refetch profile to get updated profileCompleted flag
+        try {
+          const profileRes: any = await profileService.getProfile();
+          const refreshedUser = profileRes?.profile?.user || profileRes?.user;
+          if (refreshedUser) {
+            setUser(refreshedUser);
+          }
+        } catch {
+          // Non-blocking catch
+        }
+
+        setStep(4);
       }
     } catch (err: any) {
-      // Proceed even if partial request fails
-      if (step < 4) {
-        setStep(prev => prev + 1);
-      }
+      console.error('Onboarding step error:', err);
+      setErrorMessage(err?.message || 'Failed to save details. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleBack = () => {
+    setErrorMessage(null);
     if (step > 1) {
       setStep(step - 1);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
   const finishOnboarding = () => {
-    router.push('/account');
+    router.push('/');
   };
 
   return (
@@ -153,59 +180,200 @@ export default function OnboardingPage() {
           </div>
         )}
 
+        {/* Error Message Banner */}
+        {errorMessage && (
+          <div 
+            style={{
+              margin: '1.25rem 3rem 0 3rem',
+              padding: '0.75rem 1rem',
+              background: '#FEE2E2',
+              border: '1px solid #FCA5A5',
+              borderRadius: '12px',
+              color: '#991B1B',
+              fontSize: '0.875rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+            }}
+          >
+            <AlertCircle size={18} style={{ flexShrink: 0 }} />
+            <span>{errorMessage}</span>
+          </div>
+        )}
+
         {/* Form Area */}
         <div className={styles.formContent} key={`step-${step}`}>
           {step === 1 && (
             <div>
-              <div className={styles.avatarUpload}>
-                <div className={styles.avatarCircle}>
-                  <Camera size={24} />
-                </div>
-                <div>
-                  <button className={styles.avatarBtn} type="button">Upload Photo</button>
-                  <p className={styles.avatarText} style={{ marginTop: '0.5rem' }}>JPG, PNG or GIF up to 2MB</p>
-                </div>
-              </div>
               <div className={styles.formRow}>
                 <div className={styles.inputGroup}>
                   <label className={styles.label}>First Name</label>
-                  <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} className={styles.input} placeholder="e.g. John" />
+                  <input 
+                    type="text" 
+                    name="firstName" 
+                    value={formData.firstName} 
+                    onChange={handleChange} 
+                    className={styles.input} 
+                    placeholder="e.g. Sahil" 
+                    disabled={isSubmitting}
+                  />
                 </div>
                 <div className={styles.inputGroup}>
                   <label className={styles.label}>Last Name</label>
-                  <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} className={styles.input} placeholder="e.g. Doe" />
+                  <input 
+                    type="text" 
+                    name="lastName" 
+                    value={formData.lastName} 
+                    onChange={handleChange} 
+                    className={styles.input} 
+                    placeholder="e.g. Hode" 
+                    disabled={isSubmitting}
+                  />
                 </div>
               </div>
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>Email Address</label>
-                <input type="email" name="email" value={formData.email} onChange={handleChange} className={styles.input} placeholder="john@example.com" />
+
+              <div className={styles.formRow}>
+                <div className={styles.inputGroup}>
+                  <label className={styles.label}>Email Address</label>
+                  <input 
+                    type="email" 
+                    name="email" 
+                    value={formData.email} 
+                    onChange={handleChange} 
+                    className={styles.input} 
+                    placeholder="sahil@example.com" 
+                    disabled={isSubmitting}
+                  />
+                </div>
+                <div className={styles.inputGroup}>
+                  <label className={styles.label}>Phone Number</label>
+                  <input 
+                    type="tel" 
+                    name="phone" 
+                    value={formData.phone} 
+                    onChange={handleChange} 
+                    className={styles.input} 
+                    placeholder="+91 98765 43210" 
+                    disabled={isSubmitting}
+                  />
+                </div>
               </div>
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>Phone Number</label>
-                <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className={styles.input} placeholder="+91 98765 43210" />
+
+              <div className={styles.formRow}>
+                <div className={styles.inputGroup}>
+                  <label className={styles.label}>Gender</label>
+                  <select 
+                    name="gender" 
+                    value={formData.gender} 
+                    onChange={handleChange} 
+                    className={styles.input}
+                    style={{ appearance: 'none', cursor: 'pointer' }}
+                    disabled={isSubmitting}
+                  >
+                    <option value="MALE">Male</option>
+                    <option value="FEMALE">Female</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
+                <div className={styles.inputGroup}>
+                  <label className={styles.label}>Date of Birth</label>
+                  <input 
+                    type="date" 
+                    name="dob" 
+                    value={formData.dob} 
+                    onChange={handleChange} 
+                    className={styles.input} 
+                    disabled={isSubmitting}
+                  />
+                </div>
               </div>
             </div>
           )}
 
           {step === 2 && (
             <div>
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>Street Address</label>
-                <input type="text" name="address" value={formData.address} onChange={handleChange} className={styles.input} placeholder="Flat / House No. / Building" />
+              <div className={styles.formRow}>
+                <div className={styles.inputGroup}>
+                  <label className={styles.label}>Flat / House No. / Building</label>
+                  <input 
+                    type="text" 
+                    name="houseFlat" 
+                    value={formData.houseFlat} 
+                    onChange={handleChange} 
+                    className={styles.input} 
+                    placeholder="e.g. Flat 402, Sunshine Heights" 
+                    disabled={isSubmitting}
+                  />
+                </div>
+                <div className={styles.inputGroup}>
+                  <label className={styles.label}>Street / Landmark</label>
+                  <input 
+                    type="text" 
+                    name="address" 
+                    value={formData.address} 
+                    onChange={handleChange} 
+                    className={styles.input} 
+                    placeholder="e.g. MG Road, Near City Mall" 
+                    disabled={isSubmitting}
+                  />
+                </div>
               </div>
+
               <div className={styles.formRow}>
                 <div className={styles.inputGroup}>
                   <label className={styles.label}>City</label>
-                  <input type="text" name="city" value={formData.city} onChange={handleChange} className={styles.input} placeholder="e.g. Mumbai" />
+                  <input 
+                    type="text" 
+                    name="city" 
+                    value={formData.city} 
+                    onChange={handleChange} 
+                    className={styles.input} 
+                    placeholder="e.g. Mumbai" 
+                    disabled={isSubmitting}
+                  />
                 </div>
                 <div className={styles.inputGroup}>
                   <label className={styles.label}>State</label>
-                  <input type="text" name="state" value={formData.state} onChange={handleChange} className={styles.input} placeholder="e.g. Maharashtra" />
+                  <input 
+                    type="text" 
+                    name="state" 
+                    value={formData.state} 
+                    onChange={handleChange} 
+                    className={styles.input} 
+                    placeholder="e.g. Maharashtra" 
+                    disabled={isSubmitting}
+                  />
                 </div>
               </div>
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>Pincode</label>
-                <input type="text" name="pincode" value={formData.pincode} onChange={handleChange} className={styles.input} placeholder="400001" style={{ maxWidth: '200px' }} />
+
+              <div className={styles.formRow}>
+                <div className={styles.inputGroup}>
+                  <label className={styles.label}>Pincode</label>
+                  <input 
+                    type="text" 
+                    name="pincode" 
+                    value={formData.pincode} 
+                    onChange={handleChange} 
+                    className={styles.input} 
+                    placeholder="400001" 
+                    disabled={isSubmitting}
+                  />
+                </div>
+                <div className={styles.inputGroup}>
+                  <label className={styles.label}>Address Type</label>
+                  <select 
+                    name="addressType" 
+                    value={formData.addressType} 
+                    onChange={handleChange} 
+                    className={styles.input}
+                    style={{ appearance: 'none', cursor: 'pointer' }}
+                    disabled={isSubmitting}
+                  >
+                    <option value="HOME">Home</option>
+                    <option value="WORK">Work / Office</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
               </div>
             </div>
           )}
@@ -214,26 +382,77 @@ export default function OnboardingPage() {
             <div>
               <div className={styles.inputGroup}>
                 <label className={styles.label}>Pet's Name</label>
-                <input type="text" name="petName" value={formData.petName} onChange={handleChange} className={styles.input} placeholder="e.g. Max" />
+                <input 
+                  type="text" 
+                  name="petName" 
+                  value={formData.petName} 
+                  onChange={handleChange} 
+                  className={styles.input} 
+                  placeholder="e.g. Bruno" 
+                  disabled={isSubmitting}
+                />
               </div>
+
               <div className={styles.formRow}>
                 <div className={styles.inputGroup}>
                   <label className={styles.label}>Pet Type</label>
-                  <select name="petType" value={formData.petType} onChange={handleChange} className={styles.input} style={{ appearance: 'none', cursor: 'pointer' }}>
-                    <option value="Dog">Dog</option>
-                    <option value="Cat">Cat</option>
-                    <option value="Bird">Bird</option>
-                    <option value="Other">Other</option>
+                  <select 
+                    name="petType" 
+                    value={formData.petType} 
+                    onChange={handleChange} 
+                    className={styles.input} 
+                    style={{ appearance: 'none', cursor: 'pointer' }}
+                    disabled={isSubmitting}
+                  >
+                    <option value="DOG">Dog</option>
+                    <option value="CAT">Cat</option>
+                    <option value="BIRD">Bird</option>
+                    <option value="FISH">Fish</option>
+                    <option value="OTHER">Other</option>
                   </select>
                 </div>
                 <div className={styles.inputGroup}>
                   <label className={styles.label}>Breed (Optional)</label>
-                  <input type="text" name="petBreed" value={formData.petBreed} onChange={handleChange} className={styles.input} placeholder="e.g. Golden Retriever" />
+                  <input 
+                    type="text" 
+                    name="petBreed" 
+                    value={formData.petBreed} 
+                    onChange={handleChange} 
+                    className={styles.input} 
+                    placeholder="e.g. Labrador Retriever" 
+                    disabled={isSubmitting}
+                  />
                 </div>
               </div>
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>Age (Years)</label>
-                <input type="number" name="petAge" value={formData.petAge} onChange={handleChange} className={styles.input} placeholder="e.g. 2" style={{ maxWidth: '150px' }} />
+
+              <div className={styles.formRow}>
+                <div className={styles.inputGroup}>
+                  <label className={styles.label}>Age (Years)</label>
+                  <input 
+                    type="number" 
+                    name="petAge" 
+                    value={formData.petAge} 
+                    onChange={handleChange} 
+                    className={styles.input} 
+                    placeholder="e.g. 2" 
+                    disabled={isSubmitting}
+                  />
+                </div>
+                <div className={styles.inputGroup}>
+                  <label className={styles.label}>Pet Gender</label>
+                  <select 
+                    name="petGender" 
+                    value={formData.petGender} 
+                    onChange={handleChange} 
+                    className={styles.input} 
+                    style={{ appearance: 'none', cursor: 'pointer' }}
+                    disabled={isSubmitting}
+                  >
+                    <option value="MALE">Male</option>
+                    <option value="FEMALE">Female</option>
+                    <option value="UNKNOWN">Unknown</option>
+                  </select>
+                </div>
               </div>
             </div>
           )}
@@ -245,10 +464,10 @@ export default function OnboardingPage() {
               </div>
               <h2 className={styles.successTitle}>Profile Complete!</h2>
               <p className={styles.successSubtitle}>
-                Welcome to KickAt. We've saved your preferences to give you a personalized shopping experience.
+                Welcome to KickAt. We've saved your profile, address, and pet preferences to personalize your experience.
               </p>
               <button className={styles.btnPrimary} onClick={finishOnboarding}>
-                Go to my Account
+                Explore KickAt
               </button>
             </div>
           )}
