@@ -2,7 +2,11 @@
   display: flex;
   flex: 1;
   background: #ffffff;
-  min-height: calc(100vh - 120px);
+  min-height: calc(100vh - 140px);
+  height: calc(100vh - 140px);
+  max-height: calc(100vh - 140px);
+  overflow: hidden;
+  width: 100%;
 }
 
 /* Left side: branding/imagery */
@@ -13,9 +17,10 @@
   position: relative;
   overflow: hidden;
   color: #111;
-  padding: 4rem 5rem;
+  padding: 2.25rem 3.25rem;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
+  height: 100%;
 }
 
 @media (min-width: 900px) {
@@ -40,25 +45,25 @@
 .brandingContent {
   position: relative;
   z-index: 2;
-  max-width: 540px;
+  max-width: 480px;
 }
 
 .brandingTitle {
   font-family: var(--font-fraunces), serif;
-  font-size: 4rem;
+  font-size: 2.85rem;
   font-weight: 700;
-  line-height: 1.1;
-  margin-bottom: 1.5rem;
+  line-height: 1.15;
+  margin-bottom: 1rem;
   color: #111;
   letter-spacing: -0.02em;
 }
 
 .brandingSubtitle {
-  font-size: 1.25rem;
-  line-height: 1.6;
+  font-size: 1.05rem;
+  line-height: 1.55;
   color: #555;
   font-weight: 400;
-  max-width: 440px;
+  max-width: 400px;
 }
 
 .highlight {
@@ -69,36 +74,36 @@
   position: relative;
   z-index: 2;
   font-family: var(--font-fraunces), serif;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-style: italic;
-  color: #888;
-  margin-top: 4rem;
+  color: #777;
 }
 
 /* Right side: Login form */
 .formSection {
   flex: 1;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding: 4rem 2rem 4rem 2rem;
+  padding: 1.5rem 2rem;
   background: #ffffff;
+  height: 100%;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
 
 .loginCard {
   background: white;
-  padding: 0 3.5rem 3.5rem 3.5rem;
+  padding: 1rem 2.25rem;
   width: 100%;
-  max-width: 480px;
+  max-width: 430px;
   animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -108,27 +113,27 @@
 
 .header {
   text-align: center;
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .logo {
   display: inline-block;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .title {
   font-family: var(--font-fraunces), serif;
-  font-size: 2.6rem;
+  font-size: 2.1rem;
   font-weight: 700;
   color: #111;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.35rem;
   letter-spacing: -0.02em;
 }
 
 .subtitle {
   color: #666;
-  font-size: 1.05rem;
-  line-height: 1.5;
+  font-size: 0.925rem;
+  line-height: 1.45;
 }
 
 /* Buttons */
@@ -138,22 +143,22 @@
   justify-content: center;
   gap: 0.75rem;
   width: 100%;
-  padding: 1.1rem;
+  padding: 0.85rem 1rem;
   background: white;
   border: 1.5px solid #e5e7eb;
   border-radius: 12px;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   color: #333;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.15rem;
 }
 
 .googleBtn:hover {
   background: #fcfcfc;
   border-color: #d1cbbd;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.04);
   transform: translateY(-2px);
 }
 
@@ -161,7 +166,7 @@
   display: flex;
   align-items: center;
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.15rem;
 }
 
 .divider::before,
@@ -173,23 +178,23 @@
 
 .dividerText {
   color: #9ca3af;
-  font-size: 0.75rem;
+  font-size: 0.725rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  padding: 0 1.5rem;
+  padding: 0 1.25rem;
 }
 
 .formGroup {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.15rem;
 }
 
 .label {
   display: block;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: #374151;
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.45rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -207,11 +212,11 @@
 .inputWrapper:focus-within {
   border-color: #E7A03B;
   background: white;
-  box-shadow: 0 0 0 4px rgba(231, 160, 59, 0.1);
+  box-shadow: 0 0 0 3px rgba(231, 160, 59, 0.12);
 }
 
 .prefix {
-  padding: 1.1rem 1.25rem;
+  padding: 0.85rem 1rem;
   color: #6b7280;
   font-weight: 500;
   font-family: var(--font-ibm-plex-mono), monospace;
@@ -228,10 +233,10 @@
 
 .input {
   flex: 1;
-  padding: 1.1rem 1rem;
+  padding: 0.85rem 0.85rem;
   border: none;
   outline: none;
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   background: transparent;
   color: #111;
   font-weight: 500;
@@ -245,12 +250,12 @@
 
 .primaryBtn {
   width: 100%;
-  padding: 1.1rem;
+  padding: 0.875rem 1rem;
   background: #E7A03B;
   color: white;
   border: none;
   border-radius: 12px;
-  font-size: 1.05rem;
+  font-size: 0.975rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -273,7 +278,7 @@
 .primaryBtn:hover:not(:disabled) {
   background: #D8891F;
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(231, 160, 59, 0.3);
+  box-shadow: 0 6px 16px rgba(231, 160, 59, 0.3);
 }
 
 .primaryBtn:hover:not(:disabled)::after {
@@ -292,11 +297,11 @@
 }
 
 .footer {
-  margin-top: 2rem;
+  margin-top: 1.15rem;
   text-align: center;
-  font-size: 0.85rem;
+  font-size: 0.825rem;
   color: #9ca3af;
-  line-height: 1.6;
+  line-height: 1.45;
 }
 
 .link {
@@ -318,10 +323,10 @@
   color: #6b7280;
   background: none;
   border: none;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.15rem;
   padding: 0;
   transition: color 0.2s, transform 0.2s;
 }
@@ -338,7 +343,7 @@
   font-weight: 600;
   cursor: pointer;
   padding: 0;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   transition: color 0.2s;
 }
 
@@ -348,10 +353,18 @@
 }
 
 @media (max-width: 640px) {
+  .pageWrapper {
+    height: auto;
+    min-height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+  
   .formSection {
     padding: 1.25rem 1.25rem calc(130px + env(safe-area-inset-bottom, 0px)) 1.25rem;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    height: auto;
   }
   
   .loginCard {
@@ -370,45 +383,5 @@
 
   .subtitle {
     font-size: 0.95rem;
-  }
-
-  .googleBtn {
-    padding: 0.85rem 1rem;
-    font-size: 0.95rem;
-    margin-bottom: 1.15rem;
-  }
-
-  .divider {
-    margin-bottom: 1.15rem;
-  }
-
-  .dividerText {
-    font-size: 0.7rem;
-    padding: 0 1rem;
-  }
-
-  .formGroup {
-    margin-bottom: 1.15rem;
-  }
-
-  .prefix {
-    padding: 0.85rem 1rem;
-    font-size: 0.95rem;
-  }
-
-  .input {
-    padding: 0.85rem 0.85rem;
-    font-size: 0.95rem;
-  }
-
-  .primaryBtn {
-    padding: 0.9rem;
-    font-size: 1rem;
-  }
-
-  .footer {
-    margin-top: 1.25rem;
-    font-size: 0.825rem;
-    padding-bottom: 1.5rem;
   }
 }

@@ -5,17 +5,19 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
   User, Mail, Phone, Calendar, ShieldCheck, 
-  Edit3, Sparkles, Crown, ChevronRight, Bell, Tag, X
+  Edit3, Sparkles, Crown, ChevronRight, Bell, Tag, X, Loader2
 } from 'lucide-react';
 import styles from './Account.module.css';
 import AccountSidebarNav from '@/components/account/AccountSidebarNav';
 import { useAuth } from '@/context/AuthContext';
+import { profileService } from '@/services/profileService';
+import { authService } from '@/services/authService';
 
 function AccountProfileContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const tab = searchParams.get('tab');
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
 
   // Handle URL redirects for tab search params
   useEffect(() => {
@@ -43,6 +45,8 @@ function AccountProfileContent() {
     tier: 'KickAt VIP',
     currency: 'INR (₹)'
   });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     document.title = "Profile Details | KickAt";
@@ -93,17 +97,40 @@ function AccountProfileContent() {
     }, 3500);
   };
 
-  const handleSaveProfile = (e: React.FormEvent) => {
+  const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    setUserData(prev => ({
-      ...prev,
-      firstName: profileForm.firstName,
-      lastName: profileForm.lastName,
-      email: profileForm.email,
-      phone: profileForm.phone
-    }));
-    setIsEditProfileOpen(false);
-    triggerToast('Profile information updated successfully!');
+    setIsSubmitting(true);
+
+    try {
+      const fullName = `${profileForm.firstName} ${profileForm.lastName}`.trim();
+      await profileService.updateBasicProfile({
+        name: fullName,
+        email: profileForm.email,
+        phone: profileForm.phone,
+      });
+
+      // Refetch user context profile
+      try {
+        const freshUser = await authService.getMe();
+        if (setUser) setUser(freshUser);
+      } catch {
+        // Fallback local update
+      }
+
+      setUserData(prev => ({
+        ...prev,
+        firstName: profileForm.firstName,
+        lastName: profileForm.lastName,
+        email: profileForm.email,
+        phone: profileForm.phone
+      }));
+      setIsEditProfileOpen(false);
+      triggerToast('Profile information updated successfully!');
+    } catch (err: any) {
+      triggerToast(err?.message || 'Failed to update profile details.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -375,11 +402,17 @@ function AccountProfileContent() {
               </div>
 
               <div className={styles.modalFooterActions}>
-                <button type="button" className={styles.actionBtn} onClick={() => setIsEditProfileOpen(false)}>
+                <button type="button" className={styles.actionBtn} onClick={() => setIsEditProfileOpen(false)} disabled={isSubmitting}>
                   Cancel
                 </button>
-                <button type="submit" className={`${styles.actionBtn} ${styles.primaryBtn}`}>
-                  Save Changes
+                <button type="submit" className={`${styles.actionBtn} ${styles.primaryBtn}`} disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <Loader2 size={16} className="animate-spin" /> Saving...
+                    </span>
+                  ) : (
+                    "Save Changes"
+                  )}
                 </button>
               </div>
             </form>

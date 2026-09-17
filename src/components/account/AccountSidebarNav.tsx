@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { 
   Package, User, MapPin, CreditCard, Settings, Heart, LogOut, Crown, 
-  ChevronRight, ChevronLeft, Headphones 
+  ChevronRight, Headphones 
 } from 'lucide-react';
 import styles from './AccountSidebarNav.module.css';
 import { useAuth } from "@/context/AuthContext";
@@ -20,12 +20,12 @@ interface UserProps {
 }
 
 const defaultUser: UserProps = {
-  firstName: 'Sarah',
-  lastName: 'Jenkins',
-  email: 'sarah.j@example.com',
-  totalOrders: 12,
-  points: 1240,
-  tier: 'Gold Paw VIP'
+  firstName: 'KickAt',
+  lastName: 'Member',
+  email: 'member@kickat.co.in',
+  totalOrders: 0,
+  points: 100,
+  tier: 'KickAt VIP'
 };
 
 export default function AccountSidebarNav({ 
@@ -52,23 +52,20 @@ export default function AccountSidebarNav({
   const isSettingsActive = pathname === '/account/settings' || (pathname === '/account' && currentTab === 'settings');
   const isProfileActive = (pathname === '/account' && (currentTab === 'profile' || !currentTab));
 
-  // Sub-page active status on mobile
-  const isSubPage = isOrdersActive || isWishlistActive || isAddressesActive || isPaymentsActive || isSettingsActive || (pathname === '/account' && currentTab !== null);
-
   const menuItems = [
-    {
-      id: 'orders',
-      title: 'My Orders',
-      href: '/account/orders',
-      isActive: isOrdersActive,
-      Icon: Package,
-    },
     {
       id: 'profile',
       title: 'Profile Details',
       href: '/account?tab=profile',
       isActive: isProfileActive,
       Icon: User,
+    },
+    {
+      id: 'orders',
+      title: 'My Orders',
+      href: '/account/orders',
+      isActive: isOrdersActive,
+      Icon: Package,
     },
     {
       id: 'addresses',
@@ -102,30 +99,34 @@ export default function AccountSidebarNav({
 
   return (
     <aside className={styles.navContainer}>
-      {/* Mobile Back Header when inside a sub-page */}
-      {isSubPage && (
-        <div className={styles.mobileBackNavHeader}>
-          <Link href="/account" className={styles.backBtnLink}>
-            <ChevronLeft size={18} />
-            <span>Back to Account</span>
+      {/* Mobile Horizontal Tab Navigation Strip */}
+      <div className={styles.mobileTabNavStrip}>
+        {menuItems.map((item) => (
+          <Link
+            key={item.id}
+            href={item.href}
+            className={`${styles.mobileTabBtn} ${item.isActive ? styles.mobileTabActive : ''}`}
+          >
+            <item.Icon size={15} />
+            <span>{item.title}</span>
           </Link>
-        </div>
-      )}
+        ))}
+      </div>
 
-      {/* Main Account Navigation Wrapper */}
-      <div className={`${styles.mainNavWrapper} ${isSubPage ? styles.hideOnMobileSubpage : ''}`}>
+      {/* Main Desktop Sidebar Navigation Wrapper */}
+      <div className={styles.desktopNavWrapper}>
         
         {/* 1. UNIFIED SIDEBAR MAIN CARD */}
         <div className={styles.sidebarMainCard}>
           {/* User Profile Header Block */}
           <div className={styles.userProfileSection}>
             <div className={styles.avatarCircle}>
-              {user.firstName.charAt(0)}{user.lastName.charAt(0)}
+              {user.firstName.charAt(0)}{(user.lastName || '').charAt(0)}
             </div>
             <div className={styles.profileMeta}>
               <div className={styles.vipBadgePill}>
                 <Crown size={11} fill="#F99205" color="#F99205" />
-                <span>{user.tier || 'Gold Paw VIP'}</span>
+                <span>{user.tier || 'KickAt VIP'}</span>
               </div>
               <h2 className={styles.userName}>{user.firstName} {user.lastName}</h2>
               <span className={styles.userEmail}>{user.email}</span>

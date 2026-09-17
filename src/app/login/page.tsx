@@ -125,13 +125,13 @@ function LoginContent() {
         <div className={styles.brandingPattern}></div>
         
         <div className={styles.brandingContent}>
-          <Link href="/" style={{ display: 'inline-block', marginBottom: '3rem' }}>
+          <Link href="/" style={{ display: 'inline-block', marginBottom: '1.5rem' }}>
             <Image 
               src="/logo-withoutbg.png" 
               alt="KickAt Logo" 
-              width={180} 
-              height={80} 
-              style={{ objectFit: 'contain', width: 'auto', height: 'auto' }} 
+              width={160} 
+              height={70} 
+              style={{ objectFit: 'contain', width: 'auto', height: 'auto', maxHeight: '55px' }} 
               priority
             />
           </Link>
@@ -278,7 +278,7 @@ function LoginContent() {
                 )}
               </button>
               
-              <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.9rem', color: '#666' }}>
+              <div style={{ textAlign: 'center', marginTop: '1.25rem', fontSize: '0.9rem', color: '#666' }}>
                 Didn't receive code?{' '}
                 <button 
                   type="button" 

@@ -1,13 +1,20 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Camera, Check, ChevronRight, CheckCircle2, User, MapPin, Bone } from 'lucide-react';
+import { Camera, Check, ChevronRight, CheckCircle2, User, MapPin, Bone, Loader2 } from 'lucide-react';
 import styles from './Onboarding.module.css';
+import { profileService } from '@/services/profileService';
+import { useAuth } from '@/context/AuthContext';
+import { authService } from '@/services/authService';
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const { user, setUser } = useAuth();
   const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -23,9 +30,70 @@ export default function OnboardingPage() {
     petAge: ''
   });
 
-  const handleNext = () => {
-    if (step < 4) {
-      setStep(step + 1);
+  useEffect(() => {
+    if (user) {
+      const nameParts = (user.name || '').trim().split(' ');
+      setFormData(prev => ({
+        ...prev,
+        firstName: nameParts[0] || '',
+        lastName: nameParts.slice(1).join(' ') || '',
+        email: user.email || prev.email,
+        phone: user.phone || prev.phone,
+      }));
+    }
+  }, [user]);
+
+  const handleNext = async () => {
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    try {
+      if (step === 1) {
+        const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+        if (fullName || formData.email || formData.phone) {
+          await profileService.updateBasicProfile({
+            name: fullName,
+            email: formData.email || undefined,
+            phone: formData.phone || undefined,
+          });
+        }
+      } else if (step === 2) {
+        if (formData.address && formData.city && formData.pincode) {
+          await profileService.addAddress({
+            street: formData.address,
+            city: formData.city,
+            state: formData.state || 'State',
+            pincode: formData.pincode,
+          });
+        }
+      } else if (step === 3) {
+        if (formData.petName) {
+          await profileService.addPet({
+            name: formData.petName,
+            type: formData.petType,
+            breed: formData.petBreed || undefined,
+            age: formData.petAge ? parseInt(formData.petAge) : undefined,
+          });
+        }
+        // Fetch fresh profile state into context
+        try {
+          const freshUser = await authService.getMe();
+          if (setUser) setUser(freshUser);
+        } catch {
+          // Ignore fetch error
+        }
+      }
+
+      if (step < 4) {
+        setStep(prev => prev + 1);
+      }
+    } catch (err: any) {
+      // Proceed even if partial request fails
+      if (step < 4) {
+        setStep(prev => prev + 1);
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -41,7 +109,7 @@ export default function OnboardingPage() {
   };
 
   const finishOnboarding = () => {
-    router.push('/account'); // Navigate to account page on finish
+    router.push('/account');
   };
 
   return (
@@ -190,13 +258,21 @@ export default function OnboardingPage() {
         {step < 4 && (
           <div className={styles.footer}>
             {step === 1 ? (
-              <button className={styles.btnBack} onClick={() => router.back()}>Cancel</button>
+              <button className={styles.btnBack} onClick={() => router.back()} disabled={isSubmitting}>Cancel</button>
             ) : (
-              <button className={styles.btnBack} onClick={handleBack}>Back</button>
+              <button className={styles.btnBack} onClick={handleBack} disabled={isSubmitting}>Back</button>
             )}
             
-            <button className={styles.btnNext} onClick={handleNext}>
-              {step === 3 ? "Complete Profile" : "Continue"} <ChevronRight size={18} />
+            <button className={styles.btnNext} onClick={handleNext} disabled={isSubmitting}>
+              {isSubmitting ? (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Loader2 size={16} className="animate-spin" /> Saving...
+                </span>
+              ) : (
+                <>
+                  {step === 3 ? "Complete Profile" : "Continue"} <ChevronRight size={18} />
+                </>
+              )}
             </button>
           </div>
         )}
