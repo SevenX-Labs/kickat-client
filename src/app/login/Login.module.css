@@ -407,8 +407,7 @@
 
 /* Mobile Responsive Optimization (< 1024px) */
 @media (max-width: 1023px) {
-  :global(html),
-  :global(body) {
+  :global(body:has([class*="pageWrapper"])) {
     height: 100vh !important;
     height: 100dvh !important;
     overflow: hidden !important;
@@ -530,8 +529,7 @@
 
 /* Desktop Responsive Optimization (>= 1024px) */
 @media (min-width: 1024px) {
-  :global(html),
-  :global(body) {
+  :global(body:has([class*="pageWrapper"])) {
     height: 100vh !important;
     max-height: 100vh !important;
     overflow: hidden !important;
