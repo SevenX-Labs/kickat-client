@@ -123,6 +123,7 @@ function LoginContent() {
       {/* Left Branding Section (Desktop only) */}
       <div className={styles.brandingSection}>
         <div className={styles.brandingPattern}></div>
+        <div className={styles.brandingOverlay}></div>
         
         <div className={styles.brandingContent}>
           <Link href="/" style={{ display: 'inline-block', marginBottom: '1.5rem' }}>
