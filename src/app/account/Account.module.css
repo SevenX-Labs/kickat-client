@@ -958,3 +958,360 @@
     display: none !important;
   }
 }
+
+
+/* ── ORDERS PAGE MASTER STYLES ── */
+.ordersPageWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.ordersHeaderGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-bottom: 0.5rem;
+}
+
+.ordersTitle {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1A1612;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.ordersSubtitle {
+  font-size: 0.875rem;
+  color: #78746D;
+  margin: 0;
+}
+
+.ordersSearchFilterRow {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+.ordersSearchBox {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.ordersSearchIcon {
+  position: absolute;
+  left: 1rem;
+  color: #78746D;
+  pointer-events: none;
+}
+
+.ordersSearchInput {
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 2.75rem;
+  background: #ffffff;
+  border: 1px solid #EBE5DB;
+  border-radius: 14px;
+  font-size: 0.875rem;
+  color: #1A1612;
+  outline: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.ordersSearchInput:focus {
+  border-color: #F99205;
+  box-shadow: 0 4px 14px rgba(249, 146, 5, 0.12);
+}
+
+.clearSearchBtn {
+  position: absolute;
+  right: 0.85rem;
+  background: none;
+  border: none;
+  color: #A39D93;
+  cursor: pointer;
+  padding: 0.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clearSearchBtn:hover {
+  color: #1A1612;
+}
+
+.ordersFilterIconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: #ffffff;
+  border: 1px solid #EBE5DB;
+  border-radius: 14px;
+  color: #4A453E;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.ordersFilterIconButton:hover {
+  border-color: #F99205;
+  color: #F99205;
+  background: #FFF5EE;
+}
+
+.activeFilterIconBtn {
+  background: #FFF5EE !important;
+  border-color: #F99205 !important;
+  color: #F99205 !important;
+}
+
+.filterDotBeacon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #F99205;
+  border: 2px solid #ffffff;
+}
+
+.ordersListContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.ordersCard {
+  background: #ffffff;
+  border: 1px solid #EBE5DB;
+  border-radius: 20px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.025);
+  transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ordersCard:hover {
+  border-color: rgba(249, 146, 5, 0.35);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+}
+
+.ordersCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.orderIdGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.orderIdBadge {
+  font-family: var(--font-mono), monospace;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #1A1612;
+  background: #FAF7F2;
+  border: 1px solid #E2DCD2;
+  padding: 0.25rem 0.65rem;
+  border-radius: 10px;
+}
+
+.orderDate {
+  font-size: 0.8125rem;
+  color: #78746D;
+}
+
+.orderStatusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.775rem;
+  font-weight: 700;
+}
+
+.statusDelivered {
+  background: #DCFCE7;
+  color: #15803D;
+  border: 1px solid #86EFAC;
+}
+
+.statusProcessing {
+  background: #FEF3C7;
+  color: #B45309;
+  border: 1px solid #FDE68A;
+}
+
+.statusShipped {
+  background: #E0F2FE;
+  color: #0369A1;
+  border: 1px solid #7DD3FC;
+}
+
+.statusCancelled {
+  background: #FEE2E2;
+  color: #B91C1C;
+  border: 1px solid #FCA5A5;
+}
+
+.cardRowDivider {
+  height: 1px;
+  background: #F0EAE1;
+  width: 100%;
+}
+
+.ordersCardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.orderTotalGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.orderTotalLabel {
+  font-size: 0.75rem;
+  color: #78746D;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.orderTotalValue {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #1A1612;
+}
+
+.orderActionsGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.orderActionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.95rem;
+  border-radius: 12px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: 1px solid #EBE5DB;
+  background: #ffffff;
+  color: #4A453E;
+  cursor: pointer;
+}
+
+.orderActionBtn:hover {
+  border-color: #F99205;
+  color: #F99205;
+  background: #FFF5EE;
+}
+
+.primaryActionBtn {
+  background: #F99205 !important;
+  color: #ffffff !important;
+  border-color: #F99205 !important;
+}
+
+.primaryActionBtn:hover {
+  background: #E08304 !important;
+}
+
+/* Product Item Thumbnails & List in Orders */
+.cardProductList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+.cardProductRow {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  padding: 0.85rem 1rem;
+  background: #FAF7F2;
+  border: 1px solid #EBE5DB;
+  border-radius: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.cardProductThumb {
+  position: relative !important;
+  width: 68px !important;
+  height: 68px !important;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #E2DCD2;
+  flex-shrink: 0;
+}
+
+.cardThumbImg {
+  object-fit: cover !important;
+  border-radius: 12px;
+}
+
+.cardProductMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.cardProductName {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1A1612;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.cardProductName:hover {
+  color: #F99205;
+}
+
+.cardProductVariant {
+  font-size: 0.775rem;
+  color: #78746D;
+}
+
+.cardProductPrice {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #F99205;
+}
