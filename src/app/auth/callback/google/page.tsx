@@ -1,181 +1,188 @@
 "use client";
 
-import { useEffect, useState, useRef, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
-import { Loader2, AlertCircle } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
-import { authService } from "@/services/authService";
+import React, { useEffect, useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
+import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { useAuth } from '../../../../context/AuthContext';
 
 function GoogleCallbackContent() {
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const { loginWithToken, setUser } = useAuth();
+  const searchParams = useSearchParams();
+  const { loginWithToken } = useAuth();
+  
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const isProcessingRef = useRef(false);
 
   useEffect(() => {
-    if (isProcessingRef.current) return;
-    isProcessingRef.current = true;
-
-    const processCallback = async () => {
-      const errorParam = searchParams.get("error");
-      const codeParam = searchParams.get("code");
-      const tokenParam = searchParams.get("token");
-      const isNewUser = searchParams.get("isNewUser") === "true";
+    const handleAuth = async () => {
+      const token = searchParams.get('token');
+      const isNewUserStr = searchParams.get('isNewUser');
+      const errorParam = searchParams.get('error');
 
       if (errorParam) {
-        router.push(`/login?error=${encodeURIComponent(errorParam)}`);
+        setStatus('error');
+        setErrorMessage(errorParam);
+        setTimeout(() => {
+          router.replace('/login?error=' + encodeURIComponent(errorParam));
+        }, 1500);
         return;
       }
 
-      // If backend already exchanged code and passed Bearer token
-      if (tokenParam) {
-        try {
-          await loginWithToken(tokenParam);
-          const redirectTarget = isNewUser ? "/account" : "/";
-          router.push(redirectTarget);
-          return;
-        } catch (err: any) {
-          setErrorMessage(err?.message || "Failed to establish user session.");
-          setTimeout(() => {
-            router.push(`/login?error=${encodeURIComponent("Authentication session failed")}`);
-          }, 2000);
-          return;
-        }
+      if (!token) {
+        const msg = 'No authentication token provided';
+        setStatus('error');
+        setErrorMessage(msg);
+        setTimeout(() => {
+          router.replace('/login?error=' + encodeURIComponent(msg));
+        }, 1500);
+        return;
       }
 
-      // If Google returned authorization code directly to frontend
-      if (codeParam) {
-        try {
-          const redirectUri = window.location.origin + "/api/v1/auth/callback/google";
-          const res = await authService.googleAuth(codeParam, redirectUri);
-          
-          if (res.accessToken) {
-            localStorage.setItem("accessToken", res.accessToken);
-            localStorage.setItem("user", JSON.stringify(res.user));
-            localStorage.setItem("isLoggedIn", "true");
-            setUser(res.user);
-            
-            const redirectTarget = res.isNewUser ? "/account" : "/";
-            router.push(redirectTarget);
+      try {
+        const user = await loginWithToken(token);
+        setStatus('success');
+
+        const isNewUser = isNewUserStr === 'true';
+        const isProfileIncomplete = !user?.name || (!user?.phone && !user?.isPhoneVerified);
+
+        setTimeout(() => {
+          if (isNewUser || isProfileIncomplete) {
+            router.replace('/profile?onboarding=true');
           } else {
-            throw new Error("Missing access token from server response");
+            router.replace('/');
           }
-        } catch (err: any) {
-          console.error("Google Auth Exchange Error:", err);
-          const msg = err?.message || "Failed to complete Google authentication";
-          setErrorMessage(msg);
-          setTimeout(() => {
-            router.push(`/login?error=${encodeURIComponent(msg)}`);
-          }, 2500);
-        }
-        return;
+        }, 800);
+      } catch (err: any) {
+        const msg = err?.message || 'Failed to complete Google authentication';
+        setStatus('error');
+        setErrorMessage(msg);
+        setTimeout(() => {
+          router.replace('/login?error=' + encodeURIComponent(msg));
+        }, 2000);
       }
-
-      // Neither token nor code present
-      router.push(`/login?error=${encodeURIComponent("Authentication code or token missing")}`);
     };
 
-    processCallback();
-  }, [searchParams, loginWithToken, setUser, router]);
+    handleAuth();
+  }, [searchParams, loginWithToken, router]);
 
   return (
     <div
       style={{
-        minHeight: "80vh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "2rem",
-        background: "#FAF9F6",
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#0F172A',
+        color: '#F8FAFC',
+        fontFamily: 'var(--font-sans, system-ui, sans-serif)',
+        padding: '2rem',
       }}
     >
       <div
         style={{
-          background: "#FFFFFF",
-          border: "1px solid #EBE5DB",
-          borderRadius: "24px",
-          padding: "3rem 2.5rem",
-          maxWidth: "420px",
-          width: "100%",
-          textAlign: "center",
-          boxShadow: "0 20px 40px rgba(0, 0, 0, 0.04)",
+          width: '100%',
+          maxWidth: '420px',
+          backgroundColor: '#1E293B',
+          borderRadius: '16px',
+          padding: '2.5rem 2rem',
+          textAlign: 'center',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)',
+          border: '1px solid #334155',
         }}
       >
-        <Link href="/" style={{ display: "inline-block", marginBottom: "1.5rem" }}>
+        <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'center' }}>
           <Image
-            src="/logo-clean.png"
+            src="/logo-withoutbg.png"
             alt="KickAt Logo"
-            width={140}
+            width={160}
             height={60}
-            style={{ objectFit: "contain", width: "auto", height: "auto" }}
+            style={{ objectFit: 'contain' }}
             priority
           />
-        </Link>
+        </div>
 
-        {errorMessage ? (
+        {status === 'loading' && (
           <div>
-            <div
+            <Loader2
+              size={40}
               style={{
-                width: "56px",
-                height: "56px",
-                borderRadius: "50%",
-                background: "#FEE2E2",
-                color: "#991B1B",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                margin: "0 auto 1.25rem",
+                color: '#38BDF8',
+                animation: 'spin 1s linear infinite',
+                margin: '0 auto 1.25rem auto',
               }}
-            >
-              <AlertCircle size={28} />
-            </div>
-            <h2 style={{ fontSize: "1.25rem", fontWeight: "700", color: "#1A1612", marginBottom: "0.5rem" }}>
-              Authentication Failed
+            />
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.5rem', color: '#F1F5F9' }}>
+              Authenticating with Google...
             </h2>
-            <p style={{ fontSize: "0.875rem", color: "#666055", marginBottom: "1.5rem" }}>
-              {errorMessage}
+            <p style={{ fontSize: '0.875rem', color: '#94A3B8', margin: 0 }}>
+              Connecting your account securely. Please wait a moment.
             </p>
           </div>
-        ) : (
+        )}
+
+        {status === 'success' && (
           <div>
-            <div
+            <CheckCircle2
+              size={44}
               style={{
-                width: "56px",
-                height: "56px",
-                borderRadius: "50%",
-                background: "rgba(249, 146, 5, 0.1)",
-                color: "#F99205",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                margin: "0 auto 1.25rem",
+                color: '#22C55E',
+                margin: '0 auto 1.25rem auto',
               }}
-            >
-              <Loader2 size={28} className="animate-spin" />
-            </div>
-            <h2 style={{ fontSize: "1.25rem", fontWeight: "700", color: "#1A1612", marginBottom: "0.5rem" }}>
-              Signing you in...
+            />
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.5rem', color: '#F1F5F9' }}>
+              Google Sign-In Successful!
             </h2>
-            <p style={{ fontSize: "0.875rem", color: "#666055" }}>
-              Completing Google OAuth authentication. Please wait.
+            <p style={{ fontSize: '0.875rem', color: '#94A3B8', margin: 0 }}>
+              Redirecting you to KickAt...
+            </p>
+          </div>
+        )}
+
+        {status === 'error' && (
+          <div>
+            <AlertCircle
+              size={44}
+              style={{
+                color: '#EF4444',
+                margin: '0 auto 1.25rem auto',
+              }}
+            />
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.5rem', color: '#F1F5F9' }}>
+              Authentication Error
+            </h2>
+            <p style={{ fontSize: '0.875rem', color: '#FCA5A5', margin: 0 }}>
+              {errorMessage || 'Something went wrong.'}
             </p>
           </div>
         )}
       </div>
+
+      <style jsx global>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }
 
-export default function GoogleCallbackApiPage() {
+export default function GoogleCallbackPage() {
   return (
     <Suspense
       fallback={
-        <div style={{ padding: "100px", textAlign: "center", background: "#FAF9F6", minHeight: "80vh" }}>
-          Authenticating...
+        <div
+          style={{
+            minHeight: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#0F172A',
+            color: '#F8FAFC',
+          }}
+        >
+          <Loader2 size={40} style={{ color: '#38BDF8', animation: 'spin 1s linear infinite' }} />
         </div>
       }
     >

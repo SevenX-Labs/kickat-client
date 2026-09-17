@@ -1,4 +1,5 @@
 import { api } from './api';
+import { CONFIG } from '../constants/config';
 
 export interface AuthUser {
   id: string;
@@ -73,8 +74,8 @@ export const authService = {
    */
   async googleAuth(code: string, redirectUri?: string): Promise<AuthResponse> {
     const defaultRedirectUri = typeof window !== 'undefined'
-      ? `${window.location.origin}/api/v1/auth/callback/google`
-      : 'http://localhost:3000/api/v1/auth/callback/google';
+      ? `${window.location.origin}/auth/callback/google`
+      : 'http://localhost:3001/auth/callback/google';
 
     const res = await api<AuthResponse>('/auth/google', {
       method: 'POST',
@@ -97,7 +98,7 @@ export const authService = {
    * Get Google OAuth Login Consent Screen URL (GET /auth/login/google)
    */
   getGoogleLoginUrl(): string {
-    return `${process.env.NEXT_PUBLIC_API_URL || 'https://api.kickat.co.in/api/v1'}/auth/login/google`;
+    return `${CONFIG.API_BASE_URL}/auth/login/google`;
   },
 
   /**

@@ -1,8 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { authService, AuthUser, AuthResponse, SendOtpResponse } from '../services/authService';
-import { SignOutModal } from '../components/common/SignOutModal/SignOutModal';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -11,12 +10,11 @@ interface AuthContextType {
   isLoading: boolean;
   sendMobileOtp: (phone: string) => Promise<SendOtpResponse>;
   verifyMobileOtp: (phone: string, otp: string) => Promise<AuthResponse>;
-  googleAuth: (token: string, redirectUri?: string) => Promise<AuthResponse>;
-  loginWithToken: (token: string) => Promise<AuthUser>;
-  showSignOutModal: () => void;
-  hideSignOutModal: () => void;
+  googleAuth: (code: string, redirectUri?: string) => Promise<AuthResponse>;
+  loginWithToken: (token: string, providedUser?: AuthUser) => Promise<AuthUser>;
   logout: () => Promise<void>;
   logoutAll: (password?: string) => Promise<void>;
+  showSignOutModal: () => void;
   setUser: React.Dispatch<React.SetStateAction<AuthUser | null>>;
 }
 
@@ -26,47 +24,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<AuthUser | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isSignOutModalOpen, setIsSignOutModalOpen] = useState<boolean>(false);
-  const hasCheckedRefreshRef = useRef(false);
 
   useEffect(() => {
+    // Initial hydration from localStorage and silent refresh check
     const initAuth = async () => {
-      let isLoggedIn = false;
+      try {
+        if (typeof window !== 'undefined') {
+          const storedToken = localStorage.getItem('accessToken');
+          const storedUser = localStorage.getItem('user');
 
-      if (typeof window !== 'undefined') {
-        const storedToken = localStorage.getItem('accessToken');
-        const storedUser = localStorage.getItem('user');
-        isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-
-        if (storedToken) {
-          setAccessToken(storedToken);
-        }
-        if (storedUser) {
-          try {
-            setUser(JSON.parse(storedUser));
-          } catch {
-            // Ignore JSON parse error
+          if (storedToken) {
+            setAccessToken(storedToken);
           }
-        }
-      }
-
-      // Execute silent token refresh check ONCE per session ONLY if previously logged in
-      if (isLoggedIn && !hasCheckedRefreshRef.current) {
-        hasCheckedRefreshRef.current = true;
-        try {
-          const refreshRes = await authService.refreshToken();
-          if (refreshRes.accessToken) {
-            setAccessToken(refreshRes.accessToken);
-            if (refreshRes.user) {
-              setUser(refreshRes.user);
+          if (storedUser) {
+            try {
+              setUser(JSON.parse(storedUser));
+            } catch {
+              // Ignore JSON parse error
             }
           }
-        } catch {
-          // Silent refresh failed (e.g. cookie expired), retain existing stored session
         }
-      }
 
-      setIsLoading(false);
+        // Silent token refresh check using HttpOnly cookie
+        const refreshRes = await authService.refreshToken();
+        if (refreshRes.accessToken) {
+          setAccessToken(refreshRes.accessToken);
+          if (refreshRes.user) {
+            setUser(refreshRes.user);
+          }
+        }
+      } catch {
+        // If refresh fails or user has no valid session, clear state
+        if (typeof window !== 'undefined' && !localStorage.getItem('accessToken')) {
+          setUser(null);
+          setAccessToken(null);
+        }
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     initAuth();
@@ -85,8 +80,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return res;
   };
 
-  const googleAuth = async (token: string, redirectUri?: string): Promise<AuthResponse> => {
-    const res = await authService.googleAuth(token, redirectUri);
+  const googleAuth = async (code: string, redirectUri?: string): Promise<AuthResponse> => {
+    const res = await authService.googleAuth(code, redirectUri);
     if (res.accessToken) {
       setAccessToken(res.accessToken);
       setUser(res.user);
@@ -94,45 +89,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return res;
   };
 
-  const loginWithToken = async (token: string): Promise<AuthUser> => {
+  const loginWithToken = async (token: string, providedUser?: AuthUser): Promise<AuthUser> => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('accessToken', token);
       localStorage.setItem('isLoggedIn', 'true');
     }
     setAccessToken(token);
-    const fetchedUser = await authService.getMe();
-    setUser(fetchedUser);
-    return fetchedUser;
+
+    if (providedUser) {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('user', JSON.stringify(providedUser));
+      }
+      setUser(providedUser);
+      return providedUser;
+    }
+
+    try {
+      const fetchedUser = await authService.getMe();
+      setUser(fetchedUser);
+      return fetchedUser;
+    } catch (err) {
+      // If profile fetch fails, fallback to bare user object
+      const fallbackUser: AuthUser = { id: 'user' };
+      setUser(fallbackUser);
+      return fallbackUser;
+    }
   };
 
-  const showSignOutModal = () => setIsSignOutModalOpen(true);
-  const hideSignOutModal = () => setIsSignOutModalOpen(false);
-
   const logout = async (): Promise<void> => {
-    try {
-      await authService.logout();
-    } finally {
-      setAccessToken(null);
-      setUser(null);
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('user');
-        localStorage.removeItem('isLoggedIn');
-      }
-    }
+    await authService.logout();
+    setAccessToken(null);
+    setUser(null);
   };
 
   const logoutAll = async (password?: string): Promise<void> => {
     await authService.logoutAll(password);
     setAccessToken(null);
     setUser(null);
-  };
-
-  const handleConfirmSignOut = async () => {
-    await logout();
-    if (typeof window !== 'undefined') {
-      window.location.href = '/login';
-    }
   };
 
   const isAuthenticated = Boolean(accessToken && user);
@@ -148,19 +141,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         verifyMobileOtp,
         googleAuth,
         loginWithToken,
-        showSignOutModal,
-        hideSignOutModal,
         logout,
         logoutAll,
+        showSignOutModal: logout,
         setUser,
       }}
     >
       {children}
-      <SignOutModal
-        isOpen={isSignOutModalOpen}
-        onClose={hideSignOutModal}
-        onConfirm={handleConfirmSignOut}
-      />
     </AuthContext.Provider>
   );
 };
