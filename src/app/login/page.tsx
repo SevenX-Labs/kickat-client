@@ -176,9 +176,9 @@ function LoginContent() {
               <Image
                 src="/logo-clean.png"
                 alt="KickAt Logo"
-                width={130}
-                height={40}
-                style={{ objectFit: "contain", width: "auto", height: "36px" }}
+                width={180}
+                height={55}
+                className={styles.brandLogoImage}
                 priority
               />
             </div>
