@@ -10,14 +10,17 @@ interface FetchOptions extends RequestInit {
  * - JSON stringifying
  * - Attaching the Bearer token from localStorage
  * - Passing HttpOnly credentials (cookies)
- * - Automatic 401 token refresh retry
+ * - Automatic 401 token refresh retry (only when session exists)
  */
 export async function api<T>(endpoint: string, options: FetchOptions = {}): Promise<T> {
   const { data, headers, ...customConfig } = options;
 
   let token = null;
+  let hasSession = false;
+
   if (typeof window !== 'undefined') {
     token = localStorage.getItem('accessToken');
+    hasSession = Boolean(token || localStorage.getItem('isLoggedIn') === 'true');
   }
 
   const config: RequestInit = {
@@ -38,9 +41,10 @@ export async function api<T>(endpoint: string, options: FetchOptions = {}): Prom
 
   let response = await fetch(url, config);
 
-  // Attempt automatic token refresh on 401 Unauthorized (except for auth endpoints)
+  // Attempt automatic token refresh on 401 Unauthorized (only if active user session was recorded)
   if (
     response.status === 401 &&
+    hasSession &&
     !endpoint.includes('/auth/refresh') &&
     !endpoint.includes('/auth/logout') &&
     !endpoint.includes('/auth/logout-all') &&
@@ -68,9 +72,16 @@ export async function api<T>(endpoint: string, options: FetchOptions = {}): Prom
           };
           response = await fetch(url, { ...config, headers: retryHeaders });
         }
+      } else {
+        // If refresh failed (e.g. cookie expired), clear local session flags
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('user');
+          localStorage.removeItem('isLoggedIn');
+        }
       }
     } catch {
-      // If refresh fails, original 401 error will be thrown below
+      // If refresh network error occurs, original 401 error will be thrown below
     }
   }
 

@@ -32,6 +32,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (typeof window !== 'undefined') {
           const storedToken = localStorage.getItem('accessToken');
           const storedUser = localStorage.getItem('user');
+          const isLoggedIn = localStorage.getItem('isLoggedIn');
 
           if (storedToken) {
             setAccessToken(storedToken);
@@ -43,19 +44,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               // Ignore JSON parse error
             }
           }
-        }
 
-        // Silent token refresh check using HttpOnly cookie
-        const refreshRes = await authService.refreshToken();
-        if (refreshRes.accessToken) {
-          setAccessToken(refreshRes.accessToken);
-          if (refreshRes.user) {
-            setUser(refreshRes.user);
+          // Only attempt silent token refresh if user was previously logged in or has an access token
+          if (storedToken || isLoggedIn === 'true') {
+            try {
+              const refreshRes = await authService.refreshToken();
+              if (refreshRes.accessToken) {
+                setAccessToken(refreshRes.accessToken);
+                if (refreshRes.user) {
+                  setUser(refreshRes.user);
+                }
+              }
+            } catch {
+              // If refresh fails (e.g., refresh token cookie expired), clear session state cleanly
+              localStorage.removeItem('accessToken');
+              localStorage.removeItem('user');
+              localStorage.removeItem('isLoggedIn');
+              setUser(null);
+              setAccessToken(null);
+            }
           }
         }
       } catch {
-        // If refresh fails or user has no valid session, clear state
-        if (typeof window !== 'undefined' && !localStorage.getItem('accessToken')) {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('user');
+          localStorage.removeItem('isLoggedIn');
           setUser(null);
           setAccessToken(null);
         }

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../../../context/AuthContext';
+import { OtpSuccessModal } from '@/components/common/OtpSuccessModal/OtpSuccessModal';
 
 function GoogleCallbackContent() {
   const router = useRouter();
@@ -13,6 +14,7 @@ function GoogleCallbackContent() {
   
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [authUser, setAuthUser] = useState<any>(null);
 
   useEffect(() => {
     const handleAuth = async () => {
@@ -41,6 +43,7 @@ function GoogleCallbackContent() {
 
       try {
         const user = await loginWithToken(token);
+        setAuthUser(user);
         setStatus('success');
 
         const isNewUser = isNewUserStr === 'true';
@@ -50,9 +53,9 @@ function GoogleCallbackContent() {
           if (isNewUser || isProfileIncomplete) {
             router.replace('/profile?onboarding=true');
           } else {
-            router.replace('/');
+            router.replace('/account');
           }
-        }, 800);
+        }, 2500);
       } catch (err: any) {
         const msg = err?.message || 'Failed to complete Google authentication';
         setStatus('error');
@@ -79,6 +82,12 @@ function GoogleCallbackContent() {
         padding: '2rem',
       }}
     >
+      <OtpSuccessModal
+        isOpen={status === 'success'}
+        userName={authUser?.name}
+        title="Login Successful!"
+      />
+
       <div
         style={{
           width: '100%',

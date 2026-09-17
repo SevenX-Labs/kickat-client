@@ -4,13 +4,21 @@ import React from "react";
 import { Loader2, ShieldCheck } from "lucide-react";
 import styles from "./OtpSuccessModal.module.css";
 
-interface OtpSuccessModalProps {
+export interface OtpSuccessModalProps {
   isOpen: boolean;
   phone?: string;
   userName?: string | null;
+  title?: string;
+  subtitle?: string;
 }
 
-export function OtpSuccessModal({ isOpen, phone, userName }: OtpSuccessModalProps) {
+export function OtpSuccessModal({
+  isOpen,
+  phone,
+  userName,
+  title = "OTP Verified Successfully!",
+  subtitle,
+}: OtpSuccessModalProps) {
   if (!isOpen) return null;
 
   const displayName = userName || (phone ? `+91 ${phone.slice(-10)}` : "Member");
@@ -32,9 +40,13 @@ export function OtpSuccessModal({ isOpen, phone, userName }: OtpSuccessModalProp
           </div>
         </div>
 
-        <h3 className={styles.title}>OTP Verified Successfully!</h3>
+        <h3 className={styles.title}>{title}</h3>
         <p className={styles.subtitle}>
-          Welcome back to KickAt, <strong>{displayName}</strong>! Authentication complete.
+          {subtitle || (
+            <>
+              Welcome back to KickAt, <strong>{displayName}</strong>! Authentication complete.
+            </>
+          )}
         </p>
 
         <div className={styles.badge}>

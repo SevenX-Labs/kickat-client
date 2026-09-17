@@ -7,12 +7,15 @@ import Link from "next/link";
 import { Loader2, AlertCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { authService } from "@/services/authService";
+import { OtpSuccessModal } from "@/components/common/OtpSuccessModal/OtpSuccessModal";
 
 function GoogleCallbackContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { loginWithToken, setUser } = useAuth();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [loggedInUser, setLoggedInUser] = useState<any>(null);
   const isProcessingRef = useRef(false);
 
   useEffect(() => {
@@ -33,9 +36,13 @@ function GoogleCallbackContent() {
       // If backend already exchanged code and passed Bearer token
       if (tokenParam) {
         try {
-          await loginWithToken(tokenParam);
+          const user = await loginWithToken(tokenParam);
+          setLoggedInUser(user);
+          setIsSuccessModalOpen(true);
           const redirectTarget = isNewUser ? "/account" : "/";
-          router.push(redirectTarget);
+          setTimeout(() => {
+            router.push(redirectTarget);
+          }, 2500);
           return;
         } catch (err: any) {
           setErrorMessage(err?.message || "Failed to establish user session.");
@@ -57,9 +64,13 @@ function GoogleCallbackContent() {
             localStorage.setItem("user", JSON.stringify(res.user));
             localStorage.setItem("isLoggedIn", "true");
             setUser(res.user);
+            setLoggedInUser(res.user);
+            setIsSuccessModalOpen(true);
             
             const redirectTarget = res.isNewUser ? "/account" : "/";
-            router.push(redirectTarget);
+            setTimeout(() => {
+              router.push(redirectTarget);
+            }, 2500);
           } else {
             throw new Error("Missing access token from server response");
           }
@@ -93,6 +104,12 @@ function GoogleCallbackContent() {
         background: "#FAF9F6",
       }}
     >
+      <OtpSuccessModal
+        isOpen={isSuccessModalOpen}
+        userName={loggedInUser?.name}
+        title="Login Successful!"
+      />
+
       <div
         style={{
           background: "#FFFFFF",
