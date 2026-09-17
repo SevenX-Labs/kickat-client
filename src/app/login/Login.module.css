@@ -1,3 +1,4 @@
+/* Page Base Layout */
 .pageWrapper {
   display: flex;
   min-height: 100vh;
@@ -6,42 +7,9 @@
   position: relative;
 }
 
-@media (min-width: 1024px) {
-  .pageWrapper {
-    height: 100vh;
-    max-height: 100vh;
-    overflow: hidden;
-  }
-}
-
 /* Left side: Fixed branding panel on desktop (lg: >= 1024px) */
 .brandingSection {
   display: none;
-}
-
-@media (min-width: 1024px) {
-  .brandingSection {
-    display: flex;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 50vw;
-    height: 100vh;
-    background: #FAF6EF;
-    background-image: radial-gradient(100% 100% at 50% 0%, #FDFBF7 0%, #FAF6EF 50%, #F4E8D1 100%);
-    overflow: hidden;
-    color: #111827;
-    padding: 4rem 5rem;
-    flex-direction: column;
-    justify-content: center;
-    z-index: 10;
-  }
-}
-
-@media (min-width: 1280px) {
-  .brandingSection {
-    padding: 5rem 6rem;
-  }
 }
 
 .brandingPattern {
@@ -79,7 +47,7 @@
   line-height: 1.1;
   margin-bottom: 1.25rem;
   color: #111827;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
 }
 
 @media (min-width: 1280px) {
@@ -110,7 +78,7 @@
   margin-top: 3.5rem;
 }
 
-/* Right side: Login form (scrollable, offset by 50% on desktop) */
+/* Right side: Login form surface */
 .formSection {
   width: 100%;
   min-height: 100vh;
@@ -118,31 +86,24 @@
   align-items: center;
   justify-content: center;
   padding: 3rem 1.5rem;
-  background: #ffffff;
-}
-
-@media (min-width: 1024px) {
-  .formSection {
-    width: 50vw;
-    height: 100vh;
-    max-height: 100vh;
-    margin-left: auto;
-    padding: 2rem 3rem;
-    overflow-y: auto;
-  }
+  background: #FAF9F6;
 }
 
 .loginCard {
-  background: white;
+  background: #ffffff;
   width: 100%;
   max-width: 440px;
-  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 2.75rem 2.5rem;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05), 0 0 1px rgba(0, 0, 0, 0.1);
+  animation: slideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -161,16 +122,18 @@
   font-weight: 700;
   color: #111827;
   margin-bottom: 0.5rem;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
 }
 
 .subtitle {
   color: #4b5563;
   font-size: 0.95rem;
-  line-height: 1.5;
+  line-height: 1.55;
+  max-width: 360px;
+  margin: 0 auto;
 }
 
-/* Buttons */
+/* Google Button */
 .googleBtn {
   display: flex;
   align-items: center;
@@ -179,14 +142,14 @@
   width: 100%;
   height: 48px;
   padding: 0 1rem;
-  background: white;
+  background: #ffffff;
   border: 1.5px solid #e5e7eb;
   border-radius: 12px;
   font-size: 0.95rem;
   font-weight: 600;
   color: #374151;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   margin-bottom: 1.5rem;
 }
 
@@ -194,8 +157,14 @@
   background: #f9fafb;
   border-color: #d1d5db;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
 }
 
+.googleBtn:active {
+  transform: translateY(0);
+}
+
+/* Divider */
 .divider {
   display: flex;
   align-items: center;
@@ -205,32 +174,33 @@
 
 .divider::before,
 .divider::after {
-  content: '';
+  content: "";
   flex: 1;
   border-bottom: 1px solid #f3f4f6;
 }
 
 .dividerText {
   color: #9ca3af;
-  font-size: 0.75rem;
+  font-size: 0.725rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   padding: 0 1.25rem;
 }
 
+/* Form Fields */
 .formGroup {
   margin-bottom: 1.5rem;
 }
 
 .label {
   display: block;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: #374151;
   margin-bottom: 0.5rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 }
 
 .inputWrapper {
@@ -246,15 +216,15 @@
 
 .inputWrapper:focus-within {
   border-color: #fbbf24;
-  background: white;
+  background: #ffffff;
   box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.25);
 }
 
 .prefix {
   padding: 0 1rem;
   height: 100%;
-  color: #4b5563;
-  font-weight: 600;
+  color: #374151;
+  font-weight: 700;
   font-family: var(--font-ibm-plex-mono), monospace;
   display: flex;
   align-items: center;
@@ -281,12 +251,13 @@
   font-weight: 400;
 }
 
+/* Primary Submit Button */
 .primaryBtn {
   width: 100%;
   height: 48px;
   padding: 0 1rem;
   background: #f59e0b;
-  color: white;
+  color: #ffffff;
   border: none;
   border-radius: 12px;
   font-size: 1rem;
@@ -296,11 +267,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
 }
 
 .primaryBtn:hover:not(:disabled) {
   background: #d97706;
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(217, 119, 6, 0.4);
 }
 
 .primaryBtn:active:not(:disabled) {
@@ -309,6 +282,7 @@
 
 .primaryBtn:disabled {
   background: #f3f4f6;
+  border: 1px solid #e5e7eb;
   color: #9ca3af;
   cursor: not-allowed;
   box-shadow: none;
@@ -317,7 +291,7 @@
 .footer {
   margin-top: 1.5rem;
   text-align: center;
-  font-size: 0.85rem;
+  font-size: 0.825rem;
   color: #6b7280;
   line-height: 1.5;
 }
@@ -328,6 +302,7 @@
   text-underline-offset: 2px;
   font-weight: 600;
   transition: color 0.2s ease;
+  padding: 2px 0;
 }
 
 .link:hover {
@@ -350,7 +325,7 @@
 }
 
 .backBtn:hover {
-  color: #111;
+  color: #111827;
   transform: translateX(-2px);
 }
 
@@ -370,6 +345,7 @@
   text-decoration: underline;
 }
 
+/* Mobile Responsive Optimization (< 1024px) */
 @media (max-width: 1023px) {
   :global(html),
   :global(body) {
@@ -379,47 +355,44 @@
     padding-bottom: 0 !important;
   }
   
-  :global(body) [class*="announcementBar"] {
-    display: none !important;
-  }
-
   :global(body) [class*="bottomNavContainer"] {
     display: none !important;
   }
 
-  :global(body) header {
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05) !important;
-    border-bottom: 1px solid #f1f5f9 !important;
-  }
-
   .pageWrapper {
-    height: calc(100dvh - 4.85rem);
-    max-height: calc(100dvh - 4.85rem);
+    height: 100vh;
+    height: 100dvh;
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
     background: #ffffff;
+    overflow: hidden;
   }
 
   .formSection {
     width: 100%;
     height: 100%;
     margin-left: 0;
-    padding: 0.75rem 1.25rem calc(0.75rem + env(safe-area-inset-bottom, 0px));
+    padding: 1.25rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom, 0px));
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
+    background: #ffffff;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .loginCard {
     width: 100%;
     max-width: 380px;
-    margin: auto;
+    margin: auto 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    background: transparent;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -427,78 +400,107 @@
 
   .header {
     text-align: center;
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
   }
 
   .title {
-    font-size: 1.65rem;
-    margin-bottom: 0.25rem;
-    letter-spacing: -0.02em;
-  }
-
-  .subtitle {
-    font-size: 0.85rem;
-    line-height: 1.4;
-    color: #4b5563;
-  }
-
-  .googleBtn {
-    height: 46px;
-    margin-bottom: 0.85rem;
-    font-size: 0.9rem;
-  }
-
-  .divider {
-    margin-bottom: 0.85rem;
-  }
-
-  .formGroup {
-    margin-bottom: 0.85rem;
-  }
-
-  .label {
-    color: #374151;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
+    font-size: 1.75rem;
     margin-bottom: 0.35rem;
   }
 
-  .inputWrapper {
-    height: 46px;
-  }
-
-  .prefix {
-    border-right: 1.5px solid #e5e7eb;
-    background: #f3f4f6;
-    color: #374151;
-    font-weight: 700;
-  }
-
-  .primaryBtn {
-    height: 46px;
-    font-size: 0.95rem;
-    font-weight: 600;
-  }
-
-  .primaryBtn:disabled {
-    background: #f3f4f6;
-    border: 1px solid #e5e7eb;
-    color: #9ca3af;
-  }
-
-  .footer {
-    margin-top: 1rem;
-    font-size: 0.78rem;
-    color: #6b7280;
+  .subtitle {
+    font-size: 0.875rem;
     line-height: 1.45;
   }
 
-  .link {
-    color: #d97706;
-    text-decoration: underline;
-    text-underline-offset: 2px;
-    font-weight: 600;
-    padding: 2px 0;
+  .googleBtn {
+    height: 48px;
+    margin-bottom: 1rem;
+    font-size: 0.925rem;
+  }
+
+  .divider {
+    margin-bottom: 1rem;
+  }
+
+  .formGroup {
+    margin-bottom: 1rem;
+  }
+
+  .label {
+    font-size: 0.75rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .inputWrapper {
+    height: 48px;
+  }
+
+  .primaryBtn {
+    height: 48px;
+    font-size: 0.95rem;
+  }
+
+  .footer {
+    margin-top: 1.25rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Desktop Responsive Optimization (>= 1024px) */
+@media (min-width: 1024px) {
+  :global(html),
+  :global(body) {
+    height: 100vh !important;
+    max-height: 100vh !important;
+    overflow: hidden !important;
+  }
+
+  .pageWrapper {
+    height: 100vh;
+    max-height: 100vh;
+    width: 100vw;
+    display: flex;
+    position: relative;
+    overflow: hidden;
+    background: #FAF9F6;
+  }
+
+  .brandingSection {
+    display: flex;
+    position: relative;
+    width: 50vw;
+    height: 100vh;
+    background: #FAF6EF;
+    background-image: radial-gradient(100% 100% at 50% 0%, #FDFBF7 0%, #FAF6EF 50%, #F4E8D1 100%);
+    overflow: hidden;
+    color: #111827;
+    padding: 4rem 5rem;
+    flex-direction: column;
+    justify-content: center;
+    z-index: 1;
+  }
+
+  .formSection {
+    width: 50vw;
+    height: 100vh;
+    max-height: 100vh;
+    margin-left: 0;
+    padding: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #FAF9F6;
+  }
+
+  .loginCard {
+    background: #ffffff;
+    width: 100%;
+    max-width: 440px;
+    padding: 2.75rem 2.5rem;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05), 0 0 1px rgba(0, 0, 0, 0.1);
   }
 }

@@ -76,6 +76,8 @@ const sideDrawerLinks = [
 export function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
+
+  if (pathname === "/login") return null;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [menuHoverAllowed, setMenuHoverAllowed] = useState(true);
   const [openMobileCategory, setOpenMobileCategory] = useState<string | null>(null);
