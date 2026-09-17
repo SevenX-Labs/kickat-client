@@ -149,13 +149,14 @@ function LoginContent() {
         </div>
       </div>
 
+      {/* Back to Home Button */}
+      <Link href="/" className={styles.homeBackLink} aria-label="Back to main home page">
+        <ArrowLeft size={18} />
+        <span>Back to Home</span>
+      </Link>
+
       {/* Right Form Section */}
       <div className={styles.formSection}>
-        {/* Back to Home Button */}
-        <Link href="/" className={styles.homeBackLink} aria-label="Back to main home page">
-          <ArrowLeft size={18} />
-          <span>Back to Home</span>
-        </Link>
         <div className={styles.loginCard}>
           {step === "otp" && (
             <button
