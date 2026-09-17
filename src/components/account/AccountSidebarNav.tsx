@@ -1,12 +1,12 @@
 "use client";
 
-import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
+import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
 import { 
   Package, User, MapPin, CreditCard, Settings, Heart, LogOut, Crown, 
   ChevronRight, Headphones 
-} from 'lucide-react';
-import styles from './AccountSidebarNav.module.css';
+} from "lucide-react";
+import styles from "./AccountSidebarNav.module.css";
 import { useAuth } from "@/context/AuthContext";
 
 interface UserProps {
@@ -20,12 +20,12 @@ interface UserProps {
 }
 
 const defaultUser: UserProps = {
-  firstName: 'KickAt',
-  lastName: 'Member',
-  email: 'member@kickat.co.in',
+  firstName: "KickAt",
+  lastName: "Member",
+  email: "member@kickat.co.in",
   totalOrders: 0,
   points: 100,
-  tier: 'KickAt VIP'
+  tier: "KickAt VIP"
 };
 
 export default function AccountSidebarNav({ 
@@ -42,56 +42,62 @@ export default function AccountSidebarNav({
     showSignOutModal();
   };
 
-  const currentTab = searchParams.get('tab');
+  const currentTab = searchParams.get("tab");
 
   // Determine active route item
-  const isOrdersActive = pathname.startsWith('/orders') || pathname.startsWith('/account/orders');
-  const isWishlistActive = pathname.startsWith('/wishlist') || pathname.startsWith('/account/wishlist');
-  const isAddressesActive = pathname === '/account/addresses' || (pathname === '/account' && currentTab === 'addresses');
-  const isPaymentsActive = pathname === '/account/payment-methods' || (pathname === '/account' && (currentTab === 'payments' || currentTab === 'payment-methods'));
-  const isSettingsActive = pathname === '/account/settings' || (pathname === '/account' && currentTab === 'settings');
-  const isProfileActive = (pathname === '/account' && (currentTab === 'profile' || !currentTab));
+  const isOrdersActive = pathname.startsWith("/orders") || pathname.startsWith("/account/orders");
+  const isWishlistActive = pathname.startsWith("/wishlist") || pathname.startsWith("/account/wishlist");
+  const isAddressesActive = pathname === "/account/addresses" || (pathname === "/account" && currentTab === "addresses");
+  const isPaymentsActive = pathname === "/account/payment-methods" || (pathname === "/account" && (currentTab === "payments" || currentTab === "payment-methods"));
+  const isSettingsActive = pathname === "/account/settings" || (pathname === "/account" && currentTab === "settings");
+  const isProfileActive = (pathname === "/account" && (currentTab === "profile" || (!currentTab && pathname === "/account")));
 
   const menuItems = [
     {
-      id: 'profile',
-      title: 'Profile Details',
-      href: '/account?tab=profile',
+      id: "profile",
+      title: "Profile Details",
+      subtitle: "Personal info, email & phone number",
+      href: "/account?tab=profile",
       isActive: isProfileActive,
       Icon: User,
     },
     {
-      id: 'orders',
-      title: 'My Orders',
-      href: '/account/orders',
+      id: "orders",
+      title: "My Orders",
+      subtitle: "Track, view & manage past purchases",
+      href: "/account/orders",
       isActive: isOrdersActive,
       Icon: Package,
     },
     {
-      id: 'addresses',
-      title: 'Saved Addresses',
-      href: '/account/addresses',
+      id: "addresses",
+      title: "Saved Addresses",
+      subtitle: "Delivery addresses for fast checkout",
+      href: "/account/addresses",
       isActive: isAddressesActive,
       Icon: MapPin,
     },
     {
-      id: 'payments',
-      title: 'Payment Methods',
-      href: '/account/payment-methods',
+      id: "payments",
+      title: "Payment Methods",
+      subtitle: "Saved cards, UPI & wallet options",
+      href: "/account/payment-methods",
       isActive: isPaymentsActive,
       Icon: CreditCard,
     },
     {
-      id: 'wishlist',
-      title: 'Wishlist',
-      href: '/wishlist',
+      id: "wishlist",
+      title: "Wishlist",
+      subtitle: "Your favorite saved pet items",
+      href: "/wishlist",
       isActive: isWishlistActive,
       Icon: Heart,
     },
     {
-      id: 'settings',
-      title: 'Settings',
-      href: '/account/settings',
+      id: "settings",
+      title: "Settings",
+      subtitle: "Notifications & account privacy",
+      href: "/account/settings",
       isActive: isSettingsActive,
       Icon: Settings,
     },
@@ -99,34 +105,16 @@ export default function AccountSidebarNav({
 
   return (
     <aside className={styles.navContainer}>
-      {/* Mobile Horizontal Tab Navigation Strip */}
-      <div className={styles.mobileTabNavStrip}>
-        {menuItems.map((item) => (
-          <Link
-            key={item.id}
-            href={item.href}
-            className={`${styles.mobileTabBtn} ${item.isActive ? styles.mobileTabActive : ''}`}
-          >
-            <item.Icon size={15} />
-            <span>{item.title}</span>
-          </Link>
-        ))}
-      </div>
-
-      {/* Main Desktop Sidebar Navigation Wrapper */}
-      <div className={styles.desktopNavWrapper}>
-        
-        {/* 1. UNIFIED SIDEBAR MAIN CARD */}
+      <div className={styles.unifiedNavWrapper}>
         <div className={styles.sidebarMainCard}>
-          {/* User Profile Header Block */}
           <div className={styles.userProfileSection}>
             <div className={styles.avatarCircle}>
-              {user.firstName.charAt(0)}{(user.lastName || '').charAt(0)}
+              {user.firstName.charAt(0)}{(user.lastName || "").charAt(0)}
             </div>
             <div className={styles.profileMeta}>
               <div className={styles.vipBadgePill}>
                 <Crown size={11} fill="#F99205" color="#F99205" />
-                <span>{user.tier || 'KickAt VIP'}</span>
+                <span>{user.tier || "KickAt VIP"}</span>
               </div>
               <h2 className={styles.userName}>{user.firstName} {user.lastName}</h2>
               <span className={styles.userEmail}>{user.email}</span>
@@ -135,34 +123,41 @@ export default function AccountSidebarNav({
 
           <div className={styles.sectionDivider} />
 
-          {/* Navigation Menu Links */}
           <nav className={styles.navMenuList}>
             {menuItems.map((item) => (
               <Link
                 key={item.id}
                 href={item.href}
-                className={`${styles.navItemLink} ${item.isActive ? styles.activeNavItem : ''}`}
+                className={`${styles.navItemLink} ${item.isActive ? styles.activeNavItem : ""}`}
               >
-                <item.Icon size={19} className={styles.navIcon} strokeWidth={2} />
-                <span className={styles.navTitle}>{item.title}</span>
+                <div className={styles.iconCircleWrap}>
+                  <item.Icon size={18} className={styles.navIcon} strokeWidth={2} />
+                </div>
+                <div className={styles.navTextCol}>
+                  <span className={styles.navTitle}>{item.title}</span>
+                  <span className={styles.navSubtitle}>{item.subtitle}</span>
+                </div>
                 <ChevronRight size={16} className={styles.navChevron} />
               </Link>
             ))}
 
-            {/* Sign Out Action Item */}
             <button
               type="button"
               className={`${styles.navItemLink} ${styles.signOutItem}`}
               onClick={handleSignOut}
             >
-              <LogOut size={19} className={styles.signOutIcon} strokeWidth={2} />
-              <span className={styles.signOutTitle}>Sign Out</span>
+              <div className={`${styles.iconCircleWrap} ${styles.signOutIconWrap}`}>
+                <LogOut size={18} className={styles.signOutIcon} strokeWidth={2} />
+              </div>
+              <div className={styles.navTextCol}>
+                <span className={styles.signOutTitle}>Sign Out</span>
+                <span className={styles.navSubtitle}>Log out of your KickAt account</span>
+              </div>
               <ChevronRight size={16} className={styles.navChevron} />
             </button>
           </nav>
         </div>
 
-        {/* 2. NEED HELP? SUPPORT CARD */}
         <div className={styles.helpBannerCard}>
           <div className={styles.helpLeftSection}>
             <div className={styles.helpMascotCircle}>
@@ -170,7 +165,7 @@ export default function AccountSidebarNav({
             </div>
             <div className={styles.helpTextGroup}>
               <span className={styles.helpTitle}>Need Help?</span>
-              <span className={styles.helpSubtitle}>We're here for you!</span>
+              <span className={styles.helpSubtitle}>We are here for you!</span>
               <Link href="/contact" className={styles.contactSupportBtn}>
                 <Headphones size={13} />
                 <span>Contact Support</span>
@@ -179,7 +174,6 @@ export default function AccountSidebarNav({
           </div>
         </div>
 
-        {/* 3. FOOTER LINE: Made with ❤️ by KickAt */}
         <div className={styles.madeWithLoveFooter}>
           <span>Made with ❤️ by <strong>KickAt</strong></span>
         </div>

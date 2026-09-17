@@ -7,46 +7,7 @@
   width: 100%;
 }
 
-/* Mobile Horizontal Tab Nav Strip */
-.mobileTabNavStrip {
-  display: none;
-  gap: 0.5rem;
-  overflow-x: auto;
-  padding-bottom: 0.5rem;
-  margin-bottom: 0.75rem;
-  width: 100%;
-  -webkit-overflow-scrolling: touch;
-}
-
-.mobileTabNavStrip::-webkit-scrollbar {
-  display: none;
-}
-
-.mobileTabBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.6rem 1rem;
-  border-radius: 9999px;
-  border: 1px solid #E2DCD2;
-  background: #ffffff;
-  font-size: 0.825rem;
-  font-weight: 700;
-  color: #4A453E;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-}
-
-.mobileTabActive {
-  background-color: #F99205 !important;
-  color: #ffffff !important;
-  border-color: #F99205 !important;
-  box-shadow: 0 4px 14px rgba(249, 146, 5, 0.3) !important;
-}
-
-.desktopNavWrapper {
+.unifiedNavWrapper {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -144,7 +105,7 @@
 .navMenuList {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.5rem;
   width: 100%;
 }
 
@@ -152,10 +113,10 @@
   display: flex;
   align-items: center;
   gap: 0.85rem;
-  padding: 0.75rem 0.95rem;
+  padding: 0.85rem 0.95rem;
   border-radius: 14px;
-  background: transparent;
-  border: 1px solid transparent;
+  background: #FAF9F6;
+  border: 1px solid #EBE5DB;
   color: #4A453E;
   text-decoration: none;
   font-size: 0.875rem;
@@ -167,23 +128,66 @@
 }
 
 .navItemLink:hover {
-  background-color: #FAF7F2;
+  background-color: #FFF5EE;
+  border-color: rgba(249, 146, 5, 0.3);
   color: #F99205;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.iconCircleWrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #E2DCD2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.navItemLink:hover .iconCircleWrap {
+  background: #F99205;
+  border-color: #F99205;
 }
 
 .navIcon {
   color: #78746D;
   transition: color 0.2s ease;
-  flex-shrink: 0;
 }
 
 .navItemLink:hover .navIcon {
-  color: #F99205;
+  color: #ffffff;
+}
+
+.navTextCol {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .navTitle {
-  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1A1612;
   white-space: nowrap;
+}
+
+.navItemLink:hover .navTitle {
+  color: #F99205;
+}
+
+.navSubtitle {
+  font-size: 0.75rem;
+  color: #78746D;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .navChevron {
@@ -199,35 +203,64 @@
 
 /* Active Item Style */
 .activeNavItem {
-  background-color: #FFF9F4 !important;
+  background-color: #FFF5EE !important;
   color: #F99205 !important;
-  font-weight: 700 !important;
-  border-color: rgba(249, 146, 5, 0.25) !important;
+  border-color: #F99205 !important;
+  box-shadow: 0 4px 14px rgba(249, 146, 5, 0.15) !important;
 }
 
-.activeNavItem .navIcon,
+.activeNavItem .iconCircleWrap {
+  background: #F99205 !important;
+  border-color: #F99205 !important;
+}
+
+.activeNavItem .navIcon {
+  color: #ffffff !important;
+}
+
+.activeNavItem .navTitle {
+  color: #F99205 !important;
+}
+
 .activeNavItem .navChevron {
   color: #F99205 !important;
 }
 
 /* Sign Out Item */
 .signOutItem {
+  background: #FEF2F2 !important;
+  border-color: #FCA5A5 !important;
   color: #B91C1C !important;
   margin-top: 0.4rem;
 }
 
+.signOutIconWrap {
+  background: #ffffff !important;
+  border-color: #FCA5A5 !important;
+}
+
 .signOutItem:hover {
   background-color: #FEE2E2 !important;
-  border-color: rgba(185, 28, 28, 0.15) !important;
+  border-color: #DC2626 !important;
+}
+
+.signOutItem:hover .signOutIconWrap {
+  background: #DC2626 !important;
+  border-color: #DC2626 !important;
 }
 
 .signOutIcon {
   color: #B91C1C !important;
 }
 
+.signOutItem:hover .signOutIcon {
+  color: #ffffff !important;
+}
+
 .signOutTitle {
   color: #B91C1C !important;
-  font-weight: 600;
+  font-size: 0.9rem;
+  font-weight: 700;
 }
 
 /* 2. Need Help Support Card */
@@ -331,13 +364,25 @@
   margin-left: 0.25rem;
 }
 
-/* RESPONSIVE MEDIA QUERIES */
-@media (max-width: 768px) {
-  .mobileTabNavStrip {
-    display: flex;
+@media (max-width: 1023px) {
+  .unifiedNavWrapper {
+    gap: 0.85rem;
   }
 
-  .desktopNavWrapper {
-    display: none !important;
+  .sidebarMainCard {
+    padding: 1rem;
+    border-radius: 18px;
+  }
+
+  .navItemLink {
+    padding: 0.75rem 0.85rem;
+  }
+
+  .navTitle {
+    font-size: 0.875rem;
+  }
+
+  .navSubtitle {
+    font-size: 0.725rem;
   }
 }
