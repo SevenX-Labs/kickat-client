@@ -823,3 +823,138 @@
     display: none !important;
   }
 }
+
+
+/* ── ENHANCED WEB VIEW STYLES FOR PROFILE & SUBPAGES ── */
+.sectionBlockCard {
+  background: #ffffff;
+  border: 1px solid #EBE5DB;
+  border-radius: 20px;
+  padding: 1.75rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.025);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sectionBlockHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid #F0EAE1;
+}
+
+.blockTitle {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1A1612;
+  margin: 0 0 0.25rem 0;
+  line-height: 1.2;
+}
+
+.blockSubtitle {
+  font-size: 0.875rem;
+  color: #78746D;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.editHeaderBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: #FFF5EE;
+  border: 1px solid rgba(249, 146, 5, 0.3);
+  color: #F99205;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.editHeaderBtn:hover {
+  background: #F99205;
+  color: #ffffff;
+  border-color: #F99205;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(249, 146, 5, 0.2);
+}
+
+.infoFieldsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.infoFieldBox {
+  background: #FAF7F2;
+  border: 1px solid #EBE5DB;
+  border-radius: 16px;
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.infoFieldBox:hover {
+  background: #FFFDFB;
+  border-color: rgba(249, 146, 5, 0.35);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.025);
+}
+
+.fieldIconWrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #E2DCD2;
+  color: #F99205;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.fieldMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.fieldLabel {
+  font-size: 0.725rem;
+  font-weight: 700;
+  color: #78746D;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.fieldValue {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1A1612;
+  word-break: break-word;
+  line-height: 1.35;
+}
+
+@media (min-width: 769px) {
+  .backHeaderGroup {
+    display: none !important;
+  }
+}
