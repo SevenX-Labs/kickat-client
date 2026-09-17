@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Smartphone, Loader2, AlertCircle } from "lucide-react";
+import { ArrowLeft, Smartphone, Loader2, AlertCircle, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { authService } from "@/services/authService";
 import { OtpSuccessModal } from "@/components/common/OtpSuccessModal/OtpSuccessModal";
@@ -93,7 +93,7 @@ function LoginContent() {
       if (res.success) {
         setIsSuccessModalOpen(true);
         const redirectTo = searchParams.get("redirect") || "/";
-        
+
         // Show 2.5s animated success modal before navigating to homepage
         setTimeout(() => {
           router.push(redirectTo);
@@ -113,9 +113,9 @@ function LoginContent() {
   return (
     <div className={styles.pageWrapper}>
       {/* Animated Success Dialog Box */}
-      <OtpSuccessModal 
-        isOpen={isSuccessModalOpen} 
-        phone={phoneNumber} 
+      <OtpSuccessModal
+        isOpen={isSuccessModalOpen}
+        phone={phoneNumber}
         userName={user?.name}
         title="OTP Verified Successfully!"
       />
@@ -124,15 +124,15 @@ function LoginContent() {
       <div className={styles.brandingSection}>
         <div className={styles.brandingPattern}></div>
         <div className={styles.brandingOverlay}></div>
-        
+
         <div className={styles.brandingContent}>
           <Link href="/" style={{ display: 'inline-block', marginBottom: '1.5rem' }}>
-            <Image 
-              src="/logo-withoutbg.png" 
-              alt="KickAt Logo" 
-              width={160} 
-              height={70} 
-              style={{ objectFit: 'contain', width: 'auto', height: 'auto', maxHeight: '55px' }} 
+            <Image
+              src="/logo-withoutbg.png"
+              alt="KickAt Logo"
+              width={160}
+              height={70}
+              style={{ objectFit: 'contain', width: 'auto', height: 'auto', maxHeight: '55px' }}
               priority
             />
           </Link>
@@ -158,8 +158,8 @@ function LoginContent() {
         </Link>
         <div className={styles.loginCard}>
           {step === "otp" && (
-            <button 
-              className={styles.backBtn} 
+            <button
+              className={styles.backBtn}
               onClick={() => {
                 setStep("phone");
                 setErrorMessage(null);
@@ -170,11 +170,21 @@ function LoginContent() {
               <ArrowLeft size={16} /> Back
             </button>
           )}
-          
+
           <div className={styles.header}>
+            <div className={styles.brandLogoWrapper}>
+              <Image
+                src="/logo-clean.png"
+                alt="KickAt Logo"
+                width={130}
+                height={40}
+                style={{ objectFit: "contain", width: "auto", height: "36px" }}
+                priority
+              />
+            </div>
             <h1 className={styles.title}>Welcome Back</h1>
             <p className={styles.subtitle}>
-              {step === "phone" 
+              {step === "phone"
                 ? "Sign in to access your account, orders, and wishlist."
                 : `Enter the 6-digit code sent to +91 ${phoneNumber}`
               }
@@ -182,7 +192,7 @@ function LoginContent() {
           </div>
 
           {errorMessage && (
-            <div 
+            <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -222,8 +232,8 @@ function LoginContent() {
                   <label className={styles.label}>Mobile Number</label>
                   <div className={styles.inputWrapper}>
                     <span className={styles.prefix}>+91</span>
-                    <input 
-                      type="tel" 
+                    <input
+                      type="tel"
                       className={styles.input}
                       placeholder="Enter your 10-digit mobile number"
                       value={phoneNumber}
@@ -234,8 +244,8 @@ function LoginContent() {
                     />
                   </div>
                 </div>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className={styles.primaryBtn}
                   disabled={phoneNumber.length < 10 || isSubmitting}
                 >
@@ -256,8 +266,8 @@ function LoginContent() {
                 <label className={styles.label}>One Time Password (OTP)</label>
                 <div className={styles.inputWrapper}>
                   <span className={styles.prefix}><Smartphone size={18} /></span>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     className={styles.input}
                     placeholder="Enter 6-digit OTP"
                     value={otp}
@@ -269,8 +279,8 @@ function LoginContent() {
                   />
                 </div>
               </div>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className={styles.primaryBtn}
                 disabled={otp.length < 6 || isSubmitting}
               >
@@ -283,12 +293,12 @@ function LoginContent() {
                   "Verify & Login"
                 )}
               </button>
-              
+
               <div style={{ textAlign: 'center', marginTop: '1.25rem', fontSize: '0.9rem', color: '#666' }}>
                 Didn't receive code?{' '}
-                <button 
-                  type="button" 
-                  onClick={handleResendOtp} 
+                <button
+                  type="button"
+                  onClick={handleResendOtp}
                   className={styles.resendBtn}
                   disabled={resendCooldown > 0 || isSubmitting}
                   style={{
@@ -304,6 +314,11 @@ function LoginContent() {
 
           <div className={styles.footer}>
             By continuing, you agree to KickAt's <Link href="/terms" className={styles.link}>Terms</Link> and <Link href="/privacy" className={styles.link}>Privacy Policy</Link>.
+          </div>
+
+          <div className={styles.trustMicrocopy}>
+            <ShieldCheck size={14} />
+            <span>Secure sign-in with Google or OTP</span>
           </div>
         </div>
       </div>
