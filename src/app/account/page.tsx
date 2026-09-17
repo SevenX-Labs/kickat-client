@@ -152,7 +152,6 @@ function AccountProfileContent() {
       const updatedRes: any = await profileService.updateBasicProfile({
         name: fullName || undefined,
         email: profileForm.email || undefined,
-        phone: profileForm.phone || undefined,
       });
 
       const updatedUser = updatedRes?.profile?.user || updatedRes?.user || updatedRes;

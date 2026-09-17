@@ -62,7 +62,6 @@ export default function OnboardingPage() {
         const res: any = await profileService.updateBasicProfile({
           name: fullName || undefined,
           email: formData.email || undefined,
-          phone: formData.phone || undefined,
           gender: formData.gender,
           dob: formData.dob || undefined,
         });
