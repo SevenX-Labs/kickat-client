@@ -40,7 +40,8 @@ function GoogleCallbackContent() {
           const user = await loginWithToken(tokenParam);
           setLoggedInUser(user);
           setIsSuccessModalOpen(true);
-          const redirectTarget = isNewUser ? "/onboarding" : (customRedirect || "/");
+          const isProfileComplete = Boolean(user?.isProfileComplete || user?.profileCompleted || (user?.name && (user?.email || user?.phone)));
+          const redirectTarget = (!isProfileComplete && isNewUser) ? "/onboarding" : (customRedirect || "/account");
           setTimeout(() => {
             router.push(redirectTarget);
           }, 2500);
@@ -68,7 +69,8 @@ function GoogleCallbackContent() {
             setLoggedInUser(res.user);
             setIsSuccessModalOpen(true);
             
-            const redirectTarget = res.isNewUser ? "/onboarding" : (customRedirect || "/");
+            const isProfileComplete = Boolean(res.user?.isProfileComplete || res.user?.profileCompleted || (res.user?.name && (res.user?.email || res.user?.phone)));
+            const redirectTarget = (!isProfileComplete && res.isNewUser) ? "/onboarding" : (customRedirect || "/account");
             setTimeout(() => {
               router.push(redirectTarget);
             }, 2500);

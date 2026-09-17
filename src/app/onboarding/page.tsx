@@ -9,7 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { user, setUser } = useAuth();
+  const { user, setUser, isAuthenticated, isLoading } = useAuth();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -33,6 +33,26 @@ export default function OnboardingPage() {
     petAge: '',
     petGender: 'MALE' as 'MALE' | 'FEMALE' | 'UNKNOWN'
   });
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (!isAuthenticated) {
+        router.replace('/login');
+        return;
+      }
+
+      const isProfileAlreadyComplete = Boolean(
+        user?.isProfileComplete ||
+        user?.profileCompleted ||
+        (user?.name && user.name.trim().length > 0 && (user?.email || user?.phone))
+      );
+
+      if (isProfileAlreadyComplete) {
+        router.replace('/account');
+        return;
+      }
+    }
+  }, [user, isAuthenticated, isLoading, router]);
 
   useEffect(() => {
     if (user) {

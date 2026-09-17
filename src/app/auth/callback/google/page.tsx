@@ -46,18 +46,21 @@ function GoogleCallbackContent() {
         setAuthUser(user);
         setStatus('success');
 
-        const isNewUser = isNewUserStr === 'true';
-        const isProfileIncomplete = !user?.name || (!user?.phone && !user?.isPhoneVerified);
+        const isProfileComplete = Boolean(
+          user?.isProfileComplete ||
+          user?.profileCompleted ||
+          (user?.name && user.name.trim().length > 0 && (user?.email || user?.phone))
+        );
 
-        const targetRedirect = searchParams.get('redirect') || '/';
+        const targetRedirect = searchParams.get('redirect') || '/account';
 
         setTimeout(() => {
-          if (isNewUser || isProfileIncomplete) {
+          if (!isProfileComplete && isNewUserStr === 'true') {
             router.replace('/onboarding');
           } else {
             router.replace(targetRedirect);
           }
-        }, 2500);
+        }, 2000);
       } catch (err: any) {
         const msg = err?.message || 'Failed to complete Google authentication';
         setStatus('error');
