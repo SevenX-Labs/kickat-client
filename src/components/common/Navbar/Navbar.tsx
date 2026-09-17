@@ -7,6 +7,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { ChevronDown, Search, Heart, User, ShoppingBag, Package, Tag, MapPin, Bell, LogOut, Star, Truck, Percent, Crown, Menu, X, Dog, Cat, Fish, Bird, MessageCircle, BookOpen, Phone, ShieldQuestion, Headset, ArrowRight, Sun, Sparkles, ChevronRight } from "lucide-react";
 import styles from "./Navbar.module.css";
 import { megaMenuData } from "@/data/megaMenuData";
+import { useAuth } from "@/context/AuthContext";
 
 const taxonomy = {
   Dogs: {
@@ -90,6 +91,7 @@ export function Navbar() {
   const [isCartBouncing, setIsCartBouncing] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const { logout, isAuthenticated, showSignOutModal } = useAuth();
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -146,15 +148,13 @@ export function Navbar() {
   }, [pathname]);
 
   const handleAccountClick = () => {
-    if (!isLoggedIn) {
+    if (!isLoggedIn && !isAuthenticated) {
       router.push('/login');
     }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
-    setIsLoggedIn(false);
-    router.push('/');
+    showSignOutModal();
   };
 
   const closeMobileMenu = () => {

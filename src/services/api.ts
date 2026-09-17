@@ -38,10 +38,12 @@ export async function api<T>(endpoint: string, options: FetchOptions = {}): Prom
 
   let response = await fetch(url, config);
 
-  // Attempt automatic token refresh on 401 Unauthorized
+  // Attempt automatic token refresh on 401 Unauthorized (except for auth endpoints)
   if (
     response.status === 401 &&
     !endpoint.includes('/auth/refresh') &&
+    !endpoint.includes('/auth/logout') &&
+    !endpoint.includes('/auth/logout-all') &&
     !endpoint.includes('/auth/otp/send') &&
     !endpoint.includes('/auth/otp/verify') &&
     !endpoint.includes('/auth/google')

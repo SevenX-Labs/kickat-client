@@ -141,6 +141,8 @@ export const authService = {
       await api<MessageResponse>('/auth/logout', {
         method: 'POST',
       });
+    } catch {
+      // Ignore API error if session already revoked
     } finally {
       if (typeof window !== 'undefined') {
         localStorage.removeItem('accessToken');

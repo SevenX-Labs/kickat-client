@@ -2,6 +2,7 @@
   display: flex;
   flex: 1;
   background: #ffffff;
+  min-height: calc(100vh - 120px);
 }
 
 /* Left side: branding/imagery */
@@ -82,6 +83,8 @@
   justify-content: center;
   padding: 4rem 2rem 4rem 2rem;
   background: #ffffff;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .loginCard {
@@ -289,7 +292,7 @@
 }
 
 .footer {
-  margin-top: 2.5rem;
+  margin-top: 2rem;
   text-align: center;
   font-size: 0.85rem;
   color: #9ca3af;
@@ -346,15 +349,66 @@
 
 @media (max-width: 640px) {
   .formSection {
-    padding: 1.5rem;
+    padding: 1.25rem 1.25rem calc(130px + env(safe-area-inset-bottom, 0px)) 1.25rem;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   
   .loginCard {
-    padding: 2rem 1.5rem;
+    padding: 0.75rem 0 2rem 0;
     box-shadow: none;
   }
 
+  .header {
+    margin-bottom: 1.25rem;
+  }
+
   .title {
-    font-size: 2.2rem;
+    font-size: 1.85rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .googleBtn {
+    padding: 0.85rem 1rem;
+    font-size: 0.95rem;
+    margin-bottom: 1.15rem;
+  }
+
+  .divider {
+    margin-bottom: 1.15rem;
+  }
+
+  .dividerText {
+    font-size: 0.7rem;
+    padding: 0 1rem;
+  }
+
+  .formGroup {
+    margin-bottom: 1.15rem;
+  }
+
+  .prefix {
+    padding: 0.85rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  .input {
+    padding: 0.85rem 0.85rem;
+    font-size: 0.95rem;
+  }
+
+  .primaryBtn {
+    padding: 0.9rem;
+    font-size: 1rem;
+  }
+
+  .footer {
+    margin-top: 1.25rem;
+    font-size: 0.825rem;
+    padding-bottom: 1.5rem;
   }
 }

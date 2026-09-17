@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { authService, AuthUser, AuthResponse, SendOtpResponse } from '../services/authService';
+import { SignOutModal } from '../components/common/SignOutModal/SignOutModal';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -12,6 +13,8 @@ interface AuthContextType {
   verifyMobileOtp: (phone: string, otp: string) => Promise<AuthResponse>;
   googleAuth: (token: string, redirectUri?: string) => Promise<AuthResponse>;
   loginWithToken: (token: string) => Promise<AuthUser>;
+  showSignOutModal: () => void;
+  hideSignOutModal: () => void;
   logout: () => Promise<void>;
   logoutAll: (password?: string) => Promise<void>;
   setUser: React.Dispatch<React.SetStateAction<AuthUser | null>>;
@@ -23,6 +26,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<AuthUser | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isSignOutModalOpen, setIsSignOutModalOpen] = useState<boolean>(false);
   const hasCheckedRefreshRef = useRef(false);
 
   useEffect(() => {
@@ -101,16 +105,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return fetchedUser;
   };
 
+  const showSignOutModal = () => setIsSignOutModalOpen(true);
+  const hideSignOutModal = () => setIsSignOutModalOpen(false);
+
   const logout = async (): Promise<void> => {
-    await authService.logout();
-    setAccessToken(null);
-    setUser(null);
+    try {
+      await authService.logout();
+    } finally {
+      setAccessToken(null);
+      setUser(null);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('user');
+        localStorage.removeItem('isLoggedIn');
+      }
+    }
   };
 
   const logoutAll = async (password?: string): Promise<void> => {
     await authService.logoutAll(password);
     setAccessToken(null);
     setUser(null);
+  };
+
+  const handleConfirmSignOut = async () => {
+    await logout();
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login';
+    }
   };
 
   const isAuthenticated = Boolean(accessToken && user);
@@ -126,12 +148,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         verifyMobileOtp,
         googleAuth,
         loginWithToken,
+        showSignOutModal,
+        hideSignOutModal,
         logout,
         logoutAll,
         setUser,
       }}
     >
       {children}
+      <SignOutModal
+        isOpen={isSignOutModalOpen}
+        onClose={hideSignOutModal}
+        onConfirm={handleConfirmSignOut}
+      />
     </AuthContext.Provider>
   );
 };

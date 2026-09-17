@@ -7,6 +7,7 @@ import {
   ChevronRight, ChevronLeft, Headphones 
 } from 'lucide-react';
 import styles from './AccountSidebarNav.module.css';
+import { useAuth } from "@/context/AuthContext";
 
 interface UserProps {
   firstName: string;
@@ -36,6 +37,11 @@ export default function AccountSidebarNav({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { logout, showSignOutModal } = useAuth();
+
+  const handleSignOut = () => {
+    showSignOutModal();
+  };
 
   const currentTab = searchParams.get('tab');
 
@@ -147,7 +153,7 @@ export default function AccountSidebarNav({
             <button
               type="button"
               className={`${styles.navItemLink} ${styles.signOutItem}`}
-              onClick={() => router.push('/login')}
+              onClick={handleSignOut}
             >
               <LogOut size={19} className={styles.signOutIcon} strokeWidth={2} />
               <span className={styles.signOutTitle}>Sign Out</span>

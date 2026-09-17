@@ -7,12 +7,13 @@ import Link from "next/link";
 import { ArrowLeft, Smartphone, Loader2, AlertCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { authService } from "@/services/authService";
+import { OtpSuccessModal } from "@/components/common/OtpSuccessModal/OtpSuccessModal";
 import styles from "./Login.module.css";
 
 function LoginContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { sendMobileOtp, verifyMobileOtp, isAuthenticated } = useAuth();
+  const { sendMobileOtp, verifyMobileOtp, isAuthenticated, user } = useAuth();
 
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -20,6 +21,7 @@ function LoginContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
   // Parse error query parameter if redirected back from Google OAuth
   useEffect(() => {
@@ -29,13 +31,13 @@ function LoginContent() {
     }
   }, [searchParams]);
 
-  // If already authenticated, redirect immediately
+  // If already authenticated and success modal is not active, redirect
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !isSuccessModalOpen) {
       const redirectTo = searchParams.get("redirect") || "/account";
       router.push(redirectTo);
     }
-  }, [isAuthenticated, router, searchParams]);
+  }, [isAuthenticated, isSuccessModalOpen, router, searchParams]);
 
   // Resend OTP countdown timer
   useEffect(() => {
@@ -89,24 +91,34 @@ function LoginContent() {
     try {
       const res = await verifyMobileOtp(phoneNumber, otp);
       if (res.success) {
+        setIsSuccessModalOpen(true);
         const redirectTo = searchParams.get("redirect") || "/account";
-        router.push(redirectTo);
+        
+        // Show 2.5s animated success modal before navigating
+        setTimeout(() => {
+          router.push(redirectTo);
+        }, 2500);
       }
     } catch (err: any) {
       setErrorMessage(err?.message || "Invalid OTP code. Please check and try again.");
-    } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleGoogleLogin = () => {
-    // Redirect browser to Google OAuth consent screen endpoint
     const googleLoginUrl = authService.getGoogleLoginUrl();
     window.location.href = googleLoginUrl;
   };
 
   return (
     <div className={styles.pageWrapper}>
+      {/* Animated Success Dialog Box */}
+      <OtpSuccessModal 
+        isOpen={isSuccessModalOpen} 
+        phone={phoneNumber} 
+        userName={user?.name}
+      />
+
       {/* Left Branding Section (Desktop only) */}
       <div className={styles.brandingSection}>
         <div className={styles.brandingPattern}></div>
