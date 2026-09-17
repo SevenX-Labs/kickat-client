@@ -14,21 +14,13 @@ export function ProductGallery({ images }: ProductGalleryProps) {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
-  // Ensure we have at least 5 thumbnail items for the strip (4 images + 1 video tile)
-  const defaultImages = [
-    images[0] || '/hero-products/dog_food.png',
-    images[1] || '/hero-products/pet_bowl.png',
-    images[2] || '/hero-products/pet_toy.png',
-    '/hero-products/dog_food.png',
-  ];
-
-  const thumbnails = [
-    { type: 'image', src: defaultImages[0] },
-    { type: 'image', src: defaultImages[1] },
-    { type: 'image', src: defaultImages[2] },
-    { type: 'image', src: defaultImages[3] },
-    { type: 'video', src: defaultImages[0] },
-  ];
+  // Reset activeIndex to 0 whenever images array changes (e.g. when variant selection changes)
+  const currentImages = Array.isArray(images) && images.length > 0 ? images : ['/hero-products/dog_food.png'];
+  
+  const thumbnails = currentImages.map((src) => ({
+    type: 'image',
+    src,
+  }));
 
   return (
     <div className={styles.galleryWrapper}>

@@ -1,16 +1,20 @@
 "use client";
 
-import React, { useState, useRef, ChangeEvent } from 'react';
-import { Star, X, CheckCircle2, Camera, Image as ImageIcon, Loader2 } from 'lucide-react';
+import React, { useState, useRef, ChangeEvent, useEffect } from 'react';
+import { Star, X, CheckCircle2, Camera, Image as ImageIcon, Loader2, AlertCircle, ShoppingBag } from 'lucide-react';
 import Image from 'next/image';
 import styles from './WriteReviewModal.module.css';
 import { Product } from './ProductDetail';
+import { reviewService } from '@/services/reviewService';
+import { ReviewItem } from '@/types/review';
+import { api } from '@/services/api';
 
 interface WriteReviewModalProps {
   product: Product;
+  orderId?: string;
   isOpen: boolean;
   onClose: () => void;
-  onSubmitSuccess?: (reviewData: { rating: number; message: string; photos: string[] }) => void;
+  onSubmitSuccess?: (review: ReviewItem) => void;
 }
 
 const RATING_LABELS: Record<number, string> = {
@@ -65,7 +69,6 @@ async function compressImageToWebP(file: File, maxSizeBytes: number = 2 * 1024 *
           return Math.round((base64Length * 3) / 4);
         };
 
-        // Iteratively lower quality if still over target max byte size
         while (calculateByteSize(dataUrl) > maxSizeBytes && quality > 0.2) {
           quality -= 0.1;
           dataUrl = canvas.toDataURL('image/webp', quality);
@@ -79,17 +82,77 @@ async function compressImageToWebP(file: File, maxSizeBytes: number = 2 * 1024 *
   });
 }
 
-export function WriteReviewModal({ product, isOpen, onClose, onSubmitSuccess }: WriteReviewModalProps) {
+export function WriteReviewModal({
+  product,
+  orderId: initialOrderId,
+  isOpen,
+  onClose,
+  onSubmitSuccess,
+}: WriteReviewModalProps) {
   const [rating, setRating] = useState<number>(5);
   const [hoverRating, setHoverRating] = useState<number>(0);
+  const [title, setTitle] = useState<string>('');
   const [message, setMessage] = useState<string>('');
   const [previewImages, setPreviewImages] = useState<string[]>([]);
+  const [orderId, setOrderId] = useState<string>(initialOrderId || '');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [isCompressing, setIsCompressing] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successToast, setSuccessToast] = useState<string | null>(null);
+  const [checkingPurchaser, setCheckingPurchaser] = useState<boolean>(false);
+  const [isVerifiedPurchaser, setIsVerifiedPurchaser] = useState<boolean>(true);
 
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync initial orderId if provided
+  useEffect(() => {
+    if (initialOrderId) {
+      setOrderId(initialOrderId);
+    }
+  }, [initialOrderId]);
+
+  // If orderId is missing, check user orders for delivered item
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const checkDeliveredOrder = async () => {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+      if (!token) {
+        // Guest user: allowed to enter orderId manually or inform them
+        return;
+      }
+
+      if (initialOrderId) {
+        setOrderId(initialOrderId);
+        return;
+      }
+
+      try {
+        setCheckingPurchaser(true);
+        const res = await api<{ success: boolean; orders: Array<{ id: string; orderStatus: string; items: Array<{ productId: string }> }> }>('/orders');
+        if (res && res.orders) {
+          const deliveredMatch = res.orders.find(
+            (o) =>
+              (o.orderStatus === 'DELIVERED' || o.orderStatus === 'Delivered') &&
+              o.items?.some((it) => it.productId === product.id)
+          );
+          if (deliveredMatch) {
+            setOrderId(deliveredMatch.id);
+            setIsVerifiedPurchaser(true);
+          }
+        }
+      } catch (err) {
+        console.warn('Could not auto-fetch delivered orders:', err);
+      } finally {
+        setCheckingPurchaser(false);
+      }
+    };
+
+    checkDeliveredOrder();
+  }, [isOpen, initialOrderId, product.id]);
 
   if (!isOpen) return null;
 
@@ -97,14 +160,21 @@ export function WriteReviewModal({ product, isOpen, onClose, onSubmitSuccess }: 
     const validFiles = Array.from(files).filter((f) => f.type.startsWith('image/'));
     if (validFiles.length === 0) return;
 
+    if (previewImages.length + validFiles.length > 5) {
+      setErrorMessage('You can upload up to 5 photos per review.');
+      return;
+    }
+
     setIsCompressing(true);
+    setErrorMessage(null);
     try {
       const compressedWebpUrls = await Promise.all(
         validFiles.map((file) => compressImageToWebP(file, 2 * 1024 * 1024))
       );
-      setPreviewImages((prev) => [...prev, ...compressedWebpUrls]);
+      setPreviewImages((prev) => [...prev, ...compressedWebpUrls].slice(0, 5));
     } catch (err) {
       console.error('Image compression failed:', err);
+      setErrorMessage('Failed to process image. Please try another file.');
     } finally {
       setIsCompressing(false);
     }
@@ -148,16 +218,59 @@ export function WriteReviewModal({ product, isOpen, onClose, onSubmitSuccess }: 
     setPreviewImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitted(true);
-    if (onSubmitSuccess) {
-      onSubmitSuccess({ rating, message, photos: previewImages });
+    setErrorMessage(null);
+
+    // Client-side validations
+    if (!message || message.trim().length < 10) {
+      setErrorMessage('Please write at least 10 characters sharing your honest feedback.');
+      return;
     }
-    setTimeout(() => {
-      setIsSubmitted(false);
-      onClose();
-    }, 1600);
+
+    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+    if (!token) {
+      setErrorMessage('Please log in to submit a verified purchase review.');
+      return;
+    }
+
+    const effectiveOrderId = orderId.trim();
+    if (!effectiveOrderId) {
+      setErrorMessage('Review submission requires a verified delivered order. Please select or provide your Order ID.');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const res = await reviewService.createReview({
+        productId: product.id,
+        orderId: effectiveOrderId,
+        rating,
+        title: title.trim() || undefined,
+        comment: message.trim(),
+        photos: previewImages.length > 0 ? previewImages : undefined,
+      });
+
+      // Instant live feedback toast
+      setSuccessToast('Thank you for your feedback! Your review is now live.');
+      setIsSubmitted(true);
+
+      if (onSubmitSuccess && res.review) {
+        onSubmitSuccess(res.review);
+      }
+
+      setTimeout(() => {
+        setIsSubmitted(false);
+        setSuccessToast(null);
+        onClose();
+      }, 2000);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to submit review. Please try again.';
+      setErrorMessage(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const activeRating = hoverRating || rating;
@@ -165,7 +278,6 @@ export function WriteReviewModal({ product, isOpen, onClose, onSubmitSuccess }: 
   return (
     <div className={styles.backdrop} onClick={onClose}>
       <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
-        
         {/* Header */}
         <div className={styles.modalHeader}>
           <div>
@@ -179,21 +291,65 @@ export function WriteReviewModal({ product, isOpen, onClose, onSubmitSuccess }: 
           </button>
         </div>
 
+        {/* Live Feedback Toast Notification */}
+        {successToast && (
+          <div
+            style={{
+              background: '#ECFDF5',
+              border: '1px solid #A7F3D0',
+              color: '#065F46',
+              padding: '0.75rem 1rem',
+              borderRadius: '12px',
+              fontSize: '0.85rem',
+              fontWeight: '600',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              animation: 'fadeIn 0.2s ease',
+            }}
+          >
+            <CheckCircle2 size={18} className="shrink-0 text-emerald-600" />
+            <span>{successToast}</span>
+          </div>
+        )}
+
+        {/* Error Alert */}
+        {errorMessage && (
+          <div
+            style={{
+              background: '#FFF1F2',
+              border: '1px solid #FECDD3',
+              color: '#9F1239',
+              padding: '0.65rem 0.9rem',
+              borderRadius: '10px',
+              fontSize: '0.8rem',
+              fontWeight: '500',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+            }}
+          >
+            <AlertCircle size={16} className="shrink-0 text-rose-600" />
+            <span>{errorMessage}</span>
+          </div>
+        )}
+
         {isSubmitted ? (
           <div className={styles.successState}>
             <div className={styles.successIconWrap}>
-              <CheckCircle2 size={36} />
+              <CheckCircle2 size={40} />
             </div>
-            <h4 className={styles.successTitle}>Thank You for Your Review!</h4>
-            <p className={styles.successText}>Your rating and feedback have been submitted successfully.</p>
+            <h4 className={styles.successTitle}>Thank You for Your Feedback!</h4>
+            <p className={styles.successText}>
+              Your review is now live on the storefront. We appreciate your honest opinion!
+            </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className={styles.form}>
-            
             {/* Star Rating Section */}
             <div className={styles.fieldGroup}>
               <div className={styles.labelRow}>
-                <label className={styles.label}>Overall Rating</label>
+                <label className={styles.label}>Overall Rating *</label>
               </div>
 
               <div className={styles.starPickerContainer}>
@@ -224,28 +380,86 @@ export function WriteReviewModal({ product, isOpen, onClose, onSubmitSuccess }: 
               </div>
             </div>
 
-            {/* Review Message Textarea (Optional) */}
+            {/* Review Title Input (Optional) */}
             <div className={styles.fieldGroup}>
               <div className={styles.labelRow}>
-                <label className={styles.label}>Your Message</label>
+                <label className={styles.label}>Review Title</label>
                 <span className={styles.optionalBadge}>Optional</span>
               </div>
-              <textarea
+              <input
+                type="text"
                 className={styles.textarea}
-                placeholder="Write your review here..."
-                rows={3}
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
+                style={{ minHeight: '44px', height: '44px', padding: '0.5rem 0.75rem' }}
+                placeholder="e.g., Best purchase for my pet this year!"
+                value={title}
+                maxLength={150}
+                onChange={(e) => setTitle(e.target.value)}
               />
             </div>
 
-            {/* Photo / Image Upload Section (Optional) */}
+            {/* Review Comment Textarea (Required, min 10 chars) */}
             <div className={styles.fieldGroup}>
               <div className={styles.labelRow}>
-                <label className={styles.label}>Add Photos</label>
+                <label className={styles.label}>Your Review *</label>
+                <span
+                  style={{
+                    fontSize: '0.7rem',
+                    color: message.trim().length >= 10 ? '#2E7D32' : '#888276',
+                  }}
+                >
+                  {message.trim().length}/10 min chars
+                </span>
+              </div>
+              <textarea
+                className={styles.textarea}
+                placeholder="Write your honest thoughts... (Minimum 10 characters. All genuine feedback goes live immediately!)"
+                rows={3}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                required
+              />
+            </div>
+
+            {/* Delivered Order Verification Field */}
+            {!initialOrderId && (
+              <div className={styles.fieldGroup}>
+                <div className={styles.labelRow}>
+                  <label className={styles.label}>Verified Order ID *</label>
+                  <span className={styles.optionalBadge}>Delivered Only</span>
+                </div>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="text"
+                    className={styles.textarea}
+                    style={{ minHeight: '44px', height: '44px', padding: '0.5rem 0.75rem' }}
+                    placeholder="Enter delivered order ID (e.g., ORD-89241)"
+                    value={orderId}
+                    onChange={(e) => setOrderId(e.target.value)}
+                    required
+                  />
+                  {checkingPurchaser && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        right: '10px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                      }}
+                    >
+                      <Loader2 size={16} className={styles.spinIcon} />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Photo / Image Upload Section (Optional, up to 5 photos) */}
+            <div className={styles.fieldGroup}>
+              <div className={styles.labelRow}>
+                <label className={styles.label}>Add Photos (Up to 5)</label>
                 <span className={styles.optionalBadge}>Optional</span>
               </div>
-              
+
               {/* Hidden File Input for Gallery */}
               <input
                 type="file"
@@ -266,7 +480,7 @@ export function WriteReviewModal({ product, isOpen, onClose, onSubmitSuccess }: 
                 onChange={handleImageUpload}
               />
 
-              <div 
+              <div
                 className={`${styles.uploadOptionsContainer} ${isDragging ? styles.uploadDragging : ''}`}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -281,16 +495,16 @@ export function WriteReviewModal({ product, isOpen, onClose, onSubmitSuccess }: 
                       e.stopPropagation();
                       galleryInputRef.current?.click();
                     }}
-                    disabled={isCompressing}
+                    disabled={isCompressing || previewImages.length >= 5}
                   >
                     <div className={styles.optionIconBadge}>
                       {isCompressing ? <Loader2 size={17} className={styles.spinIcon} /> : <ImageIcon size={17} />}
                     </div>
                     <div className={styles.optionTextGroup}>
                       <span className={styles.optionTitle}>
-                        {isCompressing ? 'Processing...' : 'Upload from Gallery'}
+                        {isCompressing ? 'Processing...' : 'Upload Photos'}
                       </span>
-                      <span className={styles.optionSub}>Select from device</span>
+                      <span className={styles.optionSub}>Drag & drop or browse</span>
                     </div>
                   </button>
 
@@ -302,16 +516,14 @@ export function WriteReviewModal({ product, isOpen, onClose, onSubmitSuccess }: 
                       e.stopPropagation();
                       cameraInputRef.current?.click();
                     }}
-                    disabled={isCompressing}
+                    disabled={isCompressing || previewImages.length >= 5}
                   >
                     <div className={styles.optionIconBadgeAlt}>
                       {isCompressing ? <Loader2 size={17} className={styles.spinIcon} /> : <Camera size={17} />}
                     </div>
                     <div className={styles.optionTextGroup}>
-                      <span className={styles.optionTitle}>
-                        {isCompressing ? 'Processing...' : 'Take a Photo'}
-                      </span>
-                      <span className={styles.optionSub}>Use device camera</span>
+                      <span className={styles.optionTitle}>Take Photo</span>
+                      <span className={styles.optionSub}>Use mobile camera</span>
                     </div>
                   </button>
                 </div>
@@ -333,10 +545,10 @@ export function WriteReviewModal({ product, isOpen, onClose, onSubmitSuccess }: 
                       <button
                         type="button"
                         className={styles.removeThumbBtn}
-                        onClick={(e) => { 
-                          e.preventDefault(); 
-                          e.stopPropagation(); 
-                          removeImage(index); 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          removeImage(index);
                         }}
                         aria-label="Remove image"
                       >
@@ -350,16 +562,26 @@ export function WriteReviewModal({ product, isOpen, onClose, onSubmitSuccess }: 
 
             {/* Modal Action Buttons */}
             <div className={styles.actions}>
-              <button type="button" onClick={onClose} className={styles.cancelBtn}>
+              <button type="button" onClick={onClose} className={styles.cancelBtn} disabled={isSubmitting}>
                 Cancel
               </button>
-              <button type="submit" className={styles.submitBtn} disabled={isCompressing}>
-                Submit Review
+              <button
+                type="submit"
+                className={styles.submitBtn}
+                disabled={isSubmitting || isCompressing || message.trim().length < 10}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 size={15} className={styles.spinIcon} />
+                    <span>Publishing...</span>
+                  </>
+                ) : (
+                  <span>Submit Review</span>
+                )}
               </button>
             </div>
           </form>
         )}
-
       </div>
     </div>
   );

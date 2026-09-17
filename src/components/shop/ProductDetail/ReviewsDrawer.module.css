@@ -429,3 +429,77 @@
   justify-content: center;
   cursor: pointer;
 }
+
+/* Official Store Reply Box */
+.adminReplyBox {
+  margin-top: 0.75rem;
+  background: #FAF7F2;
+  border-left: 3px solid #F99205;
+  border-radius: 0 12px 12px 0;
+  padding: 0.85rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  border-top: 1px solid rgba(249, 146, 5, 0.1);
+  border-right: 1px solid rgba(249, 146, 5, 0.1);
+  border-bottom: 1px solid rgba(249, 146, 5, 0.1);
+}
+
+.adminReplyHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.adminReplyBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.725rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #D96A00;
+  background: rgba(249, 146, 5, 0.12);
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+}
+
+.adminReplyDate {
+  font-size: 0.725rem;
+  color: #888276;
+  font-weight: 500;
+}
+
+.adminReplyText {
+  font-size: 0.85rem;
+  color: #363028;
+  line-height: 1.55;
+  margin: 0;
+  font-style: italic;
+}
+
+/* Mobile Touch Target Optimizations (44px min for mobile 375px) */
+@media (max-width: 640px) {
+  .closeBtn {
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
+  }
+  .filterPill {
+    min-height: 44px;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+  .helpfulBtn {
+    min-height: 44px;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+  .writeBtn {
+    min-height: 44px;
+    padding: 0.6rem 1.25rem;
+  }
+}
