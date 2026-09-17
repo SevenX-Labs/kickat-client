@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  User, Package, MapPin, CreditCard, Heart, Settings, Crown, ChevronRight 
+import {
+  Package, User, MapPin, CreditCard, Shield, Heart, Crown,
+  ChevronRight, Bell
 } from 'lucide-react';
 import styles from './Account.module.css';
 import AccountSidebarNav from '@/components/account/AccountSidebarNav';
@@ -12,58 +13,51 @@ import { useAuth } from '@/context/AuthContext';
 import { profileService } from '@/services/profileService';
 
 function AccountMainHubContent() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const tab = searchParams.get('tab');
   const { user, setUser, isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const tab = searchParams.get('tab');
 
-  // Redirect to login if user is not logged in
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.replace(`/login?redirect=${encodeURIComponent('/account')}`);
-    }
-  }, [isLoading, isAuthenticated, router]);
+  const [userData, setUserData] = useState({
+    firstName: "KickAt",
+    lastName: "Member",
+    email: "member@kickat.co.in",
+    phone: "Not provided",
+    tier: "Gold Paw VIP",
+    points: 1240,
+  });
 
-  // Handle URL redirects for legacy tab search params
+  // Query parameter redirect handler for legacy query params
   useEffect(() => {
-    if (tab === 'profile') {
-      router.replace('/account/profile');
-    } else if (tab === 'orders') {
+    if (tab === 'orders') {
       router.replace('/account/orders');
     } else if (tab === 'addresses') {
       router.replace('/account/addresses');
     } else if (tab === 'payments' || tab === 'payment-methods') {
       router.replace('/account/payment-methods');
-    } else if (tab === 'settings') {
-      router.replace('/account/settings');
+    } else if (tab === 'profile') {
+      router.replace('/account/profile');
     } else if (tab === 'wishlist') {
-      router.replace('/wishlist');
+      router.replace('/account/wishlist');
+    } else if (tab === 'notifications') {
+      router.replace('/account/notifications');
+    } else if (tab === 'privacy' || tab === 'settings') {
+      router.replace('/account/privacy');
     }
   }, [tab, router]);
 
-  const [userData, setUserData] = useState({
-    firstName: 'KickAt',
-    lastName: 'Member',
-    email: '',
-    phone: '',
-    memberSince: '2025',
-    totalOrders: 0,
-    points: 100,
-    tier: 'KickAt VIP',
-    currency: 'INR (₹)'
-  });
-
-  // Fetch complete profile details from backend for sidebar card
+  // Auth Guard
   useEffect(() => {
-    document.title = "My Account | KickAt";
-
-    if (!isAuthenticated && !isLoading) return;
+    if (!isLoading && !isAuthenticated) {
+      router.push('/login?redirect=/account');
+      return;
+    }
 
     const fetchFullProfile = async () => {
       try {
         const res: any = await profileService.getProfile();
         const profileUser = res?.profile?.user || res?.user || res?.data || res;
-        
+
         if (profileUser) {
           setUser(profileUser);
           const nameParts = (profileUser.name || '').trim().split(' ');
@@ -107,13 +101,13 @@ function AccountMainHubContent() {
     <div className={styles.pageWrapper}>
       <main className={styles.container}>
         <div className={styles.accountLayout}>
-          
+
           {/* Left Column: Sidebar Navigation List */}
           <AccountSidebarNav user={userData} />
 
           {/* Right Column: Desktop Dashboard Panel (Hidden on Mobile) */}
           <div className={styles.desktopDashboardPanel}>
-            
+
             {/* Welcome Banner */}
             <div className={styles.dashboardWelcomeBanner}>
               <div className={styles.welcomeTextGroup}>
@@ -132,9 +126,9 @@ function AccountMainHubContent() {
               </Link>
             </div>
 
-            {/* Shortcut Grid */}
+            {/* Shortcut Overview Cards */}
             <div className={styles.dashboardShortcutGrid}>
-              
+
               {/* 1. Profile Details */}
               <Link href="/account/profile" className={styles.shortcutCard}>
                 <div className={styles.shortcutCardHeader}>
@@ -143,10 +137,10 @@ function AccountMainHubContent() {
                   </div>
                   <ChevronRight size={18} className={styles.shortcutChevron} />
                 </div>
-                <h2 className={styles.shortcutTitle}>Profile Details</h2>
-                <p className={styles.shortcutDesc}>Personal identity, contact information, phone status & verification details.</p>
+                <h2 className={styles.shortcutTitle}>PROFILE</h2>
+                <p className={styles.shortcutDesc}>{userData.firstName} {userData.lastName}</p>
                 <div className={styles.shortcutMetaBadge}>
-                  <span>{userData.email}</span>
+                  <span>View Profile</span>
                 </div>
               </Link>
 
@@ -158,10 +152,10 @@ function AccountMainHubContent() {
                   </div>
                   <ChevronRight size={18} className={styles.shortcutChevron} />
                 </div>
-                <h2 className={styles.shortcutTitle}>My Orders</h2>
-                <p className={styles.shortcutDesc}>Track active shipments, view past order history & manage tax invoices.</p>
+                <h2 className={styles.shortcutTitle}>ORDERS</h2>
+                <p className={styles.shortcutDesc}>Track & manage recent order purchases.</p>
                 <div className={styles.shortcutMetaBadge}>
-                  <span>Track & Manage Orders</span>
+                  <span>View Orders</span>
                 </div>
               </Link>
 
@@ -173,10 +167,10 @@ function AccountMainHubContent() {
                   </div>
                   <ChevronRight size={18} className={styles.shortcutChevron} />
                 </div>
-                <h2 className={styles.shortcutTitle}>Saved Addresses</h2>
-                <p className={styles.shortcutDesc}>Delivery addresses for fast checkout, home/office tags & pincode details.</p>
+                <h2 className={styles.shortcutTitle}>ADDRESSES</h2>
+                <p className={styles.shortcutDesc}>Manage home & office delivery addresses.</p>
                 <div className={styles.shortcutMetaBadge}>
-                  <span>Delivery Locations</span>
+                  <span>Manage Addresses</span>
                 </div>
               </Link>
 
@@ -188,40 +182,55 @@ function AccountMainHubContent() {
                   </div>
                   <ChevronRight size={18} className={styles.shortcutChevron} />
                 </div>
-                <h2 className={styles.shortcutTitle}>Payment Methods</h2>
-                <p className={styles.shortcutDesc}>Saved credit/debit cards, UPI VPA handles & quick payment options.</p>
+                <h2 className={styles.shortcutTitle}>PAYMENTS</h2>
+                <p className={styles.shortcutDesc}>Saved payment options & checkout preferences.</p>
                 <div className={styles.shortcutMetaBadge}>
-                  <span>Cards & UPI Options</span>
+                  <span>View Payment Methods</span>
                 </div>
               </Link>
 
               {/* 5. Wishlist */}
-              <Link href="/wishlist" className={styles.shortcutCard}>
+              <Link href="/account/wishlist" className={styles.shortcutCard}>
                 <div className={styles.shortcutCardHeader}>
                   <div className={styles.shortcutIconWrap}>
                     <Heart size={22} color="#F99205" />
                   </div>
                   <ChevronRight size={18} className={styles.shortcutChevron} />
                 </div>
-                <h2 className={styles.shortcutTitle}>Wishlist</h2>
-                <p className={styles.shortcutDesc}>Saved favorite products, pet supplies & saved items for later purchase.</p>
+                <h2 className={styles.shortcutTitle}>WISHLIST</h2>
+                <p className={styles.shortcutDesc}>Your favorite saved pet supplies.</p>
                 <div className={styles.shortcutMetaBadge}>
-                  <span>Saved Pet Items</span>
+                  <span>View Wishlist</span>
                 </div>
               </Link>
 
-              {/* 6. Settings & Privacy */}
-              <Link href="/account/settings" className={styles.shortcutCard}>
+              {/* 6. Notifications */}
+              <Link href="/account/notifications" className={styles.shortcutCard}>
                 <div className={styles.shortcutCardHeader}>
                   <div className={styles.shortcutIconWrap}>
-                    <Settings size={22} color="#F99205" />
+                    <Bell size={22} color="#F99205" />
                   </div>
                   <ChevronRight size={18} className={styles.shortcutChevron} />
                 </div>
-                <h2 className={styles.shortcutTitle}>Settings & Privacy</h2>
-                <p className={styles.shortcutDesc}>Notification settings, promotional updates & account privacy preferences.</p>
+                <h2 className={styles.shortcutTitle}>NOTIFICATIONS</h2>
+                <p className={styles.shortcutDesc}>Order updates & promotional alerts.</p>
                 <div className={styles.shortcutMetaBadge}>
-                  <span>Account Preferences</span>
+                  <span>View Notifications</span>
+                </div>
+              </Link>
+
+              {/* 7. Privacy & Security */}
+              <Link href="/account/privacy" className={styles.shortcutCard}>
+                <div className={styles.shortcutCardHeader}>
+                  <div className={styles.shortcutIconWrap}>
+                    <Shield size={22} color="#F99205" />
+                  </div>
+                  <ChevronRight size={18} className={styles.shortcutChevron} />
+                </div>
+                <h2 className={styles.shortcutTitle}>PRIVACY & SECURITY</h2>
+                <p className={styles.shortcutDesc}>Manage account security & data privacy.</p>
+                <div className={styles.shortcutMetaBadge}>
+                  <span>Manage Privacy</span>
                 </div>
               </Link>
 

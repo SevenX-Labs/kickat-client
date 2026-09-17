@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { 
-  Package, User, MapPin, CreditCard, Settings, Heart, LogOut, Crown, 
-  ChevronRight, Headphones 
+import {
+  Package, User, MapPin, CreditCard, Shield, Heart, LogOut, Crown,
+  ChevronRight, Headphones, Bell
 } from "lucide-react";
 import styles from "./AccountSidebarNav.module.css";
 import { useAuth } from "@/context/AuthContext";
@@ -28,10 +28,10 @@ const defaultUser: UserProps = {
   tier: "KickAt VIP"
 };
 
-export default function AccountSidebarNav({ 
+export default function AccountSidebarNav({
   user = defaultUser
-}: { 
-  user?: UserProps; 
+}: {
+  user?: UserProps;
   onEditProfile?: () => void;
 }) {
   const pathname = usePathname();
@@ -47,10 +47,11 @@ export default function AccountSidebarNav({
   // Determine active route item
   const isOrdersActive = pathname.startsWith("/orders") || pathname.startsWith("/account/orders");
   const isWishlistActive = pathname.startsWith("/wishlist") || pathname.startsWith("/account/wishlist");
-  const isAddressesActive = pathname === "/account/addresses" || (pathname === "/account" && currentTab === "addresses");
-  const isPaymentsActive = pathname === "/account/payment-methods" || (pathname === "/account" && (currentTab === "payments" || currentTab === "payment-methods"));
-  const isSettingsActive = pathname === "/account/settings" || (pathname === "/account" && currentTab === "settings");
-  const isProfileActive = pathname === "/account/profile";
+  const isAddressesActive = pathname.startsWith("/account/addresses") || (pathname === "/account" && currentTab === "addresses");
+  const isPaymentsActive = pathname.startsWith("/account/payment-methods") || (pathname === "/account" && (currentTab === "payments" || currentTab === "payment-methods"));
+  const isProfileActive = pathname === "/account/profile" || (pathname === "/account" && currentTab === "profile");
+  const isNotificationsActive = pathname === "/account/notifications" || (pathname === "/account" && currentTab === "notifications");
+  const isPrivacyActive = pathname === "/account/privacy" || pathname === "/account/settings" || (pathname === "/account" && (currentTab === "privacy" || currentTab === "settings"));
 
   const menuItems = [
     {
@@ -89,17 +90,25 @@ export default function AccountSidebarNav({
       id: "wishlist",
       title: "Wishlist",
       subtitle: "Your favorite saved pet items",
-      href: "/wishlist",
+      href: "/account/wishlist",
       isActive: isWishlistActive,
       Icon: Heart,
     },
     {
-      id: "settings",
-      title: "Settings",
-      subtitle: "Notifications & account privacy",
-      href: "/account/settings",
-      isActive: isSettingsActive,
-      Icon: Settings,
+      id: "notifications",
+      title: "Notifications",
+      subtitle: "Order updates & promotional alerts",
+      href: "/account/notifications",
+      isActive: isNotificationsActive,
+      Icon: Bell,
+    },
+    {
+      id: "privacy",
+      title: "Privacy & Security",
+      subtitle: "Account security & privacy settings",
+      href: "/account/privacy",
+      isActive: isPrivacyActive,
+      Icon: Shield,
     },
   ];
 
