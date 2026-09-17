@@ -39,7 +39,7 @@ function GoogleCallbackContent() {
           const user = await loginWithToken(tokenParam);
           setLoggedInUser(user);
           setIsSuccessModalOpen(true);
-          const redirectTarget = isNewUser ? "/account" : "/";
+          const redirectTarget = isNewUser ? "/onboarding" : "/account";
           setTimeout(() => {
             router.push(redirectTarget);
           }, 2500);
@@ -67,7 +67,7 @@ function GoogleCallbackContent() {
             setLoggedInUser(res.user);
             setIsSuccessModalOpen(true);
             
-            const redirectTarget = res.isNewUser ? "/account" : "/";
+            const redirectTarget = res.isNewUser ? "/onboarding" : "/account";
             setTimeout(() => {
               router.push(redirectTarget);
             }, 2500);

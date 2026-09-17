@@ -51,7 +51,7 @@ function GoogleCallbackContent() {
 
         setTimeout(() => {
           if (isNewUser || isProfileIncomplete) {
-            router.replace('/profile?onboarding=true');
+            router.replace('/onboarding');
           } else {
             router.replace('/account');
           }

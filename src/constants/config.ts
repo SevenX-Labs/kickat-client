@@ -10,6 +10,7 @@ export const ROUTES = {
   PRODUCT: (id: string) => `/products/${id}`,
   CART: '/cart',
   CHECKOUT: '/checkout',
-  PROFILE: '/profile',
+  ACCOUNT: '/account',
+  ONBOARDING: '/onboarding',
   LOGIN: '/login',
 };

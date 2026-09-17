@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { usePathname, useSearchParams, useRouter } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { 
   Package, User, MapPin, CreditCard, Settings, Heart, LogOut, Crown, 
   ChevronRight, ChevronLeft, Headphones 
@@ -36,8 +36,7 @@ export default function AccountSidebarNav({
 }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const router = useRouter();
-  const { logout, showSignOutModal } = useAuth();
+  const { showSignOutModal } = useAuth();
 
   const handleSignOut = () => {
     showSignOutModal();
@@ -51,10 +50,10 @@ export default function AccountSidebarNav({
   const isAddressesActive = pathname === '/account/addresses' || (pathname === '/account' && currentTab === 'addresses');
   const isPaymentsActive = pathname === '/account/payment-methods' || (pathname === '/account' && (currentTab === 'payments' || currentTab === 'payment-methods'));
   const isSettingsActive = pathname === '/account/settings' || (pathname === '/account' && currentTab === 'settings');
-  const isProfileActive = (pathname === '/account' && currentTab === 'profile') || pathname === '/account/profile' || (pathname === '/account' && !currentTab);
+  const isProfileActive = (pathname === '/account' && (currentTab === 'profile' || !currentTab));
 
   // Sub-page active status on mobile
-  const isSubPage = isOrdersActive || isWishlistActive || isAddressesActive || isPaymentsActive || isSettingsActive || (pathname === '/account' && currentTab !== null) || pathname === '/account/profile';
+  const isSubPage = isOrdersActive || isWishlistActive || isAddressesActive || isPaymentsActive || isSettingsActive || (pathname === '/account' && currentTab !== null);
 
   const menuItems = [
     {
