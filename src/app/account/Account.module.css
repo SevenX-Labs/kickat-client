@@ -641,3 +641,185 @@
     display: none !important;
   }
 }
+
+
+/* ── DESKTOP DASHBOARD PANEL ── */
+.desktopDashboardPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.dashboardWelcomeBanner {
+  background: linear-gradient(135deg, #ffffff 0%, #FFFDFB 100%);
+  border: 1px solid #EBE5DB;
+  border-radius: 20px;
+  padding: 1.75rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.025);
+}
+
+.welcomeTextGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.welcomeVipBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #FFF5EE;
+  border: 1px solid rgba(249, 146, 5, 0.25);
+  border-radius: 12px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.725rem;
+  font-weight: 800;
+  color: #F99205;
+  width: fit-content;
+}
+
+.welcomeHeading {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: #1A1612;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.welcomeSubheading {
+  font-size: 0.875rem;
+  color: #78746D;
+  margin: 0;
+  max-width: 520px;
+  line-height: 1.5;
+}
+
+.manageProfileBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #F99205;
+  color: #ffffff;
+  padding: 0.65rem 1.25rem;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 14px rgba(249, 146, 5, 0.25);
+  flex-shrink: 0;
+}
+
+.manageProfileBtn:hover {
+  background: #E08304;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(249, 146, 5, 0.35);
+}
+
+.dashboardShortcutGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.shortcutCard {
+  background: #ffffff;
+  border: 1px solid #EBE5DB;
+  border-radius: 18px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  text-decoration: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.015);
+  position: relative;
+  box-sizing: border-box;
+}
+
+.shortcutCard:hover {
+  border-color: rgba(249, 146, 5, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(249, 146, 5, 0.08);
+}
+
+.shortcutCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.shortcutIconWrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #FFF5EE;
+  border: 1px solid rgba(249, 146, 5, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.shortcutCard:hover .shortcutIconWrap {
+  background: #F99205;
+}
+
+.shortcutCard:hover .shortcutIconWrap svg {
+  color: #ffffff !important;
+}
+
+.shortcutChevron {
+  color: #C2BCB2;
+  transition: all 0.2s ease;
+}
+
+.shortcutCard:hover .shortcutChevron {
+  color: #F99205;
+  transform: translateX(4px);
+}
+
+.shortcutTitle {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1A1612;
+  margin: 0;
+}
+
+.shortcutCard:hover .shortcutTitle {
+  color: #F99205;
+}
+
+.shortcutDesc {
+  font-size: 0.8125rem;
+  color: #78746D;
+  margin: 0;
+  line-height: 1.45;
+  flex: 1;
+}
+
+.shortcutMetaBadge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #A39D93;
+  padding-top: 0.5rem;
+  border-top: 1px solid #F5EFE6;
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .desktopDashboardPanel {
+    display: none !important;
+  }
+}
