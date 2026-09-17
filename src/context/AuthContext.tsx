@@ -27,9 +27,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const initAuth = async () => {
+      let isLoggedIn = false;
+
       if (typeof window !== 'undefined') {
         const storedToken = localStorage.getItem('accessToken');
         const storedUser = localStorage.getItem('user');
+        isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
         if (storedToken) {
           setAccessToken(storedToken);
@@ -43,8 +46,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
 
-      // Execute silent token refresh check ONCE per application session
-      if (!hasCheckedRefreshRef.current) {
+      // Execute silent token refresh check ONCE per session ONLY if previously logged in
+      if (isLoggedIn && !hasCheckedRefreshRef.current) {
         hasCheckedRefreshRef.current = true;
         try {
           const refreshRes = await authService.refreshToken();
@@ -55,7 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
           }
         } catch {
-          // Silent refresh failed (e.g. no cookie or 401), keep local state if available
+          // Silent refresh failed (e.g. cookie expired), retain existing stored session
         }
       }
 
