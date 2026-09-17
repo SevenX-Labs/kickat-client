@@ -374,7 +374,7 @@ export function Navbar() {
                       </div>
                     </div>
                     <div className={styles.accountDropdownList}>
-                      <Link href="/account?tab=profile" className={styles.accountDropdownItem}>
+                      <Link href="/account/profile" className={styles.accountDropdownItem}>
                         <div className={styles.itemLeft}>
                           <span className={styles.itemIconWrap}>
                             <User size={16} strokeWidth={1.8} />
@@ -383,7 +383,7 @@ export function Navbar() {
                         </div>
                         <ChevronRight size={14} strokeWidth={2.2} className={styles.itemArrow} />
                       </Link>
-                      <Link href="/orders" className={styles.accountDropdownItem}>
+                      <Link href="/account/orders" className={styles.accountDropdownItem}>
                         <div className={styles.itemLeft}>
                           <span className={styles.itemIconWrap}>
                             <Package size={16} strokeWidth={1.8} />
@@ -392,7 +392,7 @@ export function Navbar() {
                         </div>
                         <ChevronRight size={14} strokeWidth={2.2} className={styles.itemArrow} />
                       </Link>
-                      <Link href="/account?tab=addresses" className={styles.accountDropdownItem}>
+                      <Link href="/account/addresses" className={styles.accountDropdownItem}>
                         <div className={styles.itemLeft}>
                           <span className={styles.itemIconWrap}>
                             <MapPin size={16} strokeWidth={1.8} />
@@ -401,7 +401,7 @@ export function Navbar() {
                         </div>
                         <ChevronRight size={14} strokeWidth={2.2} className={styles.itemArrow} />
                       </Link>
-                      <Link href="/account?tab=wishlist" className={styles.accountDropdownItem}>
+                      <Link href="/wishlist" className={styles.accountDropdownItem}>
                         <div className={styles.itemLeft}>
                           <span className={styles.itemIconWrap}>
                             <Heart size={16} strokeWidth={1.8} />
@@ -450,7 +450,7 @@ export function Navbar() {
                       </Link>
                     </div>
                     <div className={styles.accountDropdownList}>
-                      <Link href="/orders" className={styles.accountDropdownItem}>
+                      <Link href="/account/orders" className={styles.accountDropdownItem}>
                         <div className={styles.itemLeft}>
                           <span className={styles.itemIconWrap}>
                             <Package size={16} strokeWidth={1.8} />

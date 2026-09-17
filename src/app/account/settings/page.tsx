@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, Suspense } from 'react';
+import Link from 'next/link';
+import {  useState, useEffect, Suspense } from 'react';
 import { 
   Bell, Shield, Trash2, Sparkles, AlertTriangle, X
-} from 'lucide-react';
+, ArrowLeft } from 'lucide-react';
 import accountStyles from '../Account.module.css';
 import styles from './Settings.module.css';
 import AccountSidebarNav from '@/components/account/AccountSidebarNav';
@@ -79,10 +80,19 @@ function SettingsContent() {
         <div className={accountStyles.accountLayout}>
           
           {/* Account Sidebar Nav */}
-          <AccountSidebarNav user={userData} />
+          <div className={accountStyles.subpageSidebarWrapper}>
+            <AccountSidebarNav user={userData} />
+          </div>
 
           {/* Main Content Area */}
           <div className={accountStyles.contentArea}>
+            <div className={accountStyles.backHeaderGroup}>
+              <Link href="/account" className={accountStyles.backToAccountBtn}>
+                <ArrowLeft size={18} />
+                <span>Back to Account</span>
+              </Link>
+            </div>
+
             <div className={accountStyles.tabContentCard}>
               <div className={accountStyles.sectionHeader}>
                 <h1 className={accountStyles.title}>Preferences &amp; Settings</h1>

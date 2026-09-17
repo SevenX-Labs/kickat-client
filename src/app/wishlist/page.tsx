@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect, Suspense } from 'react';
-import { Heart } from 'lucide-react';
+import { Heart, ArrowLeft } from 'lucide-react';
 import styles from './wishlist.module.css';
 import accountStyles from '@/app/account/Account.module.css';
 import AccountSidebarNav from '@/components/account/AccountSidebarNav';
@@ -28,10 +28,19 @@ function WishlistContent() {
         <div className={accountStyles.accountLayout}>
           
           {/* Account Navigation */}
-          <AccountSidebarNav />
+          <div className={accountStyles.subpageSidebarWrapper}>
+            <AccountSidebarNav />
+          </div>
 
           {/* Wishlist Main Content */}
           <div className={accountStyles.contentArea}>
+            <div className={accountStyles.backHeaderGroup}>
+              <Link href="/account" className={accountStyles.backToAccountBtn}>
+                <ArrowLeft size={18} />
+                <span>Back to Account</span>
+              </Link>
+            </div>
+
             <div className={accountStyles.tabContentCard}>
               <div className={accountStyles.sectionHeader}>
                 <h1 className={accountStyles.title}>My Wishlist</h1>

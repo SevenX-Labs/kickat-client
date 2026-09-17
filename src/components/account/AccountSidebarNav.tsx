@@ -50,14 +50,14 @@ export default function AccountSidebarNav({
   const isAddressesActive = pathname === "/account/addresses" || (pathname === "/account" && currentTab === "addresses");
   const isPaymentsActive = pathname === "/account/payment-methods" || (pathname === "/account" && (currentTab === "payments" || currentTab === "payment-methods"));
   const isSettingsActive = pathname === "/account/settings" || (pathname === "/account" && currentTab === "settings");
-  const isProfileActive = (pathname === "/account" && (currentTab === "profile" || (!currentTab && pathname === "/account")));
+  const isProfileActive = pathname === "/account/profile";
 
   const menuItems = [
     {
       id: "profile",
       title: "Profile Details",
       subtitle: "Personal info, email & phone number",
-      href: "/account?tab=profile",
+      href: "/account/profile",
       isActive: isProfileActive,
       Icon: User,
     },

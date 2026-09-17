@@ -7,7 +7,7 @@ import {
   Package, CheckCircle2, Clock, Search, XCircle, 
   ClipboardList, ClipboardCheck, Truck, PackageCheck, Check, ChevronRight, FileText,
   MapPin, AlertCircle, SlidersHorizontal, X, Calendar, CalendarDays, History, ArrowDownWideNarrow, ArrowUpWideNarrow
-} from 'lucide-react';
+, ArrowLeft } from 'lucide-react';
 import styles from '../Account.module.css';
 import AccountSidebarNav from '@/components/account/AccountSidebarNav';
 
@@ -224,13 +224,22 @@ function AccountOrdersContent() {
         <div className={styles.accountLayout}>
           
           {/* Account Navigation Sidebar */}
-          <AccountSidebarNav user={userData} />
+          <div className={styles.subpageSidebarWrapper}>
+            <AccountSidebarNav user={userData} />
+          </div>
 
           {/* Main Orders Content Area */}
           <div className={styles.contentArea}>
             <div className={styles.ordersPageWrapper}>
               
               {/* 1. Header Title Section */}
+              <div className={styles.backHeaderGroup}>
+                <Link href="/account" className={styles.backToAccountBtn}>
+                  <ArrowLeft size={18} />
+                  <span>Back to Account</span>
+                </Link>
+              </div>
+
               <div className={styles.ordersHeaderGroup}>
                 <h1 className={styles.ordersTitle}>My Orders</h1>
                 <p className={styles.ordersSubtitle}>Track, manage and reorder your purchases.</p>

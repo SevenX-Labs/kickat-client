@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, Suspense } from 'react';
+import Link from 'next/link';
+import {  useState, useEffect, Suspense } from 'react';
 import { 
   CreditCard, Plus, Check, Trash2, X, Sparkles, Smartphone, ShieldCheck, Lock, CheckCircle2
-} from 'lucide-react';
+, ArrowLeft } from 'lucide-react';
 import styles from '../Account.module.css';
 import cardStyles from './PaymentMethods.module.css';
 import AccountSidebarNav from '@/components/account/AccountSidebarNav';
@@ -191,10 +192,19 @@ function PaymentMethodsContent() {
         <div className={styles.accountLayout}>
           
           {/* Account Sidebar Nav */}
-          <AccountSidebarNav user={userData} />
+          <div className={styles.subpageSidebarWrapper}>
+            <AccountSidebarNav user={userData} />
+          </div>
 
           {/* Main Content Area */}
           <div className={styles.contentArea}>
+            <div className={styles.backHeaderGroup}>
+              <Link href="/account" className={styles.backToAccountBtn}>
+                <ArrowLeft size={18} />
+                <span>Back to Account</span>
+              </Link>
+            </div>
+
             <div className={styles.tabContentCard}>
               <div className={styles.sectionHeader}>
                 <div className={styles.headerTitleRow}>

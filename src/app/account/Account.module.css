@@ -595,3 +595,43 @@
     display: flex;
   }
 }
+
+
+/* ── BACK TO ACCOUNT TOP NAV BUTTON ── */
+.backHeaderGroup {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  width: 100%;
+}
+
+.backToAccountBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #F99205;
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-decoration: none;
+  background: #ffffff;
+  padding: 0.55rem 1rem;
+  border-radius: 12px;
+  border: 1px solid #EBE5DB;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.backToAccountBtn:hover {
+  background: #FFF5EE;
+  border-color: rgba(249, 146, 5, 0.4);
+  transform: translateX(-2px);
+  color: #E07D00;
+}
+
+/* Subpage Sidebar Wrapper: Hide sidebar on mobile so subpages render ONLY their content */
+@media (max-width: 768px) {
+  .subpageSidebarWrapper {
+    display: none !important;
+  }
+}

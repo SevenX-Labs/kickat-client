@@ -2,9 +2,10 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { 
   MapPin, Plus, Check, Trash2, X, Sparkles 
-} from 'lucide-react';
+, ArrowLeft } from 'lucide-react';
 import styles from '../Account.module.css';
 import AccountSidebarNav from '@/components/account/AccountSidebarNav';
 
@@ -118,10 +119,19 @@ function SavedAddressesContent() {
         <div className={styles.accountLayout}>
           
           {/* Reusable Account Navigation */}
-          <AccountSidebarNav user={userData} />
+          <div className={styles.subpageSidebarWrapper}>
+            <AccountSidebarNav user={userData} />
+          </div>
 
           {/* Main Content Area */}
           <div className={styles.contentArea}>
+            <div className={styles.backHeaderGroup}>
+              <Link href="/account" className={styles.backToAccountBtn}>
+                <ArrowLeft size={18} />
+                <span>Back to Account</span>
+              </Link>
+            </div>
+
             <div className={styles.tabContentCard}>
               <div className={styles.sectionHeader}>
                 <div className={styles.headerTitleRow}>
