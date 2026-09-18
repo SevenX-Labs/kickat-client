@@ -62,9 +62,6 @@ function GoogleCallbackContent() {
           const res = await authService.googleAuth(codeParam, redirectUri);
           
           if (res.accessToken) {
-            localStorage.setItem("accessToken", res.accessToken);
-            localStorage.setItem("user", JSON.stringify(res.user));
-            localStorage.setItem("isLoggedIn", "true");
             setUser(res.user);
             setLoggedInUser(res.user);
             setIsSuccessModalOpen(true);

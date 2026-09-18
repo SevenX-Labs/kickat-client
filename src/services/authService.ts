@@ -1,4 +1,4 @@
-import { api } from './api';
+import { api, setAccessToken } from './api';
 import { CONFIG } from '../constants/config';
 
 export interface AuthUser {
@@ -51,7 +51,7 @@ export const authService = {
 
   /**
    * Verify Mobile OTP (POST /auth/otp/verify)
-   * Sets isPhoneVerified: true and issues tokens (refreshToken in HttpOnly cookie)
+   * Sets isPhoneVerified: true and issues tokens (refreshToken in HttpOnly cookie, accessToken in memory)
    */
   async verifyMobileOtp(phone: string, otp: string): Promise<AuthResponse> {
     const sanitizedPhone = phone.startsWith('+91') ? phone : `+91${phone.replace(/\D/g, '')}`;
@@ -60,10 +60,8 @@ export const authService = {
       data: { phone: sanitizedPhone, otp },
     });
 
-    if (res.accessToken && typeof window !== 'undefined') {
-      localStorage.setItem('accessToken', res.accessToken);
-      localStorage.setItem('user', JSON.stringify(res.user));
-      localStorage.setItem('isLoggedIn', 'true');
+    if (res.accessToken) {
+      setAccessToken(res.accessToken);
     }
 
     return res;
@@ -85,10 +83,8 @@ export const authService = {
       },
     });
 
-    if (res.accessToken && typeof window !== 'undefined') {
-      localStorage.setItem('accessToken', res.accessToken);
-      localStorage.setItem('user', JSON.stringify(res.user));
-      localStorage.setItem('isLoggedIn', 'true');
+    if (res.accessToken) {
+      setAccessToken(res.accessToken);
     }
 
     return res;
@@ -109,9 +105,6 @@ export const authService = {
       method: 'GET',
     });
     const user = res?.profile?.user || res?.data || res?.user || res;
-    if (typeof window !== 'undefined' && user) {
-      localStorage.setItem('user', JSON.stringify(user));
-    }
     return user;
   },
 
@@ -126,12 +119,8 @@ export const authService = {
     const user = res?.profile?.user || res?.data || res?.user;
     const token = res?.accessToken;
 
-    if (token && typeof window !== 'undefined') {
-      localStorage.setItem('accessToken', token);
-      if (user) {
-        localStorage.setItem('user', JSON.stringify(user));
-      }
-      localStorage.setItem('isLoggedIn', 'true');
+    if (token) {
+      setAccessToken(token);
     }
 
     return {
@@ -152,11 +141,7 @@ export const authService = {
     } catch {
       // Ignore API error if session already revoked
     } finally {
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('user');
-        localStorage.removeItem('isLoggedIn');
-      }
+      setAccessToken(null);
     }
     return { success: true, message: 'Logged out successfully' };
   },
@@ -171,11 +156,7 @@ export const authService = {
         data: password ? { password } : {},
       });
     } finally {
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('user');
-        localStorage.removeItem('isLoggedIn');
-      }
+      setAccessToken(null);
     }
     return { success: true, message: 'All sessions revoked successfully' };
   },

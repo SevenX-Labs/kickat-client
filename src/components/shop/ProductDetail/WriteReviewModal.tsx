@@ -5,6 +5,7 @@ import { Star, X, CheckCircle2, Camera, Image as ImageIcon, Loader2, AlertCircle
 import Image from 'next/image';
 import styles from './WriteReviewModal.module.css';
 import { Product } from './ProductDetail';
+import { useAuth } from '@/context/AuthContext';
 import { reviewService } from '@/services/reviewService';
 import { ReviewItem } from '@/types/review';
 import { api } from '@/services/api';
@@ -89,6 +90,7 @@ export function WriteReviewModal({
   onClose,
   onSubmitSuccess,
 }: WriteReviewModalProps) {
+  const { isAuthenticated } = useAuth();
   const [rating, setRating] = useState<number>(5);
   const [hoverRating, setHoverRating] = useState<number>(0);
   const [title, setTitle] = useState<string>('');
@@ -119,8 +121,7 @@ export function WriteReviewModal({
     if (!isOpen) return;
 
     const checkDeliveredOrder = async () => {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-      if (!token) {
+      if (!isAuthenticated) {
         // Guest user: allowed to enter orderId manually or inform them
         return;
       }
@@ -228,8 +229,7 @@ export function WriteReviewModal({
       return;
     }
 
-    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-    if (!token) {
+    if (!isAuthenticated) {
       setErrorMessage('Please log in to submit a verified purchase review.');
       return;
     }

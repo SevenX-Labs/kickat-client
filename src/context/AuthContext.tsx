@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { setAccessToken, setOnUnauthenticated } from '../services/api';
 import { authService, AuthUser, AuthResponse, SendOtpResponse } from '../services/authService';
 
 interface AuthContextType {
@@ -22,57 +23,39 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [accessTokenState, setAccessTokenState] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Initial hydration from localStorage and silent refresh check
+    // Register unauthenticated handler for automatic token refresh failures
+    setOnUnauthenticated(() => {
+      setUser(null);
+      setAccessTokenState(null);
+    });
+
+    // App Initialization: Silent Auth Check via HttpOnly cookie
     const initAuth = async () => {
       try {
-        if (typeof window !== 'undefined') {
-          const storedToken = localStorage.getItem('accessToken');
-          const storedUser = localStorage.getItem('user');
-          const isLoggedIn = localStorage.getItem('isLoggedIn');
-
-          if (storedToken) {
-            setAccessToken(storedToken);
-          }
-          if (storedUser) {
+        const refreshRes = await authService.refreshToken();
+        if (refreshRes.accessToken) {
+          setAccessToken(refreshRes.accessToken);
+          setAccessTokenState(refreshRes.accessToken);
+          if (refreshRes.user) {
+            setUser(refreshRes.user);
+          } else {
             try {
-              setUser(JSON.parse(storedUser));
+              const fetchedUser = await authService.getMe();
+              setUser(fetchedUser);
             } catch {
-              // Ignore JSON parse error
-            }
-          }
-
-          // Only attempt silent token refresh if user was previously logged in or has an access token
-          if (storedToken || isLoggedIn === 'true') {
-            try {
-              const refreshRes = await authService.refreshToken();
-              if (refreshRes.accessToken) {
-                setAccessToken(refreshRes.accessToken);
-                if (refreshRes.user) {
-                  setUser(refreshRes.user);
-                }
-              }
-            } catch {
-              // If refresh fails (e.g., refresh token cookie expired), clear session state cleanly
-              localStorage.removeItem('accessToken');
-              localStorage.removeItem('user');
-              localStorage.removeItem('isLoggedIn');
-              setUser(null);
-              setAccessToken(null);
+              // Ignore if profile fetch fails on init
             }
           }
         }
       } catch {
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('user');
-          localStorage.removeItem('isLoggedIn');
-          setUser(null);
-          setAccessToken(null);
-        }
+        // If refresh fails (e.g., no active session or cookie expired after 30 days), allow clean public browsing
+        setAccessToken(null);
+        setAccessTokenState(null);
+        setUser(null);
       } finally {
         setIsLoading(false);
       }
@@ -89,6 +72,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const res = await authService.verifyMobileOtp(phone, otp);
     if (res.accessToken) {
       setAccessToken(res.accessToken);
+      setAccessTokenState(res.accessToken);
       setUser(res.user);
     }
     return res;
@@ -98,22 +82,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const res = await authService.googleAuth(code, redirectUri);
     if (res.accessToken) {
       setAccessToken(res.accessToken);
+      setAccessTokenState(res.accessToken);
       setUser(res.user);
     }
     return res;
   };
 
   const loginWithToken = async (token: string, providedUser?: AuthUser): Promise<AuthUser> => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('accessToken', token);
-      localStorage.setItem('isLoggedIn', 'true');
-    }
     setAccessToken(token);
+    setAccessTokenState(token);
 
     if (providedUser) {
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('user', JSON.stringify(providedUser));
-      }
       setUser(providedUser);
       return providedUser;
     }
@@ -122,8 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const fetchedUser = await authService.getMe();
       setUser(fetchedUser);
       return fetchedUser;
-    } catch (err) {
-      // If profile fetch fails, fallback to bare user object
+    } catch {
       const fallbackUser: AuthUser = { id: 'user' };
       setUser(fallbackUser);
       return fallbackUser;
@@ -133,22 +111,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async (): Promise<void> => {
     await authService.logout();
     setAccessToken(null);
+    setAccessTokenState(null);
     setUser(null);
   };
 
   const logoutAll = async (password?: string): Promise<void> => {
     await authService.logoutAll(password);
     setAccessToken(null);
+    setAccessTokenState(null);
     setUser(null);
   };
 
-  const isAuthenticated = Boolean(accessToken && user);
+  const isAuthenticated = Boolean(accessTokenState && user);
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        accessToken,
+        accessToken: accessTokenState,
         isAuthenticated,
         isLoading,
         sendMobileOtp,

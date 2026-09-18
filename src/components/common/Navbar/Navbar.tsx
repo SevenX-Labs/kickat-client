@@ -88,7 +88,7 @@ export function Navbar() {
     Birds: 'food'
   });
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
   const [cartCount, setCartCount] = useState(2);
   const [isCartBouncing, setIsCartBouncing] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -121,7 +121,7 @@ export function Navbar() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setIsLoggedIn(localStorage.getItem("isLoggedIn") === "true");
+      
     }
 
     const handleCartItemAdded = () => {
@@ -150,7 +150,7 @@ export function Navbar() {
   }, [pathname]);
 
   const handleAccountClick = () => {
-    if (!isLoggedIn && !isAuthenticated) {
+    if (!isAuthenticated) {
       router.push('/login');
     }
   };
@@ -360,7 +360,7 @@ export function Navbar() {
               </div>
 
               <div className={styles.accountDropdown}>
-                {isLoggedIn ? (
+                {isAuthenticated ? (
                   <>
                     <div className={styles.accountDropdownHeader}>
                       <div className={styles.headerUserRow}>

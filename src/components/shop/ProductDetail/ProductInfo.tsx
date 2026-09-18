@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Star, ShoppingBag, Zap, Ruler, Minus, Plus, Check, X, Dog, Droplets, Waves, Sun } from 'lucide-react';
 import styles from './ProductDetail.module.css';
@@ -16,6 +17,7 @@ interface ProductInfoProps {
 
 export function ProductInfo({ product, selectedVariant, onSelectVariant }: ProductInfoProps) {
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const [selectedColor, setSelectedColor] = useState('Charcoal & Pumpkin');
   const [selectedSize, setSelectedSize] = useState('M');
   const [quantity, setQuantity] = useState(1);
@@ -124,8 +126,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
       return;
     }
     if (isAdding) return;
-    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-    if (!isLoggedIn) {
+    if (!isAuthenticated) {
       router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
       return;
     }
@@ -140,8 +141,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
   };
 
   const handleBuyNow = () => {
-    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-    if (!isLoggedIn) {
+    if (!isAuthenticated) {
       router.push(`/login?redirect=${encodeURIComponent('/checkout')}`);
       return;
     }

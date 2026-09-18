@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, CreditCard, ShieldCheck, ShoppingBag, Trash2 } from 'lucide-react';
@@ -61,6 +62,7 @@ const initialCart = [
 ];
 
 export default function CartPage() {
+  const { isAuthenticated } = useAuth();
   const router = useRouter();
   const [cartItems, setCartItems] = useState(initialCart);
 
@@ -195,8 +197,7 @@ export default function CartPage() {
             
             <button 
               onClick={() => {
-                const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-                if (!isLoggedIn) {
+                if (!isAuthenticated) {
                   router.push('/login?redirect=/checkout');
                 } else {
                   router.push('/checkout');
