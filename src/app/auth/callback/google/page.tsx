@@ -3,9 +3,11 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import Link from 'next/link';
+import { Loader2, CheckCircle2, AlertCircle, ShieldCheck, ArrowRight } from 'lucide-react';
 import { useAuth } from '../../../../context/AuthContext';
 import { OtpSuccessModal } from '@/components/common/OtpSuccessModal/OtpSuccessModal';
+import styles from './GoogleCallback.module.css';
 
 function GoogleCallbackContent() {
   const router = useRouter();
@@ -27,7 +29,7 @@ function GoogleCallbackContent() {
         setErrorMessage(errorParam);
         setTimeout(() => {
           router.replace('/login?error=' + encodeURIComponent(errorParam));
-        }, 1500);
+        }, 2000);
         return;
       }
 
@@ -37,7 +39,7 @@ function GoogleCallbackContent() {
         setErrorMessage(msg);
         setTimeout(() => {
           router.replace('/login?error=' + encodeURIComponent(msg));
-        }, 1500);
+        }, 2000);
         return;
       }
 
@@ -67,7 +69,7 @@ function GoogleCallbackContent() {
         setErrorMessage(msg);
         setTimeout(() => {
           router.replace('/login?error=' + encodeURIComponent(msg));
-        }, 2000);
+        }, 2500);
       }
     };
 
@@ -75,109 +77,85 @@ function GoogleCallbackContent() {
   }, [searchParams, loginWithToken, router]);
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#0F172A',
-        color: '#F8FAFC',
-        fontFamily: 'var(--font-sans, system-ui, sans-serif)',
-        padding: '2rem',
-      }}
-    >
+    <div className={styles.pageWrapper}>
+      <div className={styles.ambientOrb1} />
+      <div className={styles.ambientOrb2} />
+
       <OtpSuccessModal
         isOpen={status === 'success'}
         userName={authUser?.name}
         title="Login Successful!"
       />
 
-      <div
-        style={{
-          width: '100%',
-          maxWidth: '420px',
-          backgroundColor: '#1E293B',
-          borderRadius: '16px',
-          padding: '2.5rem 2rem',
-          textAlign: 'center',
-          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)',
-          border: '1px solid #334155',
-        }}
-      >
-        <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'center' }}>
+      <div className={styles.glassCard}>
+        <Link href="/" className={styles.logoWrapper}>
           <Image
-            src="/logo-withoutbg.png"
+            src="/logo-clean.png"
             alt="KickAt Logo"
-            width={160}
-            height={60}
-            style={{ objectFit: 'contain' }}
+            width={150}
+            height={55}
+            className={styles.logoImage}
             priority
           />
-        </div>
+        </Link>
 
         {status === 'loading' && (
           <div>
-            <Loader2
-              size={40}
-              style={{
-                color: '#38BDF8',
-                animation: 'spin 1s linear infinite',
-                margin: '0 auto 1.25rem auto',
-              }}
-            />
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.5rem', color: '#F1F5F9' }}>
+            <div className={`${styles.iconBadge} ${styles.loadingBadge}`}>
+              <Loader2 size={32} className={styles.spinner} />
+            </div>
+            <h2 className={styles.title}>
               Authenticating with Google...
             </h2>
-            <p style={{ fontSize: '0.875rem', color: '#94A3B8', margin: 0 }}>
+            <p className={styles.subtitle}>
               Connecting your account securely. Please wait a moment.
             </p>
+            <div className={styles.progressBarTrack}>
+              <div className={styles.progressBarFill} />
+            </div>
           </div>
         )}
 
         {status === 'success' && (
           <div>
-            <CheckCircle2
-              size={44}
-              style={{
-                color: '#22C55E',
-                margin: '0 auto 1.25rem auto',
-              }}
-            />
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.5rem', color: '#F1F5F9' }}>
+            <div className={`${styles.iconBadge} ${styles.successBadge}`}>
+              <CheckCircle2 size={36} />
+            </div>
+            <h2 className={styles.title}>
               Google Sign-In Successful!
             </h2>
-            <p style={{ fontSize: '0.875rem', color: '#94A3B8', margin: 0 }}>
+            <p className={styles.subtitle}>
               Redirecting you to KickAt...
             </p>
+            <div className={styles.progressBarTrack}>
+              <div className={styles.progressBarFillSuccess} />
+            </div>
           </div>
         )}
 
         {status === 'error' && (
           <div>
-            <AlertCircle
-              size={44}
-              style={{
-                color: '#EF4444',
-                margin: '0 auto 1.25rem auto',
-              }}
-            />
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.5rem', color: '#F1F5F9' }}>
-              Authentication Error
+            <div className={`${styles.iconBadge} ${styles.errorBadge}`}>
+              <AlertCircle size={36} />
+            </div>
+            <h2 className={styles.title}>
+              Authentication Failed
             </h2>
-            <p style={{ fontSize: '0.875rem', color: '#FCA5A5', margin: 0 }}>
+            <p className={styles.subtitle} style={{ color: '#DC2626' }}>
               {errorMessage || 'Something went wrong.'}
             </p>
+            <Link href="/login" className={styles.errorActionBtn}>
+              <span>Return to Login</span>
+              <ArrowRight size={18} />
+            </Link>
           </div>
         )}
-      </div>
 
-      <style jsx global>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
+        <div className={styles.securityBadge}>
+          <ShieldCheck size={14} style={{ color: '#F59E0B' }} />
+          <span>256-bit SSL Secure Authentication</span>
+        </div>
+      </div>
     </div>
   );
 }
@@ -186,17 +164,13 @@ export default function GoogleCallbackPage() {
   return (
     <Suspense
       fallback={
-        <div
-          style={{
-            minHeight: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: '#0F172A',
-            color: '#F8FAFC',
-          }}
-        >
-          <Loader2 size={40} style={{ color: '#38BDF8', animation: 'spin 1s linear infinite' }} />
+        <div className={styles.pageWrapper}>
+          <div className={styles.glassCard}>
+            <div className={`${styles.iconBadge} ${styles.loadingBadge}`}>
+              <Loader2 size={32} className={styles.spinner} />
+            </div>
+            <h2 className={styles.title}>Loading...</h2>
+          </div>
         </div>
       }
     >

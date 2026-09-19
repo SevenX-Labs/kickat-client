@@ -10,11 +10,21 @@ let failedQueue: Array<{ resolve: (token: string) => void; reject: (err: any) =>
 let onUnauthenticatedHandler: (() => void) | null = null;
 
 export function getAccessToken(): string | null {
+  if (!accessTokenInMemory && typeof window !== 'undefined') {
+    accessTokenInMemory = localStorage.getItem('kickat_access_token');
+  }
   return accessTokenInMemory;
 }
 
 export function setAccessToken(token: string | null): void {
   accessTokenInMemory = token;
+  if (typeof window !== 'undefined') {
+    if (token) {
+      localStorage.setItem('kickat_access_token', token);
+    } else {
+      localStorage.removeItem('kickat_access_token');
+    }
+  }
 }
 
 export function setOnUnauthenticated(handler: () => void): void {

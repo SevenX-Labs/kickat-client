@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { setAccessToken, setOnUnauthenticated } from '../services/api';
+import { getAccessToken, setAccessToken, setOnUnauthenticated } from '../services/api';
 import { authService, AuthUser, AuthResponse, SendOtpResponse } from '../services/authService';
 
 interface AuthContextType {
@@ -33,9 +33,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setAccessTokenState(null);
     });
 
-    // App Initialization: Silent Auth Check via HttpOnly cookie
+    // App Initialization: Token restoration & Silent Auth Check
     const initAuth = async () => {
       try {
+        const storedToken = getAccessToken();
+        if (storedToken) {
+          setAccessTokenState(storedToken);
+          try {
+            const fetchedUser = await authService.getMe();
+            setUser(fetchedUser);
+            setIsLoading(false);
+            return;
+          } catch (err) {
+            console.warn('[AuthContext] Stored token verification failed, attempting refresh...', err);
+            setAccessToken(null);
+            setAccessTokenState(null);
+          }
+        }
+
         const refreshRes = await authService.refreshToken();
         if (refreshRes.accessToken) {
           setAccessToken(refreshRes.accessToken);

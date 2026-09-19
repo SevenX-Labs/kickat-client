@@ -1,20 +1,21 @@
 "use client";
 
-import { useEffect, useState, useRef, Suspense } from "react";
+import React, { useEffect, useState, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, CheckCircle2, AlertCircle, ShieldCheck, ArrowRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { authService } from "@/services/authService";
 import { OtpSuccessModal } from "@/components/common/OtpSuccessModal/OtpSuccessModal";
+import styles from "@/app/auth/callback/google/GoogleCallback.module.css";
 
 function GoogleCallbackContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { loginWithToken, setUser } = useAuth();
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState<any>(null);
   const isProcessingRef = useRef(false);
 
@@ -30,32 +31,36 @@ function GoogleCallbackContent() {
       const customRedirect = searchParams.get("redirect");
 
       if (errorParam) {
-        router.push(`/login?error=${encodeURIComponent(errorParam)}`);
+        setStatus('error');
+        setErrorMessage(errorParam);
+        setTimeout(() => {
+          router.push(`/login?error=${encodeURIComponent(errorParam)}`);
+        }, 2000);
         return;
       }
 
-      // If backend already exchanged code and passed Bearer token
       if (tokenParam) {
         try {
           const user = await loginWithToken(tokenParam);
           setLoggedInUser(user);
-          setIsSuccessModalOpen(true);
+          setStatus('success');
           const isProfileComplete = Boolean(user?.isProfileComplete || user?.profileCompleted || (user?.name && (user?.email || user?.phone)));
           const redirectTarget = (!isProfileComplete && isNewUser) ? "/onboarding" : (customRedirect || "/account");
           setTimeout(() => {
             router.push(redirectTarget);
-          }, 2500);
+          }, 2000);
           return;
         } catch (err: any) {
-          setErrorMessage(err?.message || "Failed to establish user session.");
+          const msg = err?.message || "Failed to establish user session.";
+          setStatus('error');
+          setErrorMessage(msg);
           setTimeout(() => {
-            router.push(`/login?error=${encodeURIComponent("Authentication session failed")}`);
-          }, 2000);
+            router.push(`/login?error=${encodeURIComponent(msg)}`);
+          }, 2500);
           return;
         }
       }
 
-      // If Google returned authorization code directly to frontend
       if (codeParam) {
         try {
           const redirectUri = window.location.origin + "/api/v1/auth/callback/google";
@@ -64,19 +69,20 @@ function GoogleCallbackContent() {
           if (res.accessToken) {
             setUser(res.user);
             setLoggedInUser(res.user);
-            setIsSuccessModalOpen(true);
+            setStatus('success');
             
             const isProfileComplete = Boolean(res.user?.isProfileComplete || res.user?.profileCompleted || (res.user?.name && (res.user?.email || res.user?.phone)));
             const redirectTarget = (!isProfileComplete && res.isNewUser) ? "/onboarding" : (customRedirect || "/account");
             setTimeout(() => {
               router.push(redirectTarget);
-            }, 2500);
+            }, 2000);
           } else {
             throw new Error("Missing access token from server response");
           }
         } catch (err: any) {
           console.error("Google Auth Exchange Error:", err);
           const msg = err?.message || "Failed to complete Google authentication";
+          setStatus('error');
           setErrorMessage(msg);
           setTimeout(() => {
             router.push(`/login?error=${encodeURIComponent(msg)}`);
@@ -85,103 +91,96 @@ function GoogleCallbackContent() {
         return;
       }
 
-      // Neither token nor code present
-      router.push(`/login?error=${encodeURIComponent("Authentication code or token missing")}`);
+      const msg = "Authentication code or token missing";
+      setStatus('error');
+      setErrorMessage(msg);
+      setTimeout(() => {
+        router.push(`/login?error=${encodeURIComponent(msg)}`);
+      }, 2500);
     };
 
     processCallback();
   }, [searchParams, loginWithToken, setUser, router]);
 
   return (
-    <div
-      style={{
-        minHeight: "80vh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "2rem",
-        background: "#FAF9F6",
-      }}
-    >
+    <div className={styles.pageWrapper}>
+      <div className={styles.ambientOrb1} />
+      <div className={styles.ambientOrb2} />
+
       <OtpSuccessModal
-        isOpen={isSuccessModalOpen}
+        isOpen={status === 'success'}
         userName={loggedInUser?.name}
         title="Login Successful!"
       />
 
-      <div
-        style={{
-          background: "#FFFFFF",
-          border: "1px solid #EBE5DB",
-          borderRadius: "24px",
-          padding: "3rem 2.5rem",
-          maxWidth: "420px",
-          width: "100%",
-          textAlign: "center",
-          boxShadow: "0 20px 40px rgba(0, 0, 0, 0.04)",
-        }}
-      >
-        <Link href="/" style={{ display: "inline-block", marginBottom: "1.5rem" }}>
+      <div className={styles.glassCard}>
+        <Link href="/" className={styles.logoWrapper}>
           <Image
             src="/logo-clean.png"
             alt="KickAt Logo"
-            width={140}
-            height={60}
-            style={{ objectFit: "contain", width: "auto", height: "auto" }}
+            width={150}
+            height={55}
+            className={styles.logoImage}
             priority
           />
         </Link>
 
-        {errorMessage ? (
+        {status === 'loading' && (
           <div>
-            <div
-              style={{
-                width: "56px",
-                height: "56px",
-                borderRadius: "50%",
-                background: "#FEE2E2",
-                color: "#991B1B",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                margin: "0 auto 1.25rem",
-              }}
-            >
-              <AlertCircle size={28} />
+            <div className={`${styles.iconBadge} ${styles.loadingBadge}`}>
+              <Loader2 size={32} className={styles.spinner} />
             </div>
-            <h2 style={{ fontSize: "1.25rem", fontWeight: "700", color: "#1A1612", marginBottom: "0.5rem" }}>
-              Authentication Failed
-            </h2>
-            <p style={{ fontSize: "0.875rem", color: "#666055", marginBottom: "1.5rem" }}>
-              {errorMessage}
-            </p>
-          </div>
-        ) : (
-          <div>
-            <div
-              style={{
-                width: "56px",
-                height: "56px",
-                borderRadius: "50%",
-                background: "rgba(249, 146, 5, 0.1)",
-                color: "#F99205",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                margin: "0 auto 1.25rem",
-              }}
-            >
-              <Loader2 size={28} className="animate-spin" />
-            </div>
-            <h2 style={{ fontSize: "1.25rem", fontWeight: "700", color: "#1A1612", marginBottom: "0.5rem" }}>
+            <h2 className={styles.title}>
               Signing you in...
             </h2>
-            <p style={{ fontSize: "0.875rem", color: "#666055" }}>
+            <p className={styles.subtitle}>
               Completing Google OAuth authentication. Please wait.
             </p>
+            <div className={styles.progressBarTrack}>
+              <div className={styles.progressBarFill} />
+            </div>
           </div>
         )}
+
+        {status === 'success' && (
+          <div>
+            <div className={`${styles.iconBadge} ${styles.successBadge}`}>
+              <CheckCircle2 size={36} />
+            </div>
+            <h2 className={styles.title}>
+              Login Successful!
+            </h2>
+            <p className={styles.subtitle}>
+              Redirecting you to KickAt...
+            </p>
+            <div className={styles.progressBarTrack}>
+              <div className={styles.progressBarFillSuccess} />
+            </div>
+          </div>
+        )}
+
+        {status === 'error' && (
+          <div>
+            <div className={`${styles.iconBadge} ${styles.errorBadge}`}>
+              <AlertCircle size={36} />
+            </div>
+            <h2 className={styles.title}>
+              Authentication Failed
+            </h2>
+            <p className={styles.subtitle} style={{ color: '#DC2626' }}>
+              {errorMessage || "Something went wrong."}
+            </p>
+            <Link href="/login" className={styles.errorActionBtn}>
+              <span>Return to Login</span>
+              <ArrowRight size={18} />
+            </Link>
+          </div>
+        )}
+
+        <div className={styles.securityBadge}>
+          <ShieldCheck size={14} style={{ color: '#F59E0B' }} />
+          <span>256-bit SSL Secure Authentication</span>
+        </div>
       </div>
     </div>
   );
@@ -191,8 +190,13 @@ export default function GoogleCallbackApiPage() {
   return (
     <Suspense
       fallback={
-        <div style={{ padding: "100px", textAlign: "center", background: "#FAF9F6", minHeight: "80vh" }}>
-          Authenticating...
+        <div className={styles.pageWrapper}>
+          <div className={styles.glassCard}>
+            <div className={`${styles.iconBadge} ${styles.loadingBadge}`}>
+              <Loader2 size={32} className={styles.spinner} />
+            </div>
+            <h2 className={styles.title}>Loading...</h2>
+          </div>
         </div>
       }
     >

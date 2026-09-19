@@ -1,0 +1,232 @@
+.pageWrapper {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #FAF8F5 0%, #FFFFFF 50%, #F4EFE6 100%);
+  position: relative;
+  overflow: hidden;
+  padding: 1.5rem;
+  font-family: var(--font-sans, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+}
+
+/* Ambient glassmorphism background glow */
+.ambientOrb1 {
+  position: absolute;
+  top: 15%;
+  left: 20%;
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.14) 0%, rgba(245, 158, 11, 0) 70%);
+  filter: blur(50px);
+  pointer-events: none;
+  border-radius: 50%;
+  animation: floatOrb 12s ease-in-out infinite alternate;
+}
+
+.ambientOrb2 {
+  position: absolute;
+  bottom: 15%;
+  right: 20%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(251, 146, 60, 0.12) 0%, rgba(251, 146, 60, 0) 70%);
+  filter: blur(50px);
+  pointer-events: none;
+  border-radius: 50%;
+  animation: floatOrb 10s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes floatOrb {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(30px, -20px) scale(1.1); }
+}
+
+/* White Glass Card */
+.glassCard {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 440px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 24px;
+  padding: 2.75rem 2.25rem 2.25rem 2.25rem;
+  text-align: center;
+  box-shadow: 
+    0 20px 40px -15px rgba(245, 158, 11, 0.08),
+    0 10px 30px -5px rgba(0, 0, 0, 0.05),
+    inset 0 1px 2px rgba(255, 255, 255, 1);
+  animation: cardFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes cardFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.logoWrapper {
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+}
+
+.logoImage {
+  object-fit: contain;
+  height: auto;
+  transition: transform 0.3s ease;
+}
+
+.logoWrapper:hover .logoImage {
+  transform: scale(1.03);
+}
+
+/* Icon Container Orbs */
+.iconBadge {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.5rem auto;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.loadingBadge {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: #D97706;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.12);
+}
+
+.successBadge {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  color: #16A34A;
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.12);
+}
+
+.errorBadge {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #DC2626;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.12);
+}
+
+/* Typography */
+.title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #0F172A;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  color: #64748B;
+  line-height: 1.5;
+  margin-bottom: 0.5rem;
+}
+
+/* Progress bar under loading/success */
+.progressBarTrack {
+  width: 100%;
+  height: 4px;
+  background: rgba(226, 232, 240, 0.7);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-top: 1.5rem;
+}
+
+.progressBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #F59E0B, #EA580C);
+  border-radius: 99px;
+  animation: indeterminateProgress 1.8s infinite ease-in-out;
+}
+
+.progressBarFillSuccess {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #22C55E, #16A34A);
+  border-radius: 99px;
+}
+
+@keyframes indeterminateProgress {
+  0% {
+    width: 0%;
+    margin-left: 0%;
+  }
+  50% {
+    width: 75%;
+    margin-left: 25%;
+  }
+  100% {
+    width: 0%;
+    margin-left: 100%;
+  }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Action Button for Error */
+.errorActionBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  height: 46px;
+  padding: 0 1.25rem;
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.925rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+  transition: all 0.2s ease;
+  margin-top: 1rem;
+}
+
+.errorActionBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(217, 119, 6, 0.4);
+}
+
+/* Security Pill */
+.securityBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1.75rem;
+  padding: 0.4rem 0.9rem;
+  background: rgba(241, 245, 249, 0.8);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #64748B;
+}
