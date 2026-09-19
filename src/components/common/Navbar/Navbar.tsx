@@ -385,7 +385,7 @@ export function Navbar() {
                         </div>
                         <ChevronRight size={14} strokeWidth={2.2} className={styles.itemArrow} />
                       </Link>
-                      <Link href="/account/orders" className={styles.accountDropdownItem}>
+                      <Link href="/orders" className={styles.accountDropdownItem}>
                         <div className={styles.itemLeft}>
                           <span className={styles.itemIconWrap}>
                             <Package size={16} strokeWidth={1.8} />
@@ -452,7 +452,7 @@ export function Navbar() {
                       </Link>
                     </div>
                     <div className={styles.accountDropdownList}>
-                      <Link href="/account/orders" className={styles.accountDropdownItem}>
+                      <Link href="/orders" className={styles.accountDropdownItem}>
                         <div className={styles.itemLeft}>
                           <span className={styles.itemIconWrap}>
                             <Package size={16} strokeWidth={1.8} />
