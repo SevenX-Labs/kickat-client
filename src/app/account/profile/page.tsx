@@ -8,7 +8,6 @@ import {
   Edit3, Sparkles, Crown, ChevronRight, X, Loader2, ArrowLeft, CheckCircle2
 } from 'lucide-react';
 import styles from '../Account.module.css';
-import AccountSidebarNav from '@/components/account/AccountSidebarNav';
 import { useAuth } from '@/context/AuthContext';
 import { profileService } from '@/services/profileService';
 
@@ -154,13 +153,7 @@ function ProfileDetailsContent() {
 
   return (
     <div className={styles.pageWrapper}>
-      {/* Toast Notification */}
-      {toastMsg && (
-        <div className={styles.toastBanner}>
-          <CheckCircle2 size={18} className={styles.toastIcon} />
-          <span>{toastMsg}</span>
-        </div>
-      )}
+      
 
       <main className={styles.container}>
         <div className={styles.accountLayout}>

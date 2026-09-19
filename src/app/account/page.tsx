@@ -8,7 +8,6 @@ import {
   ChevronRight, Bell
 } from 'lucide-react';
 import styles from './Account.module.css';
-import AccountSidebarNav from '@/components/account/AccountSidebarNav';
 import { useAuth } from '@/context/AuthContext';
 import { profileService } from '@/services/profileService';
 
@@ -98,15 +97,7 @@ function AccountMainHubContent() {
   }, [user]);
 
   return (
-    <div className={styles.pageWrapper}>
-      <main className={styles.container}>
-        <div className={styles.accountLayout}>
-
-          {/* Left Column: Sidebar Navigation List */}
-          <AccountSidebarNav user={userData} />
-
-          {/* Right Column: Desktop Dashboard Panel (Hidden on Mobile) */}
-          <div className={styles.desktopDashboardPanel}>
+    <div className={styles.desktopDashboardPanel}>
 
             {/* Welcome Banner */}
             <div className={styles.dashboardWelcomeBanner}>
@@ -238,10 +229,7 @@ function AccountMainHubContent() {
 
           </div>
 
-        </div>
-      </main>
-    </div>
-  );
+        );
 }
 
 export default function AccountPage() {

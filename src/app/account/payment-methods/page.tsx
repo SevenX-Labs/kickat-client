@@ -7,7 +7,6 @@ import {
 , ArrowLeft } from 'lucide-react';
 import styles from '../Account.module.css';
 import cardStyles from './PaymentMethods.module.css';
-import AccountSidebarNav from '@/components/account/AccountSidebarNav';
 
 const initialUserData = {
   firstName: 'Sarah',

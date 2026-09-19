@@ -8,7 +8,6 @@ import {
 } from 'lucide-react';
 import styles from '../Account.module.css';
 import notifStyles from './Notifications.module.css';
-import AccountSidebarNav from '@/components/account/AccountSidebarNav';
 import { useAuth } from '@/context/AuthContext';
 
 interface NotificationItem {

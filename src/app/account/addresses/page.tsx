@@ -7,7 +7,6 @@ import {
   MapPin, Plus, Check, Trash2, X, Sparkles 
 , ArrowLeft } from 'lucide-react';
 import styles from '../Account.module.css';
-import AccountSidebarNav from '@/components/account/AccountSidebarNav';
 
 const initialUserData = {
   firstName: 'Sarah',

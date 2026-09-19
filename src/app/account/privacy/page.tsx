@@ -7,7 +7,6 @@ import {
 } from 'lucide-react';
 import styles from '../Account.module.css';
 import settingsStyles from '../settings/Settings.module.css';
-import AccountSidebarNav from '@/components/account/AccountSidebarNav';
 import { useAuth } from '@/context/AuthContext';
 
 function PrivacyContent() {

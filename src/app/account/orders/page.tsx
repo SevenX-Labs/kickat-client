@@ -9,7 +9,6 @@ import {
   MapPin, AlertCircle, SlidersHorizontal, X, Calendar, CalendarDays, History, ArrowDownWideNarrow, ArrowUpWideNarrow
 , ArrowLeft } from 'lucide-react';
 import styles from '../Account.module.css';
-import AccountSidebarNav from '@/components/account/AccountSidebarNav';
 
 const initialUserData = {
   firstName: 'Sarah',
@@ -219,18 +218,8 @@ function AccountOrdersContent() {
   };
 
   return (
-    <div className={styles.pageWrapper}>
-      <main className={styles.container}>
-        <div className={styles.accountLayout}>
-          
-          {/* Account Navigation Sidebar */}
-          <div className={styles.subpageSidebarWrapper}>
-            <AccountSidebarNav user={userData} />
-          </div>
-
-          {/* Main Orders Content Area */}
-          <div className={styles.contentArea}>
-            <div className={styles.ordersPageWrapper}>
+    <>
+      <div className={styles.ordersPageWrapper}>
               
               {/* 1. Header Title Section */}
               <div className={styles.backHeaderGroup}>
@@ -316,20 +305,20 @@ function AccountOrdersContent() {
               {/* 3. Orders Cards Stack */}
               <div className={styles.ordersCardsStack}>
                 {filteredOrders.length > 0 ? filteredOrders.map(order => (
-                  <div key={order.id} className={styles.myOrderCard}>
+                  <div key={order.id} className={styles.ordersCard}>
                     {/* Header Row: Order ID, Date, Status Badge, Chevron */}
-                    <div className={styles.cardHeaderRow}>
-                      <div className={styles.cardHeaderMeta}>
-                        <span className={styles.cardOrderId}>{order.id}</span>
-                        <span className={styles.cardOrderDate}>{order.date}</span>
+                    <div className={styles.ordersCardHeader}>
+                      <div className={styles.orderIdGroup}>
+                        <span className={styles.orderIdBadge}>{order.id}</span>
+                        <span className={styles.orderDate}>{order.date}</span>
                       </div>
                       
-                      <div className={styles.cardStatusPillGroup}>
-                        <span className={`${styles.statusBadgePill} ${getStatusClass(order.status)}`}>
+                      <div className={styles.orderActionsGroup}>
+                        <span className={`${styles.orderStatusBadge} ${getStatusClass(order.status)}`}>
                           {getStatusIcon(order.status)}
                           <span>{order.status}</span>
                         </span>
-                        <ChevronRight size={18} className={styles.cardChevronIcon} />
+                        <ChevronRight size={18} className={styles.ordersSearchIcon} />
                       </div>
                     </div>
 
@@ -375,10 +364,10 @@ function AccountOrdersContent() {
                     </div>
 
                     {/* Action Buttons Row */}
-                    <div className={styles.cardActionsRow}>
+                    <div className={styles.ordersCardFooter}>
                       <Link 
                         href={`/orders/${order.id}/invoice`} 
-                        className={styles.cardOutlineBtn}
+                        className={styles.orderActionBtn}
                       >
                         <FileText size={15} />
                         <span>View Invoice</span>
@@ -387,7 +376,7 @@ function AccountOrdersContent() {
                       {order.status === 'Processing' ? (
                         <Link 
                           href={`/orders/${order.id}`} 
-                          className={styles.cardSolidBtn}
+                          className={`${styles.orderActionBtn} ${styles.primaryActionBtn}`}
                         >
                           <MapPin size={15} />
                           <span>Track Package</span>
@@ -395,7 +384,7 @@ function AccountOrdersContent() {
                       ) : (
                         <Link 
                           href={`/orders/${order.id}`} 
-                          className={styles.cardSolidBtn}
+                          className={`${styles.orderActionBtn} ${styles.primaryActionBtn}`}
                         >
                           <Package size={15} />
                           <span>View Order</span>
@@ -432,12 +421,7 @@ function AccountOrdersContent() {
               <div className={styles.madeWithLoveFooter}>
                 <span>Made with ❤️ by <strong>KickAt</strong></span>
               </div>
-            </div>
-
-          </div>
-
-        </div>
-      </main>
+      </div>
 
       {/* Filter & Sort Bottom Sheet Drawer */}
       {isFilterOpen && (
@@ -556,8 +540,7 @@ function AccountOrdersContent() {
           </div>
         </div>
       )}
-
-    </div>
+    </>
   );
 }
 
