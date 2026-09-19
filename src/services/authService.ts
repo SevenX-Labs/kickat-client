@@ -37,6 +37,8 @@ export interface MessageResponse {
   message: string;
 }
 
+let activeRefreshPromise: Promise<RefreshTokenResponse> | null = null;
+
 export const authService = {
   /**
    * Request 6-digit Mobile OTP via SMS (POST /auth/otp/send)
@@ -110,24 +112,37 @@ export const authService = {
 
   /**
    * Rotate 30-day refreshToken cookie & issue new Bearer accessToken (POST /auth/refresh)
+   * Single-flight deduplication prevents concurrent refresh requests from invalidating tokens.
    */
   async refreshToken(): Promise<RefreshTokenResponse> {
-    const res = await api<any>('/auth/refresh', {
-      method: 'POST',
-    });
-
-    const user = res?.profile?.user || res?.data || res?.user;
-    const token = res?.accessToken;
-
-    if (token) {
-      setAccessToken(token);
+    if (activeRefreshPromise) {
+      return activeRefreshPromise;
     }
 
-    return {
-      success: Boolean(res?.success ?? true),
-      accessToken: token,
-      user,
-    };
+    activeRefreshPromise = (async () => {
+      try {
+        const res = await api<any>('/auth/refresh', {
+          method: 'POST',
+        });
+
+        const user = res?.profile?.user || res?.data || res?.user;
+        const token = res?.accessToken;
+
+        if (token) {
+          setAccessToken(token);
+        }
+
+        return {
+          success: Boolean(res?.success ?? true),
+          accessToken: token,
+          user,
+        };
+      } finally {
+        activeRefreshPromise = null;
+      }
+    })();
+
+    return activeRefreshPromise;
   },
 
   /**
