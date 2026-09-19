@@ -4,29 +4,70 @@ import { useState, Suspense } from 'react';
 import { Bell, Package, Tag, Info, Trash2, CheckCircle2 } from 'lucide-react';
 import styles from '../Account.module.css';
 import { Button } from '@/components/ui/Button';
+import { notificationService, NotificationItem } from '@/services/notificationService';
+import { useEffect } from 'react';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 
 function NotificationsContent() {
-  const [notifications, setNotifications] = useState<any[]>([
-    { id: 1, type: 'order', title: 'Order Delivered', message: 'Your order ORD-89241 has been delivered.', time: '2 hours ago', isRead: false },
-    { id: 2, type: 'promo', title: 'Flash Sale! 20% Off', message: 'Use code PAWS20 for 20% off all dog accessories today only.', time: 'Yesterday', isRead: false },
-    { id: 3, type: 'system', title: 'Password Changed', message: 'Your account password was updated successfully.', time: '3 days ago', isRead: true }
-  ]);
-  const [loading, setLoading] = useState(false);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('All');
 
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        setLoading(true);
+        const res = await notificationService.getNotifications();
+        if (res.success && res.items) {
+          setNotifications(res.items);
+        }
+      } catch (err) {
+        console.error('Failed to load notifications', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchNotifications();
+  }, []);
+
   const getIcon = (type: string) => {
-    if (type === 'order') return <Package size={16} className={styles.notifIconOrder} />;
-    if (type === 'promo') return <Tag size={16} className={styles.notifIconPromo} />;
+    const t = type.toUpperCase();
+    if (t.includes('ORDER')) return <Package size={16} className={styles.notifIconOrder} />;
+    if (t.includes('CAMPAIGN') || t.includes('PROMO')) return <Tag size={16} className={styles.notifIconPromo} />;
     return <Info size={16} className={styles.notifIconSystem} />;
   };
 
-  const markAllRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, isRead: true })));
+  const formatTime = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return new Intl.DateTimeFormat('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(date);
+    } catch {
+      return dateString;
+    }
+  };
+
+  const markAllRead = async () => {
+    try {
+      await notificationService.markAllAsRead();
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    } catch (err) {
+      console.error('Failed to mark all as read', err);
+    }
+  };
+
+  const handleNotificationClick = async (notif: NotificationItem) => {
+    if (notif.isRead) return;
+    try {
+      await notificationService.markAsRead(notif.id);
+      setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, isRead: true } : n));
+    } catch (err) {
+      console.error('Failed to mark as read', err);
+    }
   };
 
   const clearAll = () => {
+    // API spec does not have a clear-all endpoint, so we just clear local state for UI purposes
     setNotifications([]);
   };
 
@@ -73,14 +114,19 @@ function NotificationsContent() {
       ) : filtered.length > 0 ? (
         <div className={styles.notifList}>
           {filtered.map(notif => (
-            <div key={notif.id} className={`${styles.notifCard} ${notif.isRead ? styles.notifRead : ''}`}>
+            <div 
+              key={notif.id} 
+              className={`${styles.notifCard} ${notif.isRead ? styles.notifRead : ''}`}
+              onClick={() => handleNotificationClick(notif)}
+              style={{ cursor: notif.isRead ? 'default' : 'pointer' }}
+            >
               <div className={styles.notifIconWrap}>
                 {getIcon(notif.type)}
               </div>
               <div className={styles.notifBody}>
                 <div className={styles.notifTitleRow}>
                   <h4 className={styles.notifTitle}>{notif.title}</h4>
-                  <span className={styles.notifTime}>{notif.time}</span>
+                  <span className={styles.notifTime}>{formatTime(notif.createdAt)}</span>
                 </div>
                 <p className={styles.notifMessage}>{notif.message}</p>
               </div>
