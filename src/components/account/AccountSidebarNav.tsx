@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
+import { useState } from "react";
 import {
   Package, User, MapPin, CreditCard, Shield, Heart, LogOut, Crown,
   ChevronRight, Headphones, Bell
 } from "lucide-react";
 import styles from "./AccountSidebarNav.module.css";
 import { useAuth } from "@/context/AuthContext";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface UserProps {
   firstName: string;
@@ -16,7 +18,6 @@ interface UserProps {
   totalOrders?: number;
   points?: number;
   tier?: string;
-  onEditProfile?: () => void;
 }
 
 const defaultUser: UserProps = {
@@ -24,34 +25,40 @@ const defaultUser: UserProps = {
   lastName: "Member",
   email: "member@kickat.co.in",
   totalOrders: 0,
-  points: 100,
-  tier: "KickAt VIP"
+  points: 1240,
+  tier: "Gold VIP"
 };
 
 export default function AccountSidebarNav({
   user = defaultUser
 }: {
   user?: UserProps;
-  onEditProfile?: () => void;
 }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { showSignOutModal } = useAuth();
+  const { logout, showSignOutModal } = useAuth();
+  
+  const [isLogoutOpen, setIsLogoutOpen] = useState(false);
 
   const handleSignOut = () => {
+    setIsLogoutOpen(true);
+  };
+  
+  const confirmSignOut = () => {
+    setIsLogoutOpen(false);
     showSignOutModal();
   };
-
-  const currentTab = searchParams.get("tab");
 
   // Determine active route item
   const isOrdersActive = pathname.startsWith("/orders") || pathname.startsWith("/account/orders");
   const isWishlistActive = pathname.startsWith("/wishlist") || pathname.startsWith("/account/wishlist");
-  const isAddressesActive = pathname.startsWith("/account/addresses") || (pathname === "/account" && currentTab === "addresses");
-  const isPaymentsActive = pathname.startsWith("/account/payment-methods") || (pathname === "/account" && (currentTab === "payments" || currentTab === "payment-methods"));
-  const isProfileActive = pathname === "/account/profile" || (pathname === "/account" && currentTab === "profile");
-  const isNotificationsActive = pathname === "/account/notifications" || (pathname === "/account" && currentTab === "notifications");
-  const isPrivacyActive = pathname === "/account/privacy" || pathname === "/account/settings" || (pathname === "/account" && (currentTab === "privacy" || currentTab === "settings"));
+  const isAddressesActive = pathname.startsWith("/account/addresses");
+  const isPaymentsActive = pathname.startsWith("/account/payment-methods");
+  const isProfileActive = pathname === "/account/profile";
+  const isNotificationsActive = pathname.startsWith("/account/notifications");
+  const isPrivacyActive = pathname.startsWith("/account/privacy");
+
+  const unreadCount = 3; // TODO: Wire to real data
 
   const menuItems = [
     {
@@ -101,6 +108,7 @@ export default function AccountSidebarNav({
       href: "/account/notifications",
       isActive: isNotificationsActive,
       Icon: Bell,
+      badge: unreadCount
     },
     {
       id: "privacy",
@@ -113,7 +121,7 @@ export default function AccountSidebarNav({
   ];
 
   return (
-    <aside className={styles.navContainer}>
+    <nav className={styles.navContainer} aria-label="Account">
       <div className={styles.unifiedNavWrapper}>
         <div className={styles.sidebarMainCard}>
           <div className={styles.userProfileSection}>
@@ -129,26 +137,52 @@ export default function AccountSidebarNav({
               <span className={styles.userEmail}>{user.email}</span>
             </div>
           </div>
+          
+          <div className={styles.rewardsStrip}>
+            <div className={styles.rewardsHeader}>
+              <span className={styles.rewardsTitle}>{user.points?.toLocaleString('en-IN') || 0} Paws · {user.tier}</span>
+            </div>
+            <div className={styles.rewardsProgressBg}>
+              <div className={styles.rewardsProgressFill} style={{ width: '80%' }} />
+            </div>
+            <span className={styles.rewardsSub}>260 pts to go</span>
+          </div>
 
           <div className={styles.sectionDivider} />
 
-          <nav className={styles.navMenuList}>
+          <div className={styles.navMenuList}>
             {menuItems.map((item) => (
               <Link
                 key={item.id}
                 href={item.href}
                 className={`${styles.navItemLink} ${item.isActive ? styles.activeNavItem : ""}`}
+                aria-current={item.isActive ? "page" : undefined}
               >
                 <div className={styles.iconCircleWrap}>
                   <item.Icon size={18} className={styles.navIcon} strokeWidth={2} />
+                  {item.badge && item.badge > 0 && <span className={styles.notifBadge}>{item.badge}</span>}
                 </div>
                 <div className={styles.navTextCol}>
                   <span className={styles.navTitle}>{item.title}</span>
                   <span className={styles.navSubtitle}>{item.subtitle}</span>
                 </div>
-                <ChevronRight size={16} className={styles.navChevron} />
+                <div className={styles.chevronWrap}>
+                  <ChevronRight size={16} className={styles.navChevron} />
+                </div>
               </Link>
             ))}
+          </div>
+          
+          <div className={styles.bottomNavGroup}>
+            <div className={styles.sectionDivider} />
+            <Link href="/contact" className={`${styles.navItemLink}`}>
+              <div className={styles.iconCircleWrap}>
+                <Headphones size={18} className={styles.navIcon} strokeWidth={2} />
+              </div>
+              <div className={styles.navTextCol}>
+                <span className={styles.navTitle}>Help & Support</span>
+              </div>
+            </Link>
 
             <button
               type="button"
@@ -160,33 +194,21 @@ export default function AccountSidebarNav({
               </div>
               <div className={styles.navTextCol}>
                 <span className={styles.signOutTitle}>Sign Out</span>
-                <span className={styles.navSubtitle}>Log out of your KickAt account</span>
               </div>
-              <ChevronRight size={16} className={styles.navChevron} />
             </button>
-          </nav>
-        </div>
-
-        <div className={styles.helpBannerCard}>
-          <div className={styles.helpLeftSection}>
-            <div className={styles.helpMascotCircle}>
-              <span className={styles.dogEmoji}>🐶</span>
-            </div>
-            <div className={styles.helpTextGroup}>
-              <span className={styles.helpTitle}>Need Help?</span>
-              <span className={styles.helpSubtitle}>We are here for you!</span>
-              <Link href="/contact" className={styles.contactSupportBtn}>
-                <Headphones size={13} />
-                <span>Contact Support</span>
-              </Link>
-            </div>
           </div>
         </div>
-
-        <div className={styles.madeWithLoveFooter}>
-          <span>Made with ❤️ by <strong>KickAt</strong></span>
-        </div>
       </div>
-    </aside>
+      
+      <ConfirmDialog 
+        isOpen={isLogoutOpen}
+        title="Sign Out"
+        message="Are you sure you want to sign out of your account?"
+        confirmText="Sign Out"
+        onConfirm={confirmSignOut}
+        onCancel={() => setIsLogoutOpen(false)}
+        isDanger={true}
+      />
+    </nav>
   );
 }

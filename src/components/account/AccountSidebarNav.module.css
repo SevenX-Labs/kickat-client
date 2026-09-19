@@ -96,6 +96,7 @@
 
 .sectionDivider {
   height: 1px;
+  margin: 8px 0;
   background-color: #F0EAE1;
   margin: 1.1rem 0 0.75rem;
   width: 100%;
@@ -458,4 +459,190 @@
     height: 38px;
     border-radius: 10px;
   }
+}
+
+/* Sidebar Redesign Overrides */
+.navMenuList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 16px 16px;
+}
+.navItemLink {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 12px;
+  border-radius: 12px;
+  background: transparent;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+}
+.navItemLink:focus-visible {
+  outline: 2px solid var(--acc-orange);
+  outline-offset: 2px;
+}
+.navItemLink:hover {
+  background: #fbfbfb;
+}
+.navItemLink:hover .navChevron {
+  transform: translateX(2px);
+}
+.activeNavItem {
+  background: var(--acc-orange-tint) !important;
+}
+.activeNavItem::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 60%;
+  width: 3px;
+  background-color: var(--acc-orange);
+  border-radius: 0 4px 4px 0;
+}
+.iconCircleWrap {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  margin-right: 12px;
+  color: var(--acc-muted);
+  position: relative;
+}
+.activeNavItem .iconCircleWrap {
+  color: var(--acc-orange);
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(242,140,15,0.1);
+}
+.notifBadge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--acc-danger);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 50%;
+  min-width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fff;
+}
+.navTextCol {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  text-align: left;
+}
+.navTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--acc-text);
+}
+.activeNavItem .navTitle {
+  color: var(--acc-orange);
+}
+.navSubtitle {
+  font-size: 12px;
+  color: var(--acc-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+.navChevron {
+  color: var(--acc-muted);
+  transition: transform 0.2s ease;
+  opacity: 0.5;
+}
+.activeNavItem .navChevron {
+  color: var(--acc-orange);
+  opacity: 1;
+}
+
+/* Rewards Strip */
+.rewardsStrip {
+  padding: 12px 16px;
+  background: var(--acc-bg);
+  border-radius: 12px;
+  margin: 0 16px 8px;
+  border: 1px solid var(--acc-border);
+}
+.rewardsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.rewardsTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--acc-text);
+}
+.rewardsSub {
+  font-size: 11px;
+  color: var(--acc-muted);
+}
+.rewardsProgressBg {
+  height: 6px;
+  background: var(--acc-border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.rewardsProgressFill {
+  height: 100%;
+  background: var(--acc-orange);
+  border-radius: 3px;
+}
+
+/* Sign Out */
+.signOutItem:hover {
+  background: var(--acc-danger-tint) !important;
+}
+.signOutItem .navTitle, .signOutItem .signOutTitle {
+  color: var(--acc-danger);
+}
+.signOutItem .iconCircleWrap {
+  color: var(--acc-danger);
+}
+
+.userProfileSection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+}
+.sidebarMainCard {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.unifiedNavWrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.bottomNavGroup {
+  margin-top: auto;
+  padding: 0 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.chevronWrap {
+  width: 20px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
 }

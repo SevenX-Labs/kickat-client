@@ -8,6 +8,8 @@ import { ChevronDown, Search, Heart, User, ShoppingBag, Package, Tag, MapPin, Be
 import styles from "./Navbar.module.css";
 import { megaMenuData } from "@/data/megaMenuData";
 import { useAuth } from "@/context/AuthContext";
+import { FREE_DELIVERY_THRESHOLD, CURRENCY_FORMATTER } from "@/utils/constants";
+
 
 const taxonomy = {
   Dogs: {
@@ -165,7 +167,7 @@ export function Navbar() {
   };
 
   const items = [
-    { text: "Free Delivery on orders over $50", Icon: Truck },
+    { text: `Free Delivery on orders over ${CURRENCY_FORMATTER.format(FREE_DELIVERY_THRESHOLD)}`, Icon: Truck },
     { text: "Available on Amazon, Flipkart, JioMart & Meesho", Icon: ShoppingBag },
     { text: "Get 20% off your first purchase", Icon: Percent },
     { text: "Premium pet accessories", Icon: Crown },

@@ -1,0 +1,31 @@
+.contentArea {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--acc-border);
+}
+.pageH1 {
+  font-size: 24px;
+  font-family: var(--font-serif);
+  color: var(--acc-text);
+  margin-bottom: 4px;
+}
+.pageSubtitle {
+  font-size: 14px;
+  color: var(--acc-muted);
+}
+.wishlistActions {
+  display: flex;
+  gap: 12px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 24px;
+}
