@@ -97,14 +97,12 @@ function NotificationsContent() {
   };
 
   return (
-    <div className={styles.pageWrapper}>
-      <main className={styles.container}>
-        <div className={styles.accountLayout}>
+    <>
+      
+        
           
           {/* Account Sidebar Nav */}
-          <div className={styles.subpageSidebarWrapper}>
-            <AccountSidebarNav user={userData} />
-          </div>
+          
 
           {/* Main Content Area */}
           <div className={styles.contentArea}>
@@ -211,9 +209,8 @@ function NotificationsContent() {
             </div>
           </aside>
 
-        </div>
-      </main>
-    </div>
+        
+    </>
   );
 }
 

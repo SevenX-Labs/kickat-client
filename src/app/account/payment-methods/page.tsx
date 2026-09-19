@@ -179,7 +179,7 @@ function PaymentMethodsContent() {
   };
 
   return (
-    <div className={styles.pageWrapper}>
+    <>
       {toastMsg && (
         <div className={styles.toastBanner}>
           <Sparkles size={18} className={styles.toastIcon} />
@@ -187,13 +187,11 @@ function PaymentMethodsContent() {
         </div>
       )}
 
-      <main className={styles.container}>
-        <div className={styles.accountLayout}>
+      
+        
           
           {/* Account Sidebar Nav */}
-          <div className={styles.subpageSidebarWrapper}>
-            <AccountSidebarNav user={userData} />
-          </div>
+          
 
           {/* Main Content Area */}
           <div className={styles.contentArea}>
@@ -360,8 +358,7 @@ function PaymentMethodsContent() {
             </div>
           </aside>
 
-        </div>
-      </main>
+        
 
       {/* ── MODAL: ADD PAYMENT METHOD ── */}
       {isAddModalOpen && (
@@ -534,7 +531,7 @@ function PaymentMethodsContent() {
         </div>
       )}
 
-    </div>
+    </>
   );
 }
 

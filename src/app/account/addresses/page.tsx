@@ -106,7 +106,7 @@ function SavedAddressesContent() {
   };
 
   return (
-    <div className={styles.pageWrapper}>
+    <>
       {toastMsg && (
         <div className={styles.toastBanner}>
           <Sparkles size={18} className={styles.toastIcon} />
@@ -114,13 +114,10 @@ function SavedAddressesContent() {
         </div>
       )}
 
-      <main className={styles.container}>
-        <div className={styles.accountLayout}>
+      
+        
           
-          {/* Reusable Account Navigation */}
-          <div className={styles.subpageSidebarWrapper}>
-            <AccountSidebarNav user={userData} />
-          </div>
+          
 
           {/* Main Content Area */}
           <div className={styles.contentArea}>
@@ -212,8 +209,7 @@ function SavedAddressesContent() {
             </div>
           </aside>
 
-        </div>
-      </main>
+        
 
       {/* Add Address Modal */}
       {isAddAddressOpen && (
@@ -341,7 +337,7 @@ function SavedAddressesContent() {
         </div>
       )}
 
-    </div>
+    </>
   );
 }
 
