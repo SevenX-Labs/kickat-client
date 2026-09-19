@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { notificationService } from "@/services/notificationService";
 import {
   Package, User, MapPin, CreditCard, Shield, Heart, LogOut, Crown,
   ChevronRight, Headphones, Bell
@@ -58,7 +59,27 @@ export default function AccountSidebarNav({
   const isNotificationsActive = pathname.startsWith("/account/notifications");
   const isPrivacyActive = pathname.startsWith("/account/privacy");
 
-  const unreadCount = 3; // TODO: Wire to real data
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      try {
+        const res = await notificationService.getNotifications(1, 50);
+        if (res.success && res.items) {
+          const unread = res.items.filter(n => !n.isRead).length;
+          setUnreadCount(unread);
+        }
+      } catch (err) {
+        console.error('Failed to load notification count', err);
+      }
+    };
+    fetchUnreadCount();
+    
+    // Optional: listen to a custom event if notifications are read on the notifications page
+    const handleRead = () => fetchUnreadCount();
+    window.addEventListener('notifications-read', handleRead);
+    return () => window.removeEventListener('notifications-read', handleRead);
+  }, []);
 
   const menuItems = [
     {

@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
 
-export default function WishlistRedirect() {
+export default function RedirectPage() {
   redirect('/account/wishlist');
 }
