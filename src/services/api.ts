@@ -120,10 +120,6 @@ export async function api<T>(endpoint: string, options: FetchOptions = {}): Prom
           if (onUnauthenticatedHandler) {
             onUnauthenticatedHandler();
           }
-
-          if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
-            window.location.href = '/login';
-          }
           throw refreshError;
         }
       } catch (refreshErr) {

@@ -50,9 +50,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               // Ignore if profile fetch fails on init
             }
           }
+        } else {
+          console.warn('[AuthContext] Refresh succeeded but no accessToken returned');
         }
       } catch {
-        // If refresh fails (e.g., no active session or cookie expired after 30 days), allow clean public browsing
+        // If refresh fails (e.g., no active session or cookie expired), allow clean public browsing
         setAccessToken(null);
         setAccessTokenState(null);
         setUser(null);
