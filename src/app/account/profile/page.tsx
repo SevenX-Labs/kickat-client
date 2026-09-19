@@ -152,20 +152,18 @@ function ProfileDetailsContent() {
   };
 
   return (
-    <div className={styles.pageWrapper}>
+    <>
       
 
-      <main className={styles.container}>
-        <div className={styles.accountLayout}>
+      
+        
           
-          {/* Account Navigation Sidebar (Visible on Desktop, hidden on Mobile) */}
-          <div className={styles.subpageSidebarWrapper}>
-            <AccountSidebarNav user={userData} />
-          </div>
+          
 
           {/* Profile Details Content */}
           <div className={styles.contentArea}>
-            <div className={styles.mainContentPanel}>
+            
+      <div className={styles.mainContentPanel}>
               
               {/* Back to Account Link */}
               <div className={styles.backHeaderGroup}>
@@ -265,8 +263,7 @@ function ProfileDetailsContent() {
             </div>
           </div>
 
-        </div>
-      </main>
+        
 
       {/* Edit Profile Modal */}
       {isEditProfileOpen && (
@@ -366,7 +363,7 @@ function ProfileDetailsContent() {
         </div>
       )}
 
-    </div>
+    </>
   );
 }
 
