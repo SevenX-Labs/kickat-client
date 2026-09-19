@@ -8,16 +8,56 @@ import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Skeleton } from '@/components/ui/Skeleton';
 import ProductCard from '@/components/common/ProductCard/ProductCard';
-import { CATALOG_PRODUCTS } from '@/data/categoryData';
-
-const MOCK_WISHLIST = CATALOG_PRODUCTS.slice(0, 5);
+import { wishlistService, WishlistItem } from '@/services/wishlistService';
+import { useEffect } from 'react';
 
 function AccountWishlistContent() {
-  const [wishlistItems, setWishlistItems] = useState(MOCK_WISHLIST);
-  const [loading, setLoading] = useState(false);
+  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleRemove = (id: string) => {
-    setWishlistItems(prev => prev.filter(item => item.id !== id));
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      try {
+        setLoading(true);
+        const res = await wishlistService.getWishlist();
+        if (res.success && res.items) {
+          setWishlistItems(res.items);
+        }
+      } catch (err) {
+        console.error('Failed to load wishlist', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchWishlist();
+  }, []);
+
+  const handleRemove = async (id: string) => {
+    try {
+      await wishlistService.removeFromWishlist(id);
+      setWishlistItems(prev => prev.filter(item => item.productId !== id));
+    } catch (err) {
+      console.error('Failed to remove item', err);
+    }
+  };
+
+  const [movingToCart, setMovingToCart] = useState(false);
+  const handleMoveAllToCart = async () => {
+    if (wishlistItems.length === 0) return;
+    setMovingToCart(true);
+    try {
+      // Execute all move-to-cart operations in parallel
+      await Promise.all(
+        wishlistItems.map(item => wishlistService.moveToCart(item.productId, item.variantId || undefined, 1))
+      );
+      // Remove all items from local state since they are moved to cart
+      setWishlistItems([]);
+      window.dispatchEvent(new CustomEvent('cart-items-added'));
+    } catch (err) {
+      console.error('Failed to move items to cart', err);
+    } finally {
+      setMovingToCart(false);
+    }
   };
 
   return (
@@ -31,7 +71,7 @@ function AccountWishlistContent() {
         </div>
         <div className={styles.wishlistActions}>
           <Button variant="secondary" icon={<Filter size={16} />}>Sort</Button>
-          <Button variant="primary">Add All to Cart</Button>
+          <Button variant="primary" onClick={handleMoveAllToCart} disabled={movingToCart || wishlistItems.length === 0}>{movingToCart ? "Moving..." : "Add All to Cart"}</Button>
         </div>
       </div>
 
@@ -43,9 +83,19 @@ function AccountWishlistContent() {
         </div>
       ) : wishlistItems.length > 0 ? (
         <div className={styles.grid}>
-          {wishlistItems.map(product => (
-            <ProductCard key={product.id} product={product as any} onRemoveFromWishlist={handleRemove} />
-          ))}
+          {wishlistItems.map(item => {
+            const productData = {
+              ...item.product,
+              id: item.productId // Ensure ProductCard uses productId for removal
+            };
+            return (
+              <ProductCard 
+                key={item.id} 
+                product={productData as any} 
+                onRemoveFromWishlist={() => handleRemove(item.productId)} 
+              />
+            );
+          })}
         </div>
       ) : (
         <EmptyState 
