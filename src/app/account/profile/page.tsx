@@ -164,9 +164,14 @@ function ProfileDetailsContent() {
     setIsSaving(true);
     try {
       const fullName = `${profileForm.firstName.trim()} ${profileForm.lastName.trim()}`.trim();
+      let rawPhone = profileForm.phone.trim();
+      if (rawPhone && !rawPhone.startsWith('+91') && /^\d{10}$/.test(rawPhone)) {
+        rawPhone = `+91 ${rawPhone}`;
+      }
       await profileService.updateBasicProfile({
         name: fullName,
         email: profileForm.email.trim() || undefined,
+        phone: rawPhone || undefined,
       });
 
       showToast("Profile details updated successfully!");

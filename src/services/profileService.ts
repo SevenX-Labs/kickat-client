@@ -3,6 +3,7 @@ import { api } from './api';
 export interface UpdateBasicProfileDto {
   name?: string;
   email?: string;
+  phone?: string;
   gender?: 'MALE' | 'FEMALE' | 'OTHER';
   dob?: string;
 }
