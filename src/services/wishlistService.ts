@@ -22,20 +22,20 @@ export interface WishlistResponse {
 
 export const wishlistService = {
   getWishlist: async (page = 1, limit = 10) => {
-    return api<WishlistResponse>(`v1/wishlist?page=${page}&limit=${limit}`);
+    return api<WishlistResponse>(`wishlist?page=${page}&limit=${limit}`);
   },
   
   addToWishlist: async (productId: string, variantId?: string) => {
     const data: any = { productId };
     if (variantId) data.variantId = variantId;
-    return api<any>('v1/wishlist', {
+    return api<any>('wishlist', {
       method: 'POST',
       data
     });
   },
   
   removeFromWishlist: async (productId: string, variantId?: string) => {
-    let url = `v1/wishlist/${productId}`;
+    let url = `wishlist/${productId}`;
     if (variantId) {
       url += `?variantId=${variantId}`;
     }
@@ -45,7 +45,7 @@ export const wishlistService = {
   },
   
   moveToCart: async (productId: string, variantId?: string, quantity: number = 1) => {
-    let url = `v1/wishlist/${productId}/move-to-cart`;
+    let url = `wishlist/${productId}/move-to-cart`;
     if (variantId) {
       url += `?variantId=${variantId}`;
     }

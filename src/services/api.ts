@@ -68,7 +68,13 @@ export async function api<T>(endpoint: string, options: FetchOptions = {}): Prom
     config.body = JSON.stringify(data);
   }
 
-  const url = `${CONFIG.API_BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+  let cleanEndpoint = endpoint;
+  if (cleanEndpoint.startsWith('/v1/')) {
+    cleanEndpoint = cleanEndpoint.substring(3);
+  } else if (cleanEndpoint.startsWith('v1/')) {
+    cleanEndpoint = cleanEndpoint.substring(3);
+  }
+  const url = `${CONFIG.API_BASE_URL}${cleanEndpoint.startsWith('/') ? cleanEndpoint : `/${cleanEndpoint}`}`;
 
   let response = await fetch(url, config);
 

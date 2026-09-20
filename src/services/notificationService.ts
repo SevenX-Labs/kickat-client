@@ -24,17 +24,17 @@ export interface NotificationsResponse {
 
 export const notificationService = {
   getNotifications: async (page = 1, limit = 10) => {
-    return api<NotificationsResponse>(`v1/notifications?page=${page}&limit=${limit}`);
+    return api<NotificationsResponse>(`notifications?page=${page}&limit=${limit}`);
   },
   
   markAllAsRead: async () => {
-    return api<any>('v1/notifications/read-all', {
+    return api<any>('notifications/read-all', {
       method: 'PATCH'
     });
   },
   
   markAsRead: async (id: string) => {
-    return api<any>(`v1/notifications/${id}/read`, {
+    return api<any>(`notifications/${id}/read`, {
       method: 'PATCH'
     });
   }
