@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { 
-  Package, Search, ChevronDown, MapPin, Check, CheckCircle2, 
-  RefreshCw, FileText, ArrowLeft 
+import {
+  Package, Search, ChevronDown, MapPin, Check, CheckCircle2,
+  RefreshCw, FileText, ArrowLeft, Filter, X
 } from 'lucide-react';
 import styles from '@/app/account/Account.module.css';
 import { Button } from '@/components/ui/Button';
@@ -22,13 +22,14 @@ export default function OrdersContent({ showBackToAccount = true }: OrdersConten
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
   const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set(['ORD-89241']));
 
-  const toggleExpanded = (id: string) => { 
-    const next = new Set(expandedOrders); 
-    if(next.has(id)) next.delete(id); 
-    else next.add(id); 
-    setExpandedOrders(next); 
+  const toggleExpanded = (id: string) => {
+    const next = new Set(expandedOrders);
+    if(next.has(id)) next.delete(id);
+    else next.add(id);
+    setExpandedOrders(next);
   };
 
   useEffect(() => {
@@ -76,7 +77,7 @@ export default function OrdersContent({ showBackToAccount = true }: OrdersConten
 
   const filteredOrders = orders.filter(o => {
     const matchesStatus = statusFilter === 'All' || o.status === statusFilter;
-    const matchesSearch = o.id.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    const matchesSearch = o.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           o.items.some((i: any) => i.name.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesStatus && matchesSearch;
   });
@@ -100,29 +101,28 @@ export default function OrdersContent({ showBackToAccount = true }: OrdersConten
           </div>
         </div>
 
-        <div className={styles.ordersToolbar}>
+        {/* Search Row + Filter Icon Button */}
+        <div className={styles.ordersToolbarRow}>
           <div className={styles.searchBox}>
             <Search size={18} className={styles.searchIcon} />
-            <input 
-              type="text" 
-              placeholder="Search by order ID or product..." 
+            <input
+              type="text"
+              placeholder="Search by order ID or product..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className={styles.searchInput}
             />
           </div>
-          <div className={styles.statusChips}>
-            {statuses.map(s => (
-              <button 
-                key={s} 
-                type="button"
-                className={`${styles.chip} ${statusFilter === s ? styles.chipActive : ''}`}
-                onClick={() => setStatusFilter(s)}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
+          <button
+            type="button"
+            className={`${styles.filterTriggerBtn} ${statusFilter !== 'All' ? styles.filterActive : ''}`}
+            onClick={() => setIsFilterSheetOpen(true)}
+            aria-label="Filter Orders"
+            title="Filter Orders"
+          >
+            <Filter size={18} />
+            {statusFilter !== 'All' && <span className={styles.filterActiveDot} />}
+          </button>
         </div>
 
         {loading ? (
@@ -205,7 +205,7 @@ export default function OrdersContent({ showBackToAccount = true }: OrdersConten
             ))}
           </div>
         ) : (
-          <EmptyState 
+          <EmptyState
             icon={<Package size={48} />}
             title="No orders found"
             description="You haven't placed any orders that match your filters."
@@ -213,6 +213,63 @@ export default function OrdersContent({ showBackToAccount = true }: OrdersConten
           />
         )}
       </div>
+
+      {/* Slide-Up Filter Bottom Sheet Modal */}
+      {isFilterSheetOpen && (
+        <div className={styles.filterSheetBackdrop} onClick={() => setIsFilterSheetOpen(false)}>
+          <div className={styles.filterSheetCard} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.sheetHandle} />
+
+            <div className={styles.sheetHeader}>
+              <h2 className={styles.sheetTitle}>Filter Orders</h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                {statusFilter !== 'All' && (
+                  <button
+                    type="button"
+                    className={styles.resetFilterBtn}
+                    onClick={() => setStatusFilter('All')}
+                  >
+                    Reset
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className={styles.sheetCloseBtn}
+                  onClick={() => setIsFilterSheetOpen(false)}
+                  aria-label="Close Filter"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            <div className={styles.sheetOptionsList}>
+              {statuses.map(s => (
+                <button
+                  key={s}
+                  type="button"
+                  className={`${styles.sheetOptionRow} ${statusFilter === s ? styles.sheetOptionSelected : ''}`}
+                  onClick={() => {
+                    setStatusFilter(s);
+                    setIsFilterSheetOpen(false);
+                  }}
+                >
+                  <span>{s === 'All' ? 'All Orders' : s}</span>
+                  {statusFilter === s && <Check size={18} color="#F28C0F" strokeWidth={2.5} />}
+                </button>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              className={styles.sheetApplyBtn}
+              onClick={() => setIsFilterSheetOpen(false)}
+            >
+              Apply Filter
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }
