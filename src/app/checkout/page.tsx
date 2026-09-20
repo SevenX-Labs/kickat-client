@@ -1,3 +1,6 @@
+import { profileService } from '@/services/profileService';
+import { UseLocationButton } from '@/components/ui/UseLocationButton';
+import { DetectedAddress } from '@/services/locationService';
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -65,16 +68,42 @@ export default function CheckoutPage() {
 
   // Form states for validation checkmarks (pre-filled with dummy data)
   const [firstName, setFirstName] = useState('Eduard');
-  const [flat, setFlat] = useState('Flat 101');
-  const [street, setStreet] = useState('SABE ROAD');
-  const [city, setCity] = useState('Mumbai');
-  const [stateName, setStateName] = useState('Maharashtra');
-  const [phone, setPhone] = useState('9876543210');
-  const [email, setEmail] = useState('eduard@example.com');
-  const [zipCode, setZipCode] = useState('400001');
-  
-  // Saved Address Toggle for Demo
-  const [hasSavedAddress, setHasSavedAddress] = useState(true);
+  const [flat, setFlat] = useState('');
+  const [street, setStreet] = useState('');
+  const [city, setCity] = useState('');
+  const [stateName, setStateName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [zipCode, setZipCode] = useState('');
+  const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
+  const [hasSavedAddress, setHasSavedAddress] = useState(false);
+  const [selectedAddressIndex, setSelectedAddressIndex] = useState(0);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchUserData = async () => {
+      try {
+        const res: any = await profileService.getProfile();
+        if (isMounted && res && res.user) {
+          if (res.user.phone) setPhone(res.user.phone);
+          if (res.user.email) setEmail(res.user.email);
+          if (res.user.name) setFirstName(res.user.name.split(' ')[0] || '');
+
+          if (Array.isArray(res.user.addresses) && res.user.addresses.length > 0) {
+            setSavedAddresses(res.user.addresses);
+            setHasSavedAddress(true);
+          } else {
+            setSavedAddresses([]);
+            setHasSavedAddress(false);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load user profile in checkout:', err);
+      }
+    };
+    fetchUserData();
+    return () => { isMounted = false; };
+  }, []);
   
   // Promo code toggle state
   const [isPromoOpen, setIsPromoOpen] = useState(false);
@@ -421,18 +450,45 @@ export default function CheckoutPage() {
                 {currentStep === 1 && (
                   <div className={styles.stepBodyAlt}>
                     
-                    {hasSavedAddress ? (
+                    {hasSavedAddress && savedAddresses.length > 0 ? (
                       <div className={styles.savedAddressContainer}>
+                        {savedAddresses.length > 1 && (
+                          <div style={{ display: 'flex', gap: '8px', marginBottom: '14px', overflowX: 'auto', paddingBottom: '4px' }}>
+                            {savedAddresses.map((addr: any, idx: number) => (
+                              <button
+                                key={addr.id || idx}
+                                type="button"
+                                onClick={() => setSelectedAddressIndex(idx)}
+                                style={{
+                                  padding: '8px 14px',
+                                  borderRadius: '8px',
+                                  border: selectedAddressIndex === idx ? '2px solid #f97316' : '1px solid #EFE7DA',
+                                  background: selectedAddressIndex === idx ? '#FFF4E6' : '#FFFFFF',
+                                  color: selectedAddressIndex === idx ? '#f97316' : '#1E1B18',
+                                  fontWeight: selectedAddressIndex === idx ? 700 : 500,
+                                  fontSize: '0.85rem',
+                                  cursor: 'pointer',
+                                  whiteSpace: 'nowrap'
+                                }}
+                              >
+                                {addr.type || addr.label || `Address ${idx + 1}`} {selectedAddressIndex === idx && '✓'}
+                              </button>
+                            ))}
+                          </div>
+                        )}
                         <div className={styles.savedAddressBlock}>
                           <div className={styles.savedAddressTop}>
                             <div className={styles.homeIconWrapper}><Home size={24} color="#f97316" /></div>
                             <div className={styles.savedAddressDetails}>
-                              <div className={styles.savedAddressName}>Sahil Hode <span className={styles.homeTag}>Home</span></div>
-                              <div className={styles.savedAddressText}>
-                                Marleshwar Apartment, Diva Sabe Gaon, Diva Road (E),<br/>
-                                Sabe Road, Sabe Gaon, Kalyan - 400612, Maharashtra
+                              <div className={styles.savedAddressName}>
+                                {(savedAddresses[selectedAddressIndex] || savedAddresses[0]).name || firstName || 'KickAt Customer'} <span className={styles.homeTag}>{(savedAddresses[selectedAddressIndex] || savedAddresses[0]).type || 'Home'}</span>
                               </div>
-                              <div className={styles.savedAddressPhone}>8652601566</div>
+                              <div className={styles.savedAddressText}>
+                                {(savedAddresses[selectedAddressIndex] || savedAddresses[0]).houseFlat ? `${(savedAddresses[selectedAddressIndex] || savedAddresses[0]).houseFlat}, ` : ''}
+                                {(savedAddresses[selectedAddressIndex] || savedAddresses[0]).buildingStreet || (savedAddresses[selectedAddressIndex] || savedAddresses[0]).addressLine}<br/>
+                                {(savedAddresses[selectedAddressIndex] || savedAddresses[0]).city}, {(savedAddresses[selectedAddressIndex] || savedAddresses[0]).state} - {(savedAddresses[selectedAddressIndex] || savedAddresses[0]).pincode || (savedAddresses[selectedAddressIndex] || savedAddresses[0]).pin}
+                              </div>
+                              {(savedAddresses[selectedAddressIndex] || savedAddresses[0]).phone && <div className={styles.savedAddressPhone}>{(savedAddresses[selectedAddressIndex] || savedAddresses[0]).phone}</div>}
                             </div>
                           </div>
                           <div className={styles.savedAddressDivider}></div>
@@ -443,7 +499,7 @@ export default function CheckoutPage() {
                             </div>
                             <div className={styles.featureItem}>
                               <div className={styles.featureIcon}><MapPin size={16} /></div>
-                              <div><strong>Near you</strong><br/><span>Kalyan, Maharashtra</span></div>
+                              <div><strong>Near you</strong><br/><span>{(savedAddresses[selectedAddressIndex] || savedAddresses[0]).city || 'India'}</span></div>
                             </div>
                             <div className={styles.featureItem}>
                               <div className={styles.featureIcon}><Shield size={16} /></div>
@@ -456,7 +512,22 @@ export default function CheckoutPage() {
                           <Plus size={16} /> Add New Address
                         </button>
                         
-                        <button type="button" className={styles.nextStepBtnAlt} onClick={() => setCurrentStep(2)} style={{ marginTop: '1.5rem' }}>
+                        <button 
+                          type="button" 
+                          className={styles.nextStepBtnAlt} 
+                          onClick={() => {
+                            const chosen = savedAddresses[selectedAddressIndex] || (savedAddresses[selectedAddressIndex] || savedAddresses[0]);
+                            if (chosen) {
+                              if (chosen.houseFlat) setFlat(chosen.houseFlat);
+                              if (chosen.buildingStreet || chosen.addressLine) setStreet(chosen.buildingStreet || chosen.addressLine);
+                              if (chosen.city) setCity(chosen.city);
+                              if (chosen.state) setStateName(chosen.state);
+                              if (chosen.pincode || chosen.pin) setZipCode(chosen.pincode || chosen.pin);
+                            }
+                            setCurrentStep(2);
+                          }} 
+                          style={{ marginTop: '1.5rem' }}
+                        >
                           Proceed to Payment <ChevronRight size={18} />
                         </button>
                       </div>
@@ -502,6 +573,15 @@ export default function CheckoutPage() {
                     {/* Home Address */}
                     <div className={styles.formSectionAlt} style={{ marginTop: '2rem' }}>
                       <h3 className={styles.sectionTitleAlt}><MapPin size={18} strokeWidth={1.5} /> Shipping Address</h3>
+                      <UseLocationButton 
+                        onLocationDetected={(addr: DetectedAddress) => {
+                          if (addr.pincode) setZipCode(addr.pincode);
+                          if (addr.city) setCity(addr.city);
+                          if (addr.state) setStateName(addr.state);
+                          if (addr.street) setStreet(addr.street);
+                          if (addr.houseFlat) setFlat(addr.houseFlat);
+                        }}
+                      />
                       <div className={styles.formGrid}>
                       <div className={styles.inputGroup}>
                         <label className={styles.label}>Flat, House no.</label>
@@ -512,7 +592,7 @@ export default function CheckoutPage() {
                       <div className={styles.inputGroup}>
                         <label className={styles.labelAlt}>Building, Company</label>
                         <div className={styles.inputWrapper}>
-                          <input type="text" className={styles.inputAlt} placeholder="e.g. Sunshine Apartments" defaultValue="Sunshine Apartments" />
+                          <input type="text" className={styles.inputAlt} placeholder="e.g. Sunshine Apartments" />
                         </div>
                       </div>
                       <div className={styles.inputGroup}>

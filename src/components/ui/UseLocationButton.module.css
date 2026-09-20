@@ -1,0 +1,59 @@
+
+.locationBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 18px;
+  background: rgba(249, 115, 22, 0.08);
+  color: #f97316;
+  border: 1.5px dashed rgba(249, 115, 22, 0.4);
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  width: 100%;
+  margin-bottom: 1.25rem;
+  box-sizing: border-box;
+  touch-action: manipulation;
+}
+
+.locationBtn:hover:not(:disabled) {
+  background: rgba(249, 115, 22, 0.15);
+  border-color: #f97316;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
+}
+
+.locationBtn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.locationBtn:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+  border-style: solid;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 480px) {
+  .locationBtn {
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    gap: 6px;
+    margin-bottom: 1rem;
+  }
+}

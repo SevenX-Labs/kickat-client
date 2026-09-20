@@ -1,3 +1,5 @@
+import { UseLocationButton } from '@/components/ui/UseLocationButton';
+import { DetectedAddress } from '@/services/locationService';
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -311,6 +313,18 @@ export default function OnboardingPage() {
 
           {step === 2 && (
             <div>
+              <UseLocationButton 
+                onLocationDetected={(addr: DetectedAddress) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    pincode: addr.pincode || prev.pincode,
+                    city: addr.city || prev.city,
+                    state: addr.state || prev.state,
+                    address: addr.street || prev.address,
+                    houseFlat: addr.houseFlat || prev.houseFlat,
+                  }));
+                }}
+              />
               <div className={styles.formRow}>
                 <div className={styles.inputGroup}>
                   <label className={styles.label}>Flat / House No. / Building</label>
