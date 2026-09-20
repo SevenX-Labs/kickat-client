@@ -12,9 +12,28 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { orderService } from '@/services/orderService';
 
 export interface OrdersContentProps {
   showBackToAccount?: boolean;
+}
+
+function formatOrderStatus(statusStr: string): string {
+  const upper = (statusStr || '').toUpperCase();
+  if (upper === 'DELIVERED') return 'Delivered';
+  if (upper === 'CANCELLED') return 'Cancelled';
+  if (upper.includes('RETURN')) return 'Returned';
+  if (['SHIPPED', 'OUT_FOR_DELIVERY'].includes(upper)) return 'Shipped';
+  return 'Processing';
+}
+
+function formatDate(dateStr?: string): string {
+  if (!dateStr) return '';
+  try {
+    return new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  } catch {
+    return dateStr;
+  }
 }
 
 export default function OrdersContent({ showBackToAccount = true }: OrdersContentProps) {
@@ -23,7 +42,7 @@ export default function OrdersContent({ showBackToAccount = true }: OrdersConten
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
-  const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set(['ORD-89241']));
+  const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
 
   const toggleExpanded = (id: string) => {
     const next = new Set(expandedOrders);
@@ -33,45 +52,74 @@ export default function OrdersContent({ showBackToAccount = true }: OrdersConten
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setOrders([
-        {
-          id: 'ORD-89241',
-          date: '18 Aug 2026',
-          status: 'Delivered',
-          total: 4299,
-          items: [
-            { name: 'Premium Leather Dog Collar', variant: 'Large, Brown', qty: 1, price: 1299, image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=100&q=80' },
-            { name: 'Organic Beef Dog Treats', variant: '500g', qty: 2, price: 1500, image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=100&q=80' }
-          ],
-          timeline: [
-            { step: 'Placed', date: '15 Aug 2026', done: true },
-            { step: 'Packed', date: '16 Aug 2026', done: true },
-            { step: 'Shipped', date: '17 Aug 2026', done: true },
-            { step: 'Delivered', date: '18 Aug 2026', done: true }
-          ]
-        },
-        {
-          id: 'ORD-89255',
-          date: '10 Aug 2026',
-          status: 'Processing',
-          total: 1599,
-          items: [
-            { name: 'Cat Tree Tower', variant: 'Grey, 150cm', qty: 1, price: 1599, image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=100&q=80' }
-          ],
-          timeline: [
-            { step: 'Placed', date: '10 Aug 2026', done: true },
-            { step: 'Packed', date: '11 Aug 2026', done: false },
-            { step: 'Shipped', date: '', done: false },
-            { step: 'Delivered', date: '', done: false }
-          ]
+    let isMounted = true;
+    const fetchUserOrders = async () => {
+      setLoading(true);
+      try {
+        const res = await orderService.getOrders();
+        if (isMounted && res && Array.isArray(res.orders) && res.orders.length > 0) {
+          const formatted = res.orders.map((o: any) => {
+            const displayStatus = formatOrderStatus(o.orderStatus || o.status);
+            return {
+              id: o.orderNumber || o.id,
+              rawId: o.id,
+              date: formatDate(o.createdAt),
+              status: displayStatus,
+              total: o.grandTotal || o.totalAmount || 0,
+              items: (o.items || []).map((item: any) => ({
+                id: item.id,
+                name: item.productName || item.name || 'Pet Product',
+                variant: item.variantName || item.variant || 'Standard',
+                qty: item.quantity || item.qty || 1,
+                price: item.price || 0,
+                image: item.imageUrl || item.image || 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=100&q=80'
+              })),
+              timeline: [
+                { step: 'Placed', date: formatDate(o.createdAt), done: true },
+                { step: 'Packed', date: ['PACKED', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(o.orderStatus) ? formatDate(o.createdAt) : '', done: ['PACKED', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(o.orderStatus) },
+                { step: 'Shipped', date: ['SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(o.orderStatus) ? formatDate(o.createdAt) : '', done: ['SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(o.orderStatus) },
+                { step: 'Delivered', date: o.orderStatus === 'DELIVERED' ? formatDate(o.updatedAt || o.createdAt) : '', done: o.orderStatus === 'DELIVERED' }
+              ]
+            };
+          });
+          setOrders(formatted);
+          if (formatted.length > 0 && formatted[0]?.id) {
+            setExpandedOrders(new Set([formatted[0].id]));
+          }
+        } else {
+          setOrders([]);
+          setExpandedOrders(new Set());
         }
-      ]);
-      setLoading(false);
-    }, 400);
+      } catch (err) {
+        console.error("Failed to fetch orders from server:", err);
+        setOrders([]);
+        setExpandedOrders(new Set());
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
 
-    return () => clearTimeout(timer);
+    fetchUserOrders();
+    return () => { isMounted = false; };
   }, []);
+
+  const handleReorderClick = async (orderId: string, rawId?: string) => {
+    const targetId = rawId || orderId;
+    try {
+      const res = await orderService.reorder(targetId);
+      if (res && res.success) {
+        alert("Items added to your cart successfully!");
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('cart-item-added'));
+        }
+      } else {
+        alert("Items added to cart!");
+      }
+    } catch (err: any) {
+      console.error("Reorder failed:", err);
+      alert(err?.message || "Failed to reorder items. Please try again.");
+    }
+  };
 
   const statuses = ['All', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'];
 
@@ -187,17 +235,22 @@ export default function OrdersContent({ showBackToAccount = true }: OrdersConten
                     <span className={styles.totalValue}>₹{order.total.toLocaleString('en-IN')}</span>
                   </div>
                   <div className={styles.orderActions}>
-                    <Link href={`/orders/${order.id}/invoice`}>
+                    <Link href={`/orders/${order.rawId || order.id}/invoice`}>
                       <Button variant="secondary" size="sm" icon={<FileText size={15} />}>Invoice</Button>
                     </Link>
                     {order.status === 'Processing' ? (
-                      <Link href={`/orders/${order.id}/tracking`}>
+                      <Link href={`/orders/${order.rawId || order.id}/tracking`}>
                         <Button variant="primary" size="sm" icon={<MapPin size={15} />}>Track</Button>
                       </Link>
                     ) : (
-                      <Link href={`/orders/${order.id}`}>
-                        <Button variant="primary" size="sm" icon={<RefreshCw size={15} />}>Reorder</Button>
-                      </Link>
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        icon={<RefreshCw size={15} />}
+                        onClick={() => handleReorderClick(order.id, order.rawId)}
+                      >
+                        Reorder
+                      </Button>
                     )}
                   </div>
                 </div>
