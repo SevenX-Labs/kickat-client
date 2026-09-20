@@ -376,7 +376,7 @@
 /* Safe Area & Mobile Bottom Navigation Spacing */
 @media (max-width: 1023px) {
   .navContainer {
-    padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 80px);
+    padding-bottom: 0;
   }
 }
 
