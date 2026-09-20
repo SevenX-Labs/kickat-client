@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, Suspense } from 'react';
-import { Shield, Key, Download, MonitorSmartphone, AlertTriangle, ChevronRight, ToggleLeft, ToggleRight } from 'lucide-react';
+import Link from 'next/link';
+import { Shield, Key, Download, MonitorSmartphone, AlertTriangle, ArrowLeft, ChevronRight, ToggleLeft, ToggleRight } from 'lucide-react';
 import styles from '../Account.module.css';
 import { Button } from '@/components/ui/Button';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
@@ -14,6 +15,13 @@ function PrivacyContent() {
 
   return (
     <>
+      <div className={styles.backHeaderGroup}>
+        <Link href="/account" className={styles.backToAccountBtn}>
+          <ArrowLeft size={18} />
+          <span>Back to Account</span>
+        </Link>
+      </div>
+
       <div className={styles.contentArea}>
         <div className={styles.pageHeader}>
           <div>

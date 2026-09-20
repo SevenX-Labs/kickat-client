@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, Suspense } from 'react';
-import { CreditCard, Plus, ShieldCheck, Lock, Trash2, Smartphone } from 'lucide-react';
+import Link from 'next/link';
+import { CreditCard, Plus, ShieldCheck, Lock, Trash2, Smartphone, ArrowLeft } from 'lucide-react';
 import styles from '../Account.module.css';
 import { Button } from '@/components/ui/Button';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
@@ -22,6 +23,13 @@ function PaymentMethodsContent() {
 
   return (
     <>
+      <div className={styles.backHeaderGroup}>
+        <Link href="/account" className={styles.backToAccountBtn}>
+          <ArrowLeft size={18} />
+          <span>Back to Account</span>
+        </Link>
+      </div>
+
       <div className={styles.contentArea}>
         <div className={styles.pageHeader}>
           <div>

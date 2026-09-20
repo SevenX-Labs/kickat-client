@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, Suspense } from 'react';
+import Link from 'next/link';
 import { MapPin, Plus, Check, Trash2, Home, Briefcase, ArrowLeft } from 'lucide-react';
 import styles from '../Account.module.css';
 import { Button } from '@/components/ui/Button';
@@ -31,6 +32,13 @@ function SavedAddressesContent() {
 
   return (
     <>
+      <div className={styles.backHeaderGroup}>
+        <Link href="/account" className={styles.backToAccountBtn}>
+          <ArrowLeft size={18} />
+          <span>Back to Account</span>
+        </Link>
+      </div>
+
       <div className={styles.contentArea}>
         <div className={styles.pageHeader}>
           <div>

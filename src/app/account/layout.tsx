@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import AccountSidebarNav from '@/components/account/AccountSidebarNav';
 import { useAuth } from '@/context/AuthContext';
 import { profileService } from '@/services/profileService';
@@ -9,6 +9,7 @@ import styles from './Account.module.css';
 
 export default function AccountLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { user, setUser, isAuthenticated, isLoading } = useAuth();
   const [userData, setUserData] = useState({
     firstName: 'KickAt',
@@ -21,6 +22,8 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
     tier: 'KickAt VIP',
     currency: 'INR (₹)'
   });
+
+  const isRootAccountPage = pathname === '/account' || pathname === '/account/';
 
   useEffect(() => {
     if (!isAuthenticated && !isLoading) {
@@ -84,8 +87,10 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
   return (
     <div className={styles.pageWrapper}>
       <main className={styles.container}>
-        <div className={styles.accountLayout}>
-          <AccountSidebarNav user={userData} />
+        <div className={`${styles.accountLayout} ${isRootAccountPage ? styles.isRootMenu : styles.isSubPage}`}>
+          <div className={styles.sidebarWrapper}>
+            <AccountSidebarNav user={userData} />
+          </div>
           <div className={styles.mainContentPanel}>
             {children}
           </div>

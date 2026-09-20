@@ -35,18 +35,62 @@
 }
 
 .accountLayout {
-  display: grid;
-  grid-template-columns: 300px minmax(0, 1fr);
-  column-gap: 32px;
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
 }
 
-.accountLayout > :first-child {
-  position: sticky;
-  top: 96px;
-  height: calc(100vh - 120px);
-  overflow-y: auto;
-  scrollbar-width: thin;
+.sidebarWrapper {
+  width: 100%;
+}
+
+/* Mobile Drill-Down Layout (max-width: 1023px) */
+@media (max-width: 1023px) {
+  .container {
+    padding: 16px 16px 40px 16px;
+  }
+
+  .accountLayout.isRootMenu .sidebarWrapper {
+    display: block !important;
+    width: 100%;
+  }
+
+  .accountLayout.isRootMenu .mainContentPanel {
+    display: none !important;
+  }
+
+  .accountLayout.isSubPage .sidebarWrapper {
+    display: none !important;
+  }
+
+  .accountLayout.isSubPage .mainContentPanel {
+    display: flex !important;
+    width: 100%;
+  }
+}
+
+/* Desktop Side-by-Side 2-Column Layout (min-width: 1024px) */
+@media (min-width: 1024px) {
+  .accountLayout {
+    display: grid !important;
+    grid-template-columns: 300px minmax(0, 1fr) !important;
+    column-gap: 32px !important;
+    align-items: start;
+  }
+
+  .sidebarWrapper {
+    display: block !important;
+    position: sticky;
+    top: 96px;
+    height: calc(100vh - 120px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  .mainContentPanel {
+    display: flex !important;
+  }
 }
 
 .mainContentPanel {

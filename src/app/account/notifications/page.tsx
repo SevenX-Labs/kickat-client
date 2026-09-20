@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, Suspense } from 'react';
-import { Bell, Package, Tag, Info, Trash2, CheckCircle2 } from 'lucide-react';
+import Link from 'next/link';
+import { Bell, Package, Tag, Info, Trash2, CheckCircle2, ArrowLeft } from 'lucide-react';
 import styles from '../Account.module.css';
 import { Button } from '@/components/ui/Button';
 import { notificationService, NotificationItem } from '@/services/notificationService';

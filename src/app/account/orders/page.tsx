@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
-  Package, Search, Filter, X, ChevronDown, MapPin, Check, CheckCircle2, 
+  Package, Search, Filter, X, ChevronDown, MapPin, Check, CheckCircle2, ArrowLeft, 
   RefreshCw, ChevronRight, FileText
 } from 'lucide-react';
 import styles from '../Account.module.css';
@@ -82,6 +82,13 @@ function AccountOrdersContent() {
 
   return (
     <>
+      <div className={styles.backHeaderGroup}>
+        <Link href="/account" className={styles.backToAccountBtn}>
+          <ArrowLeft size={18} />
+          <span>Back to Account</span>
+        </Link>
+      </div>
+
       <div className={styles.contentArea}>
         <div className={styles.pageHeader}>
           <div>
