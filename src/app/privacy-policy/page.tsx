@@ -1,4 +1,3 @@
-import PrivacyPage, { metadata } from '../privacy/page';
+import PrivacyPage from '../privacy/page';
 
-export { metadata };
 export default PrivacyPage;

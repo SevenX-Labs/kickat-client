@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
   User, Mail, Phone, Calendar, ShieldCheck, 
-  Edit3, Sparkles, Crown, ChevronRight, X, Loader2, ArrowLeft, CheckCircle2
+  Edit3, Crown, X, Loader2, ArrowLeft, CheckCircle2
 } from 'lucide-react';
 import styles from '../Account.module.css';
 import { useAuth } from '@/context/AuthContext';
@@ -123,7 +123,6 @@ function ProfileDetailsContent() {
       const updatedUserRes: any = await profileService.updateBasicProfile({
         name: fullName,
         email: profileForm.email.trim(),
-        
       });
 
       const updatedUser = updatedUserRes?.profile?.user || updatedUserRes?.user || updatedUserRes?.data || updatedUserRes;
@@ -153,117 +152,108 @@ function ProfileDetailsContent() {
 
   return (
     <>
-      
+      {/* Toast Notification */}
+      {toastMsg && (
+        <div className={styles.toastNotification}>
+          <CheckCircle2 size={18} color="#16A34A" />
+          <span>{toastMsg}</span>
+        </div>
+      )}
 
-      
-        
-          
-          
+      {/* Back to Account Link */}
+      <div className={styles.backHeaderGroup}>
+        <Link href="/account" className={styles.backToAccountBtn}>
+          <ArrowLeft size={18} />
+          <span>Back to Account</span>
+        </Link>
+      </div>
 
-          {/* Profile Details Content */}
-          <div className={styles.contentArea}>
-            
-      <div className={styles.mainContentPanel}>
-              
-              {/* Back to Account Link */}
-              <div className={styles.backHeaderGroup}>
-                <Link href="/account" className={styles.backToAccountBtn}>
-                  <ArrowLeft size={18} />
-                  <span>Back to Account</span>
-                </Link>
+      {/* Personal Information Card */}
+      <div className={styles.sectionBlockCard}>
+        <div className={styles.sectionBlockHeader}>
+          <div>
+            <h1 className={styles.blockTitle}>Profile Details</h1>
+            <p className={styles.blockSubtitle}>Manage your personal identity, contact preferences, and security settings.</p>
+          </div>
+          <button 
+            type="button" 
+            className={styles.editHeaderBtn}
+            onClick={openEditModal}
+          >
+            <Edit3 size={15} />
+            <span>Edit Profile</span>
+          </button>
+        </div>
+
+        {isLoadingProfile ? (
+          <div style={{ padding: '3rem 2rem', textAlign: 'center', color: '#78746D' }}>
+            <Loader2 size={28} className="animate-spin" style={{ margin: '0 auto 0.75rem', color: '#F28C0F' }} />
+            <p style={{ fontWeight: 500 }}>Loading profile details...</p>
+          </div>
+        ) : (
+          <div className={styles.infoFieldsGrid}>
+            <div className={styles.infoFieldBox}>
+              <div className={styles.fieldIconWrap}>
+                <User size={18} />
               </div>
-
-              {/* Personal Information Card */}
-              <div className={styles.sectionBlockCard}>
-                <div className={styles.sectionBlockHeader}>
-                  <div>
-                    <h1 className={styles.blockTitle}>Profile Details</h1>
-                    <p className={styles.blockSubtitle}>Manage your personal identity, contact preferences, and security settings.</p>
-                  </div>
-                  <button 
-                    type="button" 
-                    className={styles.editHeaderBtn}
-                    onClick={openEditModal}
-                  >
-                    <Edit3 size={15} />
-                    <span>Edit Profile</span>
-                  </button>
-                </div>
-
-                {isLoadingProfile ? (
-                  <div style={{ padding: '2rem', textAlign: 'center', color: '#78746D' }}>
-                    <Loader2 size={24} className="animate-spin" style={{ margin: '0 auto 0.5rem' }} />
-                    <p>Loading details...</p>
-                  </div>
-                ) : (
-                  <div className={styles.infoFieldsGrid}>
-                    <div className={styles.infoFieldBox}>
-                      <div className={styles.fieldIconWrap}>
-                        <User size={18} />
-                      </div>
-                      <div className={styles.fieldMeta}>
-                        <span className={styles.fieldLabel}>Full Name</span>
-                        <span className={styles.fieldValue}>{userData.firstName} {userData.lastName}</span>
-                      </div>
-                    </div>
-
-                    <div className={styles.infoFieldBox}>
-                      <div className={styles.fieldIconWrap}>
-                        <Mail size={18} />
-                      </div>
-                      <div className={styles.fieldMeta}>
-                        <span className={styles.fieldLabel}>Email Address</span>
-                        <span className={styles.fieldValue}>{userData.email}</span>
-                      </div>
-                    </div>
-
-                    <div className={styles.infoFieldBox}>
-                      <div className={styles.fieldIconWrap}>
-                        <Phone size={18} />
-                      </div>
-                      <div className={styles.fieldMeta}>
-                        <span className={styles.fieldLabel}>Phone Number</span>
-                        <span className={styles.fieldValue}>{userData.phone}</span>
-                      </div>
-                    </div>
-
-                    <div className={styles.infoFieldBox}>
-                      <div className={styles.fieldIconWrap}>
-                        <Calendar size={18} />
-                      </div>
-                      <div className={styles.fieldMeta}>
-                        <span className={styles.fieldLabel}>Member Since</span>
-                        <span className={styles.fieldValue}>{userData.memberSince}</span>
-                      </div>
-                    </div>
-
-                    <div className={styles.infoFieldBox}>
-                      <div className={styles.fieldIconWrap}>
-                        <Crown size={18} />
-                      </div>
-                      <div className={styles.fieldMeta}>
-                        <span className={styles.fieldLabel}>Membership Tier</span>
-                        <span className={styles.fieldValue}>{userData.tier}</span>
-                      </div>
-                    </div>
-
-                    <div className={styles.infoFieldBox}>
-                      <div className={styles.fieldIconWrap}>
-                        <ShieldCheck size={18} />
-                      </div>
-                      <div className={styles.fieldMeta}>
-                        <span className={styles.fieldLabel}>Account Status</span>
-                        <span className={styles.fieldValue} style={{ color: '#16A34A', fontWeight: 700 }}>Verified</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
+              <div className={styles.fieldMeta}>
+                <span className={styles.fieldLabel}>Full Name</span>
+                <span className={styles.fieldValue}>{userData.firstName} {userData.lastName}</span>
               </div>
+            </div>
 
+            <div className={styles.infoFieldBox}>
+              <div className={styles.fieldIconWrap}>
+                <Mail size={18} />
+              </div>
+              <div className={styles.fieldMeta}>
+                <span className={styles.fieldLabel}>Email Address</span>
+                <span className={styles.fieldValue}>{userData.email}</span>
+              </div>
+            </div>
+
+            <div className={styles.infoFieldBox}>
+              <div className={styles.fieldIconWrap}>
+                <Phone size={18} />
+              </div>
+              <div className={styles.fieldMeta}>
+                <span className={styles.fieldLabel}>Phone Number</span>
+                <span className={styles.fieldValue}>{userData.phone}</span>
+              </div>
+            </div>
+
+            <div className={styles.infoFieldBox}>
+              <div className={styles.fieldIconWrap}>
+                <Calendar size={18} />
+              </div>
+              <div className={styles.fieldMeta}>
+                <span className={styles.fieldLabel}>Member Since</span>
+                <span className={styles.fieldValue}>{userData.memberSince}</span>
+              </div>
+            </div>
+
+            <div className={styles.infoFieldBox}>
+              <div className={styles.fieldIconWrap}>
+                <Crown size={18} />
+              </div>
+              <div className={styles.fieldMeta}>
+                <span className={styles.fieldLabel}>Membership Tier</span>
+                <span className={styles.fieldValue}>{userData.tier}</span>
+              </div>
+            </div>
+
+            <div className={styles.infoFieldBox}>
+              <div className={styles.fieldIconWrap}>
+                <ShieldCheck size={18} />
+              </div>
+              <div className={styles.fieldMeta}>
+                <span className={styles.fieldLabel}>Account Status</span>
+                <span className={styles.fieldValue} style={{ color: '#16A34A', fontWeight: 700 }}>Verified</span>
+              </div>
             </div>
           </div>
-
-        
+        )}
+      </div>
 
       {/* Edit Profile Modal */}
       {isEditProfileOpen && (
@@ -271,7 +261,7 @@ function ProfileDetailsContent() {
           <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <div className={styles.modalTitleGroup}>
-                <Edit3 size={20} color="#F99205" />
+                <Edit3 size={20} color="#F28C0F" />
                 <h2>Edit Personal Details</h2>
               </div>
               <button 
@@ -362,7 +352,6 @@ function ProfileDetailsContent() {
           </div>
         </div>
       )}
-
     </>
   );
 }
