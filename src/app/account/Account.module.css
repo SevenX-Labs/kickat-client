@@ -48,7 +48,7 @@
 /* Mobile Drill-Down Layout (max-width: 1023px) */
 @media (max-width: 1023px) {
   .container {
-    padding: 16px 16px 40px 16px;
+    padding: 16px 16px calc(env(safe-area-inset-bottom, 20px) + 96px) 16px;
   }
 
   .accountLayout.isRootMenu .sidebarWrapper {

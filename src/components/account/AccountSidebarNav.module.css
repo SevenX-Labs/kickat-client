@@ -1,60 +1,63 @@
-/* AccountSidebarNav.module.css - Unified D2C Sidebar Navigation */
+/* AccountSidebarNav.module.css - Polished Mobile & Desktop Account Navigation */
 
 .navContainer {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
   width: 100%;
 }
 
 .unifiedNavWrapper {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
   width: 100%;
 }
 
-/* 1. Unified Sidebar Main Card */
 .sidebarMainCard {
-  background: #ffffff;
-  border: 1px solid #EBE5DB;
-  border-radius: 20px;
-  padding: 1.25rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.025);
   display: flex;
   flex-direction: column;
+  background: var(--acc-surface, #FFFFFF);
+  border: 1px solid var(--acc-border, #EFE7DA);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
   width: 100%;
   box-sizing: border-box;
 }
 
-/* User Profile Section inside Card */
+/* 1. Profile Header */
 .userProfileSection {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
-  width: 100%;
+  gap: 14px;
+  padding: 12px 8px;
 }
 
 .avatarCircle {
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  background: #FAF7F2;
-  border: 2px solid #E2DCD2;
-  color: #1A1612;
-  font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 1.25rem;
-  font-weight: 700;
+  background: var(--acc-orange-tint, #FFF4E6);
+  border: 2px solid rgba(242, 140, 15, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--acc-orange, #F28C0F);
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .profileMeta {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 3px;
   min-width: 0;
   flex: 1;
 }
@@ -62,440 +65,195 @@
 .vipBadgePill {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  background: #FFF5EE;
-  border: 1px solid rgba(249, 146, 5, 0.25);
-  border-radius: 12px;
-  padding: 0.15rem 0.5rem;
-  font-size: 0.65rem;
-  font-weight: 800;
-  color: #F99205;
+  gap: 5px;
+  background: var(--acc-orange-tint, #FFF4E6);
+  border: 1px solid rgba(242, 140, 15, 0.25);
+  color: #D97706;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
   width: fit-content;
-  white-space: nowrap;
+  margin-bottom: 2px;
 }
 
 .userName {
-  font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 1.1rem;
+  font-size: 16px;
   font-weight: 700;
-  color: #1A1612;
+  color: var(--acc-text, #1A1410);
   margin: 0;
-  line-height: 1.25;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .userEmail {
-  font-size: 0.775rem;
-  color: #78746D;
+  font-size: 13px;
+  color: var(--acc-muted, #6B6157);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+/* 2. Rewards Strip */
+.rewardsStrip {
+  padding: 12px 14px;
+  background: var(--acc-bg, #FAF7F2);
+  border-radius: 14px;
+  margin: 8px 0 12px 0;
+  border: 1px solid var(--acc-border, #EFE7DA);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rewardsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rewardsTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--acc-text, #1A1410);
+}
+
+.rewardsSub {
+  font-size: 11px;
+  color: var(--acc-muted, #6B6157);
+  font-weight: 500;
+}
+
+.rewardsProgressBg {
+  height: 5px;
+  background: #EFE7DA;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.rewardsProgressFill {
+  height: 100%;
+  background: var(--acc-orange, #F28C0F);
+  border-radius: 3px;
+}
+
 .sectionDivider {
   height: 1px;
-  margin: 8px 0;
-  background-color: #F0EAE1;
-  margin: 1.1rem 0 0.75rem;
+  background-color: var(--acc-border, #EFE7DA);
+  margin: 8px 0 16px 0;
   width: 100%;
 }
 
-/* Navigation Menu Items List */
+/* 3. Section Grouping */
 .navMenuList {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  width: 100%;
+  gap: 16px;
 }
 
+.menuGroupBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.groupHeaderLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: #8C827A;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  margin: 4px 0 4px 6px;
+}
+
+/* 4. Navigation Links */
 .navItemLink {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
-  padding: 0.85rem 0.95rem;
+  min-height: 56px;
+  padding: 10px 12px;
   border-radius: 14px;
-  background: #FAF9F6;
-  border: 1px solid #EBE5DB;
-  color: #4A453E;
+  background: #FFFFFF;
+  border: 1px solid transparent;
   text-decoration: none;
-  font-size: 0.875rem;
-  font-weight: 600;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   width: 100%;
   box-sizing: border-box;
 }
 
-.navItemLink:hover {
-  background-color: #FFF5EE;
-  border-color: rgba(249, 146, 5, 0.3);
-  color: #F99205;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+.navItemLink:focus-visible {
+  outline: 2px solid var(--acc-orange, #F28C0F);
+  outline-offset: 2px;
+}
+
+.navItemLink:active {
+  background: #FAF7F2;
+  transform: scale(0.99);
 }
 
 .iconCircleWrap {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: #ffffff;
-  border: 1px solid #E2DCD2;
+  width: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 10px;
+  margin-right: 12px;
+  background: #FAF7F2;
+  color: var(--acc-muted, #6B6157);
   flex-shrink: 0;
   transition: all 0.2s ease;
-}
-
-.navItemLink:hover .iconCircleWrap {
-  background: #F99205;
-  border-color: #F99205;
-}
-
-.navIcon {
-  color: #78746D;
-  transition: color 0.2s ease;
-}
-
-.navItemLink:hover .navIcon {
-  color: #ffffff;
 }
 
 .navTextCol {
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
   flex: 1;
   min-width: 0;
+  text-align: left;
+  gap: 2px;
 }
 
 .navTitle {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #1A1612;
-  white-space: nowrap;
-}
-
-.navItemLink:hover .navTitle {
-  color: #F99205;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--acc-text, #1A1410);
+  line-height: 1.3;
 }
 
 .navSubtitle {
-  font-size: 0.75rem;
-  color: #78746D;
-  font-weight: 400;
+  font-size: 12px;
+  color: var(--acc-muted, #6B6157);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.chevronWrap {
+  width: 24px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .navChevron {
-  color: #A39D93;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
+  color: var(--acc-muted, #6B6157);
+  transition: transform 0.2s ease;
+  opacity: 0.5;
 }
 
-.navItemLink:hover .navChevron {
-  transform: translateX(3px);
-  color: #F99205;
-}
-
-/* Active Item Style */
+/* Active Navigation Item State */
 .activeNavItem {
-  background-color: #FFF5EE !important;
-  color: #F99205 !important;
-  border-color: #F99205 !important;
-  box-shadow: 0 4px 14px rgba(249, 146, 5, 0.15) !important;
+  background: #FFFDF9 !important;
+  border-color: rgba(242, 140, 15, 0.2) !important;
 }
 
-.activeNavItem .iconCircleWrap {
-  background: #F99205 !important;
-  border-color: #F99205 !important;
-}
-
-.activeNavItem .navIcon {
-  color: #ffffff !important;
-}
-
-.activeNavItem .navTitle {
-  color: #F99205 !important;
-}
-
-.activeNavItem .navChevron {
-  color: #F99205 !important;
-}
-
-/* Sign Out Item */
-.signOutItem {
-  background: #FEF2F2 !important;
-  border-color: #FCA5A5 !important;
-  color: #B91C1C !important;
-  margin-top: 0.4rem;
-}
-
-.signOutIconWrap {
-  background: #ffffff !important;
-  border-color: #FCA5A5 !important;
-}
-
-.signOutItem:hover {
-  background-color: #FEE2E2 !important;
-  border-color: #DC2626 !important;
-}
-
-.signOutItem:hover .signOutIconWrap {
-  background: #DC2626 !important;
-  border-color: #DC2626 !important;
-}
-
-.signOutIcon {
-  color: #B91C1C !important;
-}
-
-.signOutItem:hover .signOutIcon {
-  color: #ffffff !important;
-}
-
-.signOutTitle {
-  color: #B91C1C !important;
-  font-size: 0.9rem;
-  font-weight: 700;
-}
-
-/* 2. Need Help Support Card */
-.helpBannerCard {
-  background: linear-gradient(180deg, #FFFFFF 0%, #FFFDFB 100%);
-  border: 1px solid #EBE5DB;
-  border-radius: 20px;
-  padding: 1.15rem 1.1rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  box-sizing: border-box;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
-}
-
-.helpLeftSection {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  width: 100%;
-}
-
-.helpMascotCircle {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: #FFF5EE;
-  border: 1px solid rgba(249, 146, 5, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.65rem;
-  flex-shrink: 0;
-}
-
-.helpTextGroup {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  flex: 1;
-  gap: 0.15rem;
-}
-
-.helpTitle {
-  font-family: var(--font-fraunces), Georgia, serif;
-  font-weight: 700;
-  font-size: 1.05rem;
-  color: #1A1612;
-  text-align: center;
-}
-
-.helpSubtitle {
-  font-size: 0.785rem;
-  color: #78746D;
-  margin-bottom: 0.35rem;
-  text-align: center;
-}
-
-.contactSupportBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  border: 1.5px solid #F99205;
-  background: #ffffff;
-  color: #F99205;
-  padding: 0.35rem 0.95rem;
-  border-radius: 20px;
-  font-size: 0.775rem;
-  font-weight: 700;
-  text-decoration: none;
-  width: fit-content;
-  margin: 0 auto;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(249, 146, 5, 0.1);
-}
-
-.contactSupportBtn:hover {
-  background: #F99205;
-  color: #ffffff;
-}
-
-/* 3. Made with love by KickAt Footer */
-.madeWithLoveFooter {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.65rem 0 0.25rem;
-  font-size: 0.825rem;
-  color: #78746D;
-  text-align: center;
-  font-weight: 500;
-  width: 100%;
-}
-
-.madeWithLoveFooter strong {
-  color: #F99205;
-  font-weight: 800;
-  margin-left: 0.25rem;
-}
-
-@media (max-width: 1023px) {
-  .unifiedNavWrapper {
-    gap: 0.85rem;
-  }
-
-  .sidebarMainCard {
-    padding: 1rem;
-    border-radius: 18px;
-  }
-
-  .navItemLink {
-    padding: 0.75rem 0.85rem;
-  }
-
-  .navTitle {
-    font-size: 0.875rem;
-  }
-
-  .navSubtitle {
-    font-size: 0.725rem;
-  }
-}
-
-
-/* ── DESKTOP SIDEBAR REFINEMENT (MIN-WIDTH: 1024PX) ── */
-@media (min-width: 1024px) {
-  .sidebarMainCard {
-    padding: 1.5rem;
-    border-radius: 20px;
-    background: #ffffff;
-    border: 1px solid #EBE5DB;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.025);
-  }
-
-  .avatarCircle {
-    width: 54px;
-    height: 54px;
-    font-size: 1.3rem;
-    border: 2px solid #E2DCD2;
-  }
-
-  .profileMeta {
-    gap: 0.2rem;
-    min-width: 0;
-  }
-
-  .vipBadgePill {
-    font-size: 0.675rem;
-    padding: 0.18rem 0.55rem;
-    font-weight: 700;
-    border-radius: 10px;
-    margin-bottom: 0.15rem;
-  }
-
-  .userName {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: #1A1612;
-  }
-
-  .userEmail {
-    font-size: 0.785rem;
-    color: #78746D;
-  }
-
-  .sectionDivider {
-    margin: 1.25rem 0 1rem;
-    background-color: #F0EAE1;
-  }
-
-  .navMenuList {
-    gap: 0.55rem;
-  }
-
-  .navItemLink {
-    padding: 0.85rem 1rem;
-    border-radius: 14px;
-    min-height: 54px;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .activeNavItem {
-    background-color: #FFF5EE !important;
-    border-color: rgba(249, 146, 5, 0.4) !important;
-    color: #F99205 !important;
-    box-shadow: 0 4px 14px rgba(249, 146, 5, 0.12) !important;
-    border-left: 3px solid #F99205 !important;
-  }
-
-  .iconCircleWrap {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
-  }
-}
-
-/* Sidebar Redesign Overrides */
-.navMenuList {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 0 16px 16px;
-}
-.navItemLink {
-  display: flex;
-  align-items: center;
-  height: 48px;
-  padding: 0 12px;
-  border-radius: 12px;
-  background: transparent;
-  text-decoration: none;
-  transition: all 0.2s ease;
-  position: relative;
-  overflow: hidden;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-}
-.navItemLink:focus-visible {
-  outline: 2px solid var(--acc-orange);
-  outline-offset: 2px;
-}
-.navItemLink:hover {
-  background: #fbfbfb;
-}
-.navItemLink:hover .navChevron {
-  transform: translateX(2px);
-}
-.activeNavItem {
-  background: var(--acc-orange-tint) !important;
-}
 .activeNavItem::before {
   content: '';
   position: absolute;
@@ -504,145 +262,127 @@
   transform: translateY(-50%);
   height: 60%;
   width: 3px;
-  background-color: var(--acc-orange);
+  background-color: var(--acc-orange, #F28C0F);
   border-radius: 0 4px 4px 0;
 }
-.iconCircleWrap {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  margin-right: 12px;
-  color: var(--acc-muted);
-  position: relative;
-}
+
 .activeNavItem .iconCircleWrap {
-  color: var(--acc-orange);
-  background: #fff;
-  box-shadow: 0 1px 2px rgba(242,140,15,0.1);
+  color: var(--acc-orange, #F28C0F);
+  background: var(--acc-orange-tint, #FFF4E6);
 }
-.notifBadge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  background: var(--acc-danger);
-  color: #fff;
-  font-size: 10px;
-  font-weight: 700;
-  border-radius: 50%;
-  min-width: 16px;
-  height: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid #fff;
-}
-.navTextCol {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  text-align: left;
-}
-.navTitle {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--acc-text);
-}
+
 .activeNavItem .navTitle {
-  color: var(--acc-orange);
+  color: var(--acc-orange, #F28C0F);
+  font-weight: 700;
 }
-.navSubtitle {
-  font-size: 12px;
-  color: var(--acc-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 160px;
-}
-.navChevron {
-  color: var(--acc-muted);
-  transition: transform 0.2s ease;
-  opacity: 0.5;
-}
+
 .activeNavItem .navChevron {
-  color: var(--acc-orange);
+  color: var(--acc-orange, #F28C0F);
   opacity: 1;
 }
 
-/* Rewards Strip */
-.rewardsStrip {
-  padding: 12px 16px;
-  background: var(--acc-bg);
-  border-radius: 12px;
-  margin: 0 16px 8px;
-  border: 1px solid var(--acc-border);
-}
-.rewardsHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-.rewardsTitle {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--acc-text);
-}
-.rewardsSub {
+/* Notification Badge Pill */
+.notifBadgePill {
+  background: var(--acc-danger, #DC2626);
+  color: #FFFFFF;
   font-size: 11px;
-  color: var(--acc-muted);
-}
-.rewardsProgressBg {
-  height: 6px;
-  background: var(--acc-border);
-  border-radius: 3px;
-  overflow: hidden;
-}
-.rewardsProgressFill {
-  height: 100%;
-  background: var(--acc-orange);
-  border-radius: 3px;
+  font-weight: 700;
+  border-radius: 9999px;
+  padding: 2px 8px;
+  margin-right: 6px;
+  flex-shrink: 0;
 }
 
-/* Sign Out */
-.signOutItem:hover {
-  background: var(--acc-danger-tint) !important;
-}
-.signOutItem .navTitle, .signOutItem .signOutTitle {
-  color: var(--acc-danger);
-}
-.signOutItem .iconCircleWrap {
-  color: var(--acc-danger);
-}
-
-.userProfileSection {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px;
-}
-.sidebarMainCard {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-.unifiedNavWrapper {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
+/* Bottom Group: Help & Sign Out */
 .bottomNavGroup {
-  margin-top: auto;
-  padding: 0 16px 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-top: 16px;
 }
-.chevronWrap {
-  width: 20px;
-  flex-shrink: 0;
+
+.signOutItem {
+  background: #FEF2F2 !important;
+  border-color: rgba(220, 38, 38, 0.2) !important;
+  color: var(--acc-danger, #DC2626) !important;
+  margin-top: 4px;
+}
+
+.signOutIconWrap {
+  background: #FFFFFF !important;
+  color: var(--acc-danger, #DC2626) !important;
+}
+
+.signOutTitle {
+  color: var(--acc-danger, #DC2626) !important;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.signOutItem:active {
+  background: #FEE2E2 !important;
+}
+
+/* Premium "Made with Love by KickAt" Footer */
+.madeWithLoveWrapper {
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 20px 12px 12px 12px;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.madeWithLovePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--acc-orange-tint, #FFF4E6);
+  border: 1px solid rgba(242, 140, 15, 0.2);
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--acc-muted, #6B6157);
+  box-shadow: 0 2px 8px rgba(242, 140, 15, 0.06);
+}
+
+.madeWithLovePill strong {
+  color: var(--acc-orange, #F28C0F);
+  font-weight: 800;
+}
+
+.heartIcon {
+  display: inline-block;
+  flex-shrink: 0;
+  animation: heartPulse 2s infinite ease-in-out;
+}
+
+@keyframes heartPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.18); }
+}
+
+.appVersionText {
+  font-size: 11px;
+  color: #9CA3AF;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+/* Safe Area & Mobile Bottom Navigation Spacing */
+@media (max-width: 1023px) {
+  .navContainer {
+    padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 80px);
+  }
+}
+
+/* Desktop Sidebar Styling (min-width: 1024px) */
+@media (min-width: 1024px) {
+  .sidebarMainCard {
+    padding: 20px;
+  }
 }
