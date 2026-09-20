@@ -175,4 +175,54 @@ export const authService = {
     }
     return { success: true, message: 'All sessions revoked successfully' };
   },
+
+  /**
+   * Send Phone Verification OTP for logged in user (POST /users/mobile/send-verification)
+   */
+  async sendUserMobileVerification(phone?: string): Promise<SendOtpResponse> {
+    const data = phone ? { phone: phone.startsWith("+91") ? phone : `+91${phone.replace(/\D/g, "")}` } : {};
+    return api<SendOtpResponse>("/users/mobile/send-verification", {
+      method: "POST",
+      data,
+    });
+  },
+
+  /**
+   * Verify Phone OTP for logged in user (POST /users/mobile/verify)
+   */
+  async verifyUserMobile(otp: string, phone?: string): Promise<MessageResponse> {
+    const data: Record<string, string> = { otp };
+    if (phone) {
+      data.phone = phone.startsWith("+91") ? phone : `+91${phone.replace(/\D/g, "")}`;
+    }
+    return api<MessageResponse>("/users/mobile/verify", {
+      method: "POST",
+      data,
+    });
+  },
+
+  /**
+   * Send Email Verification OTP for logged in user (POST /users/email/send-verification)
+   */
+  async sendUserEmailVerification(email?: string): Promise<SendOtpResponse> {
+    const data = email ? { email } : {};
+    return api<SendOtpResponse>("/users/email/send-verification", {
+      method: "POST",
+      data,
+    });
+  },
+
+  /**
+   * Verify Email OTP for logged in user (POST /users/email/verify)
+   */
+  async verifyUserEmail(otp: string, email?: string): Promise<MessageResponse> {
+    const data: Record<string, string> = { otp };
+    if (email) {
+      data.email = email;
+    }
+    return api<MessageResponse>("/users/email/verify", {
+      method: "POST",
+      data,
+    });
+  },
 };

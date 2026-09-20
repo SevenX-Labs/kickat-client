@@ -1,13 +1,14 @@
 "use client";
 
 import { profileService } from '@/services/profileService';
+import { authService } from '@/services/authService';
 import { UseLocationButton } from '@/components/ui/UseLocationButton';
 import { DetectedAddress } from '@/services/locationService';
 import { useState, useEffect } from 'react';
 import { AnimatedOrderButton } from './AnimatedOrderButton';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Check, Truck, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, CreditCard, Smartphone, ChevronDown, User, MapPin, Lock, Edit3, X, Home, Shield, Plus, Loader2, Calendar, Mail, Package, ShoppingBag, Download, Heart, RotateCcw, Headphones, PawPrint, Sparkles } from 'lucide-react';
+import { Check, Truck, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, CreditCard, Smartphone, ChevronDown, User, MapPin, Lock, Edit3, X, Home, Shield, AlertCircle,  Plus, Loader2, Calendar, Mail, Package, ShoppingBag, Download, Heart, RotateCcw, Headphones, PawPrint, Sparkles } from 'lucide-react';
 import styles from './Checkout.module.css';
 
 // Mock Cart Data for Checkout
@@ -79,6 +80,51 @@ export default function CheckoutPage() {
   const [hasSavedAddress, setHasSavedAddress] = useState(false);
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(0);
 
+  const [isPhoneVerified, setIsPhoneVerified] = useState(true);
+  const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
+  const [phoneOtp, setPhoneOtp] = useState("");
+  const [isSendingPhoneOtp, setIsSendingPhoneOtp] = useState(false);
+  const [isVerifyingPhoneOtp, setIsVerifyingPhoneOtp] = useState(false);
+  const [phoneOtpError, setPhoneOtpError] = useState<string | null>(null);
+
+  const handleSendCheckoutPhoneOtp = async () => {
+    if (!phone) {
+      alert("Please enter a phone number first.");
+      return;
+    }
+    setPhoneOtpError(null);
+    setIsSendingPhoneOtp(true);
+    setIsPhoneModalOpen(true);
+    try {
+      await authService.sendUserMobileVerification(phone);
+    } catch (err: any) {
+      setPhoneOtpError(err?.message || "Failed to send OTP. Please try again.");
+    } finally {
+      setIsSendingPhoneOtp(false);
+    }
+  };
+
+  const handleVerifyCheckoutPhoneOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!phoneOtp || phoneOtp.trim().length !== 6) {
+      setPhoneOtpError("Please enter a 6-digit OTP code");
+      return;
+    }
+    setIsVerifyingPhoneOtp(true);
+    setPhoneOtpError(null);
+    try {
+      await authService.verifyUserMobile(phoneOtp.trim(), phone);
+      setIsPhoneVerified(true);
+      setIsPhoneModalOpen(false);
+      setPhoneOtp("");
+    } catch (err: any) {
+      setPhoneOtpError(err?.message || "Invalid OTP. Please try again.");
+    } finally {
+      setIsVerifyingPhoneOtp(false);
+    }
+  };
+
+
   useEffect(() => {
     let isMounted = true;
     const fetchUserData = async () => {
@@ -86,6 +132,7 @@ export default function CheckoutPage() {
         const res: any = await profileService.getProfile();
         if (isMounted && res && res.user) {
           if (res.user.phone) setPhone(res.user.phone);
+          setIsPhoneVerified(Boolean(res.user.isPhoneVerified));
           if (res.user.email) setEmail(res.user.email);
           if (res.user.name) setFirstName(res.user.name.split(' ')[0] || '');
 
@@ -377,6 +424,74 @@ export default function CheckoutPage() {
           </div>
           
         </div>
+      
+      {/* Phone OTP Verification Modal */}
+      {isPhoneModalOpen && (
+        <div className={styles.modalBackdrop} onClick={() => !isVerifyingPhoneOtp && setIsPhoneModalOpen(false)}>
+          <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <div className={styles.modalTitleGroup}>
+                <Shield size={20} color="#F28C0F" />
+                <h2>Verify Mobile Number</h2>
+              </div>
+              <button
+                type="button"
+                className={styles.modalCloseBtn}
+                onClick={() => setIsPhoneModalOpen(false)}
+                disabled={isVerifyingPhoneOtp}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleVerifyCheckoutPhoneOtp} className={styles.modalForm}>
+              <p style={{ fontSize: 13, color: "#6E6259", margin: "0 0 12px 0" }}>
+                We sent a 6-digit OTP code to <strong>{phone}</strong>.
+              </p>
+
+              {phoneOtpError && (
+                <div style={{ background: "#FEE2E2", color: "#DC2626", padding: "10px 14px", borderRadius: 10, fontSize: 13, marginBottom: 12 }}>
+                  {phoneOtpError}
+                </div>
+              )}
+
+              <div className={styles.inputGroup}>
+                <label className={styles.labelAlt}>Enter 6-Digit OTP</label>
+                <input
+                  type="text"
+                  required
+                  maxLength={6}
+                  className={styles.inputAlt}
+                  placeholder="123456"
+                  value={phoneOtp}
+                  onChange={(e) => setPhoneOtp(e.target.value.replace(/\D/g, ""))}
+                  disabled={isVerifyingPhoneOtp || isSendingPhoneOtp}
+                  style={{ textAlign: "center", letterSpacing: "4px", fontSize: 18, fontWeight: 700 }}
+                />
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 20 }}>
+                <button
+                  type="button"
+                  className={styles.editChangeBtn}
+                  onClick={handleSendCheckoutPhoneOtp}
+                  disabled={isSendingPhoneOtp || isVerifyingPhoneOtp}
+                >
+                  {isSendingPhoneOtp ? "Resending..." : "Resend OTP"}
+                </button>
+                <button
+                  type="submit"
+                  className={styles.saveAddressSubmitBtn}
+                  disabled={isVerifyingPhoneOtp || phoneOtp.length !== 6}
+                >
+                  {isVerifyingPhoneOtp ? "Verifying..." : "Verify & Continue"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       </main>
     );
   }
@@ -417,6 +532,26 @@ export default function CheckoutPage() {
           <div className={styles.formsColumn}>
             
             <div className={styles.mainCard}>
+              
+              {!isPhoneVerified && (
+                <div style={{ background: "#FFF9F0", border: "1px solid #F28C0F", borderRadius: 16, padding: "16px 20px", marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <AlertCircle size={22} color="#F28C0F" />
+                    <div>
+                      <strong style={{ fontSize: 14, color: "#2D261E", display: "block" }}>Phone Number Unverified</strong>
+                      <span style={{ fontSize: 12, color: "#6E6259" }}>Verify your phone number via OTP to receive live tracking SMS & delivery updates.</span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    style={{ background: "#F28C0F", color: "#FFFFFF", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 12, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}
+                    onClick={handleSendCheckoutPhoneOtp}
+                  >
+                    Verify Phone OTP
+                  </button>
+                </div>
+              )}
+
               {currentStep === 1 && (
               <div className={styles.mainCardHeader}>
                 <div className={styles.mainCardHeaderInner}>
