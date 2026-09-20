@@ -1,5 +1,8 @@
 /* Global Layout Overrides */
 .pageWrapper {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   --acc-bg: #FBF8F3;
   --acc-surface: #FFFFFF;
   --acc-border: #EFE7DA;
@@ -1071,7 +1074,10 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  overflow: hidden;
+  flex: 1;
+  min-width: 0;
+  overflow: visible;
+  touch-action: pan-y;
 }
 
 .fieldLabel {
@@ -2014,10 +2020,30 @@ input:checked + .slider:before {
 }
 
 @media (max-width: 640px) {
+  .container {
+    padding-bottom: 120px !important;
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
   .sectionBlockCard {
     padding: 20px 16px !important;
     border-radius: 16px !important;
-    padding-bottom: 90px !important;
+    padding-bottom: 120px !important;
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .contentArea {
+    padding-bottom: 120px !important;
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .infoFieldBox {
+    padding: 16px 14px !important;
+    gap: 12px !important;
+    touch-action: pan-y !important;
   }
 
   .sectionBlockHeader {
@@ -2047,11 +2073,6 @@ input:checked + .slider:before {
   .infoFieldsGrid {
     grid-template-columns: 1fr !important;
     gap: 14px !important;
-  }
-
-  .infoFieldBox {
-    padding: 16px 14px !important;
-    gap: 12px !important;
   }
 
   .fieldValueRow {
