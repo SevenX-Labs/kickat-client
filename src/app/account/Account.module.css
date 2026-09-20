@@ -1953,3 +1953,115 @@ input:checked + .slider:before {
     padding-bottom: 90px !important;
   }
 }
+
+/* Profile Details Enhancements */
+.fieldHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+
+.fieldValueRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  margin-top: 2px;
+}
+
+.verifyBtn {
+  background: #FFF9F0;
+  border: 1px solid #F28C0F;
+  color: #F28C0F;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.verifyBtn:hover {
+  background: #F28C0F;
+  color: #FFFFFF;
+}
+
+.verifiedBadge {
+  color: #16A34A;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.unverifiedBadge {
+  color: #D97706;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .sectionBlockCard {
+    padding: 20px 16px !important;
+    border-radius: 16px !important;
+    padding-bottom: 90px !important;
+  }
+
+  .sectionBlockHeader {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    margin-bottom: 20px !important;
+    padding-bottom: 16px !important;
+  }
+
+  .blockTitle {
+    font-size: 22px !important;
+    white-space: nowrap !important;
+    margin-bottom: 4px !important;
+  }
+
+  .blockSubtitle {
+    font-size: 13px !important;
+  }
+
+  .editHeaderBtn {
+    width: 100% !important;
+    justify-content: center !important;
+    height: 44px !important;
+  }
+
+  .infoFieldsGrid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .infoFieldBox {
+    padding: 16px 14px !important;
+    gap: 12px !important;
+  }
+
+  .fieldValueRow {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 6px !important;
+  }
+
+  .verifyBtn {
+    margin-top: 2px !important;
+    align-self: flex-start !important;
+  }
+}

@@ -280,33 +280,24 @@ function ProfileDetailsContent() {
                 <Mail size={18} />
               </div>
               <div className={styles.fieldMeta}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
+                <div className={styles.fieldHeaderRow}>
                   <span className={styles.fieldLabel}>Email Address</span>
                   {userData.isEmailVerified ? (
-                    <span style={{ color: "#16A34A", fontSize: 11, fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 3 }}>
+                    <span className={styles.verifiedBadge}>
                       <ShieldCheck size={13} /> Verified
                     </span>
                   ) : (
-                    <span style={{ color: "#D97706", fontSize: 11, fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 3 }}>
+                    <span className={styles.unverifiedBadge}>
                       <AlertCircle size={13} /> Unverified
                     </span>
                   )}
                 </div>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 2 }}>
+                <div className={styles.fieldValueRow}>
                   <span className={styles.fieldValue}>{userData.email}</span>
                   {!userData.isEmailVerified && userData.email !== "Not provided" && (
                     <button
                       type="button"
-                      style={{
-                        background: "#FFF9F0",
-                        border: "1px solid #F28C0F",
-                        color: "#F28C0F",
-                        padding: "2px 8px",
-                        borderRadius: 6,
-                        fontSize: 11,
-                        fontWeight: 600,
-                        cursor: "pointer",
-                      }}
+                      className={styles.verifyBtn}
                       onClick={() => handleOpenVerifyModal("EMAIL")}
                     >
                       Verify Now
