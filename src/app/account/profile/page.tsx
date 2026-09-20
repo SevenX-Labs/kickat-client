@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  User,
+  User, UserCheck,
   Mail,
   Phone,
   Calendar,
@@ -42,6 +42,7 @@ function ProfileDetailsContent() {
     phone: "",
     isEmailVerified: false,
     isPhoneVerified: false,
+    gender: "Not specified",
     memberSince: "2025",
     totalOrders: 0,
     points: 100,
@@ -77,6 +78,8 @@ function ProfileDetailsContent() {
               ? profileUser.phone
               : `+91 ${profileUser.phone}`
             : "Not provided",
+          gender: profileUser.gender ? (profileUser.gender === 'PREFER_NOT_TO_SAY' ? 'Not specified' : profileUser.gender.charAt(0).toUpperCase() + profileUser.gender.slice(1).toLowerCase()) : 'Not specified',
+          memberSince: profileUser.createdAt ? new Date(profileUser.createdAt).getFullYear().toString() : (prev.memberSince || '2025'),
           isEmailVerified: Boolean(profileUser.isEmailVerified),
           isPhoneVerified: Boolean(profileUser.isPhoneVerified),
         }));
@@ -119,6 +122,8 @@ function ProfileDetailsContent() {
             ? user.phone
             : `+91 ${user.phone}`
           : "Not provided",
+        gender: (user as any)?.gender ? ((user as any)?.gender === 'PREFER_NOT_TO_SAY' ? 'Not specified' : (user as any)?.gender.charAt(0).toUpperCase() + (user as any)?.gender.slice(1).toLowerCase()) : 'Not specified',
+        memberSince: (user as any).createdAt ? new Date((user as any).createdAt).getFullYear().toString() : (prev.memberSince || '2025'),
         isEmailVerified: Boolean(user.isEmailVerified),
         isPhoneVerified: Boolean(user.isPhoneVerified),
       }));
@@ -147,6 +152,7 @@ function ProfileDetailsContent() {
     lastName: "",
     email: "",
     phone: "",
+    gender: "",
   });
 
   const openEditModal = () => {
@@ -155,6 +161,7 @@ function ProfileDetailsContent() {
       lastName: userData.lastName,
       email: userData.email === "Not provided" ? "" : userData.email,
       phone: userData.phone === "Not provided" ? "" : userData.phone.replace("+91 ", ""),
+      gender: (user as any)?.gender || "",
     });
     setIsEditProfileOpen(true);
   };
@@ -172,6 +179,7 @@ function ProfileDetailsContent() {
         name: fullName,
         email: profileForm.email.trim() || undefined,
         phone: rawPhone || undefined,
+        gender: (profileForm.gender as any) || undefined,
       });
 
       showToast("Profile details updated successfully!");
@@ -355,6 +363,16 @@ function ProfileDetailsContent() {
 
             <div className={styles.infoFieldBox}>
               <div className={styles.fieldIconWrap}>
+                <UserCheck size={18} />
+              </div>
+              <div className={styles.fieldMeta}>
+                <span className={styles.fieldLabel}>Gender</span>
+                <span className={styles.fieldValue}>{userData.gender}</span>
+              </div>
+            </div>
+
+            <div className={styles.infoFieldBox}>
+              <div className={styles.fieldIconWrap}>
                 <Calendar size={18} />
               </div>
               <div className={styles.fieldMeta}>
@@ -463,6 +481,22 @@ function ProfileDetailsContent() {
                   onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
                   disabled={isSaving}
                 />
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label className={styles.inputLabel}>Gender</label>
+                <select
+                  className={styles.modalInput}
+                  value={profileForm.gender}
+                  onChange={(e) => setProfileForm({ ...profileForm, gender: e.target.value })}
+                  disabled={isSaving}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <option value="">Select Gender</option>
+                  <option value="MALE">Male</option>
+                  <option value="FEMALE">Female</option>
+                  <option value="OTHER">Other</option>
+                </select>
               </div>
 
               <div className={styles.modalFooterActions}>
