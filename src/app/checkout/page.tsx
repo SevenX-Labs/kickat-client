@@ -1,8 +1,8 @@
+"use client";
+
 import { profileService } from '@/services/profileService';
 import { UseLocationButton } from '@/components/ui/UseLocationButton';
 import { DetectedAddress } from '@/services/locationService';
-"use client";
-
 import { useState, useEffect } from 'react';
 import { AnimatedOrderButton } from './AnimatedOrderButton';
 import Image from 'next/image';

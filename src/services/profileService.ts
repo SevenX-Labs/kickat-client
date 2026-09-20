@@ -31,6 +31,19 @@ export interface CreatePetDto {
   allergies?: string[];
 }
 
+
+export interface CreatePaymentMethodDto {
+  type: "UPI" | "BANK_ACCOUNT" | "CARD";
+  upiId?: string;
+  accountNumber?: string;
+  ifscCode?: string;
+  accountHolderName?: string;
+  bankName?: string;
+  cardLast4?: string;
+  cardNetwork?: string;
+  isDefault?: boolean;
+}
+
 export const profileService = {
   /**
    * GET /profile (Fetch complete profile with addresses and pets)
@@ -104,6 +117,41 @@ export const profileService = {
   async deletePet(petId: string) {
     return api(`/profile/pets/${petId}`, {
       method: 'DELETE',
+    });
+  },
+
+  /**
+   * GET /profile/payment-methods
+   */
+  async getPaymentMethods(): Promise<any> {
+    return api("/profile/payment-methods", { method: "GET" });
+  },
+
+  /**
+   * POST /profile/payment-methods
+   */
+  async addPaymentMethod(dto: CreatePaymentMethodDto) {
+    return api("/profile/payment-methods", {
+      method: "POST",
+      data: dto as unknown as Record<string, unknown>,
+    });
+  },
+
+  /**
+   * DELETE /profile/payment-methods/:id
+   */
+  async deletePaymentMethod(methodId: string) {
+    return api(`/profile/payment-methods/${methodId}`, {
+      method: "DELETE",
+    });
+  },
+
+  /**
+   * PATCH /profile/payment-methods/:id/default
+   */
+  async setDefaultPaymentMethod(methodId: string) {
+    return api(`/profile/payment-methods/${methodId}/default`, {
+      method: "PATCH",
     });
   },
 };

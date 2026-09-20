@@ -1,7 +1,7 @@
-import { UseLocationButton } from '@/components/ui/UseLocationButton';
-import { DetectedAddress } from '@/services/locationService';
 "use client";
 
+import { UseLocationButton } from '@/components/ui/UseLocationButton';
+import { DetectedAddress } from '@/services/locationService';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Check, ChevronRight, CheckCircle2, User, MapPin, Bone, Loader2, AlertCircle } from 'lucide-react';
