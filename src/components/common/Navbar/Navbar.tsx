@@ -8,6 +8,7 @@ import { ChevronDown, Search, Heart, User, ShoppingBag, Package, Tag, MapPin, Be
 import styles from "./Navbar.module.css";
 import { megaMenuData } from "@/data/megaMenuData";
 import { useAuth } from "@/context/AuthContext";
+import { useCart } from "@/context/CartContext";
 import { FREE_DELIVERY_THRESHOLD, CURRENCY_FORMATTER } from "@/utils/constants";
 
 
@@ -91,7 +92,7 @@ export function Navbar() {
   });
   const [isScrolled, setIsScrolled] = useState(false);
   
-  const [cartCount, setCartCount] = useState(2);
+  const { cartCount } = useCart();
   const [isCartBouncing, setIsCartBouncing] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -127,7 +128,7 @@ export function Navbar() {
     }
 
     const handleCartItemAdded = () => {
-      setCartCount((prev) => prev + 1);
+      // cartCount synced via CartContext
       setIsCartBouncing(true);
       setTimeout(() => {
         setIsCartBouncing(false);

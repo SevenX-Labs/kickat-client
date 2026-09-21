@@ -4,6 +4,7 @@ import React, { useState, useCallback, useMemo, memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useCart } from '@/context/CartContext';
 import { Heart, Star, ShoppingCart, Trash2, Check } from 'lucide-react';
 import styles from './HomeProductCard.module.css';
 
@@ -31,6 +32,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
   const router = useRouter();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
+  const { addToCart } = useCart();
 
   const rating = product.rating || 4.8;
   const reviewsCount = product.reviewsCount || 64;
@@ -124,6 +126,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
     }
 
     setIsAdded(true);
+    addToCart(product.id).catch(err => console.warn("Add to cart error:", err));
   }, [isAdded, product.image, router]);
 
   return (

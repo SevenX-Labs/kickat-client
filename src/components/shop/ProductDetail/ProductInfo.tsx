@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useCart } from '@/context/CartContext';
 import { useRouter } from 'next/navigation';
 import { Star, ShoppingBag, Zap, Ruler, Minus, Plus, Check, X, Dog, Droplets, Waves, Sun } from 'lucide-react';
 import styles from './ProductDetail.module.css';
@@ -18,6 +19,7 @@ interface ProductInfoProps {
 export function ProductInfo({ product, selectedVariant, onSelectVariant }: ProductInfoProps) {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
+  const { addToCart, buyNow } = useCart();
   const [selectedColor, setSelectedColor] = useState('Charcoal & Pumpkin');
   const [selectedSize, setSelectedSize] = useState('M');
   const [quantity, setQuantity] = useState(1);
@@ -120,32 +122,39 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
     };
   };
 
-  const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleAddToCart = async (e: React.MouseEvent<HTMLButtonElement>) => {
     if (hasAdded) {
-      router.push('/cart');
+      router.push("/cart");
       return;
     }
     if (isAdding) return;
-    if (!isAuthenticated) {
-      router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
-      return;
-    }
     const buttonElem = e.currentTarget;
     setIsAdding(true);
     animateFlyToCart(buttonElem);
-
-    setTimeout(() => {
-      setIsAdding(false);
-      setHasAdded(true);
-    }, 1800);
+    try {
+      await addToCart(product.id, selectedVariant?.id, quantity);
+    } catch (err) {
+      console.error("Error adding to cart:", err);
+    } finally {
+      setTimeout(() => {
+        setIsAdding(false);
+        setHasAdded(true);
+      }, 1200);
+    }
   };
 
-  const handleBuyNow = () => {
+  const handleBuyNow = async () => {
     if (!isAuthenticated) {
-      router.push(`/login?redirect=${encodeURIComponent('/checkout')}`);
+      router.push(`/login?redirect=${encodeURIComponent("/checkout")}`);
       return;
     }
-    router.push('/checkout');
+    try {
+      await buyNow(product.id, selectedVariant?.id, quantity);
+      router.push("/checkout");
+    } catch (err) {
+      console.error("Error with Buy Now:", err);
+      router.push("/checkout");
+    }
   };
 
   return (

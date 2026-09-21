@@ -3,17 +3,18 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCart } from "@/context/CartContext";
 import { Home, LayoutGrid, Package, ShoppingBag, User } from "lucide-react";
 import styles from "./BottomNav.module.css";
 
 export function BottomNav() {
   const pathname = usePathname();
-  const [cartCount, setCartCount] = useState(2);
+  const { cartCount } = useCart();
   const [isCartBouncing, setIsCartBouncing] = useState(false);
 
   useEffect(() => {
     const handleCartItemAdded = () => {
-      setCartCount((prev) => prev + 1);
+      // cartCount synced via CartContext
       setIsCartBouncing(true);
       setTimeout(() => {
         setIsCartBouncing(false);
