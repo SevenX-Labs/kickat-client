@@ -86,9 +86,18 @@
     display: block !important;
     position: sticky;
     top: 96px;
-    height: calc(100vh - 120px);
+    max-height: calc(100vh - 120px);
     overflow-y: auto;
-    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .sidebarWrapper::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
   }
 
   .mainContentPanel {
@@ -947,7 +956,8 @@
    PROFILE DETAILS PAGE
    ───────────────────────────────────────────────────────────── */
 .backHeaderGroup {
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  display: flex;
 }
 
 .backToAccountBtn {
@@ -967,6 +977,14 @@
 .backToAccountBtn:hover {
   color: var(--acc-orange);
   background: var(--acc-orange-tint);
+}
+
+/* Hide 'Back to Account' button on desktop/laptop screens (min-width: 1024px) */
+@media (min-width: 1024px) {
+  .backHeaderGroup,
+  .backToAccountBtn {
+    display: none !important;
+  }
 }
 
 .sectionBlockCard {
