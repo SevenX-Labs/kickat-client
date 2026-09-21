@@ -88,12 +88,11 @@
   .sidebarWrapper {
     display: block !important;
     position: sticky;
-    top: 80px;
-    max-height: calc(100vh - 100px);
+    top: 96px;
+    max-height: calc(100vh - 120px);
     overflow-y: auto;
-    overscroll-behavior-y: auto;
+    overscroll-behavior-y: contain !important;
     -webkit-overflow-scrolling: touch;
-    touch-action: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
