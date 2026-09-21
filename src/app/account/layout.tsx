@@ -38,7 +38,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
       try {
         const res: any = await profileService.getProfile();
         const profileUser = res?.profile?.user || res?.user || res?.data || res;
-        
+
         if (profileUser) {
           setUser(profileUser);
           const nameParts = (profileUser.name || '').trim().split(' ');
@@ -88,7 +88,19 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
     <div className={styles.pageWrapper}>
       <main className={styles.container}>
         <div className={`${styles.accountLayout} ${isRootAccountPage ? styles.isRootMenu : styles.isSubPage}`}>
-          <div className={styles.sidebarWrapper}>
+          <div
+            className={styles.sidebarWrapper}
+            onWheel={(e) => {
+              const el = e.currentTarget;
+              const isScrollable = el.scrollHeight > el.clientHeight + 2;
+              const isAtTop = el.scrollTop <= 0 && e.deltaY < 0;
+              const isAtBottom = Math.abs(el.scrollHeight - el.clientHeight - el.scrollTop) <= 2 && e.deltaY > 0;
+
+              if (!isScrollable || isAtTop || isAtBottom) {
+                window.scrollBy({ top: e.deltaY, behavior: 'auto' });
+              }
+            }}
+          >
             <AccountSidebarNav user={userData} />
           </div>
           <div className={styles.mainContentPanel}>
