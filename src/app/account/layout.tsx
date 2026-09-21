@@ -88,7 +88,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
     <div className={styles.pageWrapper}>
       <main className={styles.container}>
         <div className={`${styles.accountLayout} ${isRootAccountPage ? styles.isRootMenu : styles.isSubPage}`}>
-          <div className={styles.sidebarWrapper}>
+          <div className={styles.sidebarWrapper} data-lenis-prevent>
             <AccountSidebarNav user={userData} />
           </div>
           <div className={styles.mainContentPanel}>
