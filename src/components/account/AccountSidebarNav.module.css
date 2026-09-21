@@ -18,7 +18,7 @@
   background: var(--acc-surface, #FFFFFF);
   border: 1px solid var(--acc-border, #EFE7DA);
   border-radius: 20px;
-  padding: 16px;
+  padding: 12px 16px 16px 16px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
   width: 100%;
   box-sizing: border-box;
@@ -29,7 +29,7 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 12px 8px;
+  padding: 4px 8px 10px 8px;
 }
 
 .avatarCircle {
