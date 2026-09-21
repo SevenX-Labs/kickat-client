@@ -33,7 +33,7 @@
   max-width: 1280px;
   width: 100%;
   margin: 0 auto;
-  padding: 32px 32px 64px 32px;
+  padding: 16px 32px 64px 32px;
   flex: 1;
 }
 
@@ -75,23 +75,29 @@
 
 /* Desktop Side-by-Side 2-Column Layout (min-width: 1024px) */
 @media (min-width: 1024px) {
+  .container {
+    padding: 16px 32px 64px 32px !important;
+  }
+
   .accountLayout {
     display: grid !important;
-    grid-template-columns: 300px minmax(0, 1fr) !important;
+    grid-template-columns: 280px minmax(0, 1fr) !important;
     column-gap: 32px !important;
-    align-items: start;
+    row-gap: 0 !important;
+    align-items: start !important;
   }
 
   .sidebarWrapper {
     display: block !important;
     position: sticky;
-    top: 96px;
-    max-height: calc(100vh - 120px);
+    top: 76px;
+    max-height: calc(100vh - 90px);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
     scrollbar-width: none;
     -ms-overflow-style: none;
+    margin: 0 !important;
   }
 
   .sidebarWrapper::-webkit-scrollbar {
@@ -885,9 +891,10 @@
 }
 
 .shortcutCard:hover {
-  border-color: var(--acc-orange);
-  transform: translateY(-3px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
+  border-color: rgba(242, 140, 15, 0.35);
+  background: #FFFDF9;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
 }
 
 .shortcutCardHeader {
@@ -908,12 +915,11 @@
 }
 
 .shortcutCard:hover .shortcutIconWrap {
-  background: var(--acc-orange);
-  color: #FFFFFF;
+  background: var(--acc-orange-tint);
 }
 
 .shortcutCard:hover .shortcutIconWrap svg {
-  color: #FFFFFF !important;
+  color: var(--acc-orange) !important;
 }
 
 .shortcutChevron {
