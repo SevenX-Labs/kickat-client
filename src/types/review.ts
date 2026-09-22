@@ -25,6 +25,32 @@ export interface ReviewRatingBreakdown {
   percentage: number;
 }
 
+export interface RatingDistribution {
+  1: number;
+  2: number;
+  3: number;
+  4: number;
+  5: number;
+  [key: number]: number;
+}
+
+export interface ReviewSummaryData {
+  averageRating: number;
+  totalReviews: number;
+  ratingDistribution: RatingDistribution;
+}
+
+export interface ReviewSummaryResponse {
+  success: boolean;
+  productId: string;
+  summary: ReviewSummaryData;
+}
+
+export interface SingleReviewResponse {
+  success: boolean;
+  review: ReviewItem;
+}
+
 export interface ReviewsPagination {
   page: number;
   limit: number;
@@ -56,15 +82,16 @@ export interface CreateReviewResponse {
 export interface MarkHelpfulResponse {
   success: boolean;
   message: string;
+  isHelpful?: boolean;
   helpfulCount: number;
 }
 
 export interface GetReviewsParams {
-  productId?: string;
+  productId: string;
   page?: number;
   limit?: number;
   rating?: number;
   hasPhotos?: boolean;
   verifiedOnly?: boolean;
-  sort?: 'NEWEST' | 'HELPFUL' | 'HIGHEST' | 'LOWEST';
+  sort?: 'newest' | 'helpful' | 'highest' | 'lowest' | 'NEWEST' | 'HELPFUL' | 'HIGHEST' | 'LOWEST';
 }

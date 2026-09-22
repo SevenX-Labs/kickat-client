@@ -1,26 +1,20 @@
 "use client";
 
-import { useState } from 'react';
-import { Star, Edit3, ArrowRight, MessageSquare } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Star, Edit3, ArrowRight, MessageSquare, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import styles from './ProductDetail.module.css';
 import { Product } from './ProductDetail';
 import { ReviewsDrawer } from './ReviewsDrawer';
 import { WriteReviewModal } from './WriteReviewModal';
+import { reviewService } from '@/services/reviewService';
+import { ReviewSummaryData, ReviewItem } from '@/types/review';
 
 interface ProductReviewsProps {
   product: Product;
 }
 
-const RATING_BREAKDOWN = [
-  { stars: 5, percentage: 68 },
-  { stars: 4, percentage: 20 },
-  { stars: 3, percentage: 8 },
-  { stars: 2, percentage: 3 },
-  { stars: 1, percentage: 1 },
-];
-
-const CUSTOMER_PHOTOS = [
+const DEFAULT_PHOTOS = [
   '/hero-products/dog_food.png',
   '/hero-products/pet_toy.png',
   '/hero-products/pet_bowl.png',
@@ -29,10 +23,59 @@ const CUSTOMER_PHOTOS = [
 ];
 
 export function ProductReviews({ product }: ProductReviewsProps) {
-  const rating = product.rating || 4.8;
-  const reviewsCount = product.reviewsCount || 142;
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [summary, setSummary] = useState<ReviewSummaryData | null>(null);
+  const [liveReviews, setLiveReviews] = useState<ReviewItem[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const fetchSummaryAndReviews = useCallback(async () => {
+    if (!product?.id) return;
+    setIsLoading(true);
+    try {
+      const [sumRes, revRes] = await Promise.allSettled([
+        reviewService.getReviewSummary(product.id),
+        reviewService.getReviews({ productId: product.id, limit: 50, sort: 'newest' }),
+      ]);
+
+      if (sumRes.status === 'fulfilled' && sumRes.value?.summary) {
+        setSummary(sumRes.value.summary);
+      }
+      if (revRes.status === 'fulfilled' && revRes.value?.reviews) {
+        setLiveReviews(revRes.value.reviews);
+      }
+    } catch (err) {
+      console.warn('Could not load live reviews summary:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [product?.id]);
+
+  useEffect(() => {
+    fetchSummaryAndReviews();
+  }, [fetchSummaryAndReviews]);
+
+  const rating = summary?.averageRating || product.rating || 4.8;
+  const reviewsCount = summary?.totalReviews ?? product.reviewsCount ?? liveReviews.length ?? 0;
+
+  // Build 5 -> 1 rating breakdown percentages dynamically
+  const dist = summary?.ratingDistribution || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  const totalInDist = Object.values(dist).reduce((acc, val) => acc + val, 0);
+
+  const ratingBreakdown = [5, 4, 3, 2, 1].map((stars) => {
+    const count = dist[stars] || 0;
+    const percentage = totalInDist > 0 ? Math.round((count / totalInDist) * 100) : 0;
+    return { stars, count, percentage };
+  });
+
+  // Extract photos attached to customer reviews or use defaults
+  const customerPhotos = liveReviews.flatMap((r) => r.photos || []).filter(Boolean);
+  const displayPhotos = customerPhotos.length > 0 ? customerPhotos.slice(0, 5) : DEFAULT_PHOTOS;
+  const extraPhotoCount = customerPhotos.length > 5 ? customerPhotos.length - 5 : 12;
+
+  const handleReviewSubmitted = () => {
+    fetchSummaryAndReviews();
+  };
 
   return (
     <div className={styles.reviewsMainWrapper} id="reviews">
@@ -64,18 +107,18 @@ export function ProductReviews({ product }: ProductReviewsProps) {
 
       {/* Top Ratings Overview Row */}
       <div className={styles.reviewsOverviewCard}>
-        {/* Left: Big Rating Number & Stars */}
+        {/* Left: Big Rating Score & Stars */}
         <div className={styles.ratingNumberBlock} onClick={() => setIsDrawerOpen(true)} style={{ cursor: 'pointer' }}>
-          <span className={styles.bigRatingScore}>{rating}</span>
+          <span className={styles.bigRatingScore}>{typeof rating === 'number' ? rating.toFixed(1) : rating}</span>
           <div className={styles.ratingStarsCol}>
             <div className={styles.starsRowInline}>
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
                   size={18}
-                  fill="#F99205"
-                  color="#F99205"
-                  strokeWidth={1}
+                  fill={i < Math.round(Number(rating)) ? "#F99205" : "#E0DCD4"}
+                  color={i < Math.round(Number(rating)) ? "#F99205" : "#E0DCD4"}
+                  strokeWidth={0}
                 />
               ))}
             </div>
@@ -85,7 +128,7 @@ export function ProductReviews({ product }: ProductReviewsProps) {
 
         {/* Center: Rating Progress Bars */}
         <div className={styles.ratingProgressBarsCol} onClick={() => setIsDrawerOpen(true)} style={{ cursor: 'pointer' }}>
-          {RATING_BREAKDOWN.map((item) => (
+          {ratingBreakdown.map((item) => (
             <div key={item.stars} className={styles.progressRow}>
               <span className={styles.starLabelNum}>{item.stars} ★</span>
               <div className={styles.progressTrack}>
@@ -133,7 +176,7 @@ export function ProductReviews({ product }: ProductReviewsProps) {
         </div>
 
         <div className={styles.customerPhotosRow}>
-          {CUSTOMER_PHOTOS.map((photo, idx) => (
+          {displayPhotos.map((photo, idx) => (
             <div key={idx} className={styles.photoTileWrap} onClick={() => setIsDrawerOpen(true)} style={{ cursor: 'pointer' }}>
               <Image
                 src={photo}
@@ -141,25 +184,27 @@ export function ProductReviews({ product }: ProductReviewsProps) {
                 fill
                 sizes="120px"
                 className={styles.customerPhotoImg}
+                unoptimized={photo.startsWith('data:')}
               />
             </div>
           ))}
 
-          {/* +12 More Tile */}
+          {/* +More Tile */}
           <div 
             className={`${styles.photoTileWrap} ${styles.morePhotosTile}`} 
             onClick={() => setIsDrawerOpen(true)} 
             style={{ cursor: 'pointer' }}
           >
             <Image
-              src={CUSTOMER_PHOTOS[0]}
+              src={displayPhotos[0]}
               alt="More customer photos"
               fill
               sizes="120px"
               className={styles.customerPhotoImg}
+              unoptimized={displayPhotos[0]?.startsWith('data:')}
             />
             <div className={styles.morePhotosOverlay}>
-              <span className={styles.moreCountText}>+12</span>
+              <span className={styles.moreCountText}>+{extraPhotoCount}</span>
               <span className={styles.moreLabelText}>More</span>
             </div>
           </div>
@@ -179,8 +224,8 @@ export function ProductReviews({ product }: ProductReviewsProps) {
         product={product}
         isOpen={showReviewModal}
         onClose={() => setShowReviewModal(false)}
+        onSubmitSuccess={handleReviewSubmitted}
       />
     </div>
   );
 }
-

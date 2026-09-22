@@ -106,23 +106,6 @@ const FALLBACK_REVIEWS: ReviewItem[] = [
     isSpam: false,
     adminReply: null,
   },
-  {
-    id: 'rev-6',
-    productId: '',
-    userName: 'Kabir Das',
-    isVerifiedPurchase: true,
-    rating: 3,
-    createdAt: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString(),
-    title: 'Decent product, good lather',
-    comment: 'Works well for cleaning. Smells nice, though hair fall reduction took about 2 weeks to show noticeable results.',
-    photos: [],
-    helpfulCount: 4,
-    status: 'APPROVED',
-    isSpam: false,
-    adminReply: 'Thank you Kabir. Consistency is key with natural anti-hair fall formulas — we are here if you need any usage tips!',
-    adminReplyAt: new Date(Date.now() - 39 * 24 * 60 * 60 * 1000).toISOString(),
-  },
 ];
 
 function formatRelativeTime(dateString: string): string {
@@ -155,6 +138,7 @@ export function ReviewsDrawer({ product, isOpen, onClose, onWriteReview }: Revie
   const [helpfulVotes, setHelpfulVotes] = useState<Record<string, boolean>>({});
   const [helpfulCountMap, setHelpfulCountMap] = useState<Record<string, number>>({});
   const [previewPhoto, setPreviewPhoto] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Fetch live reviews from backend
   const fetchReviews = useCallback(async () => {
@@ -164,7 +148,7 @@ export function ReviewsDrawer({ product, isOpen, onClose, onWriteReview }: Revie
       const res = await reviewService.getReviews({
         productId: product.id,
         limit: 50,
-        sort: 'NEWEST',
+        sort: 'newest',
       });
       if (res && res.reviews && res.reviews.length > 0) {
         setReviews(res.reviews);
@@ -197,6 +181,29 @@ export function ReviewsDrawer({ product, isOpen, onClose, onWriteReview }: Revie
     };
   }, [isOpen]);
 
+  // Toggle helpful vote on a review
+  const toggleHelpful = async (revId: string) => {
+    try {
+      const res = await reviewService.markHelpful(revId);
+      if (res && res.success) {
+        setHelpfulVotes((prev) => ({
+          ...prev,
+          [revId]: res.isHelpful ?? !prev[revId],
+        }));
+        setHelpfulCountMap((prev) => ({
+          ...prev,
+          [revId]: res.helpfulCount,
+        }));
+        setToastMessage(res.message || 'Updated helpful vote');
+        setTimeout(() => setToastMessage(null), 2500);
+      }
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : 'Could not mark review as helpful';
+      setToastMessage(errMsg);
+      setTimeout(() => setToastMessage(null), 3000);
+    }
+  };
+
   if (!isOpen) return null;
 
   // Filter reviews
@@ -208,128 +215,100 @@ export function ReviewsDrawer({ product, isOpen, onClose, onWriteReview }: Revie
     return true;
   });
 
-  // Calculate dynamic stats
+  // Dynamic stats
   const totalReviewsCount = reviews.length;
   const avgRating =
     totalReviewsCount > 0
       ? (reviews.reduce((acc, r) => acc + r.rating, 0) / totalReviewsCount).toFixed(1)
       : (product.rating || 4.8).toFixed(1);
 
-  // Aggregate all photos across reviews
-  const allCustomerPhotos = reviews.flatMap((r) => r.photos || []);
-
-  const toggleHelpful = async (revId: string) => {
-    const isCurrentlyVoted = !!helpfulVotes[revId];
-    // Optimistic toggle
-    setHelpfulVotes((prev) => ({
-      ...prev,
-      [revId]: !isCurrentlyVoted,
-    }));
-    setHelpfulCountMap((prev) => {
-      const current = prev[revId] ?? (reviews.find((r) => r.id === revId)?.helpfulCount || 0);
-      return {
-        ...prev,
-        [revId]: isCurrentlyVoted ? Math.max(0, current - 1) : current + 1,
-      };
-    });
-
-    if (!isCurrentlyVoted) {
-      try {
-        await reviewService.markHelpful(revId);
-      } catch (err) {
-        console.warn('Could not persist helpful upvote:', err);
-      }
-    }
-  };
+  // Aggregate all customer photos across reviews
+  const allCustomerPhotos = reviews.flatMap((r) => r.photos || []).filter(Boolean);
 
   return (
     <>
       {/* Backdrop */}
       <div className={styles.backdrop} onClick={onClose} />
 
-      {/* Drawer */}
-      <aside
-        className={styles.drawer}
-        aria-label="Customer Reviews Drawer"
-        data-lenis-prevent="true"
-        data-lenis-prevent-wheel="true"
-        data-lenis-prevent-touch="true"
-      >
-        {/* Sticky Header */}
-        <div className={styles.header}>
-          <div className={styles.headerTitleGroup}>
-            <h2 className={styles.title}>Customer Reviews</h2>
-            <div className={styles.badgeRating}>
-              <Star size={13} fill="#F99205" color="#F99205" />
-              <span>{avgRating}</span>
-            </div>
+      {/* Slide-over Drawer */}
+      <aside className={styles.drawerCard} aria-label="Customer Reviews Drawer">
+        {/* Header */}
+        <div className={styles.drawerHeader}>
+          <div>
+            <h3 className={styles.drawerTitle}>Customer Feedback</h3>
+            <p className={styles.drawerSubtitle}>
+              {totalReviewsCount} verified reviews for {product.name || 'this item'}
+            </p>
           </div>
-
           <button
             type="button"
             className={styles.closeBtn}
             onClick={onClose}
             aria-label="Close reviews drawer"
           >
-            <X size={18} />
+            <X size={20} />
           </button>
         </div>
 
-        {/* Scrollable Content */}
-        <div
-          className={styles.contentScrollable}
-          data-lenis-prevent="true"
-          data-lenis-prevent-wheel="true"
-          data-lenis-prevent-touch="true"
-          onWheel={(e) => e.stopPropagation()}
-        >
-          {/* Overview Card */}
-          <div className={styles.summaryCard}>
-            <div className={styles.summaryScoreBlock}>
-              <span className={styles.bigScore}>{avgRating}</span>
-              <div className={styles.scoreSub}>
-                <div className={styles.starsRow}>
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      size={14}
-                      fill={i < Math.round(Number(avgRating)) ? '#F99205' : '#E0DCD4'}
-                      color={i < Math.round(Number(avgRating)) ? '#F99205' : '#E0DCD4'}
-                      strokeWidth={1}
-                    />
-                  ))}
-                </div>
-                <span className={styles.totalText}>Based on {totalReviewsCount} reviews</span>
-              </div>
+        {/* Action Bar */}
+        <div className={styles.actionHeaderBar}>
+          <div className={styles.summaryBadgeInline}>
+            <div className={styles.scoreRow}>
+              <span className={styles.scoreVal}>{avgRating}</span>
+              <Star size={16} fill="#F99205" color="#F99205" strokeWidth={0} />
             </div>
-
-            <button
-              type="button"
-              className={styles.writeBtn}
-              onClick={() => {
-                onClose();
-                onWriteReview();
-              }}
-            >
-              <Edit3 size={14} />
-              <span>Write Review</span>
-            </button>
+            <span className={styles.countText}>{totalReviewsCount} Reviews</span>
           </div>
 
-          {/* Customer Photos Strip */}
+          <button
+            type="button"
+            className={styles.writeReviewCta}
+            onClick={() => {
+              onClose();
+              onWriteReview();
+            }}
+          >
+            <Edit3 size={15} />
+            <span>Write a Review</span>
+          </button>
+        </div>
+
+        {/* Notification Toast */}
+        {toastMessage && (
+          <div
+            style={{
+              padding: '0.6rem 1rem',
+              margin: '0.5rem 1.5rem',
+              background: '#FFFBEB',
+              border: '1px solid #FCD34D',
+              borderRadius: '8px',
+              color: '#92400E',
+              fontSize: '0.8rem',
+              fontWeight: '600',
+              animation: 'fadeIn 0.2s ease',
+            }}
+          >
+            {toastMessage}
+          </div>
+        )}
+
+        <div className={styles.scrollableContent}>
+          {/* Customer Photo Gallery Strip */}
           {allCustomerPhotos.length > 0 && (
-            <div className={styles.photoSection}>
-              <span className={styles.photoSectionTitle}>
-                Customer Photos ({allCustomerPhotos.length})
-              </span>
-              <div className={styles.photoStrip}>
-                {allCustomerPhotos.slice(0, 10).map((src, idx) => (
-                  <div key={idx} className={styles.thumbTile} onClick={() => setPreviewPhoto(src)}>
+            <div className={styles.photoGalleryStripSection}>
+              <h4 className={styles.galleryTitle}>Customer Photos ({allCustomerPhotos.length})</h4>
+              <div className={styles.drawerPhotoGrid}>
+                {allCustomerPhotos.map((src, i) => (
+                  <div
+                    key={i}
+                    className={styles.galleryPhotoWrap}
+                    onClick={() => setPreviewPhoto(src)}
+                  >
                     <Image
                       src={src}
-                      alt={`Customer photo ${idx + 1}`}
+                      alt={`Customer review photo ${i + 1}`}
                       fill
-                      sizes="72px"
+                      sizes="80px"
                       className={styles.thumbImg}
                       unoptimized={src.startsWith('data:')}
                     />

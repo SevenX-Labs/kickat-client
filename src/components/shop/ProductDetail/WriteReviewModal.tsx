@@ -104,7 +104,6 @@ export function WriteReviewModal({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
   const [checkingPurchaser, setCheckingPurchaser] = useState<boolean>(false);
-  const [isVerifiedPurchaser, setIsVerifiedPurchaser] = useState<boolean>(true);
 
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -121,11 +120,7 @@ export function WriteReviewModal({
     if (!isOpen) return;
 
     const checkDeliveredOrder = async () => {
-      if (!isAuthenticated) {
-        // Guest user: allowed to enter orderId manually or inform them
-        return;
-      }
-
+      if (!isAuthenticated) return;
       if (initialOrderId) {
         setOrderId(initialOrderId);
         return;
@@ -142,7 +137,6 @@ export function WriteReviewModal({
           );
           if (deliveredMatch) {
             setOrderId(deliveredMatch.id);
-            setIsVerifiedPurchaser(true);
           }
         }
       } catch (err) {
@@ -153,7 +147,7 @@ export function WriteReviewModal({
     };
 
     checkDeliveredOrder();
-  }, [isOpen, initialOrderId, product.id]);
+  }, [isOpen, initialOrderId, product.id, isAuthenticated]);
 
   if (!isOpen) return null;
 
@@ -174,7 +168,7 @@ export function WriteReviewModal({
       );
       setPreviewImages((prev) => [...prev, ...compressedWebpUrls].slice(0, 5));
     } catch (err) {
-      console.error('Image compression failed:', err);
+      console.error('Image processing failed:', err);
       setErrorMessage('Failed to process image. Please try another file.');
     } finally {
       setIsCompressing(false);
@@ -236,11 +230,16 @@ export function WriteReviewModal({
 
     const effectiveOrderId = orderId.trim();
     if (!effectiveOrderId) {
-      setErrorMessage('Review submission requires a verified delivered order. Please select or provide your Order ID.');
+      setErrorMessage('Review submission requires a verified delivered order UUID. Please enter your Order ID.');
       return;
     }
 
     setIsSubmitting(true);
+
+    // Filter valid HTTP/HTTPS URLs for photos payload
+    const validPhotoUrls = previewImages.filter((img) =>
+      /^https?:\/\//i.test(img)
+    );
 
     try {
       const res = await reviewService.createReview({
@@ -249,10 +248,9 @@ export function WriteReviewModal({
         rating,
         title: title.trim() || undefined,
         comment: message.trim(),
-        photos: previewImages.length > 0 ? previewImages : undefined,
+        photos: validPhotoUrls.length > 0 ? validPhotoUrls : undefined,
       });
 
-      // Instant live feedback toast
       setSuccessToast('Thank you for your feedback! Your review is now live.');
       setIsSubmitted(true);
 
@@ -264,10 +262,10 @@ export function WriteReviewModal({
         setIsSubmitted(false);
         setSuccessToast(null);
         onClose();
-      }, 2000);
+      }, 1500);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to submit review. Please try again.';
-      setErrorMessage(message);
+      const msg = err instanceof Error ? err.message : 'Failed to submit review. Please try again.';
+      setErrorMessage(msg);
     } finally {
       setIsSubmitting(false);
     }
@@ -320,13 +318,13 @@ export function WriteReviewModal({
               background: '#FFF1F2',
               border: '1px solid #FECDD3',
               color: '#9F1239',
-              padding: '0.65rem 0.9rem',
-              borderRadius: '10px',
-              fontSize: '0.8rem',
+              padding: '0.75rem 1rem',
+              borderRadius: '12px',
+              fontSize: '0.825rem',
               fontWeight: '500',
               display: 'flex',
               alignItems: 'center',
-              gap: '0.45rem',
+              gap: '0.5rem',
             }}
           >
             <AlertCircle size={16} className="shrink-0 text-rose-600" />
@@ -335,55 +333,49 @@ export function WriteReviewModal({
         )}
 
         {isSubmitted ? (
-          <div className={styles.successState}>
-            <div className={styles.successIconWrap}>
-              <CheckCircle2 size={40} />
+          <div className={styles.successStateContainer}>
+            <div className={styles.successBadgeCircle}>
+              <CheckCircle2 size={40} className={styles.successIcon} />
             </div>
-            <h4 className={styles.successTitle}>Thank You for Your Feedback!</h4>
-            <p className={styles.successText}>
-              Your review is now live on the storefront. We appreciate your honest opinion!
+            <h4 className={styles.successTitle}>Review Submitted!</h4>
+            <p className={styles.successMessage}>
+              Thank you for sharing your genuine experience!
             </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className={styles.form}>
-            {/* Star Rating Section */}
+            {/* Star Rating Select */}
             <div className={styles.fieldGroup}>
               <div className={styles.labelRow}>
                 <label className={styles.label}>Overall Rating *</label>
-              </div>
-
-              <div className={styles.starPickerContainer}>
-                <div className={styles.starsRow}>
-                  {[1, 2, 3, 4, 5].map((starVal) => {
-                    const isFilled = starVal <= activeRating;
-                    return (
-                      <button
-                        key={starVal}
-                        type="button"
-                        className={styles.starBtn}
-                        onClick={() => setRating(starVal)}
-                        onMouseEnter={() => setHoverRating(starVal)}
-                        onMouseLeave={() => setHoverRating(0)}
-                        aria-label={`Rate ${starVal} star${starVal > 1 ? 's' : ''}`}
-                      >
-                        <Star
-                          size={28}
-                          fill={isFilled ? '#F99205' : 'transparent'}
-                          color={isFilled ? '#F99205' : '#C2BEB6'}
-                          strokeWidth={isFilled ? 0 : 1.5}
-                        />
-                      </button>
-                    );
-                  })}
-                </div>
                 <span className={styles.ratingLabelBadge}>{RATING_LABELS[activeRating]}</span>
+              </div>
+              <div className={styles.starRow}>
+                {[1, 2, 3, 4, 5].map((starVal) => (
+                  <button
+                    key={starVal}
+                    type="button"
+                    className={styles.starPickBtn}
+                    onClick={() => setRating(starVal)}
+                    onMouseEnter={() => setHoverRating(starVal)}
+                    onMouseLeave={() => setHoverRating(0)}
+                    aria-label={`Rate ${starVal} out of 5 stars`}
+                  >
+                    <Star
+                      size={28}
+                      fill={starVal <= activeRating ? '#F99205' : 'transparent'}
+                      color={starVal <= activeRating ? '#F99205' : '#D1D5DB'}
+                      strokeWidth={1.5}
+                    />
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Review Title Input (Optional) */}
+            {/* Review Title Input (Optional, max 200 chars) */}
             <div className={styles.fieldGroup}>
               <div className={styles.labelRow}>
-                <label className={styles.label}>Review Title</label>
+                <label className={styles.label}>Headline / Title</label>
                 <span className={styles.optionalBadge}>Optional</span>
               </div>
               <input
@@ -392,7 +384,7 @@ export function WriteReviewModal({
                 style={{ minHeight: '44px', height: '44px', padding: '0.5rem 0.75rem' }}
                 placeholder="e.g., Best purchase for my pet this year!"
                 value={title}
-                maxLength={150}
+                maxLength={200}
                 onChange={(e) => setTitle(e.target.value)}
               />
             </div>
@@ -412,7 +404,7 @@ export function WriteReviewModal({
               </div>
               <textarea
                 className={styles.textarea}
-                placeholder="Write your honest thoughts... (Minimum 10 characters. All genuine feedback goes live immediately!)"
+                placeholder="Write your honest thoughts... (Minimum 10 characters)"
                 rows={3}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -421,46 +413,43 @@ export function WriteReviewModal({
             </div>
 
             {/* Delivered Order Verification Field */}
-            {!initialOrderId && (
-              <div className={styles.fieldGroup}>
-                <div className={styles.labelRow}>
-                  <label className={styles.label}>Verified Order ID *</label>
-                  <span className={styles.optionalBadge}>Delivered Only</span>
-                </div>
-                <div style={{ position: 'relative' }}>
-                  <input
-                    type="text"
-                    className={styles.textarea}
-                    style={{ minHeight: '44px', height: '44px', padding: '0.5rem 0.75rem' }}
-                    placeholder="Enter delivered order ID (e.g., ORD-89241)"
-                    value={orderId}
-                    onChange={(e) => setOrderId(e.target.value)}
-                    required
-                  />
-                  {checkingPurchaser && (
-                    <div
-                      style={{
-                        position: 'absolute',
-                        right: '10px',
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                      }}
-                    >
-                      <Loader2 size={16} className={styles.spinIcon} />
-                    </div>
-                  )}
-                </div>
+            <div className={styles.fieldGroup}>
+              <div className={styles.labelRow}>
+                <label className={styles.label}>Delivered Order ID (UUID) *</label>
+                <span className={styles.optionalBadge}>Verified Purchase</span>
               </div>
-            )}
+              <div style={{ position: 'relative' }}>
+                <input
+                  type="text"
+                  className={styles.textarea}
+                  style={{ minHeight: '44px', height: '44px', padding: '0.5rem 0.75rem' }}
+                  placeholder="Enter delivered order UUID"
+                  value={orderId}
+                  onChange={(e) => setOrderId(e.target.value)}
+                  required
+                />
+                {checkingPurchaser && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      right: '10px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                    }}
+                  >
+                    <Loader2 size={16} className={styles.spinIcon} />
+                  </div>
+                )}
+              </div>
+            </div>
 
-            {/* Photo / Image Upload Section (Optional, up to 5 photos) */}
+            {/* Photo Upload Section */}
             <div className={styles.fieldGroup}>
               <div className={styles.labelRow}>
                 <label className={styles.label}>Add Photos (Up to 5)</label>
                 <span className={styles.optionalBadge}>Optional</span>
               </div>
 
-              {/* Hidden File Input for Gallery */}
               <input
                 type="file"
                 ref={galleryInputRef}
@@ -469,8 +458,6 @@ export function WriteReviewModal({
                 style={{ display: 'none' }}
                 onChange={handleImageUpload}
               />
-
-              {/* Hidden File Input for Camera */}
               <input
                 type="file"
                 ref={cameraInputRef}

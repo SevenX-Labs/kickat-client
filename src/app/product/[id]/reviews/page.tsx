@@ -1,43 +1,93 @@
 "use client";
 
-import { useState, use } from 'react';
+import { useState, useEffect, useCallback, use } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Star, Edit3 } from 'lucide-react';
+import { ArrowLeft, Star, Edit3, CheckCircle2, ThumbsUp, Loader2 } from 'lucide-react';
 import styles from './Reviews.module.css';
-
-const INITIAL_REVIEWS = [
-  { id: 1, author: 'Alex Morgan', rating: 5, date: 'August 12, 2026', title: 'Perfect for my golden retriever', content: 'The anti-slip base is a game changer. No more sliding bowls around the kitchen floor. Highly recommend this for medium to large dogs.' },
-  { id: 2, author: 'Jamie L.', rating: 4, date: 'July 28, 2026', title: 'Good quality, slightly small', content: 'The ceramic is very high quality and easy to clean. Only giving 4 stars because it holds slightly less water than expected.' },
-];
+import { reviewService } from '@/services/reviewService';
+import { ReviewItem, ReviewSummaryData } from '@/types/review';
+import { WriteReviewModal } from '@/components/shop/ProductDetail/WriteReviewModal';
 
 export default function ReviewsPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
-  const productId = resolvedParams.id || "1";
+  const productId = resolvedParams.id;
   
-  const [reviews, setReviews] = useState(INITIAL_REVIEWS);
+  const [reviews, setReviews] = useState<ReviewItem[]>([]);
+  const [summary, setSummary] = useState<ReviewSummaryData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [rating, setRating] = useState(5);
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const [helpfulVotes, setHelpfulVotes] = useState<Record<string, boolean>>({});
+  const [helpfulCountMap, setHelpfulCountMap] = useState<Record<string, number>>({});
+  const [toast, setToast] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!title || !content) return alert("Please fill out all fields.");
-    
-    const newReview = {
-      id: Date.now(),
-      author: 'You',
-      rating,
-      date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-      title,
-      content
-    };
-    
-    setReviews([newReview, ...reviews]);
-    setIsModalOpen(false);
-    setTitle('');
-    setContent('');
-    setRating(5);
+  const loadData = useCallback(async () => {
+    if (!productId) return;
+    setIsLoading(true);
+    try {
+      const [sumRes, revRes] = await Promise.allSettled([
+        reviewService.getReviewSummary(productId),
+        reviewService.getReviews({ productId, limit: 50, sort: 'newest' }),
+      ]);
+
+      if (sumRes.status === 'fulfilled' && sumRes.value?.summary) {
+        setSummary(sumRes.value.summary);
+      }
+      if (revRes.status === 'fulfilled' && revRes.value?.reviews) {
+        setReviews(revRes.value.reviews);
+      }
+    } catch (err) {
+      console.warn('Could not load reviews:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [productId]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const toggleHelpful = async (revId: string) => {
+    try {
+      const res = await reviewService.markHelpful(revId);
+      if (res && res.success) {
+        setHelpfulVotes((prev) => ({
+          ...prev,
+          [revId]: res.isHelpful ?? !prev[revId],
+        }));
+        setHelpfulCountMap((prev) => ({
+          ...prev,
+          [revId]: res.helpfulCount,
+        }));
+        setToast(res.message || 'Updated vote');
+        setTimeout(() => setToast(null), 2500);
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Action failed';
+      setToast(msg);
+      setTimeout(() => setToast(null), 2500);
+    }
+  };
+
+  const avgRating = summary?.averageRating ? summary.averageRating.toFixed(1) : '0.0';
+  const totalReviews = summary?.totalReviews ?? reviews.length;
+  const dist = summary?.ratingDistribution || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  const totalInDist = Object.values(dist).reduce((acc, v) => acc + v, 0);
+
+  const bars = [5, 4, 3, 2, 1].map((s) => {
+    const count = dist[s] || 0;
+    const percent = totalInDist > 0 ? `${Math.round((count / totalInDist) * 100)}%` : '0%';
+    return { stars: s, percent, count };
+  });
+
+  const dummyProduct = {
+    id: productId,
+    name: 'Product',
+    price: 0,
+    rating: Number(avgRating),
+    image: '',
+    images: [],
+    mainCategory: '',
+    subCategory: '',
   };
 
   return (
@@ -50,25 +100,34 @@ export default function ReviewsPage({ params }: { params: Promise<{ id: string }
           <h1 className={styles.title}>Customer Reviews</h1>
         </div>
 
+        {toast && (
+          <div style={{ background: '#FEF3C7', color: '#92400E', padding: '0.5rem 1rem', borderRadius: '8px', marginBottom: '1rem', fontWeight: 600 }}>
+            {toast}
+          </div>
+        )}
+
         <div className={styles.dashboard}>
           <div className={styles.aggregateScore}>
-            <div className={styles.bigScore}>4.8</div>
+            <div className={styles.bigScore}>{avgRating}</div>
             <div style={{ display: 'flex', gap: '0.25rem' }}>
-              {[1,2,3,4,5].map(s => <Star key={s} size={24} fill={s <= 4 ? "#E7A03B" : "none"} color={s <= 4 ? "#E7A03B" : "#ccc"} />)}
+              {[1, 2, 3, 4, 5].map((s) => (
+                <Star
+                  key={s}
+                  size={24}
+                  fill={s <= Math.round(Number(avgRating)) ? "#F99205" : "none"}
+                  color={s <= Math.round(Number(avgRating)) ? "#F99205" : "#ccc"}
+                />
+              ))}
             </div>
-            <div className={styles.totalReviews}>Based on 128 reviews</div>
+            <div className={styles.totalReviews}>Based on {totalReviews} reviews</div>
           </div>
           
           <div className={styles.bars}>
-            {[
-              { stars: 5, percent: '80%', count: 102 },
-              { stars: 4, percent: '15%', count: 19 },
-              { stars: 3, percent: '3%', count: 4 },
-              { stars: 2, percent: '1%', count: 1 },
-              { stars: 1, percent: '1%', count: 2 },
-            ].map(row => (
+            {bars.map((row) => (
               <div key={row.stars} className={styles.barRow}>
-                <span className={styles.starLabel}>{row.stars} <Star size={12} fill="#555" color="#555" /></span>
+                <span className={styles.starLabel}>
+                  {row.stars} <Star size={12} fill="#F99205" color="#F99205" />
+                </span>
                 <div className={styles.barTrack}>
                   <div className={styles.barFill} style={{ width: row.percent }} />
                 </div>
@@ -87,59 +146,81 @@ export default function ReviewsPage({ params }: { params: Promise<{ id: string }
             </button>
           </div>
 
-          <div style={{ background: '#fafafa', borderRadius: '16px', padding: '1.5rem', border: '1px solid #eaeaea' }}>
-            {reviews.map(review => (
-              <div key={review.id} className={styles.reviewCard}>
-                <div className={styles.reviewHeader}>
-                  <div>
-                    <div className={styles.reviewerName}>{review.author}</div>
-                    <div style={{ display: 'flex', gap: '0.15rem', marginTop: '0.25rem' }}>
-                      {[1,2,3,4,5].map(s => <Star key={s} size={14} fill={s <= review.rating ? "#E7A03B" : "none"} color={s <= review.rating ? "#E7A03B" : "#ccc"} />)}
+          {isLoading ? (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem 0', color: '#666' }}>
+              <Loader2 size={24} className="animate-spin" />
+            </div>
+          ) : reviews.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#666' }}>
+              No reviews submitted for this product yet.
+            </div>
+          ) : (
+            <div style={{ background: '#fafafa', borderRadius: '16px', padding: '1.5rem', border: '1px solid #eaeaea' }}>
+              {reviews.map((review) => {
+                const count = helpfulCountMap[review.id] ?? review.helpfulCount;
+                const isVoted = !!helpfulVotes[review.id];
+                return (
+                  <div key={review.id} className={styles.reviewCard}>
+                    <div className={styles.reviewHeader}>
+                      <div>
+                        <div className={styles.reviewerName}>
+                          {review.userName}
+                          {review.isVerifiedPurchase && (
+                            <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', color: '#16a34a', fontWeight: 500 }}>
+                              ✓ Verified Purchase
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ display: 'flex', gap: '0.15rem', marginTop: '0.25rem' }}>
+                          {[1, 2, 3, 4, 5].map((s) => (
+                            <Star
+                              key={s}
+                              size={14}
+                              fill={s <= review.rating ? "#F99205" : "none"}
+                              color={s <= review.rating ? "#F99205" : "#ccc"}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      <div className={styles.reviewDate}>
+                        {new Date(review.createdAt).toLocaleDateString()}
+                      </div>
                     </div>
+                    {review.title && <h3 className={styles.reviewTitle}>{review.title}</h3>}
+                    <p className={styles.reviewText}>{review.comment}</p>
+                    <button
+                      type="button"
+                      onClick={() => toggleHelpful(review.id)}
+                      style={{
+                        marginTop: '0.75rem',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        background: isVoted ? '#FEF3C7' : '#f3f4f6',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '0.3rem 0.6rem',
+                        fontSize: '0.8rem',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <ThumbsUp size={12} color={isVoted ? '#D97706' : '#6b7280'} />
+                      <span>Helpful ({count})</span>
+                    </button>
                   </div>
-                  <div className={styles.reviewDate}>{review.date}</div>
-                </div>
-                <h3 className={styles.reviewTitle}>{review.title}</h3>
-                <p className={styles.reviewText}>{review.content}</p>
-              </div>
-            ))}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 
-      {isModalOpen && (
-        <div className={styles.modalOverlay}>
-          <form className={styles.modalContent} onSubmit={handleSubmit}>
-            <h2 className={styles.modalTitle}>Write a Review</h2>
-            
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>Rating</label>
-              <div className={styles.starRating}>
-                {[1,2,3,4,5].map(s => (
-                  <button key={s} type="button" className={styles.starBtn} onClick={() => setRating(s)}>
-                    <Star size={28} fill={s <= rating ? "#E7A03B" : "none"} color={s <= rating ? "#E7A03B" : "#ccc"} />
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>Review Title</label>
-              <input type="text" className={styles.input} placeholder="Summarize your experience" value={title} onChange={e => setTitle(e.target.value)} required />
-            </div>
-
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>Your Review</label>
-              <textarea className={styles.textarea} placeholder="What did you like or dislike?" value={content} onChange={e => setContent(e.target.value)} required />
-            </div>
-
-            <div className={styles.modalActions}>
-              <button type="button" className={styles.cancelBtn} onClick={() => setIsModalOpen(false)}>Cancel</button>
-              <button type="submit" className={styles.submitBtn}>Submit Review</button>
-            </div>
-          </form>
-        </div>
-      )}
+      <WriteReviewModal
+        product={dummyProduct}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmitSuccess={() => loadData()}
+      />
     </main>
   );
 }
