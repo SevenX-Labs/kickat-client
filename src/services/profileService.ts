@@ -16,6 +16,8 @@ export interface CreateAddressDto {
   state: string;
   country?: string;
   pincode: string;
+  landmark?: string;
+  deliveryInstructions?: string;
   isDefault?: boolean;
 }
 

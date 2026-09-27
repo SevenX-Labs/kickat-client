@@ -28,7 +28,7 @@ export default function OnboardingPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [initialCheckDone, setInitialCheckDone] = useState(false);
 
-  // Form State
+  // Form State with granular address fields and coordinates
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -36,12 +36,16 @@ export default function OnboardingPage() {
     phone: '',
     gender: 'MALE' as 'MALE' | 'FEMALE' | 'PREFER_NOT_TO_SAY',
     dob: '',
-    houseFlat: '',
-    address: '',
+    flatNo: '',
+    buildingName: '',
+    street: '',
+    landmark: '',
     city: '',
     state: 'Maharashtra',
     pincode: '',
     addressType: 'HOME' as 'HOME' | 'WORK' | 'OTHER',
+    latitude: null as number | null,
+    longitude: null as number | null,
     petName: '',
     petType: 'DOG' as 'DOG' | 'CAT' | 'BIRD' | 'FISH' | 'RABBIT' | 'OTHER',
     petBreed: '',
@@ -92,7 +96,7 @@ export default function OnboardingPage() {
   const handleNext = async () => {
     setErrorMessage(null);
 
-    // STEP 1 VALIDATION (Local only, no premature API save)
+    // STEP 1 VALIDATION (Local only)
     if (step === 1) {
       const trimmedFirst = formData.firstName.trim();
       const trimmedLast = formData.lastName.trim();
@@ -122,23 +126,30 @@ export default function OnboardingPage() {
         }
       }
 
-      // Seamlessly advance to Step 2
       setStep(2);
       return;
     }
 
-    // STEP 2 VALIDATION (Local only, no premature API save)
+    // STEP 2 VALIDATION (Local only)
     if (step === 2) {
-      if (!formData.houseFlat.trim()) {
-        setErrorMessage('Please enter Flat / House No. / Building.');
+      if (!formData.flatNo.trim()) {
+        setErrorMessage('Please enter your Flat / House number.');
         return;
       }
-      if (!formData.address.trim()) {
-        setErrorMessage('Please enter Street / Landmark.');
+      if (!formData.buildingName.trim()) {
+        setErrorMessage('Please enter your Building / Society name.');
+        return;
+      }
+      if (!formData.street.trim()) {
+        setErrorMessage('Please enter your Street name or road.');
         return;
       }
       if (!formData.city.trim()) {
         setErrorMessage('Please enter your City.');
+        return;
+      }
+      if (!formData.state.trim()) {
+        setErrorMessage('Please enter your State.');
         return;
       }
       if (!formData.pincode.trim() || !/^\d{5,6}$/.test(formData.pincode.trim())) {
@@ -146,7 +157,6 @@ export default function OnboardingPage() {
         return;
       }
 
-      // Seamlessly advance to Step 3
       setStep(3);
       return;
     }
@@ -163,14 +173,22 @@ export default function OnboardingPage() {
 
       try {
         const fullName = `${formData.firstName.trim()} ${formData.lastName.trim()}`.trim();
+        const houseFlatCombined = `${formData.flatNo.trim()}, ${formData.buildingName.trim()}`.trim();
+        const streetCombined = formData.street.trim();
+        const landmarkValue = formData.landmark.trim() || undefined;
+
         const addressObj: CreateAddressDto = {
           type: formData.addressType,
-          houseFlat: formData.houseFlat.trim(),
-          buildingStreet: formData.address.trim(),
+          houseFlat: houseFlatCombined,
+          buildingStreet: streetCombined,
+          landmark: landmarkValue,
           city: formData.city.trim(),
           state: formData.state.trim() || 'Maharashtra',
           pincode: formData.pincode.trim(),
           isDefault: true,
+          deliveryInstructions: (formData.latitude !== null && formData.longitude !== null)
+            ? `Geo: ${formData.latitude.toFixed(6)}, ${formData.longitude.toFixed(6)}`
+            : undefined,
         };
 
         const petObj: CreatePetDto = {
@@ -320,7 +338,7 @@ export default function OnboardingPage() {
                     value={formData.firstName} 
                     onChange={handleChange} 
                     className={styles.input} 
-                    placeholder="e.g. Sahil" 
+                    placeholder="Enter your first name" 
                     disabled={isSubmitting}
                     required
                   />
@@ -333,7 +351,7 @@ export default function OnboardingPage() {
                     value={formData.lastName} 
                     onChange={handleChange} 
                     className={styles.input} 
-                    placeholder="e.g. Hode" 
+                    placeholder="Enter your last name" 
                     disabled={isSubmitting}
                   />
                 </div>
@@ -355,7 +373,7 @@ export default function OnboardingPage() {
                     value={formData.email} 
                     onChange={handleChange} 
                     className={styles.input} 
-                    placeholder="sahil@example.com" 
+                    placeholder="Enter your email address" 
                     disabled={isSubmitting || Boolean(user?.email && (user?.isEmailVerified ?? true))}
                     readOnly={Boolean(user?.email && (user?.isEmailVerified ?? true))}
                   />
@@ -375,7 +393,7 @@ export default function OnboardingPage() {
                     value={formData.phone} 
                     onChange={handleChange} 
                     className={styles.input} 
-                    placeholder="+91 98765 43210" 
+                    placeholder="Enter your mobile number" 
                     disabled={isSubmitting || Boolean(user?.phone)}
                     readOnly={Boolean(user?.phone)}
                   />
@@ -412,10 +430,10 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* STEP 2: Address */}
+          {/* STEP 2: Address with Granular Separate Fields */}
           {step === 2 && (
             <div>
-              <div style={{ marginBottom: '0.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
                 <UseLocationButton 
                   onLocationDetected={(addr: DetectedAddress) => {
                     setFormData(prev => ({
@@ -423,40 +441,90 @@ export default function OnboardingPage() {
                       pincode: addr.pincode || prev.pincode,
                       city: addr.city || prev.city,
                       state: addr.state || prev.state,
-                      address: addr.street || prev.address,
-                      houseFlat: addr.houseFlat || prev.houseFlat,
+                      street: addr.street || prev.street,
+                      landmark: addr.landmark || prev.landmark,
+                      latitude: addr.latitude || prev.latitude,
+                      longitude: addr.longitude || prev.longitude,
                     }));
                   }}
                 />
+                {(formData.latitude !== null && formData.longitude !== null) && (
+                  <span style={{ 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    gap: '4px', 
+                    fontSize: '11px', 
+                    color: '#16A34A', 
+                    fontWeight: 600, 
+                    backgroundColor: '#DCFCE7', 
+                    padding: '0.25rem 0.55rem', 
+                    borderRadius: '6px' 
+                  }}>
+                    <CheckCircle2 size={13} /> {formData.latitude.toFixed(4)}°, {formData.longitude.toFixed(4)}°
+                  </span>
+                )}
               </div>
 
+              {/* Row 1: Flat / House No. & Building / Society Name */}
               <div className={styles.formRow}>
                 <div className={styles.inputGroup}>
-                  <label className={styles.label}>Flat / House No. / Building</label>
+                  <label className={styles.label}>Flat / House No.</label>
                   <input 
                     type="text" 
-                    name="houseFlat" 
-                    value={formData.houseFlat} 
+                    name="flatNo" 
+                    value={formData.flatNo} 
                     onChange={handleChange} 
                     className={styles.input} 
-                    placeholder="e.g. Flat 402, Sunshine Heights" 
+                    placeholder="e.g. Flat 402 / House No. 12" 
                     disabled={isSubmitting}
+                    required
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label className={styles.label}>Street / Landmark</label>
+                  <label className={styles.label}>Building / Society Name</label>
                   <input 
                     type="text" 
-                    name="address" 
-                    value={formData.address} 
+                    name="buildingName" 
+                    value={formData.buildingName} 
                     onChange={handleChange} 
                     className={styles.input} 
-                    placeholder="e.g. MG Road, Near City Mall" 
+                    placeholder="e.g. Sunshine Heights" 
+                    disabled={isSubmitting}
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Row 2: Street Name & Landmark */}
+              <div className={styles.formRow}>
+                <div className={styles.inputGroup}>
+                  <label className={styles.label}>Street Name / Road</label>
+                  <input 
+                    type="text" 
+                    name="street" 
+                    value={formData.street} 
+                    onChange={handleChange} 
+                    className={styles.input} 
+                    placeholder="e.g. MG Road / Main Street" 
+                    disabled={isSubmitting}
+                    required
+                  />
+                </div>
+                <div className={styles.inputGroup}>
+                  <label className={styles.label}>Landmark (Optional)</label>
+                  <input 
+                    type="text" 
+                    name="landmark" 
+                    value={formData.landmark} 
+                    onChange={handleChange} 
+                    className={styles.input} 
+                    placeholder="e.g. Near City Mall / Opposite Metro" 
                     disabled={isSubmitting}
                   />
                 </div>
               </div>
 
+              {/* Row 3: City & State */}
               <div className={styles.formRow}>
                 <div className={styles.inputGroup}>
                   <label className={styles.label}>City</label>
@@ -466,8 +534,9 @@ export default function OnboardingPage() {
                     value={formData.city} 
                     onChange={handleChange} 
                     className={styles.input} 
-                    placeholder="e.g. Mumbai" 
+                    placeholder="Enter your city" 
                     disabled={isSubmitting}
+                    required
                   />
                 </div>
                 <div className={styles.inputGroup}>
@@ -478,12 +547,14 @@ export default function OnboardingPage() {
                     value={formData.state} 
                     onChange={handleChange} 
                     className={styles.input} 
-                    placeholder="e.g. Maharashtra" 
+                    placeholder="Enter your state" 
                     disabled={isSubmitting}
+                    required
                   />
                 </div>
               </div>
 
+              {/* Row 4: Pincode & Address Type */}
               <div className={styles.formRow}>
                 <div className={styles.inputGroup}>
                   <label className={styles.label}>Pincode</label>
@@ -493,8 +564,10 @@ export default function OnboardingPage() {
                     value={formData.pincode} 
                     onChange={handleChange} 
                     className={styles.input} 
-                    placeholder="400001" 
+                    placeholder="Enter 6-digit pincode" 
+                    maxLength={6}
                     disabled={isSubmitting}
+                    required
                   />
                 </div>
                 <div className={styles.inputGroup}>
@@ -527,7 +600,7 @@ export default function OnboardingPage() {
                     value={formData.petName} 
                     onChange={handleChange} 
                     className={styles.input} 
-                    placeholder="e.g. Bruno" 
+                    placeholder="Enter your pet's name" 
                     disabled={isSubmitting}
                     required
                   />
@@ -560,7 +633,7 @@ export default function OnboardingPage() {
                     value={formData.petBreed} 
                     onChange={handleChange} 
                     className={styles.input} 
-                    placeholder="e.g. Labrador Retriever" 
+                    placeholder="Enter breed (optional)" 
                     disabled={isSubmitting}
                   />
                 </div>
@@ -572,7 +645,7 @@ export default function OnboardingPage() {
                     value={formData.petAge} 
                     onChange={handleChange} 
                     className={styles.input} 
-                    placeholder="e.g. 2" 
+                    placeholder="Enter age in years" 
                     min="0"
                     max="30"
                     disabled={isSubmitting}

@@ -213,7 +213,7 @@ function SavedAddressesContent() {
                   <label className={styles.formLabel}>Full Name</label>
                   <input 
                     type="text" 
-                    placeholder="e.g. Sahil Hode" 
+                    placeholder="Enter recipient full name" 
                     value={formName} 
                     onChange={e => setFormName(e.target.value)} 
                     className={styles.formInput} 
