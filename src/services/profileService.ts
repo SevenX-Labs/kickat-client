@@ -27,11 +27,30 @@ export interface CreatePetDto {
   breed?: string;
   age?: number;
   ageUnit?: 'YEARS' | 'MONTHS';
-  gender?: 'MALE' | 'FEMALE' | 'UNKNOWN';
+  gender?: 'MALE' | 'FEMALE' | 'UNKNOWN' | 'PREFER_NOT_TO_SAY';
   weight?: number;
   weightUnit?: 'KG' | 'LBS';
-  dietaryPreference?: 'DRY' | 'WET' | 'BOTH' | 'HOME_COOKED';
+  dietaryPreference?: 'DRY' | 'WET' | 'BOTH' | 'HOME_COOKED' | 'VEG' | 'NON_VEG';
   allergies?: string[];
+  healthNotes?: string;
+}
+
+export interface Pet {
+  id: string;
+  userId?: string;
+  species: 'DOG' | 'CAT' | 'BIRD' | 'FISH' | 'RABBIT' | 'OTHER';
+  name: string;
+  breed?: string;
+  age?: number;
+  ageUnit?: 'YEARS' | 'MONTHS';
+  gender?: 'MALE' | 'FEMALE' | 'UNKNOWN' | 'PREFER_NOT_TO_SAY';
+  weight?: number;
+  weightUnit?: 'KG' | 'LBS';
+  dietaryPreference?: string;
+  allergies?: string[];
+  healthNotes?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 

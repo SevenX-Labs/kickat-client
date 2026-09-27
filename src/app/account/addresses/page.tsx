@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { MapPin, Plus, Check, Trash2, Home, Briefcase, ArrowLeft, X } from 'lucide-react';
+import { MapPin, Plus, Check, Trash2, Home, Briefcase, ArrowLeft, X, Edit3 } from 'lucide-react';
 import styles from '../Account.module.css';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -17,10 +17,13 @@ function SavedAddressesContent() {
   const [addresses, setAddresses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [editingAddress, setEditingAddress] = useState<any | null>(null);
   const [deleteId, setDeleteId] = useState<string | number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
 
-  // New Address Form State
+  // Address Form State
   const [formName, setFormName] = useState('');
   const [formPhone, setFormPhone] = useState('');
   const [formHouseFlat, setFormHouseFlat] = useState('');
@@ -30,6 +33,11 @@ function SavedAddressesContent() {
   const [formPin, setFormPin] = useState('');
   const [formLabel, setFormLabel] = useState<'HOME' | 'WORK' | 'OTHER'>('HOME');
   const [formIsDefault, setFormIsDefault] = useState(false);
+
+  const showToast = (msg: string) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(null), 4000);
+  };
 
   const fetchAddresses = async () => {
     setLoading(true);
@@ -64,31 +72,61 @@ function SavedAddressesContent() {
     setFormPin('');
     setFormLabel('HOME');
     setFormIsDefault(false);
+    setEditingAddress(null);
+  };
+
+  const handleOpenAdd = () => {
+    resetForm();
+    setIsAddOpen(true);
+  };
+
+  const handleOpenEdit = (addr: any) => {
+    setEditingAddress(addr);
+    setFormName(addr.name || addr.fullName || '');
+    setFormPhone(addr.phone || '');
+    setFormHouseFlat(addr.houseFlat || '');
+    setFormAddressLine(addr.buildingStreet || addr.addressLine || addr.street || '');
+    setFormCity(addr.city || '');
+    setFormState(addr.state || 'Maharashtra');
+    setFormPin(addr.pincode || addr.pin || '');
+    const upperType = (addr.type || addr.label || 'HOME').toUpperCase();
+    setFormLabel(upperType === 'WORK' ? 'WORK' : upperType === 'OTHER' ? 'OTHER' : 'HOME');
+    setFormIsDefault(Boolean(addr.isDefault));
+    setIsAddOpen(true);
   };
 
   const handleSaveAddress = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formCity || !formPin || !formAddressLine) {
+    if (!formCity.trim() || !formPin.trim() || !formAddressLine.trim()) {
       alert('Please fill in Street Address, City, and PIN code.');
       return;
     }
 
     setSubmitting(true);
     try {
-      await profileService.addAddress({
+      const payload = {
         type: formLabel,
-        houseFlat: formHouseFlat || undefined,
-        buildingStreet: formAddressLine,
-        city: formCity,
-        state: formState || 'Maharashtra',
-        pincode: formPin,
-        isDefault: formIsDefault
-      });
+        houseFlat: formHouseFlat.trim() || undefined,
+        buildingStreet: formAddressLine.trim(),
+        city: formCity.trim(),
+        state: formState.trim() || 'Maharashtra',
+        pincode: formPin.trim(),
+        isDefault: formIsDefault,
+      };
+
+      if (editingAddress) {
+        await profileService.updateAddress(String(editingAddress.id), payload);
+        showToast('Address updated successfully!');
+      } else {
+        await profileService.addAddress(payload);
+        showToast('Address saved successfully!');
+      }
+
       await fetchAddresses();
       resetForm();
       setIsAddOpen(false);
     } catch (err: any) {
-      console.error('Error adding address:', err);
+      console.error('Error saving address:', err);
       alert(err?.message || 'Failed to save address. Please try again.');
     } finally {
       setSubmitting(false);
@@ -112,19 +150,29 @@ function SavedAddressesContent() {
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    setIsDeleting(true);
     try {
       await profileService.deleteAddress(String(deleteId));
+      showToast('Address removed successfully!');
       await fetchAddresses();
+      setDeleteId(null);
     } catch (err: any) {
       console.error('Failed to delete address:', err);
       alert(err?.message || 'Failed to delete address');
     } finally {
-      setDeleteId(null);
+      setIsDeleting(false);
     }
   };
 
   return (
     <>
+      {toastMsg && (
+        <div className={styles.toastNotification}>
+          <Check size={18} color="#16A34A" />
+          <span>{toastMsg}</span>
+        </div>
+      )}
+
       <div className={styles.backHeaderGroup}>
         <Link href="/account" className={styles.backToAccountBtn}>
           <ArrowLeft size={18} />
@@ -138,7 +186,7 @@ function SavedAddressesContent() {
             <h1 className={styles.pageH1}>Saved Addresses</h1>
             <p className={styles.pageSubtitle}>Manage your delivery locations for faster checkout</p>
           </div>
-          <Button variant="primary" icon={<Plus size={16} />} onClick={() => setIsAddOpen(true)}>Add New Address</Button>
+          <Button variant="primary" icon={<Plus size={16} />} onClick={handleOpenAdd}>Add New Address</Button>
         </div>
 
         {loading ? (
@@ -166,12 +214,31 @@ function SavedAddressesContent() {
                 </div>
 
                 <div className={styles.addressFooterRow}>
-                  <Button variant="danger" size="sm" icon={<Trash2 size={14} />} onClick={() => setDeleteId(addr.id)}>Remove</Button>
+                  <Button 
+                    variant="secondary" 
+                    size="sm" 
+                    icon={<Edit3 size={14} />} 
+                    onClick={() => handleOpenEdit(addr)}
+                    aria-label={`Edit ${addr.type || 'address'}`}
+                    style={{ minHeight: '36px' }}
+                  >
+                    Edit
+                  </Button>
+                  <Button 
+                    variant="danger" 
+                    size="sm" 
+                    icon={<Trash2 size={14} />} 
+                    onClick={() => setDeleteId(addr.id)}
+                    aria-label={`Remove ${addr.type || 'address'}`}
+                    style={{ minHeight: '36px' }}
+                  >
+                    Remove
+                  </Button>
                 </div>
               </div>
             ))}
             
-            <button className={styles.addAddressDashedCard} onClick={() => setIsAddOpen(true)}>
+            <button className={styles.addAddressDashedCard} onClick={handleOpenAdd}>
               <div className={styles.dashedCardInner}>
                 <Plus size={24} className={styles.dashedIcon} />
                 <span className={styles.dashedText}>Add New Address</span>
@@ -183,21 +250,22 @@ function SavedAddressesContent() {
             icon={<MapPin size={48} />}
             title="No saved addresses found"
             description="You haven't saved any delivery addresses yet."
-            action={<Button variant="primary" icon={<Plus size={16} />} onClick={() => setIsAddOpen(true)}>Add Address</Button>}
+            action={<Button variant="primary" icon={<Plus size={16} />} onClick={handleOpenAdd}>Add Address</Button>}
           />
         )}
       </div>
 
-      {/* Left-Side Slide-Out Drawer for Add New Address */}
+      {/* Left-Side Slide-Out Drawer for Add / Edit Address */}
       {isAddOpen && (
-        <div className={styles.leftDrawerBackdrop} onClick={() => setIsAddOpen(false)}>
+        <div className={styles.leftDrawerBackdrop} onClick={() => { if (!submitting) { setIsAddOpen(false); resetForm(); } }}>
           <div className={styles.leftDrawerPanel} onClick={e => e.stopPropagation()}>
             <div className={styles.leftDrawerHeader}>
-              <h2 className={styles.leftDrawerTitle}>Add New Address</h2>
+              <h2 className={styles.leftDrawerTitle}>{editingAddress ? 'Edit Address' : 'Add New Address'}</h2>
               <button 
                 type="button" 
                 className={styles.leftDrawerCloseBtn} 
-                onClick={() => setIsAddOpen(false)}
+                onClick={() => { setIsAddOpen(false); resetForm(); }}
+                disabled={submitting}
                 aria-label="Close Drawer"
               >
                 <X size={20} />
@@ -217,6 +285,7 @@ function SavedAddressesContent() {
                     value={formName} 
                     onChange={e => setFormName(e.target.value)} 
                     className={styles.formInput} 
+                    disabled={submitting}
                   />
                 </div>
 
@@ -228,6 +297,7 @@ function SavedAddressesContent() {
                     value={formPhone} 
                     onChange={e => setFormPhone(e.target.value)} 
                     className={styles.formInput} 
+                    disabled={submitting}
                   />
                 </div>
 
@@ -239,6 +309,7 @@ function SavedAddressesContent() {
                     value={formHouseFlat} 
                     onChange={e => setFormHouseFlat(e.target.value)} 
                     className={styles.formInput} 
+                    disabled={submitting}
                   />
                 </div>
 
@@ -251,6 +322,7 @@ function SavedAddressesContent() {
                     value={formAddressLine} 
                     onChange={e => setFormAddressLine(e.target.value)} 
                     className={styles.formInput} 
+                    disabled={submitting}
                   />
                 </div>
 
@@ -264,6 +336,7 @@ function SavedAddressesContent() {
                       value={formCity} 
                       onChange={e => setFormCity(e.target.value)} 
                       className={styles.formInput} 
+                      disabled={submitting}
                     />
                   </div>
                   <div className={styles.formGroup}>
@@ -274,6 +347,7 @@ function SavedAddressesContent() {
                       value={formState} 
                       onChange={e => setFormState(e.target.value)} 
                       className={styles.formInput} 
+                      disabled={submitting}
                     />
                   </div>
                 </div>
@@ -287,6 +361,7 @@ function SavedAddressesContent() {
                     value={formPin} 
                     onChange={e => setFormPin(e.target.value)} 
                     className={styles.formInput} 
+                    disabled={submitting}
                   />
                 </div>
 
@@ -299,6 +374,7 @@ function SavedAddressesContent() {
                         type="button"
                         className={`${styles.addressTypeBtn} ${formLabel === type ? styles.addressTypeActive : ''}`}
                         onClick={() => setFormLabel(type)}
+                        disabled={submitting}
                       >
                         {type === 'HOME' && <Home size={14} />}
                         {type === 'WORK' && <Briefcase size={14} />}
@@ -315,6 +391,7 @@ function SavedAddressesContent() {
                       type="checkbox" 
                       checked={formIsDefault} 
                       onChange={e => setFormIsDefault(e.target.checked)} 
+                      disabled={submitting}
                     />
                     Make this my default delivery address
                   </label>
@@ -325,8 +402,8 @@ function SavedAddressesContent() {
                 <Button 
                   type="button" 
                   variant="secondary" 
-                  style={{ flex: 1 }} 
-                  onClick={() => setIsAddOpen(false)}
+                  style={{ flex: 1, minHeight: '44px' }} 
+                  onClick={() => { setIsAddOpen(false); resetForm(); }}
                   disabled={submitting}
                 >
                   Cancel
@@ -334,10 +411,10 @@ function SavedAddressesContent() {
                 <Button 
                   type="submit" 
                   variant="primary" 
-                  style={{ flex: 1 }}
+                  style={{ flex: 1, minHeight: '44px' }}
                   disabled={submitting}
                 >
-                  {submitting ? 'Saving...' : 'Save Address'}
+                  {submitting ? (editingAddress ? 'Updating...' : 'Saving...') : (editingAddress ? 'Save Changes' : 'Save Address')}
                 </Button>
               </div>
             </form>
@@ -350,9 +427,11 @@ function SavedAddressesContent() {
         title="Remove Address"
         message="Are you sure you want to remove this address? You can't undo this action."
         confirmText="Remove"
+        cancelText="Cancel"
         onConfirm={handleDelete}
-        onCancel={() => setDeleteId(null)}
+        onCancel={() => { if (!isDeleting) setDeleteId(null); }}
         isDanger={true}
+        isLoading={isDeleting}
       />
     </>
   );

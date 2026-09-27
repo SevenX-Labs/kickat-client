@@ -17,11 +17,14 @@ import {
   Loader2,
   ArrowLeft,
   CheckCircle2,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import styles from "../Account.module.css";
 import { useAuth } from "@/context/AuthContext";
-import { profileService } from "@/services/profileService";
+import { profileService, Pet } from "@/services/profileService";
 import { authService } from "@/services/authService";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 function ProfileDetailsContent() {
   const router = useRouter();
@@ -49,6 +52,23 @@ function ProfileDetailsContent() {
     points: 100,
     tier: "KickAt VIP",
     currency: "INR (₹)",
+  });
+
+  // Pets State
+  const [pets, setPets] = useState<Pet[]>([]);
+  const [isPetModalOpen, setIsPetModalOpen] = useState(false);
+  const [editingPet, setEditingPet] = useState<Pet | null>(null);
+  const [isSavingPet, setIsSavingPet] = useState(false);
+  const [petToDelete, setPetToDelete] = useState<Pet | null>(null);
+  const [isDeletingPet, setIsDeletingPet] = useState(false);
+
+  const [petForm, setPetForm] = useState({
+    name: "",
+    species: "DOG" as "DOG" | "CAT" | "BIRD" | "FISH" | "RABBIT" | "OTHER",
+    breed: "",
+    age: "",
+    ageUnit: "YEARS" as "YEARS" | "MONTHS",
+    gender: "PREFER_NOT_TO_SAY" as "MALE" | "FEMALE" | "PREFER_NOT_TO_SAY",
   });
 
   const fetchFullProfile = async () => {
@@ -85,6 +105,9 @@ function ProfileDetailsContent() {
           isEmailVerified: Boolean(profileUser.isEmailVerified),
           isPhoneVerified: Boolean(profileUser.isPhoneVerified),
         }));
+
+        const petList = profileUser.pets || profileUser.petProfiles || res?.user?.pets || res?.pets || [];
+        setPets(Array.isArray(petList) ? petList : []);
       }
     } catch (err: any) {
       console.error("Failed to load profile details:", err);
@@ -130,6 +153,10 @@ function ProfileDetailsContent() {
         isEmailVerified: Boolean(user.isEmailVerified),
         isPhoneVerified: Boolean(user.isPhoneVerified),
       }));
+
+      if ((user as any).pets && Array.isArray((user as any).pets)) {
+        setPets((user as any).pets);
+      }
     }
   }, [user]);
 
@@ -211,6 +238,96 @@ function ProfileDetailsContent() {
     }
   };
 
+  // Pet Actions
+  const handleOpenAddPet = () => {
+    setEditingPet(null);
+    setPetForm({
+      name: "",
+      species: "DOG",
+      breed: "",
+      age: "1",
+      ageUnit: "YEARS",
+      gender: "PREFER_NOT_TO_SAY",
+    });
+    setIsPetModalOpen(true);
+  };
+
+  const handleOpenEditPet = (pet: Pet) => {
+    setEditingPet(pet);
+    setPetForm({
+      name: pet.name || "",
+      species: pet.species || "DOG",
+      breed: pet.breed || "",
+      age: pet.age !== undefined && pet.age !== null ? String(pet.age) : "",
+      ageUnit: (pet.ageUnit as any) || "YEARS",
+      gender: (pet.gender as any) || "PREFER_NOT_TO_SAY",
+    });
+    setIsPetModalOpen(true);
+  };
+
+  const handleSavePet = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!petForm.name.trim()) {
+      alert("Please enter your pet's name");
+      return;
+    }
+
+    setIsSavingPet(true);
+    try {
+      const payload: any = {
+        name: petForm.name.trim(),
+        species: petForm.species,
+        breed: petForm.breed.trim() || undefined,
+        age: petForm.age ? Math.max(0, parseInt(petForm.age, 10)) : undefined,
+        ageUnit: petForm.ageUnit,
+        gender: petForm.gender || undefined,
+      };
+
+      if (editingPet) {
+        await profileService.updatePet(editingPet.id, payload);
+        showToast("Pet profile updated successfully!");
+      } else {
+        await profileService.addPet(payload);
+        showToast("Pet profile added successfully!");
+      }
+
+      setIsPetModalOpen(false);
+      await fetchFullProfile();
+    } catch (err: any) {
+      console.error("Error saving pet:", err);
+      alert(err?.message || "Failed to save pet details. Please check the information and try again.");
+    } finally {
+      setIsSavingPet(false);
+    }
+  };
+
+  const handleConfirmDeletePet = async () => {
+    if (!petToDelete) return;
+    setIsDeletingPet(true);
+    try {
+      await profileService.deletePet(petToDelete.id);
+      showToast("Pet removed successfully!");
+      setPetToDelete(null);
+      await fetchFullProfile();
+    } catch (err: any) {
+      console.error("Failed to delete pet:", err);
+      alert(err?.message || "Failed to remove pet. Please try again.");
+    } finally {
+      setIsDeletingPet(false);
+    }
+  };
+
+  const getSpeciesEmoji = (species: string) => {
+    switch ((species || "").toUpperCase()) {
+      case "DOG": return "🐶";
+      case "CAT": return "🐱";
+      case "BIRD": return "🦜";
+      case "FISH": return "🐠";
+      case "RABBIT": return "🐰";
+      default: return "🐾";
+    }
+  };
+
   // Trigger Send OTP for verification
   const handleOpenVerifyModal = async (type: "PHONE" | "EMAIL") => {
     setVerifyModalType(type);
@@ -219,7 +336,6 @@ function ProfileDetailsContent() {
     setResentSuccessMsg(null);
     setIsResending(false);
 
-    // If cooldown expired, send verification code in background
     if (resendCooldown <= 0) {
       setResendCooldown(60);
       try {
@@ -355,6 +471,7 @@ function ProfileDetailsContent() {
         </Link>
       </div>
 
+      {/* 1. Profile Details Card */}
       <div className={styles.sectionBlockCard}>
         <div className={styles.sectionBlockHeader}>
           <div>
@@ -503,10 +620,10 @@ function ProfileDetailsContent() {
 
             <div className={styles.infoFieldBox}>
               <div className={styles.fieldIconWrap}>
-                <ShieldCheck size={18} />
+                <Sparkles size={18} />
               </div>
               <div className={styles.fieldMeta}>
-                <span className={styles.fieldLabel}>Account Security</span>
+                <span className={styles.fieldLabel}>Security & Verification</span>
                 <span
                   className={styles.fieldValue}
                   style={{
@@ -520,6 +637,139 @@ function ProfileDetailsContent() {
                 </span>
               </div>
             </div>
+          </div>
+        )}
+      </div>
+
+      {/* 2. Pet Profiles Section */}
+      <div className={styles.sectionBlockCard} style={{ marginTop: "24px" }}>
+        <div className={styles.sectionBlockHeader}>
+          <div>
+            <h2 className={styles.blockTitle}>Pet Profiles</h2>
+            <p className={styles.blockSubtitle}>
+              Manage your registered pets, breeds, and personalized dietary preferences.
+            </p>
+          </div>
+          <button
+            type="button"
+            className={styles.editHeaderBtn}
+            onClick={handleOpenAddPet}
+            aria-label="Add New Pet Profile"
+          >
+            <Plus size={16} />
+            <span>Add Pet</span>
+          </button>
+        </div>
+
+        {pets.length === 0 ? (
+          <div className={styles.emptyPetsBox}>
+            <div className={styles.petAvatar} style={{ width: 56, height: 56, fontSize: 26, marginBottom: 12 }}>
+              🐾
+            </div>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: "#111827", margin: "0 0 6px" }}>
+              No pet profiles registered
+            </h3>
+            <p style={{ fontSize: 13, color: "#6B7280", maxWidth: 420, margin: "0 0 20px", lineHeight: 1.5 }}>
+              Add your dogs, cats, or other companion animals to receive personalized nutritional recommendations, allergy alerts, and exclusive birthday perks.
+            </p>
+            <button
+              type="button"
+              className={styles.editHeaderBtn}
+              onClick={handleOpenAddPet}
+              style={{ background: "#F28C0F", color: "#FFFFFF", borderColor: "#F28C0F" }}
+            >
+              <Plus size={16} />
+              <span>Add Your First Pet</span>
+            </button>
+          </div>
+        ) : (
+          <div className={styles.petsGrid}>
+            {pets.map((pet) => (
+              <div key={pet.id} className={styles.petCard}>
+                <div className={styles.petCardHeader}>
+                  <div className={styles.petIdentity}>
+                    <div className={styles.petAvatar}>
+                      {getSpeciesEmoji(pet.species)}
+                    </div>
+                    <div>
+                      <h3 className={styles.petNameTitle}>{pet.name}</h3>
+                      <span className={styles.petSpeciesBadge}>
+                        {pet.species || "PET"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.petInfoGrid}>
+                  <div className={styles.petInfoCell}>
+                    <span className={styles.petInfoLabel}>Breed</span>
+                    <span className={styles.petInfoValue}>{pet.breed || "Not specified"}</span>
+                  </div>
+                  <div className={styles.petInfoCell}>
+                    <span className={styles.petInfoLabel}>Age</span>
+                    <span className={styles.petInfoValue}>
+                      {pet.age !== undefined && pet.age !== null
+                        ? `${pet.age} ${pet.ageUnit === "MONTHS" ? (pet.age === 1 ? "Month" : "Months") : (pet.age === 1 ? "Year" : "Years")}`
+                        : "Not specified"}
+                    </span>
+                  </div>
+                  <div className={styles.petInfoCell}>
+                    <span className={styles.petInfoLabel}>Gender</span>
+                    <span className={styles.petInfoValue}>
+                      {pet.gender === "MALE"
+                        ? "Male"
+                        : pet.gender === "FEMALE"
+                        ? "Female"
+                        : "Not specified"}
+                    </span>
+                  </div>
+                  <div className={styles.petInfoCell}>
+                    <span className={styles.petInfoLabel}>Diet</span>
+                    <span className={styles.petInfoValue}>
+                      {pet.dietaryPreference
+                        ? pet.dietaryPreference.replace(/_/g, " ")
+                        : "Standard"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className={styles.petCardActions}>
+                  <button
+                    type="button"
+                    className={`${styles.petActionBtn} ${styles.petEditBtn}`}
+                    onClick={() => handleOpenEditPet(pet)}
+                    aria-label={`Edit ${pet.name}`}
+                  >
+                    <Edit3 size={14} />
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.petActionBtn} ${styles.petDeleteBtn}`}
+                    onClick={() => setPetToDelete(pet)}
+                    aria-label={`Delete ${pet.name}`}
+                  >
+                    <Trash2 size={14} />
+                    <span>Remove</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            {/* Add Pet Dashed Card */}
+            <button
+              type="button"
+              className={styles.addPetDashedCard}
+              onClick={handleOpenAddPet}
+              aria-label="Add Another Pet"
+            >
+              <div className={styles.addPetDashedInner}>
+                <div className={styles.addPetPlusIcon}>
+                  <Plus size={20} />
+                </div>
+                <span style={{ fontWeight: 600, fontSize: 14 }}>Add Another Pet</span>
+              </div>
+            </button>
           </div>
         )}
       </div>
@@ -538,6 +788,7 @@ function ProfileDetailsContent() {
                 className={styles.modalCloseBtn}
                 onClick={() => setIsEditProfileOpen(false)}
                 disabled={isSaving}
+                aria-label="Close"
               >
                 <X size={20} />
               </button>
@@ -550,6 +801,7 @@ function ProfileDetailsContent() {
                   <input
                     type="text"
                     required
+                    placeholder="Enter first name"
                     className={styles.modalInput}
                     value={profileForm.firstName}
                     onChange={(e) => setProfileForm({ ...profileForm, firstName: e.target.value })}
@@ -561,6 +813,7 @@ function ProfileDetailsContent() {
                   <input
                     type="text"
                     required
+                    placeholder="Enter last name"
                     className={styles.modalInput}
                     value={profileForm.lastName}
                     onChange={(e) => setProfileForm({ ...profileForm, lastName: e.target.value })}
@@ -570,44 +823,26 @@ function ProfileDetailsContent() {
               </div>
 
               <div className={styles.inputGroup}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-                  <label className={styles.inputLabel} style={{ marginBottom: 0 }}>Email Address</label>
-                  {userData.isEmailVerified && (
-                    <span style={{ color: '#16A34A', fontSize: '11px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                      <ShieldCheck size={12} /> Verified
-                    </span>
-                  )}
-                </div>
+                <label className={styles.inputLabel}>Email Address</label>
                 <input
                   type="email"
-                  required
+                  placeholder="Enter email address"
                   className={styles.modalInput}
                   value={profileForm.email}
                   onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
-                  disabled={isSaving || userData.isEmailVerified}
-                  readOnly={userData.isEmailVerified}
-                  style={userData.isEmailVerified ? { cursor: 'not-allowed', backgroundColor: '#F9FAFB', color: '#6B7280' } : undefined}
+                  disabled={isSaving}
                 />
               </div>
 
               <div className={styles.inputGroup}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-                  <label className={styles.inputLabel} style={{ marginBottom: 0 }}>Phone Number</label>
-                  {userData.isPhoneVerified && (
-                    <span style={{ color: '#16A34A', fontSize: '11px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                      <ShieldCheck size={12} /> Verified
-                    </span>
-                  )}
-                </div>
+                <label className={styles.inputLabel}>Phone Number</label>
                 <input
                   type="tel"
-                  required
+                  placeholder="10-digit mobile number"
                   className={styles.modalInput}
                   value={profileForm.phone}
                   onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
-                  disabled={isSaving || userData.isPhoneVerified}
-                  readOnly={userData.isPhoneVerified}
-                  style={userData.isPhoneVerified ? { cursor: 'not-allowed', backgroundColor: '#F9FAFB', color: '#6B7280' } : undefined}
+                  disabled={isSaving}
                 />
               </div>
 
@@ -667,6 +902,162 @@ function ProfileDetailsContent() {
           </div>
         </div>
       )}
+
+      {/* Edit / Add Pet Modal */}
+      {isPetModalOpen && (
+        <div className={styles.modalBackdrop} onClick={() => !isSavingPet && setIsPetModalOpen(false)}>
+          <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <div className={styles.modalTitleGroup}>
+                <Sparkles size={20} color="#F28C0F" />
+                <h2>{editingPet ? "Edit Pet Profile" : "Add Pet Profile"}</h2>
+              </div>
+              <button
+                type="button"
+                className={styles.modalCloseBtn}
+                onClick={() => setIsPetModalOpen(false)}
+                disabled={isSavingPet}
+                aria-label="Close"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSavePet} className={styles.modalForm}>
+              <div className={styles.formRow}>
+                <div className={styles.inputGroup}>
+                  <label className={styles.inputLabel}>
+                    Pet Name <span style={{ color: "#EF4444" }}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Charlie, Bruno, Bella"
+                    className={styles.modalInput}
+                    value={petForm.name}
+                    onChange={(e) => setPetForm({ ...petForm, name: e.target.value })}
+                    disabled={isSavingPet}
+                  />
+                </div>
+                <div className={styles.inputGroup}>
+                  <label className={styles.inputLabel}>
+                    Pet Species <span style={{ color: "#EF4444" }}>*</span>
+                  </label>
+                  <select
+                    className={styles.modalInput}
+                    value={petForm.species}
+                    onChange={(e) => setPetForm({ ...petForm, species: e.target.value as any })}
+                    disabled={isSavingPet}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <option value="DOG">Dog</option>
+                    <option value="CAT">Cat</option>
+                    <option value="BIRD">Bird</option>
+                    <option value="FISH">Fish</option>
+                    <option value="RABBIT">Rabbit</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className={styles.formRow}>
+                <div className={styles.inputGroup}>
+                  <label className={styles.inputLabel}>Breed (Optional)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Golden Retriever, Persian"
+                    className={styles.modalInput}
+                    value={petForm.breed}
+                    onChange={(e) => setPetForm({ ...petForm, breed: e.target.value })}
+                    disabled={isSavingPet}
+                  />
+                </div>
+                <div className={styles.inputGroup}>
+                  <label className={styles.inputLabel}>Gender</label>
+                  <select
+                    className={styles.modalInput}
+                    value={petForm.gender}
+                    onChange={(e) => setPetForm({ ...petForm, gender: e.target.value as any })}
+                    disabled={isSavingPet}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <option value="PREFER_NOT_TO_SAY">Unknown / Not specified</option>
+                    <option value="MALE">Male</option>
+                    <option value="FEMALE">Female</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className={styles.formRow}>
+                <div className={styles.inputGroup} style={{ flex: 1 }}>
+                  <label className={styles.inputLabel}>Age</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="50"
+                    placeholder="Age number"
+                    className={styles.modalInput}
+                    value={petForm.age}
+                    onChange={(e) => setPetForm({ ...petForm, age: e.target.value })}
+                    disabled={isSavingPet}
+                  />
+                </div>
+                <div className={styles.inputGroup} style={{ flex: 1 }}>
+                  <label className={styles.inputLabel}>Age Unit</label>
+                  <select
+                    className={styles.modalInput}
+                    value={petForm.ageUnit}
+                    onChange={(e) => setPetForm({ ...petForm, ageUnit: e.target.value as any })}
+                    disabled={isSavingPet}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <option value="YEARS">Years</option>
+                    <option value="MONTHS">Months</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className={styles.modalFooterActions}>
+                <button
+                  type="button"
+                  className={styles.actionBtn}
+                  onClick={() => setIsPetModalOpen(false)}
+                  disabled={isSavingPet}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className={`${styles.actionBtn} ${styles.primaryBtn}`}
+                  disabled={isSavingPet || !petForm.name.trim()}
+                >
+                  {isSavingPet ? (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem" }}>
+                      <Loader2 size={16} className="animate-spin" />
+                      Saving...
+                    </span>
+                  ) : (
+                    editingPet ? "Save Changes" : "Add Pet"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Pet Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={Boolean(petToDelete)}
+        title="Delete this pet?"
+        message="Are you sure you want to remove this pet from your profile?"
+        confirmText="Delete Pet"
+        cancelText="Cancel"
+        isDanger={true}
+        isLoading={isDeletingPet}
+        onConfirm={handleConfirmDeletePet}
+        onCancel={() => !isDeletingPet && setPetToDelete(null)}
+      />
 
       {/* OTP Verification Modal */}
       {verifyModalType && (
@@ -801,7 +1192,7 @@ function ProfileDetailsContent() {
           </div>
         </div>
       )}
-</>
+    </>
   );
 }
 

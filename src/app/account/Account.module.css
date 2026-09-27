@@ -2142,3 +2142,230 @@ input:checked + .slider:before {
     align-self: flex-start !important;
   }
 }
+
+/* ==========================================================================
+   PET PROFILES & CARDS
+   ========================================================================== */
+
+.petsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.petCard {
+  background: var(--acc-surface, #ffffff);
+  border: 1px solid var(--acc-border, #E5E7EB);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.petCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(242, 140, 15, 0.08);
+  border-color: rgba(242, 140, 15, 0.3);
+}
+
+.petCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.petIdentity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.petAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #FFF7ED;
+  border: 1.5px solid #FED7AA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.petNameTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--acc-text, #111827);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.petSpeciesBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  background: #FFF9F0;
+  border: 1px solid rgba(242, 140, 15, 0.25);
+  border-radius: 20px;
+  color: #D97706;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+}
+
+.petInfoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  background: var(--acc-bg, #F9FAFB);
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.petInfoCell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.petInfoLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--acc-muted, #6B7280);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.petInfoValue {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--acc-text, #1F2937);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.petCardActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--acc-border, #F3F4F6);
+}
+
+.petActionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 38px;
+}
+
+.petEditBtn {
+  background: #FFFFFF;
+  border: 1px solid #D1D5DB;
+  color: #374151;
+}
+
+.petEditBtn:hover {
+  background: #F9FAFB;
+  border-color: #9CA3AF;
+  color: #111827;
+}
+
+.petDeleteBtn {
+  background: #FFFFFF;
+  border: 1px solid #FCA5A5;
+  color: #DC2626;
+}
+
+.petDeleteBtn:hover {
+  background: #FEF2F2;
+  border-color: #EF4444;
+  color: #B91C1C;
+}
+
+.addPetDashedCard {
+  border: 2px dashed var(--acc-border, #D1D5DB);
+  border-radius: 16px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.addPetDashedCard:hover {
+  background: #FFF9F0;
+  border-color: #F28C0F;
+}
+
+.addPetDashedInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #6B7280;
+}
+
+.addPetDashedCard:hover .addPetDashedInner {
+  color: #D97706;
+}
+
+.addPetPlusIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #F3F4F6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  transition: all 0.2s ease;
+}
+
+.addPetDashedCard:hover .addPetPlusIcon {
+  background: #FED7AA;
+  color: #D97706;
+}
+
+.emptyPetsBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  background: var(--acc-bg, #F9FAFB);
+  border-radius: 16px;
+  border: 1px dashed var(--acc-border, #E5E7EB);
+}
+
+@media (max-width: 768px) {
+  .petsGrid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+}
