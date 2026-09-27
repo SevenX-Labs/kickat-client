@@ -1,52 +1,23 @@
 "use client";
 
+import { useEffect, useState } from 'react';
 import { Star } from 'lucide-react';
+import { testimonialService, TestimonialItem } from '@/services/testimonialService';
 import styles from './CustomerReviews.module.css';
 
-const reviews = [
-  {
-    author: "Sarah Mitchell",
-    pet: "Max · Golden Retriever",
-    initial: "S",
-    avatarColor: "#333F2B",
-    content: "KickAt completely transformed Max's digestion. The quality of the food is unmatched and the delivery is always perfectly on time.",
-    rating: 4.9,
-  },
-  {
-    author: "Priya Sharma",
-    pet: "Luna · Bengal Cat",
-    initial: "P",
-    avatarColor: "#E7A03B",
-    content: "I've never seen Luna so excited for meal time. The treats are her absolute favorite, and I love that they are made with clean, honest ingredients.",
-    rating: 5.0,
-  },
-  {
-    author: "James Cooper",
-    pet: "Charlie · French Bulldog",
-    initial: "J",
-    avatarColor: "#8B6F4E",
-    content: "The toys are incredibly durable and beautifully designed. Finally, pet accessories that actually look good in my apartment!",
-    rating: 4.8,
-  },
-  {
-    author: "Ananya Desai",
-    pet: "Coco · Labrador",
-    initial: "A",
-    avatarColor: "#5B7553",
-    content: "We switched to KickAt six months ago and Coco's coat has never looked shinier. The subscription saves us so much time and money.",
-    rating: 4.9,
-  },
-  {
-    author: "Rohan Mehta",
-    pet: "Simba · Persian Cat",
-    initial: "R",
-    avatarColor: "#A0522D",
-    content: "Simba is the pickiest eater I've ever met, but he devours everything from KickAt. The grooming products are amazing too.",
-    rating: 5.0,
-  },
-];
+interface ReviewDisplayItem {
+  id?: string;
+  author: string;
+  pet: string;
+  initial: string;
+  avatarColor: string;
+  content: string;
+  rating: number;
+}
 
-function ReviewCard({ review }: { review: typeof reviews[0] }) {
+const AVATAR_COLORS = ["#333F2B", "#E7A03B", "#8B6F4E", "#5B7553", "#A0522D", "#2C4A6F", "#B45309"];
+
+function ReviewCard({ review }: { review: ReviewDisplayItem }) {
   return (
     <div className={styles.card}>
       <span className={styles.quoteDecor}>&ldquo;</span>
@@ -63,11 +34,11 @@ function ReviewCard({ review }: { review: typeof reviews[0] }) {
           </div>
           <div className={styles.authorInfo}>
             <span className={styles.authorName}>{review.author}</span>
-            <span className={styles.authorPet}>{review.pet}</span>
+            {review.pet && <span className={styles.authorPet}>{review.pet}</span>}
           </div>
         </div>
         <div className={styles.ratingBadge}>
-          <Star className={styles.starIcon} strokeWidth={1.5} />
+          <Star className={styles.starIcon} strokeWidth={1.5} fill="#E7A03B" />
           <span className={styles.ratingValue}>{review.rating.toFixed(1)}</span>
         </div>
       </div>
@@ -76,6 +47,53 @@ function ReviewCard({ review }: { review: typeof reviews[0] }) {
 }
 
 export function CustomerReviews() {
+  const [reviewsList, setReviewsList] = useState<ReviewDisplayItem[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadTestimonials() {
+      try {
+        const data = await testimonialService.getTestimonials(10);
+        if (isMounted && data && Array.isArray(data) && data.length > 0) {
+          const mapped: ReviewDisplayItem[] = data.map((t: any, idx) => {
+            const petSpecies = t.petType || t.petSpecies || '';
+            const petInfo = [t.petName, petSpecies].filter(Boolean).join(' · ') || t.role || t.location || '';
+            const author = t.name || t.authorName || 'Pet Parent';
+            const initial = author.trim().charAt(0).toUpperCase();
+            const avatarColor = AVATAR_COLORS[idx % AVATAR_COLORS.length];
+            return {
+              id: t.id,
+              author,
+              pet: petInfo,
+              initial,
+              avatarColor,
+              content: t.content || t.comment || '',
+              rating: Number(t.rating) || 5.0,
+            };
+          });
+          setReviewsList(mapped);
+        }
+      } catch (err) {
+        console.warn('Could not load testimonials feed:', err);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    }
+    loadTestimonials();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  if (isLoading || reviewsList.length === 0) {
+    return null;
+  }
+
+  const averageRating = (
+    reviewsList.reduce((acc, r) => acc + r.rating, 0) / (reviewsList.length || 1)
+  ).toFixed(1);
+
   return (
     <section id="reviews" className={styles.section}>
       <div className={styles.container}>
@@ -92,12 +110,12 @@ export function CustomerReviews() {
       <div className={styles.marqueeWrapper}>
         <div className={styles.marqueeTrack}>
           {/* First set */}
-          {reviews.map((review, idx) => (
-            <ReviewCard key={`a-${idx}`} review={review} />
+          {reviewsList.map((review, idx) => (
+            <ReviewCard key={`a-${review.id || idx}`} review={review} />
           ))}
           {/* Duplicate set for seamless loop */}
-          {reviews.map((review, idx) => (
-            <ReviewCard key={`b-${idx}`} review={review} />
+          {reviewsList.map((review, idx) => (
+            <ReviewCard key={`b-${review.id || idx}`} review={review} />
           ))}
         </div>
       </div>
@@ -107,7 +125,7 @@ export function CustomerReviews() {
         <div className={styles.trustStrip}>
           <div className={styles.trustRating}>
             <Star className={styles.trustStar} strokeWidth={1.5} fill="#E7A03B" color="#E7A03B" />
-            <span className={styles.trustScore}>4.9</span>
+            <span className={styles.trustScore}>{averageRating}</span>
             <span className={styles.trustLabel}>average from 12,300+ reviews</span>
           </div>
         </div>

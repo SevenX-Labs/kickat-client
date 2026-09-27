@@ -7,6 +7,7 @@ import { CATALOG_PRODUCTS } from '@/data/categoryData';
 
 // Dynamic code-splitting for below-the-fold components
 const WhyKickat = dynamic(() => import("@/components/common/WhyKickat").then(mod => mod.WhyKickat));
+const RecentlyViewed = dynamic(() => import("@/components/common/RecentlyViewed").then(mod => mod.RecentlyViewed));
 const CustomerReviews = dynamic(() => import("@/components/common/CustomerReviews").then(mod => mod.CustomerReviews));
 const FAQ = dynamic(() => import("@/components/common/FAQ").then(mod => mod.FAQ));
 const InstagramFeed = dynamic(() => import("@/components/common/InstagramFeed").then(mod => mod.InstagramFeed));
@@ -48,17 +49,20 @@ export default function Home() {
         {/* 6 & 7. Why KickAt (Stats + Founder Story) */}
         <WhyKickat />
 
-        {/* 8. Testimonials / Reviews */}
+        {/* 8. Recently Viewed (renders when user has history) */}
+        <RecentlyViewed />
+
+        {/* 9. Testimonials / Reviews (Live feed from /api/v1/home/testimonials) */}
         <CustomerReviews />
 
-        {/* 9. FAQ */}
+        {/* 10. FAQ */}
         <FAQ />
 
-        {/* 10. Instagram / Community Feed */}
+        {/* 11. Instagram / Community Feed */}
         <InstagramFeed />
       </main>
 
-      {/* 11. Footer */}
+      {/* 12. Footer */}
       <Footer />
     </div>
   );

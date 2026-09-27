@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { userService } from '@/services/userService';
 import { ProductGallery } from './ProductGallery';
 import { ProductInfo } from './ProductInfo';
 import { ProductTrustStrip } from './ProductTrustStrip';
@@ -70,6 +71,20 @@ export function ProductDetail({ product, isLoading }: ProductDetailProps) {
     : null;
 
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(defaultVar);
+
+  // Track product view in background
+  useEffect(() => {
+    if (product?.id) {
+      userService.trackProductView(product.id, {
+        name: product.name,
+        price: product.price,
+        discountPrice: product.discountPrice ?? undefined,
+        rating: product.rating,
+        imageUrl: product.image || (product.images && product.images[0]),
+        stock: product.stock,
+      });
+    }
+  }, [product]);
 
   if (isLoading) {
     return <ProductDetailSkeleton />;
