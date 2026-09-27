@@ -80,7 +80,7 @@ export function ProductDetail({ product, isLoading }: ProductDetailProps) {
       <section className={styles.mainProductSection}>
         <div className={styles.container}>
           <div className={styles.mainProductGrid}>
-            <ProductGallery images={activeImages} />
+            <ProductGallery images={activeImages} productId={product.id} variantId={selectedVariant?.id} />
             <ProductInfo
               product={product}
               selectedVariant={selectedVariant}

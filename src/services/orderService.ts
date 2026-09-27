@@ -1,4 +1,5 @@
-import { api } from './api';
+import { api, getAccessToken } from './api';
+import { CONFIG } from '../constants/config';
 
 export interface OrderItem {
   id: string;
@@ -176,5 +177,34 @@ export const orderService = {
    */
   async getOrderInvoice(id: string) {
     return api<{ success: boolean; invoice: any }>(`/orders/${id}/invoice`);
+  },
+
+  /**
+   * GET /api/v1/orders/:id/invoice/pdf
+   * Download generated PDF invoice
+   */
+  async downloadInvoicePdf(id: string, orderNumber?: string) {
+    const token = getAccessToken();
+    const cleanId = id.trim();
+    const url = `${CONFIG.API_BASE_URL}/orders/${cleanId}/invoice/pdf`;
+    const res = await fetch(url, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+    if (!res.ok) {
+      throw new Error('Failed to download invoice PDF');
+    }
+    const blob = await res.blob();
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `Invoice-${orderNumber || cleanId}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(downloadUrl);
   }
 };

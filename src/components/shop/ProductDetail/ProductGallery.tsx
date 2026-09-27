@@ -1,18 +1,80 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { Play, Maximize, Heart, Share2, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Play, Maximize, Heart, Share2, X, Loader2 } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { wishlistService } from '@/services/wishlistService';
 import styles from './ProductDetail.module.css';
 
 interface ProductGalleryProps {
   images: string[];
+  productId?: string;
+  variantId?: string;
 }
 
-export function ProductGallery({ images }: ProductGalleryProps) {
+export function ProductGallery({ images, productId, variantId }: ProductGalleryProps) {
+  const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const [activeIndex, setActiveIndex] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [isWishlistLoading, setIsWishlistLoading] = useState(false);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
+  // Sync wishlist status from event or initial fetch if productId present
+  useEffect(() => {
+    if (!productId) return;
+    const handleWishlistUpdated = (e: any) => {
+      if (e.detail?.productId === productId) {
+        setIsWishlisted(e.detail.action === 'add');
+      }
+    };
+    window.addEventListener('wishlist-updated', handleWishlistUpdated);
+    return () => window.removeEventListener('wishlist-updated', handleWishlistUpdated);
+  }, [productId]);
+
+  const handleWishlistToggle = useCallback(async () => {
+    if (!productId) {
+      setIsWishlisted((prev) => !prev);
+      return;
+    }
+
+    if (isWishlistLoading) return;
+
+    if (!isAuthenticated) {
+      const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/shop';
+      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+      return;
+    }
+
+    setIsWishlistLoading(true);
+    if (!isWishlisted) {
+      try {
+        await wishlistService.addToWishlist(productId, variantId);
+        setIsWishlisted(true);
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('wishlist-updated', { detail: { productId, action: 'add' } }));
+        }
+      } catch (err: any) {
+        console.error('Failed to add to wishlist:', err);
+      } finally {
+        setIsWishlistLoading(false);
+      }
+    } else {
+      try {
+        await wishlistService.removeFromWishlist(productId, variantId);
+        setIsWishlisted(false);
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('wishlist-updated', { detail: { productId, action: 'remove' } }));
+        }
+      } catch (err: any) {
+        console.error('Failed to remove from wishlist:', err);
+      } finally {
+        setIsWishlistLoading(false);
+      }
+    }
+  }, [productId, variantId, isWishlisted, isWishlistLoading, isAuthenticated, router]);
 
   // Reset activeIndex to 0 whenever images array changes (e.g. when variant selection changes)
   const currentImages = Array.isArray(images) && images.length > 0 ? images : ['/hero-products/dog_food.png'];
@@ -65,10 +127,15 @@ export function ProductGallery({ images }: ProductGalleryProps) {
           <button
             type="button"
             className={`${styles.imageFloatingBtn} ${isWishlisted ? styles.wishlistActive : ''}`}
-            aria-label="Add to Wishlist"
-            onClick={() => setIsWishlisted(!isWishlisted)}
+            aria-label={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
+            onClick={handleWishlistToggle}
+            disabled={isWishlistLoading}
           >
-            <Heart size={16} fill={isWishlisted ? "#F99205" : "none"} color={isWishlisted ? "#F99205" : "#211C15"} />
+            {isWishlistLoading ? (
+              <Loader2 size={16} className="animate-spin" color="#F99205" />
+            ) : (
+              <Heart size={16} fill={isWishlisted ? "#F99205" : "none"} color={isWishlisted ? "#F99205" : "#211C15"} />
+            )}
           </button>
           <button
             type="button"
