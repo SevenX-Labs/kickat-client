@@ -3,7 +3,7 @@
   width: 100%;
   min-height: calc(100vh - 5rem);
   background-color: #FBF7EE;
-  padding: 1rem 2rem 2rem;
+  padding: 1rem 2rem 3rem;
 }
 
 .container {
@@ -32,7 +32,7 @@
 }
 
 .crumbLink:hover {
-  color: #E7A03B;
+  color: #F99205;
 }
 
 .crumbBtn {
@@ -47,7 +47,7 @@
 }
 
 .crumbBtn:hover {
-  color: #E7A03B;
+  color: #F99205;
 }
 
 .crumbSep {
@@ -60,7 +60,7 @@
 }
 
 .crumbSubActive {
-  color: #E7A03B;
+  color: #F99205;
   font-weight: 600;
 }
 
@@ -74,7 +74,7 @@
 
 @media (min-width: 900px) {
   .masterLayout {
-    grid-template-columns: 200px 1fr;
+    grid-template-columns: 140px 1fr;
     gap: 2.5rem;
   }
 }
@@ -83,20 +83,17 @@
 .sidebar {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1rem;
   position: sticky;
   top: 5.5rem;
   align-self: start;
-  max-height: calc(100vh - 6.5rem);
+  max-height: calc(100vh - 6rem);
   overflow-y: auto;
+  padding-bottom: 2rem;
   scrollbar-width: none;
 }
 
 .sidebar::-webkit-scrollbar {
-  display: none;
-}
-
-.sidebar::-webkit-scrollbar-thumb {
   display: none;
 }
 
@@ -108,7 +105,7 @@
   background: #ffffff;
   border: 1px solid rgba(33, 28, 21, 0.1);
   padding: 0.6rem 0.85rem;
-  border-radius: 10px;
+  border-radius: 12px;
   font-family: var(--font-ibm-plex-mono), monospace;
   font-size: 0.725rem;
   font-weight: 500;
@@ -142,10 +139,10 @@
 .railList {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.45rem;
   background: #ffffff;
-  border-radius: 18px;
-  padding: 0.75rem;
+  border-radius: 20px;
+  padding: 0.65rem;
   border: 1px solid rgba(33, 28, 21, 0.06);
   box-shadow: 0 4px 20px rgba(33, 28, 21, 0.02);
 }
@@ -155,38 +152,50 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0.85rem 0.5rem;
-  border-radius: 14px;
+  padding: 0.85rem 0.4rem;
+  border-radius: 16px;
   background: transparent;
-  border: none;
+  border: 1.5px solid transparent;
   cursor: pointer;
   position: relative;
-  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
   gap: 0.45rem;
 }
 
 .railItem:hover {
-  background: #FBF7EE;
+  background: #FAF7F2;
 }
 
 .railItemActive {
   background: #FFF8F0;
+  border-color: rgba(249, 146, 5, 0.2);
 }
 
 .railAvatarWrap {
-  width: 44px;
-  height: 44px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #FBF7EE;
+  border: 2px solid rgba(33, 28, 21, 0.06);
+  position: relative;
+  overflow: hidden;
   transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(33, 28, 21, 0.04);
+}
+
+.railItem:hover .railAvatarWrap {
+  transform: scale(1.05);
+  border-color: rgba(249, 146, 5, 0.3);
 }
 
 .railItemActive .railAvatarWrap {
-  background: #F99205;
-  box-shadow: 0 4px 12px rgba(249, 146, 5, 0.25);
+  background: #ffffff;
+  border-color: #F99205;
+  box-shadow: 0 0 0 2.5px #F99205, 0 4px 12px rgba(249, 146, 5, 0.25);
+  transform: scale(1.06);
 }
 
 .railAvatar {
@@ -194,8 +203,26 @@
   border-radius: 50%;
 }
 
+.allAvatarWrap {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FBF7EE;
+  border: 2px solid rgba(33, 28, 21, 0.06);
+  transition: all 0.25s ease;
+}
+
+.railItemActive .allAvatarWrap {
+  background: #F99205;
+  border-color: #F99205;
+  box-shadow: 0 4px 14px rgba(249, 146, 5, 0.35);
+}
+
 .railIcon {
-  color: rgba(33, 28, 21, 0.55);
+  color: #211C15;
 }
 
 .activeIcon {
@@ -204,26 +231,16 @@
 
 .railLabel {
   font-family: var(--font-sans), Inter, sans-serif;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 500;
   color: #211C15;
   text-align: center;
+  line-height: 1.2;
 }
 
 .railItemActive .railLabel {
   color: #F99205;
-  font-weight: 600;
-}
-
-.activeBar {
-  position: absolute;
-  left: -0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 4px;
-  height: 28px;
-  background: #F99205;
-  border-radius: 0 4px 4px 0;
+  font-weight: 700;
 }
 
 /* Sidebar Additional Filters */
@@ -245,8 +262,8 @@
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.08em;
-  color: #E7A03B;
-  background: rgba(231, 160, 59, 0.1);
+  color: #F99205;
+  background: rgba(249, 146, 5, 0.1);
   padding: 0.35rem 0.65rem;
   border-radius: 6px;
 }
@@ -287,8 +304,8 @@
 
 .sizeBtn:hover,
 .sizeActive {
-  background: #E7A03B;
-  border-color: #E7A03B;
+  background: #F99205;
+  border-color: #F99205;
   color: #ffffff;
 }
 
@@ -313,7 +330,7 @@
 .colorSwatch:hover,
 .colorActive {
   transform: scale(1.15);
-  box-shadow: 0 0 0 2px #E7A03B;
+  box-shadow: 0 0 0 2px #F99205;
 }
 
 /* ── 2. Right Main Panel ────────────────────────────────── */
@@ -814,19 +831,13 @@
   }
 
   .railAvatarWrap {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
   }
 
   .railLabel {
     font-size: 0.8rem;
     line-height: 1.15;
-  }
-
-  .activeBar {
-    width: 3px;
-    height: 24px;
-    left: -0.2rem;
   }
 
   .mainPanel {

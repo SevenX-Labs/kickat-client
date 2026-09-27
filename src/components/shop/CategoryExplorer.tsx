@@ -272,11 +272,10 @@ export function CategoryExplorer({
                 onClick={() => handleMainCategoryClick('all')}
                 className={`${styles.railItem} ${selectedMainCat === 'all' ? styles.railItemActive : ''}`}
               >
-                <div className={styles.railAvatarWrap}>
-                  <LayoutGrid size={20} className={selectedMainCat === 'all' ? styles.activeIcon : styles.railIcon} />
+                <div className={styles.allAvatarWrap}>
+                  <LayoutGrid size={22} className={selectedMainCat === 'all' ? styles.activeIcon : styles.railIcon} />
                 </div>
                 <span className={styles.railLabel}>All</span>
-                {selectedMainCat === 'all' && <div className={styles.activeBar} />}
               </button>
 
               {/* Backend Categories */}
@@ -294,22 +293,18 @@ export function CategoryExplorer({
                   >
                     <div className={styles.railAvatarWrap}>
                       {cat.imageUrl ? (
-                        <div className="relative w-9 h-9 rounded-full overflow-hidden">
-                          <Image
-                            src={cat.imageUrl}
-                            alt={cat.name}
-                            fill
-                            sizes="36px"
-                            style={{ objectFit: 'cover' }}
-                            className={styles.railAvatar}
-                          />
-                        </div>
+                        <Image
+                          src={cat.imageUrl}
+                          alt={cat.name}
+                          fill
+                          sizes="50px"
+                          className={styles.railAvatar}
+                        />
                       ) : (
-                        <LayoutGrid size={20} className={isSelected ? styles.activeIcon : styles.railIcon} />
+                        <LayoutGrid size={22} className={isSelected ? styles.activeIcon : styles.railIcon} />
                       )}
                     </div>
                     <span className={styles.railLabel}>{cat.name}</span>
-                    {isSelected && <div className={styles.activeBar} />}
                   </button>
                 );
               })}
