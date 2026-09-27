@@ -4,7 +4,7 @@ import { UseLocationButton } from '@/components/ui/UseLocationButton';
 import { DetectedAddress } from '@/services/locationService';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Check, ChevronRight, CheckCircle2, User, MapPin, Bone, Loader2, AlertCircle } from 'lucide-react';
+import { Check, ChevronRight, CheckCircle2, User, MapPin, Bone, Loader2, AlertCircle, ShieldCheck } from 'lucide-react';
 import styles from './Onboarding.module.css';
 import { profileService } from '@/services/profileService';
 import { useAuth } from '@/context/AuthContext';
@@ -255,7 +255,14 @@ export default function OnboardingPage() {
 
               <div className={styles.formRow}>
                 <div className={styles.inputGroup}>
-                  <label className={styles.label}>Email Address</label>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                    <label className={styles.label} style={{ marginBottom: 0 }}>Email Address</label>
+                    {Boolean(user?.email && (user?.isEmailVerified ?? true)) && (
+                      <span style={{ color: '#16A34A', fontSize: '11px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                        <ShieldCheck size={13} /> Verified
+                      </span>
+                    )}
+                  </div>
                   <input 
                     type="email" 
                     name="email" 
@@ -263,11 +270,19 @@ export default function OnboardingPage() {
                     onChange={handleChange} 
                     className={styles.input} 
                     placeholder="sahil@example.com" 
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || Boolean(user?.email && (user?.isEmailVerified ?? true))}
+                    readOnly={Boolean(user?.email && (user?.isEmailVerified ?? true))}
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label className={styles.label}>Phone Number</label>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                    <label className={styles.label} style={{ marginBottom: 0 }}>Phone Number</label>
+                    {Boolean(user?.phone) && (
+                      <span style={{ color: '#16A34A', fontSize: '11px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                        <ShieldCheck size={13} /> Verified
+                      </span>
+                    )}
+                  </div>
                   <input 
                     type="tel" 
                     name="phone" 
@@ -275,7 +290,8 @@ export default function OnboardingPage() {
                     onChange={handleChange} 
                     className={styles.input} 
                     placeholder="+91 98765 43210" 
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || Boolean(user?.phone)}
+                    readOnly={Boolean(user?.phone)}
                   />
                 </div>
               </div>
@@ -413,20 +429,19 @@ export default function OnboardingPage() {
 
           {step === 3 && (
             <div>
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>Pet's Name</label>
-                <input 
-                  type="text" 
-                  name="petName" 
-                  value={formData.petName} 
-                  onChange={handleChange} 
-                  className={styles.input} 
-                  placeholder="e.g. Bruno" 
-                  disabled={isSubmitting}
-                />
-              </div>
-
               <div className={styles.formRow}>
+                <div className={styles.inputGroup}>
+                  <label className={styles.label}>Pet's Name</label>
+                  <input 
+                    type="text" 
+                    name="petName" 
+                    value={formData.petName} 
+                    onChange={handleChange} 
+                    className={styles.input} 
+                    placeholder="e.g. Bruno" 
+                    disabled={isSubmitting}
+                  />
+                </div>
                 <div className={styles.inputGroup}>
                   <label className={styles.label}>Pet Type</label>
                   <select 
@@ -434,7 +449,6 @@ export default function OnboardingPage() {
                     value={formData.petType} 
                     onChange={handleChange} 
                     className={styles.input} 
-                    style={{ appearance: 'none', cursor: 'pointer' }}
                     disabled={isSubmitting}
                   >
                     <option value="DOG">Dog</option>
@@ -444,6 +458,9 @@ export default function OnboardingPage() {
                     <option value="OTHER">Other</option>
                   </select>
                 </div>
+              </div>
+
+              <div className={styles.formRow}>
                 <div className={styles.inputGroup}>
                   <label className={styles.label}>Breed (Optional)</label>
                   <input 
@@ -453,6 +470,20 @@ export default function OnboardingPage() {
                     onChange={handleChange} 
                     className={styles.input} 
                     placeholder="e.g. Labrador Retriever" 
+                    disabled={isSubmitting}
+                  />
+                </div>
+                <div className={styles.inputGroup}>
+                  <label className={styles.label}>Age (Years)</label>
+                  <input 
+                    type="number" 
+                    name="petAge" 
+                    value={formData.petAge} 
+                    onChange={handleChange} 
+                    className={styles.input} 
+                    placeholder="e.g. 2" 
+                    min="0"
+                    max="30"
                     disabled={isSubmitting}
                   />
                 </div>

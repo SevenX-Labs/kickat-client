@@ -478,26 +478,44 @@ function ProfileDetailsContent() {
               </div>
 
               <div className={styles.inputGroup}>
-                <label className={styles.inputLabel}>Email Address</label>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                  <label className={styles.inputLabel} style={{ marginBottom: 0 }}>Email Address</label>
+                  {userData.isEmailVerified && (
+                    <span style={{ color: '#16A34A', fontSize: '11px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                      <ShieldCheck size={12} /> Verified
+                    </span>
+                  )}
+                </div>
                 <input
                   type="email"
                   required
                   className={styles.modalInput}
                   value={profileForm.email}
                   onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
-                  disabled={isSaving}
+                  disabled={isSaving || userData.isEmailVerified}
+                  readOnly={userData.isEmailVerified}
+                  style={userData.isEmailVerified ? { cursor: 'not-allowed', backgroundColor: '#F9FAFB', color: '#6B7280' } : undefined}
                 />
               </div>
 
               <div className={styles.inputGroup}>
-                <label className={styles.inputLabel}>Phone Number</label>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                  <label className={styles.inputLabel} style={{ marginBottom: 0 }}>Phone Number</label>
+                  {userData.isPhoneVerified && (
+                    <span style={{ color: '#16A34A', fontSize: '11px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                      <ShieldCheck size={12} /> Verified
+                    </span>
+                  )}
+                </div>
                 <input
                   type="tel"
                   required
                   className={styles.modalInput}
                   value={profileForm.phone}
                   onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
-                  disabled={isSaving}
+                  disabled={isSaving || userData.isPhoneVerified}
+                  readOnly={userData.isPhoneVerified}
+                  style={userData.isPhoneVerified ? { cursor: 'not-allowed', backgroundColor: '#F9FAFB', color: '#6B7280' } : undefined}
                 />
               </div>
 
