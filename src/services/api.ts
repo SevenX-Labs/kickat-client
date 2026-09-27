@@ -84,6 +84,7 @@ export async function api<T>(endpoint: string, options: FetchOptions = {}): Prom
     endpoint.includes('/auth/logout-all') ||
     endpoint.includes('/auth/otp/send') ||
     endpoint.includes('/auth/otp/verify') ||
+    endpoint.includes('/auth/email-otp') ||
     endpoint.includes('/auth/google');
 
   // Attempt automatic token refresh on 401 Unauthorized for non-auth endpoints

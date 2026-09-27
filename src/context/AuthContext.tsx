@@ -11,6 +11,8 @@ interface AuthContextType {
   isLoading: boolean;
   sendMobileOtp: (phone: string) => Promise<SendOtpResponse>;
   verifyMobileOtp: (phone: string, otp: string) => Promise<AuthResponse>;
+  sendEmailOtp: (email: string) => Promise<SendOtpResponse>;
+  verifyEmailOtp: (email: string, otp: string) => Promise<AuthResponse>;
   googleAuth: (code: string, redirectUri?: string) => Promise<AuthResponse>;
   loginWithToken: (token: string, providedUser?: AuthUser) => Promise<AuthUser>;
   logout: () => Promise<void>;
@@ -95,6 +97,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return res;
   };
 
+  const sendEmailOtp = async (email: string): Promise<SendOtpResponse> => {
+    return authService.sendEmailOtp(email);
+  };
+
+  const verifyEmailOtp = async (email: string, otp: string): Promise<AuthResponse> => {
+    const res = await authService.verifyEmailOtp(email, otp);
+    if (res.accessToken) {
+      setAccessToken(res.accessToken);
+      setAccessTokenState(res.accessToken);
+      setUser(res.user);
+    }
+    return res;
+  };
+
   const googleAuth = async (code: string, redirectUri?: string): Promise<AuthResponse> => {
     const res = await authService.googleAuth(code, redirectUri);
     if (res.accessToken) {
@@ -150,6 +166,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         sendMobileOtp,
         verifyMobileOtp,
+        sendEmailOtp,
+        verifyEmailOtp,
         googleAuth,
         loginWithToken,
         logout,

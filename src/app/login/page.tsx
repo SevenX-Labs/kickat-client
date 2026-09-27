@@ -31,7 +31,7 @@ function LoginContent() {
     }
   }, [searchParams]);
 
-  // If already authenticated and success modal is not active, redirect to homepage
+  // If already authenticated and success modal is not active, redirect to target
   useEffect(() => {
     if (isAuthenticated && !isSuccessModalOpen) {
       const redirectTo = searchParams.get("redirect") || "/";
@@ -42,7 +42,7 @@ function LoginContent() {
   // Resend OTP countdown timer
   useEffect(() => {
     if (resendCooldown > 0) {
-      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+      const timer = setTimeout(() => setResendCooldown((prev) => prev - 1), 1000);
       return () => clearTimeout(timer);
     }
   }, [resendCooldown]);
@@ -94,9 +94,16 @@ function LoginContent() {
         setIsSuccessModalOpen(true);
         const redirectTo = searchParams.get("redirect") || "/";
 
-        // Show 2.5s animated success modal before navigating to homepage
+        const isProfileComplete = Boolean(
+          res.user?.isProfileComplete ||
+          res.user?.profileCompleted ||
+          (res.user?.name && (res.user?.email || res.user?.phone))
+        );
+        const redirectTarget = (!isProfileComplete && res.isNewUser) ? "/onboarding" : redirectTo;
+
+        // Show 2.5s animated success modal before navigating to destination
         setTimeout(() => {
-          router.push(redirectTo);
+          router.push(redirectTarget);
         }, 2500);
       }
     } catch (err: any) {
@@ -120,15 +127,12 @@ function LoginContent() {
         title="OTP Verified Successfully!"
       />
 
-      {/* Left Branding Section (Desktop only) */}
+      {/* Left Branding Section (Visible on Desktop) */}
       <div className={styles.brandingSection}>
-        <div className={styles.brandingPattern}></div>
-        <div className={styles.brandingOverlay}></div>
-
         <div className={styles.brandingContent}>
-          <Link href="/" style={{ display: 'inline-block', marginBottom: '1.5rem' }}>
+          <Link href="/" className={styles.brandLogoHeader} aria-label="KickAt Home">
             <Image
-              src="/logo-withoutbg.png"
+              src="/logo-clean.png"
               alt="KickAt Logo"
               width={160}
               height={70}
@@ -269,10 +273,18 @@ function LoginContent() {
                   <span className={styles.prefix}><Smartphone size={18} /></span>
                   <input
                     type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
                     className={styles.input}
                     placeholder="Enter 6-digit OTP"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    onPaste={(e) => {
+                      e.preventDefault();
+                      const pasteData = e.clipboardData.getData('text');
+                      const clean = pasteData.replace(/\D/g, '').slice(0, 6);
+                      setOtp(clean);
+                    }}
                     maxLength={6}
                     disabled={isSubmitting}
                     required

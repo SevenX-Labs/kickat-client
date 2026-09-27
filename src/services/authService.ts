@@ -70,6 +70,35 @@ export const authService = {
   },
 
   /**
+   * Request 6-digit Email OTP (POST /auth/email-otp/send)
+   */
+  async sendEmailOtp(email: string): Promise<SendOtpResponse> {
+    const sanitizedEmail = email.trim().toLowerCase();
+    return api<SendOtpResponse>('/auth/email-otp/send', {
+      method: 'POST',
+      data: { email: sanitizedEmail },
+    });
+  },
+
+  /**
+   * Verify Email OTP (POST /auth/email-otp/verify)
+   * Sets isEmailVerified: true and issues tokens (refreshToken in HttpOnly cookie, accessToken in memory)
+   */
+  async verifyEmailOtp(email: string, otp: string): Promise<AuthResponse> {
+    const sanitizedEmail = email.trim().toLowerCase();
+    const res = await api<AuthResponse>('/auth/email-otp/verify', {
+      method: 'POST',
+      data: { email: sanitizedEmail, otp },
+    });
+
+    if (res.accessToken) {
+      setAccessToken(res.accessToken);
+    }
+
+    return res;
+  },
+
+  /**
    * Authenticate via Google OAuth Code (POST /auth/google)
    */
   async googleAuth(code: string, redirectUri?: string): Promise<AuthResponse> {
@@ -165,15 +194,12 @@ export const authService = {
    * Revoke all active sessions across all devices (POST /auth/logout-all)
    */
   async logoutAll(password?: string): Promise<MessageResponse> {
-    try {
-      await api<MessageResponse>('/auth/logout-all', {
-        method: 'POST',
-        data: password ? { password } : {},
-      });
-    } finally {
-      setAccessToken(null);
-    }
-    return { success: true, message: 'All sessions revoked successfully' };
+    const res = await api<MessageResponse>('/auth/logout-all', {
+      method: 'POST',
+      data: password ? { password } : {},
+    });
+    setAccessToken(null);
+    return res || { success: true, message: 'All sessions revoked successfully' };
   },
 
   /**
