@@ -118,7 +118,7 @@ function LoginContent() {
   };
 
   return (
-    <div className={styles.pageWrapper}>
+    <div className={styles.loginPageWrapper}>
       {/* Animated Success Dialog Box */}
       <OtpSuccessModal
         isOpen={isSuccessModalOpen}
