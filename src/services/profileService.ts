@@ -20,7 +20,7 @@ export interface CreateAddressDto {
 }
 
 export interface CreatePetDto {
-  species: 'DOG' | 'CAT' | 'BIRD' | 'FISH' | 'OTHER';
+  species: 'DOG' | 'CAT' | 'BIRD' | 'FISH' | 'RABBIT' | 'OTHER';
   name: string;
   breed?: string;
   age?: number;
@@ -32,6 +32,16 @@ export interface CreatePetDto {
   allergies?: string[];
 }
 
+
+
+export interface CreateProfileUnifiedDto {
+  name: string;
+  email?: string;
+  gender?: 'MALE' | 'FEMALE' | 'PREFER_NOT_TO_SAY';
+  dob?: string;
+  addresses?: CreateAddressDto[];
+  pets?: CreatePetDto[];
+}
 
 export interface CreatePaymentMethodDto {
   type: "UPI" | "BANK_ACCOUNT" | "CARD";
@@ -46,6 +56,16 @@ export interface CreatePaymentMethodDto {
 }
 
 export const profileService = {
+  /**
+   * POST /profile (Unified onboarding profile creation)
+   */
+  async createOrUpdateProfile(dto: CreateProfileUnifiedDto) {
+    return api('/profile', {
+      method: 'POST',
+      data: dto as unknown as Record<string, unknown>,
+    });
+  },
+
   /**
    * GET /profile (Fetch complete profile with addresses and pets)
    */
