@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import ProductCard from '../common/ProductCard/ProductCard';
@@ -16,40 +16,14 @@ import {
   Filter,
   Check,
   Sparkles,
+  Loader2,
 } from 'lucide-react';
-import {
-  MAIN_CATEGORIES,
-  CATALOG_PRODUCTS,
-} from '@/data/categoryData';
+import { categoryService } from '@/services/categoryService';
+import { Category } from '@/types/category';
+import { productService } from '@/services/productService';
+import { mapBackendProductToCard } from '@/types/product';
+import { Skeleton } from '@/components/ui/Skeleton';
 import styles from './CategoryExplorer.module.css';
-
-const MAIN_CAT_ICONS: Record<string, string> = {
-  all: '/category-images/food.png',
-  dogs: '/category-images/dog.png',
-  cats: '/category-images/cat.png',
-  fish: '/category-images/fish.png',
-  birds: '/category-images/bird.png',
-};
-
-const SUBCAT_IMAGES: Record<string, string> = {
-  'dog-accessories': '/category-images/accessories.png',
-  'dog-food-treats': '/hero-products/dog_food.png',
-  'dog-grooming-hygiene': '/hero-products/pet_bowl.png',
-  'dog-feeding': '/hero-products/pet_bowl.png',
-  'cat-accessories': '/category-images/toys.png',
-  'cat-food': '/hero-products/cat_treats.png',
-  'cat-grooming-hygiene': '/category-images/fish.png',
-  'cat-feeding': '/hero-products/pet_bowl.png',
-  'aquarium-filtration': '/category-images/fish.png',
-  'aquarium-pumps': '/category-images/fish.png',
-  'aquarium-heating': '/category-images/accessories.png',
-  'aquarium-lighting': '/category-images/accessories.png',
-  'aquarium-food': '/category-images/food.png',
-  'aquarium-care-medicine': '/category-images/food.png',
-  'aquarium-tools': '/hero-products/pet_toy.png',
-  'bird-feeding': '/hero-products/pet_bowl.png',
-  'bird-food': '/category-images/bird.png',
-};
 
 const AVAILABLE_SIZES = ['S', 'M', 'L', 'XL', '2XL'];
 const COLOR_SWATCHES = [
@@ -59,17 +33,22 @@ const COLOR_SWATCHES = [
   { name: 'Orange', hex: '#F99205' },
 ];
 
+const ITEMS_PER_PAGE = 8;
+
 interface CategoryExplorerProps {
   initialMainCat?: string;
   initialSubCat?: string;
 }
 
 export function CategoryExplorer({
-  initialMainCat = 'dogs',
+  initialMainCat = 'dog',
   initialSubCat = 'all',
 }: CategoryExplorerProps) {
   const router = useRouter();
-  // State initialized from props
+
+  // Categories from Backend Tree
+  const [categoriesTree, setCategoriesTree] = useState<Category[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState<boolean>(true);
   const [selectedMainCat, setSelectedMainCat] = useState<string>(initialMainCat);
   const [selectedSubCat, setSelectedSubCat] = useState<string>(initialSubCat);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
@@ -78,34 +57,157 @@ export function CategoryExplorer({
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Products from Backend
+  const [products, setProducts] = useState<any[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  // 1. Fetch Categories Tree from Backend API
+  useEffect(() => {
+    let isMounted = true;
+    setCategoriesLoading(true);
+    categoryService.getCategoryTree()
+      .then((res) => {
+        if (isMounted && res.success && Array.isArray(res.categories)) {
+          setCategoriesTree(res.categories);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load category tree:", err);
+      })
+      .finally(() => {
+        if (isMounted) setCategoriesLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   // Sync state if props change
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (initialMainCat) setSelectedMainCat(initialMainCat);
     if (initialSubCat) setSelectedSubCat(initialSubCat);
   }, [initialMainCat, initialSubCat]);
 
   // Active Main Category Object
   const activeMainCatObj = useMemo(() => {
-    if (selectedMainCat === 'all') {
-      const allSubcats = MAIN_CATEGORIES.filter((c) => c.slug !== 'all')
-        .flatMap((c) => c.subcategories);
+    if (categoriesTree.length === 0) {
       return {
         id: 'all',
         name: 'All Categories',
         slug: 'all',
-        count: CATALOG_PRODUCTS.length,
-        subcategories: allSubcats,
+        imageUrl: null,
+        children: [],
       };
     }
-    return MAIN_CATEGORIES.find((c) => c.slug === selectedMainCat) || MAIN_CATEGORIES[1];
-  }, [selectedMainCat]);
+
+    if (selectedMainCat === 'all') {
+      const allSubcats = categoriesTree.flatMap((c) => c.children || []);
+      return {
+        id: 'all',
+        name: 'All Categories',
+        slug: 'all',
+        imageUrl: null,
+        children: allSubcats,
+      };
+    }
+
+    const found = categoriesTree.find(
+      (c) => c.slug.toLowerCase() === selectedMainCat.toLowerCase() ||
+             c.id === selectedMainCat ||
+             (c.slug === 'dog' && (selectedMainCat === 'dogs' || selectedMainCat === 'dog')) ||
+             (c.slug === 'cat' && (selectedMainCat === 'cats' || selectedMainCat === 'cat')) ||
+             (c.slug === 'birds' && (selectedMainCat === 'bird' || selectedMainCat === 'birds'))
+    );
+
+    if (found) {
+      return found;
+    }
+
+    return categoriesTree[0] || {
+      id: selectedMainCat,
+      name: selectedMainCat.charAt(0).toUpperCase() + selectedMainCat.slice(1),
+      slug: selectedMainCat,
+      imageUrl: null,
+      children: [],
+    };
+  }, [selectedMainCat, categoriesTree]);
 
   // Active Sub Category Object
   const activeSubCatObj = useMemo(() => {
     if (selectedSubCat === 'all') return null;
-    return activeMainCatObj.subcategories.find((s) => s.slug === selectedSubCat) || null;
+    return (activeMainCatObj.children || []).find((s) => s.slug === selectedSubCat || s.id === selectedSubCat) || null;
   }, [activeMainCatObj, selectedSubCat]);
+
+  // Fetch real products from backend API
+  const fetchCatalogProducts = useCallback(async () => {
+    setLoading(true);
+    try {
+      let apiSort: any = 'popularity';
+      if (sortBy === 'price-low') apiSort = 'price_asc';
+      else if (sortBy === 'price-high') apiSort = 'price_desc';
+      else if (sortBy === 'rating') apiSort = 'rating';
+      else if (sortBy === 'newest') apiSort = 'newest';
+
+      let targetCat = selectedSubCat !== 'all' ? selectedSubCat : selectedMainCat;
+      let res;
+
+      if (targetCat && targetCat !== 'all') {
+        res = await categoryService.getCategoryProducts(targetCat, {
+          page: currentPage,
+          limit: ITEMS_PER_PAGE,
+          sort: apiSort,
+        }).catch(() => null);
+      }
+
+      if (!res || !res.success) {
+        let speciesParam: string | undefined = undefined;
+        if (selectedMainCat === 'dogs' || selectedMainCat === 'dog') speciesParam = 'dog';
+        else if (selectedMainCat === 'cats' || selectedMainCat === 'cat') speciesParam = 'cat';
+        else if (selectedMainCat === 'fish') speciesParam = 'fish';
+        else if (selectedMainCat === 'birds' || selectedMainCat === 'bird') speciesParam = 'bird';
+
+        res = await productService.getProducts({
+          page: currentPage,
+          limit: ITEMS_PER_PAGE,
+          sort: apiSort,
+          petSpecies: speciesParam,
+        });
+      }
+
+      if (res && res.success && Array.isArray(res.products)) {
+        let mapped = res.products.map(mapBackendProductToCard);
+
+        if (selectedSize) {
+          mapped = mapped.filter((p: any) => p.sizes && p.sizes.includes(selectedSize));
+        }
+        if (selectedColor) {
+          mapped = mapped.filter((p: any) => p.color === selectedColor);
+        }
+
+        setProducts(mapped);
+        setTotalCount(res.meta?.total || mapped.length);
+        setTotalPages(res.meta?.totalPages || Math.ceil((res.meta?.total || mapped.length) / ITEMS_PER_PAGE) || 1);
+      } else {
+        setProducts([]);
+        setTotalCount(0);
+        setTotalPages(1);
+      }
+    } catch (err) {
+      console.error('Failed to load catalog products:', err);
+      setProducts([]);
+      setTotalCount(0);
+      setTotalPages(1);
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedMainCat, selectedSubCat, sortBy, currentPage, selectedSize, selectedColor]);
+
+  useEffect(() => {
+    fetchCatalogProducts();
+  }, [fetchCatalogProducts]);
 
   // Handlers with URL synchronization
   const handleMainCategoryClick = (catSlug: string) => {
@@ -134,51 +236,14 @@ export function CategoryExplorer({
   };
 
   const resetFilters = () => {
-    setSelectedMainCat('dogs');
-    setSelectedSubCat('all');
     setSelectedSize(null);
     setSelectedColor(null);
+    setSelectedSubCat('all');
     setSortBy('featured');
     setCurrentPage(1);
-
-    if (typeof window !== 'undefined') {
-      window.history.pushState(null, '', `/categories/dogs`);
-    }
   };
 
-  // Filtered products list
-  const filteredProducts = useMemo(() => {
-    return CATALOG_PRODUCTS.filter((product) => {
-      if (selectedMainCat !== 'all' && product.mainCategory !== selectedMainCat) {
-        return false;
-      }
-      if (selectedSubCat !== 'all' && product.subCategory !== selectedSubCat) {
-        return false;
-      }
-      if (selectedSize && (!product.sizes || !product.sizes.includes(selectedSize))) {
-        return false;
-      }
-      if (selectedColor && product.color !== selectedColor) {
-        return false;
-      }
-      return true;
-    }).sort((a, b) => {
-      if (sortBy === 'name-asc') return a.name.localeCompare(b.name);
-      if (sortBy === 'name-desc') return b.name.localeCompare(a.name);
-      if (sortBy === 'price-low') return a.price - b.price;
-      if (sortBy === 'price-high') return b.price - a.price;
-      if (sortBy === 'rating') return b.rating - a.rating;
-      return 0;
-    });
-  }, [selectedMainCat, selectedSubCat, selectedSize, selectedColor, sortBy]);
-
-  // Pagination calculation
-  const ITEMS_PER_PAGE = 6;
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) || 1;
-  const paginatedProducts = filteredProducts.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  const hasSubcategories = (activeMainCatObj.children && activeMainCatObj.children.length > 0);
 
   return (
     <div className={styles.pageWrapper}>
@@ -196,15 +261,30 @@ export function CategoryExplorer({
                 onClick={handleBackToSubCategories}
                 className={styles.backNavBtn}
               >
-                <ArrowLeft size={14} /> Back to {activeMainCatObj.name} Categories
+                <ArrowLeft size={14} /> Back to {activeMainCatObj.name}
               </button>
             )}
 
             {/* Main Categories Vertical Rail */}
             <div className={styles.railList}>
-              {MAIN_CATEGORIES.map((cat) => {
-                const isSelected = selectedMainCat === cat.slug;
-                const iconSrc = MAIN_CAT_ICONS[cat.slug] || '/category-images/food.png';
+              {/* All Categories Item */}
+              <button
+                onClick={() => handleMainCategoryClick('all')}
+                className={`${styles.railItem} ${selectedMainCat === 'all' ? styles.railItemActive : ''}`}
+              >
+                <div className={styles.railAvatarWrap}>
+                  <LayoutGrid size={20} className={selectedMainCat === 'all' ? styles.activeIcon : styles.railIcon} />
+                </div>
+                <span className={styles.railLabel}>All</span>
+                {selectedMainCat === 'all' && <div className={styles.activeBar} />}
+              </button>
+
+              {/* Backend Categories */}
+              {categoriesTree.map((cat) => {
+                const isSelected = selectedMainCat.toLowerCase() === cat.slug.toLowerCase() ||
+                                   (cat.slug === 'dog' && selectedMainCat === 'dogs') ||
+                                   (cat.slug === 'cat' && selectedMainCat === 'cats') ||
+                                   (cat.slug === 'birds' && selectedMainCat === 'bird');
 
                 return (
                   <button
@@ -213,16 +293,19 @@ export function CategoryExplorer({
                     className={`${styles.railItem} ${isSelected ? styles.railItemActive : ''}`}
                   >
                     <div className={styles.railAvatarWrap}>
-                      {cat.slug === 'all' ? (
-                        <LayoutGrid size={20} className={isSelected ? styles.activeIcon : styles.railIcon} />
+                      {cat.imageUrl ? (
+                        <div className="relative w-9 h-9 rounded-full overflow-hidden">
+                          <Image
+                            src={cat.imageUrl}
+                            alt={cat.name}
+                            fill
+                            sizes="36px"
+                            style={{ objectFit: 'cover' }}
+                            className={styles.railAvatar}
+                          />
+                        </div>
                       ) : (
-                        <Image
-                          src={iconSrc}
-                          alt={cat.name}
-                          width={36}
-                          height={36}
-                          className={styles.railAvatar}
-                        />
+                        <LayoutGrid size={20} className={isSelected ? styles.activeIcon : styles.railIcon} />
                       )}
                     </div>
                     <span className={styles.railLabel}>{cat.name}</span>
@@ -237,7 +320,7 @@ export function CategoryExplorer({
               <div className={styles.filtersBlock}>
                 <div className={styles.filterActivePill}>
                   <Filter size={12} />
-                  <span>FILTERING: {activeSubCatObj?.name}</span>
+                  <span>FILTERING: {activeSubCatObj?.name || selectedSubCat}</span>
                 </div>
 
                 {/* Size Filter */}
@@ -280,76 +363,82 @@ export function CategoryExplorer({
           {/* RIGHT MAIN PANEL */}
           <main className={styles.mainPanel}>
 
-            {/* ── STEP 1: SUBCATEGORIES TILES VIEW (Only shown when selectedSubCat === 'all') ── */}
-            {selectedSubCat === 'all' && (
+            {/* ── STEP 1: SUBCATEGORIES TILES VIEW (Only shown when selectedSubCat === 'all' AND subcategories exist) ── */}
+            {selectedSubCat === 'all' && hasSubcategories && (
               <div className={`${styles.subCategoriesSection} ${styles.viewTransition}`}>
                 <div className={styles.subCatSectionHeader}>
                   <div>
                     <span className={styles.subCatEyebrow}>SUBCATEGORIES</span>
                     <h1 className={styles.subCatMainTitle}>{activeMainCatObj.name}</h1>
                   </div>
-                  <span className={styles.subCatCountBadge}>{activeMainCatObj.count} Products</span>
+                  {totalCount > 0 && (
+                    <span className={styles.subCatCountBadge}>{totalCount} Products</span>
+                  )}
                 </div>
 
                 {/* Grid of Sub-Category Cards */}
                 <div className={styles.subCategoriesGrid}>
-                  {activeMainCatObj.subcategories.map((sub) => {
-                    const imgUrl = SUBCAT_IMAGES[sub.slug] || '/category-images/food.png';
-
-                    return (
-                      <div
-                        key={sub.id}
-                        onClick={() => handleSubCategoryClick(sub.slug)}
-                        className={styles.subCategoryCard}
-                      >
-                        <div className={styles.subCardImgWrap}>
-                          <Image
-                            src={imgUrl}
-                            alt={sub.name}
-                            fill
-                            style={{ objectFit: 'contain' }}
-                            className={styles.subCardImg}
-                          />
-                        </div>
-                        <div className={styles.subCardInfo}>
-                          <span className={styles.subCardCount}>{sub.count} items</span>
-                          <h2 className={styles.subCardTitle}>{sub.name}</h2>
-                          <span className={styles.subCardLink}>
-                            Explore <ArrowRight className={styles.linkArrow} size={14} />
-                          </span>
+                  {(activeMainCatObj.children || []).map((sub) => (
+                    <div
+                      key={sub.id || sub.slug}
+                      onClick={() => handleSubCategoryClick(sub.slug)}
+                      className={styles.subCategoryCard}
+                    >
+                      <div className={styles.subCardImgWrap}>
+                        <div className={styles.subCardImgInner}>
+                          {sub.imageUrl ? (
+                            <Image
+                              src={sub.imageUrl}
+                              alt={sub.name}
+                              fill
+                              sizes="(max-width: 768px) 140px, 160px"
+                              style={{ objectFit: 'contain' }}
+                              className={styles.subCardImg}
+                            />
+                          ) : (
+                            <LayoutGrid size={28} className="text-stone-400 m-auto" />
+                          )}
                         </div>
                       </div>
-                    );
-                  })}
+                      <div className={styles.subCardInfo}>
+                        <h2 className={styles.subCardTitle}>{sub.name}</h2>
+                        <span className={styles.subCardLink}>
+                          Explore <ArrowRight className={styles.linkArrow} size={14} />
+                        </span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
 
-            {/* ── STEP 2: PRODUCT LISTING VIEW (Shown after clicking a subcategory) ── */}
-            {selectedSubCat !== 'all' && (
+            {/* ── STEP 2: PRODUCT LISTING VIEW (Shown if subcategory selected OR if category has no nested subcategories) ── */}
+            {(selectedSubCat !== 'all' || !hasSubcategories) && (
               <div className={`${styles.productListingSection} ${styles.viewTransition}`}>
                 
-                {/* Horizontal Subcategory Pill Switcher */}
-                <div className={styles.subPillsBar}>
-                  <span className={styles.subBarLabel}>SUBCATEGORIES:</span>
-                  <div className={styles.subPillsScroll}>
-                    <button
-                      onClick={handleBackToSubCategories}
-                      className={styles.subPill}
-                    >
-                      All {activeMainCatObj.name}
-                    </button>
-                    {activeMainCatObj.subcategories.map((sub) => (
+                {/* Horizontal Subcategory Pill Switcher (Only if subcategories exist) */}
+                {hasSubcategories && (
+                  <div className={styles.subPillsBar}>
+                    <span className={styles.subBarLabel}>SUBCATEGORIES:</span>
+                    <div className={styles.subPillsScroll}>
                       <button
-                        key={sub.id}
-                        onClick={() => handleSubCategoryClick(sub.slug)}
-                        className={`${styles.subPill} ${selectedSubCat === sub.slug ? styles.subPillActive : ''}`}
+                        onClick={handleBackToSubCategories}
+                        className={styles.subPill}
                       >
-                        {sub.name} ({sub.count})
+                        All {activeMainCatObj.name}
                       </button>
-                    ))}
+                      {(activeMainCatObj.children || []).map((sub) => (
+                        <button
+                          key={sub.id || sub.slug}
+                          onClick={() => handleSubCategoryClick(sub.slug)}
+                          className={`${styles.subPill} ${selectedSubCat === sub.slug ? styles.subPillActive : ''}`}
+                        >
+                          {sub.name}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Toolbar Row */}
                 <div className={styles.toolbar}>
@@ -372,7 +461,7 @@ export function CategoryExplorer({
                     </div>
 
                     <div className={styles.resultsText}>
-                      Showing <strong>{filteredProducts.length > 0 ? (currentPage - 1) * ITEMS_PER_PAGE + 1 : 0} – {Math.min(currentPage * ITEMS_PER_PAGE, filteredProducts.length)}</strong> of <strong>{filteredProducts.length}</strong> results
+                      Showing <strong>{products.length > 0 ? (currentPage - 1) * ITEMS_PER_PAGE + 1 : 0} – {Math.min(currentPage * ITEMS_PER_PAGE, totalCount || products.length)}</strong> of <strong>{totalCount || products.length}</strong> results
                     </div>
                   </div>
 
@@ -380,12 +469,14 @@ export function CategoryExplorer({
                     <label className={styles.sortLabel}>SORT BY:</label>
                     <select
                       value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
+                      onChange={(e) => {
+                        setSortBy(e.target.value);
+                        setCurrentPage(1);
+                      }}
                       className={styles.sortSelect}
                     >
                       <option value="featured">Featured & Popular</option>
-                      <option value="name-asc">Alphabetically, A-Z</option>
-                      <option value="name-desc">Alphabetically, Z-A</option>
+                      <option value="newest">Newest</option>
                       <option value="price-low">Price: Low to High</option>
                       <option value="price-high">Price: High to Low</option>
                       <option value="rating">Highest Rated</option>
@@ -394,14 +485,26 @@ export function CategoryExplorer({
                 </div>
 
                 {/* Product Grid / List */}
-                {filteredProducts.length === 0 ? (
+                {loading ? (
+                  <div className={styles.productGrid}>
+                    {Array.from({ length: 6 }).map((_, idx) => (
+                      <div key={idx} style={{ height: 320, background: '#FAF7F2', borderRadius: 16, border: '1px solid #EBE5DB', padding: 16 }}>
+                        <Skeleton style={{ height: 180, width: '100%', borderRadius: 12, marginBottom: 12 }} />
+                        <Skeleton style={{ height: 20, width: '80%', marginBottom: 8 }} />
+                        <Skeleton style={{ height: 24, width: '40%' }} />
+                      </div>
+                    ))}
+                  </div>
+                ) : products.length === 0 ? (
                   <div className={styles.emptyState}>
                     <RotateCcw size={36} className={styles.emptyIcon} />
-                    <h3 className={styles.emptyTitle}>No products match your active filters</h3>
-                    <p className={styles.emptySubtitle}>Try clearing active size/color filters or viewing all subcategories.</p>
-                    <button onClick={resetFilters} className={styles.resetBtn}>
-                      Reset All Filters
-                    </button>
+                    <h3 className={styles.emptyTitle}>No products found</h3>
+                    <p className={styles.emptySubtitle}>We are stocking new products in this category soon.</p>
+                    {(selectedSize || selectedColor) && (
+                      <button onClick={resetFilters} className={styles.resetBtn}>
+                        Reset Filters
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <div
@@ -409,14 +512,14 @@ export function CategoryExplorer({
                       viewMode === 'grid' ? styles.productGrid : styles.productList
                     }
                   >
-                    {paginatedProducts.map((product) => (
-                      <ProductCard key={product.id} product={product as any} />
+                    {products.map((product) => (
+                      <ProductCard key={product.id} product={product} />
                     ))}
                   </div>
                 )}
 
                 {/* Pagination */}
-                {totalPages > 1 && (
+                {totalPages > 1 && !loading && (
                   <div className={styles.pagination}>
                     <button
                       disabled={currentPage === 1}
@@ -425,7 +528,7 @@ export function CategoryExplorer({
                     >
                       «
                     </button>
-                    {[...Array(totalPages)].map((_, idx) => {
+                    {Array.from({ length: totalPages }, (_, idx) => {
                       const pageNum = idx + 1;
                       return (
                         <button

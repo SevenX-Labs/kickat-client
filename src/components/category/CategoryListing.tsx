@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import ProductCard from '../common/ProductCard/ProductCard';
 import {
@@ -9,29 +10,59 @@ import {
   SlidersHorizontal,
   X,
   RotateCcw,
+  ChevronRight,
+  ChevronLeft,
+  ArrowRight,
+  ArrowLeft,
+  Loader2,
+  Filter,
 } from 'lucide-react';
-import { CategoryInfo } from '@/data/categoryData';
+import { categoryService } from '@/services/categoryService';
+import { Category, CategoryProductsQuery } from '@/types/category';
+import { mapBackendProductToCard } from '@/types/product';
+import { Skeleton } from '@/components/ui/Skeleton';
 import styles from './CategoryListing.module.css';
 
 interface CategoryListingProps {
-  category: CategoryInfo;
+  categorySlug: string;
+  subcategorySlug?: string;
 }
 
-export function CategoryListing({ category }: CategoryListingProps) {
+const ITEMS_PER_PAGE = 12;
+
+export function CategoryListing({ categorySlug, subcategorySlug }: CategoryListingProps) {
   const router = useRouter();
 
-  // State
+  // Category and Tree State
+  const [category, setCategory] = useState<Category | null>(null);
+  const [categoryTree, setCategoryTree] = useState<Category[]>([]);
+  const [parentCategory, setParentCategory] = useState<Category | null>(null);
+
+  // Products and Meta State
+  const [products, setProducts] = useState<any[]>([]);
+  const [totalProducts, setTotalProducts] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  // Status States
+  const [loading, setLoading] = useState<boolean>(true);
+  const [categoryLoading, setCategoryLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [notFound, setNotFound] = useState<boolean>(false);
+
+  // Filter & UI State
   const [searchQuery, setSearchQuery] = useState('');
   const [maxPrice, setMaxPrice] = useState(6000);
-  const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>(
-    category.subcategoryName ? [category.subcategoryName] : []
-  );
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [inStockOnly, setInStockOnly] = useState(false);
   const [minRating, setMinRating] = useState<number>(0);
-  const [sortBy, setSortBy] = useState<'featured' | 'price-low' | 'price-high' | 'rating'>('featured');
+  const [sortBy, setSortBy] = useState<'featured' | 'price-low' | 'price-high' | 'rating' | 'newest'>('featured');
   const [gridCols, setGridCols] = useState<2 | 3 | 4>(3);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+
+  // Active identifier for API query
+  const targetSlug = useMemo(() => {
+    return (subcategorySlug || categorySlug || '').trim();
+  }, [subcategorySlug, categorySlug]);
 
   // Lock background scroll when mobile filter drawer is open
   useEffect(() => {
@@ -44,77 +75,294 @@ export function CategoryListing({ category }: CategoryListingProps) {
     }
   }, [mobileFilterOpen]);
 
-  // Handlers
-  const toggleSubcategory = (name: string, slug: string) => {
-    setSelectedSubcategories((prev) => {
-      const next = prev.includes(name) ? prev.filter((item) => item !== name) : [...prev, name];
-      return next;
-    });
-    // Navigate laterally
-    router.push(`/category/${category.categorySlug}/${slug}`);
-  };
+  // 1. Fetch Category Information & Tree
+  useEffect(() => {
+    let isMounted = true;
+    setCategoryLoading(true);
+    setError(null);
+    setNotFound(false);
 
+    async function loadCategoryDetails() {
+      try {
+        // Fetch Category Tree in parallel
+        const treePromise = categoryService.getCategoryTree().catch(() => ({ success: false, categories: [] }));
+        
+        // Attempt fetching target category
+        let catRes = await categoryService.getCategoryById(targetSlug).catch(async (err) => {
+          // If 404 and slug is e.g. "dogs" or "dog", try alternative slug
+          if (targetSlug.endsWith('s')) {
+            const singular = targetSlug.slice(0, -1);
+            return categoryService.getCategoryById(singular).catch(() => null);
+          } else {
+            const plural = `${targetSlug}s`;
+            return categoryService.getCategoryById(plural).catch(() => null);
+          }
+        });
+
+        const treeRes = await treePromise;
+
+        if (!isMounted) return;
+
+        if (treeRes.success && Array.isArray(treeRes.categories)) {
+          setCategoryTree(treeRes.categories);
+        }
+
+        if (catRes && catRes.success && catRes.category) {
+          setCategory(catRes.category);
+          setNotFound(false);
+
+          // Find parent category if target is a subcategory
+          if (catRes.category.parentId && treeRes.success) {
+            const parent = treeRes.categories.find((c) => c.id === catRes!.category.parentId);
+            setParentCategory(parent || null);
+          } else {
+            setParentCategory(null);
+          }
+        } else {
+          // If no direct category match, check if categorySlug exists in tree
+          if (treeRes.success) {
+            const matched = treeRes.categories.find(
+              (c) => c.slug.toLowerCase() === categorySlug.toLowerCase() ||
+                     c.slug.toLowerCase() === targetSlug.toLowerCase() ||
+                     (c.slug === 'dog' && (categorySlug === 'dogs' || targetSlug === 'dogs')) ||
+                     (c.slug === 'cat' && (categorySlug === 'cats' || targetSlug === 'cats'))
+            );
+            if (matched) {
+              setCategory(matched);
+              setNotFound(false);
+            } else {
+              setNotFound(true);
+            }
+          } else {
+            setNotFound(true);
+          }
+        }
+      } catch (err: any) {
+        if (!isMounted) return;
+        console.error("Failed to load category details:", err);
+        setError("Unable to load category details.");
+      } finally {
+        if (isMounted) setCategoryLoading(false);
+      }
+    }
+
+    loadCategoryDetails();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [targetSlug, categorySlug]);
+
+  // 2. Fetch Category Products
+  const fetchProducts = useCallback(async () => {
+    if (notFound) return;
+    setLoading(true);
+    setError(null);
+
+    try {
+      let apiSort: any = 'popularity';
+      if (sortBy === 'price-low') apiSort = 'price_asc';
+      else if (sortBy === 'price-high') apiSort = 'price_desc';
+      else if (sortBy === 'rating') apiSort = 'rating';
+      else if (sortBy === 'newest') apiSort = 'newest';
+
+      const queryParams: CategoryProductsQuery = {
+        page: currentPage,
+        limit: ITEMS_PER_PAGE,
+        sort: apiSort,
+      };
+
+      if (maxPrice < 6000) {
+        queryParams.priceMax = maxPrice;
+      }
+      if (inStockOnly) {
+        queryParams.inStock = true;
+      }
+
+      const activeIdOrSlug = category?.slug || category?.id || targetSlug;
+      let res = await categoryService.getCategoryProducts(activeIdOrSlug, queryParams).catch(async () => {
+        // Alternative fallback if plural/singular mismatch
+        if (activeIdOrSlug.endsWith('s')) {
+          return categoryService.getCategoryProducts(activeIdOrSlug.slice(0, -1), queryParams).catch(() => null);
+        } else {
+          return categoryService.getCategoryProducts(`${activeIdOrSlug}s`, queryParams).catch(() => null);
+        }
+      });
+
+      if (res && res.success) {
+        let mapped = (res.products || []).map(mapBackendProductToCard);
+
+        // Client-side search and rating filter
+        if (searchQuery.trim()) {
+          const q = searchQuery.toLowerCase();
+          mapped = mapped.filter((p) => p.name.toLowerCase().includes(q) || (p.brand && p.brand.toLowerCase().includes(q)));
+        }
+        if (minRating > 0) {
+          mapped = mapped.filter((p) => (p.rating || 0) >= minRating);
+        }
+
+        setProducts(mapped);
+        setTotalProducts(res.meta?.total ?? mapped.length);
+        setTotalPages(res.meta?.totalPages ?? Math.max(1, Math.ceil((res.meta?.total || mapped.length) / ITEMS_PER_PAGE)));
+      } else {
+        setProducts([]);
+        setTotalProducts(0);
+        setTotalPages(1);
+      }
+    } catch (err: any) {
+      console.error("Failed to load category products:", err);
+      setError("Unable to load products for this category.");
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [category, targetSlug, currentPage, sortBy, maxPrice, inStockOnly, searchQuery, minRating, notFound]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  // Handlers
   const clearAllFilters = () => {
     setSearchQuery('');
     setMaxPrice(6000);
-    setSelectedSubcategories([]);
-    setSelectedBrands([]);
     setInStockOnly(false);
     setMinRating(0);
+    setSortBy('featured');
+    setCurrentPage(1);
+  };
+
+  const handleSubcategoryClick = (subSlug: string) => {
+    const parentSlug = parentCategory?.slug || category?.slug || categorySlug;
+    router.push(`/category/${parentSlug}/${subSlug}`);
   };
 
   const activeFilterCount =
     (searchQuery ? 1 : 0) +
     (maxPrice < 6000 ? 1 : 0) +
-    selectedSubcategories.length +
-    selectedBrands.length +
     (inStockOnly ? 1 : 0) +
-    (minRating > 0 ? 1 : 0);
+    (minRating > 0 ? 1 : 0) +
+    (sortBy !== 'featured' ? 1 : 0);
 
-  // Filtered & sorted products
-  const filteredProducts = useMemo(() => {
-    return category.products.filter((p) => {
-      if (searchQuery && !p.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-      if (p.price > maxPrice) return false;
-      if (
-        selectedSubcategories.length > 0 &&
-        !selectedSubcategories.some(
-          (subName) =>
-            p.subcategory?.toLowerCase() === subName.toLowerCase() ||
-            category.subcategories.find((s) => s.name === subName)?.slug === p.subCategory
-        )
-      ) {
-        return false;
-      }
-      if (selectedBrands.length > 0 && !selectedBrands.includes(p.brand)) return false;
-      if (inStockOnly && !p.inStock) return false;
-      if (minRating > 0 && p.rating < minRating) return false;
-      return true;
-    }).sort((a, b) => {
-      if (sortBy === 'price-low') return a.price - b.price;
-      if (sortBy === 'price-high') return b.price - a.price;
-      if (sortBy === 'rating') return b.rating - a.rating;
-      return 0;
-    });
-  }, [category.products, category.subcategories, searchQuery, maxPrice, selectedSubcategories, selectedBrands, inStockOnly, minRating, sortBy]);
+  // Available Subcategories List from Tree or Category
+  const availableSubcategories = useMemo(() => {
+    if (category?.children && category.children.length > 0) {
+      return category.children;
+    }
+    if (parentCategory?.children && parentCategory.children.length > 0) {
+      return parentCategory.children;
+    }
+    // Fallback lookup in categoryTree
+    const matchedRoot = categoryTree.find(
+      (c) => c.id === category?.id || c.slug === categorySlug || c.slug === category?.slug
+    );
+    return matchedRoot?.children || [];
+  }, [category, parentCategory, categoryTree, categorySlug]);
 
+  // Display Name & Breadcrumb
+  const categoryDisplayName = category?.name || (categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1));
+  const pageTitle = category ? category.name : categoryDisplayName;
+  const pageSubcopy = `Explore premium ${categoryDisplayName.toLowerCase()} essentials, supplies, and care products curated by pet experts.`;
 
+  // 404 Not Found State
+  if (notFound && !categoryLoading) {
+    return (
+      <div className={styles.pageWrapper}>
+        <div className={styles.topContainer}>
+          <div className={styles.emptyState} style={{ padding: '4rem 2rem' }}>
+            <RotateCcw size={40} className={styles.emptyIcon} />
+            <h3 className={styles.emptyTitle}>Category Not Found</h3>
+            <p className={styles.emptySubtitle}>
+              The category you requested could not be found or is currently inactive.
+            </p>
+            <Link href="/category" className={styles.resetBtn}>
+              <ArrowLeft size={16} /> Browse All Categories
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.pageWrapper}>
       {/* Mobile Filter Overlay */}
       {mobileFilterOpen && (
-        <div 
+        <div
           className={styles.mobileFilterOverlay}
           onClick={() => setMobileFilterOpen(false)}
         />
       )}
-      
 
+      <div className={styles.topContainer}>
+        {/* 1. Breadcrumbs */}
+        <nav className={styles.breadcrumb} aria-label="Breadcrumb">
+          <Link href="/" className={styles.breadcrumbLink}>Home</Link>
+          <span className={styles.breadcrumbSep}>/</span>
+          <Link href="/category" className={styles.breadcrumbLink}>Categories</Link>
+          <span className={styles.breadcrumbSep}>/</span>
+          {parentCategory ? (
+            <>
+              <Link href={`/category/${parentCategory.slug}`} className={styles.breadcrumbLink}>
+                {parentCategory.name}
+              </Link>
+              <span className={styles.breadcrumbSep}>/</span>
+              <span className={styles.breadcrumbCurrent}>{categoryDisplayName}</span>
+            </>
+          ) : (
+            <span className={styles.breadcrumbCurrent}>{categoryDisplayName}</span>
+          )}
+        </nav>
+
+        {/* 2. Header Banner */}
+        <div className={styles.pageHeader}>
+          <div className={styles.headerTitleRow}>
+            <div>
+              <span className={styles.eyebrow}>CURATED COLLECTION</span>
+              <h1 className={styles.pageTitle}>{pageTitle}</h1>
+            </div>
+            {category?.imageUrl && (
+              <div className="relative w-14 h-14 rounded-full overflow-hidden border-2 border-[#F99205]/20 shadow-sm hidden sm:block">
+                <Image
+                  src={category.imageUrl}
+                  alt={category.name}
+                  fill
+                  sizes="56px"
+                  style={{ objectFit: 'cover' }}
+                />
+              </div>
+            )}
+          </div>
+          <p className={styles.pageSubcopy}>{pageSubcopy}</p>
+
+          {/* Subcategory Pills */}
+          {availableSubcategories.length > 0 && (
+            <div className={styles.subcatPillsRow}>
+              <Link
+                href={`/category/${parentCategory?.slug || category?.slug || categorySlug}`}
+                className={`${styles.subcatPill} ${!subcategorySlug ? styles.subcatPillActive : ''}`}
+              >
+                All {parentCategory?.name || category?.name}
+              </Link>
+              {availableSubcategories.map((sub) => {
+                const isActive = sub.slug === subcategorySlug || sub.id === targetSlug;
+                return (
+                  <button
+                    key={sub.id}
+                    onClick={() => handleSubcategoryClick(sub.slug)}
+                    className={`${styles.subcatPill} ${isActive ? styles.subcatPillActive : ''}`}
+                  >
+                    {sub.name}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Main Layout: Sidebar Filters + Main Content */}
       <div className={styles.mainLayout}>
-        
         {/* 3. Sidebar Filters Column (Sticky) */}
         <aside className={`${styles.sidebar} ${mobileFilterOpen ? styles.sidebarMobileOpen : ''}`}>
           <div className={styles.sidebarHeader}>
@@ -142,94 +390,108 @@ export function CategoryListing({ category }: CategoryListingProps) {
           </div>
 
           <div className={styles.sidebarBody}>
-          {/* Sort By Filter Group */}
-          <div className={styles.filterGroup}>
-            <div className={styles.groupHeader}>
-              <span className={styles.groupTitle}>Sort By</span>
+            {/* Sort By Filter Group */}
+            <div className={styles.filterGroup}>
+              <div className={styles.groupHeader}>
+                <span className={styles.groupTitle}>Sort By</span>
+              </div>
+              <select
+                value={sortBy}
+                onChange={(e) => {
+                  setSortBy(e.target.value as any);
+                  setCurrentPage(1);
+                }}
+                className={styles.sidebarSortSelect}
+              >
+                <option value="featured">Featured & Popular</option>
+                <option value="newest">Newest Arrivals</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="rating">Highest Rated</option>
+              </select>
             </div>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as 'featured' | 'price-low' | 'price-high' | 'rating')}
-              className={styles.sidebarSortSelect}
-            >
-              <option value="featured">Featured & Popular</option>
-              <option value="price-low">Price: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-              <option value="rating">Highest Rated</option>
-            </select>
-          </div>
 
-          {/* Price Filter */}
-          <div className={styles.filterGroup}>
-            <div className={styles.groupHeader}>
-              <span className={styles.groupTitle}>Max Price</span>
-              <span className={styles.priceValue}>₹{maxPrice.toLocaleString()}</span>
+            {/* Price Filter */}
+            <div className={styles.filterGroup}>
+              <div className={styles.groupHeader}>
+                <span className={styles.groupTitle}>Max Price</span>
+                <span className={styles.priceValue}>₹{maxPrice.toLocaleString()}</span>
+              </div>
+              <input
+                type="range"
+                min={200}
+                max={6000}
+                step={50}
+                value={maxPrice}
+                onChange={(e) => {
+                  setMaxPrice(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+                className={styles.rangeSlider}
+              />
+              <div className={styles.rangeLabels}>
+                <span>₹200</span>
+                <span>₹6,000</span>
+              </div>
             </div>
-            <input
-              type="range"
-              min={200}
-              max={6000}
-              step={50}
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(Number(e.target.value))}
-              className={styles.rangeSlider}
-            />
-            <div className={styles.rangeLabels}>
-              <span>₹200</span>
-              <span>₹6,000</span>
-            </div>
-          </div>
 
-          {/* Subcategories Filter */}
-          <div className={styles.filterGroup}>
-            <div className={styles.groupHeader}>
-              <span className={styles.groupTitle}>Subcategory</span>
-            </div>
-            <div className={styles.checkList}>
-              {category.subcategories.map((sub) => {
-                const checked = selectedSubcategories.includes(sub.name) || category.subcategorySlug === sub.slug;
-                return (
-                  <label key={sub.slug} className={styles.checkLabel}>
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={() => toggleSubcategory(sub.name, sub.slug)}
-                      className={styles.checkbox}
-                    />
-                    <span className={styles.checkText}>{sub.name}</span>
-                    <span className={styles.checkCountBadge}>{sub.count}</span>
-                  </label>
-                );
-              })}
-            </div>
-          </div>
+            {/* Subcategories in Sidebar */}
+            {availableSubcategories.length > 0 && (
+              <div className={styles.filterGroup}>
+                <div className={styles.groupHeader}>
+                  <span className={styles.groupTitle}>Subcategories</span>
+                </div>
+                <div className={styles.checkList}>
+                  {availableSubcategories.map((sub) => {
+                    const checked = sub.slug === subcategorySlug || sub.id === targetSlug;
+                    return (
+                      <label key={sub.id} className={styles.checkLabel}>
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => handleSubcategoryClick(sub.slug)}
+                          className={styles.checkbox}
+                        />
+                        <span className={styles.checkText}>{sub.name}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
-          {/* Options Filter */}
-          <div className={styles.filterGroup}>
-            <div className={styles.groupHeader}>
-              <span className={styles.groupTitle}>Options</span>
+            {/* Options Filter */}
+            <div className={styles.filterGroup}>
+              <div className={styles.groupHeader}>
+                <span className={styles.groupTitle}>Options</span>
+              </div>
+              <div className={styles.checkList}>
+                <label className={styles.checkLabel}>
+                  <input
+                    type="checkbox"
+                    checked={inStockOnly}
+                    onChange={(e) => {
+                      setInStockOnly(e.target.checked);
+                      setCurrentPage(1);
+                    }}
+                    className={styles.checkbox}
+                  />
+                  <span className={styles.checkText}>In Stock Only</span>
+                </label>
+                <label className={styles.checkLabel}>
+                  <input
+                    type="checkbox"
+                    checked={minRating === 4.5}
+                    onChange={(e) => {
+                      setMinRating(e.target.checked ? 4.5 : 0);
+                      setCurrentPage(1);
+                    }}
+                    className={styles.checkbox}
+                  />
+                  <span className={styles.checkText}>4.5★ & Above</span>
+                </label>
+              </div>
             </div>
-            <div className={styles.checkList}>
-              <label className={styles.checkLabel}>
-                <input
-                  type="checkbox"
-                  checked={inStockOnly}
-                  onChange={(e) => setInStockOnly(e.target.checked)}
-                  className={styles.checkbox}
-                />
-                <span className={styles.checkText}>In Stock Only</span>
-              </label>
-              <label className={styles.checkLabel}>
-                <input
-                  type="checkbox"
-                  checked={minRating === 4.5}
-                  onChange={(e) => setMinRating(e.target.checked ? 4.5 : 0)}
-                  className={styles.checkbox}
-                />
-                <span className={styles.checkText}>4.5★ & Above</span>
-              </label>
-            </div>
-          </div>
           </div>
 
           {/* Sticky Mobile Apply Footer */}
@@ -239,7 +501,7 @@ export function CategoryListing({ category }: CategoryListingProps) {
               onClick={() => setMobileFilterOpen(false)}
               className={styles.applyFilterBtn}
             >
-              Apply Filters ({filteredProducts.length})
+              Apply Filters ({totalProducts})
             </button>
           </div>
         </aside>
@@ -252,7 +514,7 @@ export function CategoryListing({ category }: CategoryListingProps) {
               <Search size={15} className={styles.toolbarSearchIcon} />
               <input
                 type="text"
-                placeholder="Search products..."
+                placeholder="Search category products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={styles.toolbarSearchInput}
@@ -273,10 +535,14 @@ export function CategoryListing({ category }: CategoryListingProps) {
               <select
                 id="sortSelect"
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'featured' | 'price-low' | 'price-high' | 'rating')}
+                onChange={(e) => {
+                  setSortBy(e.target.value as any);
+                  setCurrentPage(1);
+                }}
                 className={styles.sortSelect}
               >
                 <option value="featured">Featured</option>
+                <option value="newest">Newest</option>
                 <option value="price-low">Price: Low–High</option>
                 <option value="price-high">Price: High–Low</option>
                 <option value="rating">Top Rated</option>
@@ -295,24 +561,99 @@ export function CategoryListing({ category }: CategoryListingProps) {
             </button>
           </div>
 
-          {/* Product Grid */}
-          {filteredProducts.length === 0 ? (
-            <div className={styles.emptyState}>
-              <RotateCcw size={32} className={styles.emptyIcon} />
-              <h3 className={styles.emptyTitle}>No products found</h3>
-              <p className={styles.emptySubtitle}>Try adjusting your filters or price range.</p>
-              <button onClick={clearAllFilters} className={styles.resetBtn}>
-                Clear All Filters
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-4 text-sm flex items-center justify-between">
+              <span>{error}</span>
+              <button onClick={() => fetchProducts()} className="underline font-semibold ml-4">
+                Retry
               </button>
-            </div>
-          ) : (
-            <div className={`${styles.productGrid} ${styles[`gridCols${gridCols}`]}`}>
-              {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product as any} />
-              ))}
             </div>
           )}
 
+          {/* Product Grid / Skeletons / Empty State */}
+          {loading ? (
+            <div className={`${styles.productGrid} ${styles[`gridCols${gridCols}`]}`}>
+              {Array.from({ length: 6 }).map((_, idx) => (
+                <div key={idx} className="bg-white rounded-2xl p-4 border border-stone-200 shadow-sm flex flex-col gap-3">
+                  <Skeleton className="w-full h-48 rounded-xl" />
+                  <Skeleton className="w-20 h-4 rounded-md" />
+                  <Skeleton className="w-3/4 h-5 rounded-md" />
+                  <div className="flex justify-between items-center mt-2">
+                    <Skeleton className="w-24 h-6 rounded-md" />
+                    <Skeleton className="w-20 h-8 rounded-full" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : products.length === 0 ? (
+            <div className={styles.emptyState}>
+              <RotateCcw size={32} className={styles.emptyIcon} />
+              <h3 className={styles.emptyTitle}>No products found</h3>
+              <p className={styles.emptySubtitle}>
+                {activeFilterCount > 0
+                  ? "Try adjusting your filters, price range, or search query."
+                  : "We are stocking new products in this category soon."}
+              </p>
+              {activeFilterCount > 0 && (
+                <button onClick={clearAllFilters} className={styles.resetBtn}>
+                  Clear All Filters
+                </button>
+              )}
+            </div>
+          ) : (
+            <>
+              <div className={`${styles.productGrid} ${styles[`gridCols${gridCols}`]}`}>
+                {products.map((product) => (
+                  <ProductCard key={product.id} product={product as any} />
+                ))}
+              </div>
+
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-8 py-4">
+                  <button
+                    onClick={() => {
+                      setCurrentPage((p) => Math.max(1, p - 1));
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    disabled={currentPage <= 1}
+                    className="flex items-center gap-1 px-4 py-2 rounded-xl border border-stone-300 text-stone-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-stone-100 font-medium text-sm transition"
+                  >
+                    <ChevronLeft size={16} /> Previous
+                  </button>
+                  <div className="flex items-center gap-1.5">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                      <button
+                        key={pageNum}
+                        onClick={() => {
+                          setCurrentPage(pageNum);
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className={`w-9 h-9 rounded-xl font-semibold text-sm transition ${
+                          currentPage === pageNum
+                            ? 'bg-[#F99205] text-white shadow-sm'
+                            : 'border border-stone-300 text-stone-700 hover:bg-stone-100'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => {
+                      setCurrentPage((p) => Math.min(totalPages, p + 1));
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    disabled={currentPage >= totalPages}
+                    className="flex items-center gap-1 px-4 py-2 rounded-xl border border-stone-300 text-stone-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-stone-100 font-medium text-sm transition"
+                  >
+                    Next <ChevronRight size={16} />
+                  </button>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>

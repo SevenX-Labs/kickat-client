@@ -6,8 +6,6 @@ import { useCart } from '@/context/CartContext';
 import { useRouter } from 'next/navigation';
 import { Star, ShoppingBag, Zap, Ruler, Minus, Plus, Check, X, Dog, Droplets, Waves, Sun, Loader2 } from 'lucide-react';
 import styles from './ProductDetail.module.css';
- // import Product
-
 import { Product, ProductVariant } from './ProductDetail';
 
 interface ProductInfoProps {
@@ -20,32 +18,38 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
   const router = useRouter();
   const { isAuthenticated } = useAuth();
   const { addToCart, buyNow } = useCart();
-  const [selectedColor, setSelectedColor] = useState('Charcoal & Pumpkin');
-  const [selectedSize, setSelectedSize] = useState('M');
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const [hasAdded, setHasAdded] = useState(false);
   const [isBuyingNow, setIsBuyingNow] = useState(false);
   const [isSizeGuideModalOpen, setIsSizeGuideModalOpen] = useState(false);
 
-  const title = product.name || "Mim & Mate Natural Rubber Chew Toy";
-  const badge = product.badge || "Best Seller";
-  const price = product.price || 899;
-  const originalPrice = product.originalPrice || 1199;
-  const rating = product.rating || 4.8;
-  const reviewsCount = product.reviewsCount || 64;
-  const description = product.description || "Premium quality natural rubber chew toy designed for your pet's comfort, safety, and long-lasting fun. Perfect for daily play and helps support dental health.";
+  // Dynamic pricing & stock based on selected variant or base product
+  const effectivePrice = selectedVariant
+    ? (selectedVariant.discountPrice && selectedVariant.discountPrice > 0 ? selectedVariant.discountPrice : selectedVariant.price)
+    : (product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price);
 
-  const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
+  const effectiveOriginalPrice = selectedVariant
+    ? (selectedVariant.discountPrice && selectedVariant.discountPrice > 0 ? selectedVariant.price : (product.originalPrice || undefined))
+    : (product.discountPrice && product.discountPrice > 0 ? product.price : (product.originalPrice || undefined));
 
-  const colorSwatches = [
-    { name: 'Charcoal & Pumpkin', hex: '#2B2E33', hex2: '#F99205' },
-    { name: 'Pumpkin', hex: '#F99205' },
-    { name: 'Charcoal', hex: '#2B2E33' },
-    { name: 'Beige', hex: '#E6DEC9' },
-  ];
+  const currentStock = selectedVariant && selectedVariant.stock !== undefined
+    ? selectedVariant.stock
+    : (product.stock ?? 100);
 
-  const sizes = ['S', 'M', 'L'];
+  const isOutOfStock = currentStock <= 0;
+
+  const discountPercent = effectiveOriginalPrice && effectiveOriginalPrice > effectivePrice
+    ? Math.round(((effectiveOriginalPrice - effectivePrice) / effectiveOriginalPrice) * 100)
+    : null;
+
+  const title = product.name;
+  const rating = product.rating || 4.5;
+  const reviewsCount = product.reviewsCount || 0;
+  const description = product.description || product.descriptionTitle || "Premium quality pet essential curated for health, safety, and everyday comfort.";
+
+  const variants = product.variants || [];
+  const hasVariants = (product.type === 'VARIABLE' || variants.length > 0) && variants.length > 0;
 
   const animateFlyToCart = (startElem: HTMLElement) => {
     const bottomNavCart = document.getElementById('bottom-nav-cart-btn');
@@ -53,7 +57,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
     const cartBtn = (bottomNavCart && window.getComputedStyle(bottomNavCart).display !== 'none' && bottomNavCart.offsetWidth > 0)
       ? bottomNavCart
       : topNavbarCart;
-    const imageSrc = product.image || '/hero-products/dog_food.png';
+    const imageSrc = (selectedVariant?.imageUrl || selectedVariant?.images?.[0]) || product.image || '/hero-products/dog_food.png';
 
     if (!cartBtn) {
       window.dispatchEvent(new CustomEvent('cart-item-added'));
@@ -128,7 +132,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
       router.push("/cart");
       return;
     }
-    if (isAdding || isBuyingNow) return;
+    if (isAdding || isBuyingNow || isOutOfStock) return;
     const buttonElem = e.currentTarget;
     setIsAdding(true);
     try {
@@ -144,7 +148,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
   };
 
   const handleBuyNow = async () => {
-    if (isBuyingNow || isAdding) return;
+    if (isBuyingNow || isAdding || isOutOfStock) return;
     if (!isAuthenticated) {
       router.push(`/login?redirect=${encodeURIComponent("/checkout")}`);
       return;
@@ -166,29 +170,45 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
       {/* Product Title */}
       <h1 className={styles.productTitle}>{title}</h1>
 
-      {/* Tagline / Subtitle */}
-      <p className={styles.productSubtitle}>Durable. Safe. Fun. Made for endless play.</p>
+      {/* Brand / Category Tagline */}
+      <p className={styles.productSubtitle}>
+        {product.brand ? `${product.brand} · ` : ''}{product.mainCategory || 'KickAt Essential'}
+      </p>
 
       {/* Rating & Social Proof Row */}
       <div className={styles.ratingRow}>
         <div className={styles.starsGroup}>
           {[...Array(5)].map((_, i) => (
-            <Star key={i} size={15} fill="#F99205" color="#F99205" strokeWidth={1} />
+            <Star 
+              key={i} 
+              size={15} 
+              fill={i < Math.floor(rating) ? "#F99205" : "#E5E7EB"} 
+              color={i < Math.floor(rating) ? "#F99205" : "#E5E7EB"} 
+              strokeWidth={1} 
+            />
           ))}
-          <span className={styles.ratingScore}>{rating}</span>
+          <span className={styles.ratingScore}>{rating.toFixed(1)}</span>
         </div>
         <span className={styles.ratingDivider}>|</span>
-        <a href="#reviews" className={styles.reviewsLink}>({reviewsCount} reviews)</a>
-        <span className={styles.ratingDivider}>|</span>
-        <span className={styles.socialProofText}>2.2K+ bought</span>
+        <span className={styles.reviewsCountText}>{reviewsCount} Reviews</span>
+        {product.badge && (
+          <span className={styles.verifiedBadge}>
+            <Check size={12} strokeWidth={2.5} />
+            <span>{product.badge}</span>
+          </span>
+        )}
       </div>
 
       {/* Price Row */}
       <div className={styles.priceContainer}>
         <div className={styles.priceRowMain}>
-          <span className={styles.currentPrice}>₹{price.toLocaleString()}</span>
-          <span className={styles.originalPrice}>₹{originalPrice.toLocaleString()}</span>
-          <span className={styles.discountBadge}>{discountPercent}% OFF</span>
+          <span className={styles.currentPrice}>₹{effectivePrice.toLocaleString()}</span>
+          {effectiveOriginalPrice && effectiveOriginalPrice > effectivePrice && (
+            <span className={styles.originalPrice}>₹{effectiveOriginalPrice.toLocaleString()}</span>
+          )}
+          {discountPercent && (
+            <span className={styles.discountBadge}>{discountPercent}% OFF</span>
+          )}
         </div>
         <span className={styles.taxNote}>Inclusive of all taxes</span>
       </div>
@@ -196,65 +216,50 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
       {/* Short Description */}
       <p className={styles.shortDescription}>{description}</p>
 
-      {/* Color Selector */}
-      <div className={styles.selectorBlock}>
-        <div className={styles.selectorHeader}>
-          <span className={styles.selectorTitle}>Color:</span>
-          <span className={styles.selectorValue}>{selectedColor}</span>
-        </div>
-        <div className={styles.colorSwatchesRow}>
-          {colorSwatches.map((color) => {
-            const isSelected = selectedColor === color.name;
-            const bgStyle = color.hex2
-              ? `linear-gradient(135deg, ${color.hex} 50%, ${color.hex2} 50%)`
-              : color.hex;
-            return (
-              <button
-                key={color.name}
-                type="button"
-                className={`${styles.colorSwatchBtn} ${isSelected ? styles.colorSwatchActive : ''}`}
-                style={{ background: bgStyle }}
-                onClick={() => setSelectedColor(color.name)}
-                title={color.name}
-                aria-label={`Select ${color.name} color`}
-              />
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Size Selector */}
-      <div className={styles.selectorBlock}>
-        <div className={styles.selectorHeaderWithLink}>
-          <div className={styles.selectorHeader}>
-            <span className={styles.selectorTitle}>Size:</span>
-            <span className={styles.selectorValue}>{selectedSize}</span>
+      {/* Real Variants Selector for VARIABLE Products */}
+      {hasVariants && (
+        <div className={styles.selectorBlock}>
+          <div className={styles.selectorHeaderWithLink}>
+            <div className={styles.selectorHeader}>
+              <span className={styles.selectorTitle}>Options:</span>
+              <span className={styles.selectorValue}>
+                {selectedVariant ? selectedVariant.name : 'Select an option'}
+              </span>
+            </div>
+            <button
+              type="button"
+              className={styles.sizeGuideRowLink}
+              onClick={() => setIsSizeGuideModalOpen(true)}
+            >
+              <Ruler size={14} />
+              <span>Guide</span>
+            </button>
           </div>
-          <button
-            type="button"
-            className={styles.sizeGuideRowLink}
-            onClick={() => setIsSizeGuideModalOpen(true)}
-          >
-            <Ruler size={14} />
-            <span>Size Guide</span>
-          </button>
+          <div className={styles.sizePillsRow}>
+            {variants.map((variant) => {
+              const isSelected = selectedVariant?.id === variant.id;
+              const isVarOutOfStock = variant.stock <= 0;
+              const varPrice = variant.discountPrice && variant.discountPrice > 0 ? variant.discountPrice : variant.price;
+
+              return (
+                <button
+                  key={variant.id}
+                  type="button"
+                  className={`${styles.sizePillBtn} ${isSelected ? styles.sizePillActive : ''}`}
+                  onClick={() => onSelectVariant?.(variant)}
+                  style={{
+                    opacity: isVarOutOfStock ? 0.5 : 1,
+                    textDecoration: isVarOutOfStock ? 'line-through' : 'none',
+                  }}
+                  title={isVarOutOfStock ? 'Out of stock' : `₹${varPrice}`}
+                >
+                  <span>{variant.name}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
-        <div className={styles.sizePillsRow}>
-          {sizes.map((sz) => {
-            const isSelected = selectedSize === sz;
-            return (
-              <button
-                key={sz}
-                type="button"
-                className={`${styles.sizePillBtn} ${isSelected ? styles.sizePillActive : ''}`}
-                onClick={() => setSelectedSize(sz)}
-              >
-                {sz}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      )}
 
       {/* Quantity & Stock Row */}
       <div className={styles.quantityStockRow}>
@@ -263,6 +268,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
             type="button"
             className={styles.stepperBtn}
             onClick={() => setQuantity(Math.max(1, quantity - 1))}
+            disabled={quantity <= 1 || isOutOfStock}
             aria-label="Decrease quantity"
           >
             <Minus size={14} />
@@ -271,7 +277,8 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
           <button
             type="button"
             className={styles.stepperBtn}
-            onClick={() => setQuantity(quantity + 1)}
+            onClick={() => setQuantity(Math.min(currentStock, quantity + 1))}
+            disabled={quantity >= currentStock || isOutOfStock}
             aria-label="Increase quantity"
           >
             <Plus size={14} />
@@ -279,9 +286,23 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
         </div>
 
         <div className={styles.stockStatusBox}>
-          <span className={styles.greenDot} />
-          <span className={styles.stockBold}>In Stock</span>
-          <span className={styles.lowStockBadge}>Only 5 left</span>
+          {isOutOfStock ? (
+            <>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#DC2626', display: 'inline-block' }} />
+              <span style={{ fontWeight: 700, color: '#DC2626' }}>Out of Stock</span>
+            </>
+          ) : currentStock <= 5 ? (
+            <>
+              <span className={styles.greenDot} />
+              <span className={styles.stockBold}>In Stock</span>
+              <span className={styles.lowStockBadge}>Only {currentStock} left</span>
+            </>
+          ) : (
+            <>
+              <span className={styles.greenDot} />
+              <span className={styles.stockBold}>In Stock</span>
+            </>
+          )}
         </div>
       </div>
 
@@ -291,7 +312,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
           type="button"
           className={`${styles.addToCartMainBtn} ${hasAdded ? styles.addedState : ''}`}
           onClick={handleAddToCart}
-          disabled={isAdding || isBuyingNow}
+          disabled={isAdding || isBuyingNow || isOutOfStock}
         >
           {isAdding ? (
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
@@ -303,6 +324,8 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
               <Check size={18} />
               <span>Go to Cart</span>
             </>
+          ) : isOutOfStock ? (
+            <span>Out of Stock</span>
           ) : (
             <>
               <ShoppingBag size={18} />
@@ -315,7 +338,8 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
           type="button"
           className={styles.buyNowMainBtn}
           onClick={handleBuyNow}
-          disabled={isBuyingNow || isAdding}
+          disabled={isBuyingNow || isAdding || isOutOfStock}
+          style={{ opacity: isOutOfStock ? 0.5 : 1 }}
         >
           {isBuyingNow ? (
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>

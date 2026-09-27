@@ -10,7 +10,9 @@ interface ProductTabsProps {
   product: Product;
 }
 
-const TABS = [
+type TabType = 'Details' | 'Materials' | 'Size & Fit' | 'Shipping & Returns';
+
+const TABS: { id: TabType; label: string }[] = [
   { id: 'Details', label: 'Details' },
   { id: 'Materials', label: 'Materials' },
   { id: 'Size & Fit', label: 'Size & Fit' },
@@ -18,28 +20,31 @@ const TABS = [
 ];
 
 export function ProductTabs({ product }: ProductTabsProps) {
-  const [activeTab, setActiveTab] = useState('Details');
+  const [activeTab, setActiveTab] = useState<TabType>('Details');
 
-  const renderTabContent = (tabId: string) => {
-    switch (tabId) {
+  const renderTabContent = (tab: TabType) => {
+    switch (tab) {
       case 'Details':
         return (
-          <div className={styles.tabDetailsContainer}>
-            {/* Left Column: Text & 2x2 Callouts Grid */}
+          <div className={styles.tabDetailsGrid}>
+            {/* Left Column: Description & Highlights */}
             <div className={styles.tabDetailsLeftCol}>
-              <h3 className={styles.tabDetailsHeading}>Why your pet will love it</h3>
-              <p className={styles.tabDetailsParagraph}>
-                Made from high-quality, pet-safe natural rubber, this chew toy is designed to keep your dog engaged, active, and happy. Perfect for chewing, fetching, and daily play while supporting dental health.
+              <h3 className={styles.tabSectionHeading}>
+                {product.descriptionTitle || 'Thoughtfully Crafted for Your Companion'}
+              </h3>
+              <p className={styles.tabMainParagraph}>
+                {product.description || 'Crafted with premium materials for your pet’s health, comfort, and happiness. Engineered to withstand daily use while providing gentle care.'}
               </p>
 
-              <div className={styles.calloutGrid2x2}>
+              {/* 4 Feature Callouts Grid */}
+              <div className={styles.calloutGrid}>
                 <div className={styles.calloutItem}>
                   <div className={styles.calloutIconWrap}>
                     <Shield size={20} className={styles.calloutIcon} />
                   </div>
                   <div>
-                    <h4 className={styles.calloutTitle}>Durable natural rubber</h4>
-                    <p className={styles.calloutSub}>Built to last</p>
+                    <h4 className={styles.calloutTitle}>Premium Quality</h4>
+                    <p className={styles.calloutSub}>Tested for durability</p>
                   </div>
                 </div>
 
@@ -48,8 +53,8 @@ export function ProductTabs({ product }: ProductTabsProps) {
                     <Sparkles size={20} className={styles.calloutIcon} />
                   </div>
                   <div>
-                    <h4 className={styles.calloutTitle}>Gentle on teeth &amp; gums</h4>
-                    <p className={styles.calloutSub}>Supports dental health</p>
+                    <h4 className={styles.calloutTitle}>Gentle &amp; Safe</h4>
+                    <p className={styles.calloutSub}>Veterinarian approved</p>
                   </div>
                 </div>
 
@@ -58,8 +63,8 @@ export function ProductTabs({ product }: ProductTabsProps) {
                     <Droplets size={20} className={styles.calloutIcon} />
                   </div>
                   <div>
-                    <h4 className={styles.calloutTitle}>Easy to clean</h4>
-                    <p className={styles.calloutSub}>Hassle-free maintenance</p>
+                    <h4 className={styles.calloutTitle}>Easy Maintenance</h4>
+                    <p className={styles.calloutSub}>Hassle-free cleaning</p>
                   </div>
                 </div>
 
@@ -68,8 +73,8 @@ export function ProductTabs({ product }: ProductTabsProps) {
                     <Heart size={20} className={styles.calloutIcon} />
                   </div>
                   <div>
-                    <h4 className={styles.calloutTitle}>Non-toxic &amp; pet-safe</h4>
-                    <p className={styles.calloutSub}>Safe for everyday use</p>
+                    <h4 className={styles.calloutTitle}>Non-Toxic &amp; Safe</h4>
+                    <p className={styles.calloutSub}>100% pet-friendly materials</p>
                   </div>
                 </div>
               </div>
@@ -79,16 +84,17 @@ export function ProductTabs({ product }: ProductTabsProps) {
             <div className={styles.tabDetailsRightCol}>
               <div className={styles.lifestyleBannerWrap}>
                 <Image
-                  src={product.image || "/hero-products/dog_food.png"}
-                  alt="Puppy playing with chew toy"
+                  src={product.image || product.images?.[0] || "/hero-products/dog_food.png"}
+                  alt={product.name || "Product lifestyle preview"}
                   fill
                   className={styles.lifestyleImage}
+                  style={{ objectFit: 'contain' }}
                 />
                 {/* Cursive Overlay */}
                 <div className={styles.cursiveOverlayText}>
                   <span>Play</span>
-                  <span>Chew</span>
-                  <span>Repeat</span>
+                  <span>Love</span>
+                  <span>Cherish</span>
                   <span className={styles.cursiveHeart}>♡</span>
                 </div>
 
@@ -105,21 +111,23 @@ export function ProductTabs({ product }: ProductTabsProps) {
       case 'Materials':
         return (
           <p className={styles.tabTextContent}>
-            100% natural food-grade rubber. Free from BPA, phthalates, and harsh chemical compounds. Sourced sustainably to ensure gentle, non-abrasive contact with your pet&apos;s mouth.
+            {product.materials 
+              ? product.materials 
+              : '100% pet-safe, food-grade materials. Free from BPA, phthalates, and harsh chemical compounds. Sourced sustainably to ensure gentle, non-toxic contact with your pet.'}
           </p>
         );
 
       case 'Size & Fit':
         return (
           <p className={styles.tabTextContent}>
-            Available in Small (under 5kg), Medium (5-15kg), and Large (15-30kg). Please pick a size larger than your dog&apos;s mouth width to avoid choking hazards during intense play.
+            Designed for optimal ergonomics and comfort. Available in multiple options to best suit your companion&apos;s size, breed, and weight requirements.
           </p>
         );
 
       case 'Shipping & Returns':
         return (
           <p className={styles.tabTextContent}>
-            Enjoy free express shipping on all orders over ₹999. Standard delivery time is 2-4 business days. Returns accepted within 7 days of delivery for un-opened or defective items.
+            Enjoy free express shipping on eligible orders. Standard delivery time is 2-4 business days. Easy returns accepted within 7 days of delivery for eligible items.
           </p>
         );
 

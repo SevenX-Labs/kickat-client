@@ -12,6 +12,22 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
+        hostname: 'mspqduxvrypexahkkxjz.supabase.co',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.supabase.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.kickat.co.in',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.kickat.co.in',
+      },
+      {
+        protocol: 'https',
         hostname: 'images.unsplash.com',
       },
       {

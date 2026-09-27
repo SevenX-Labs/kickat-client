@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { ProductGallery } from './ProductGallery';
 import { ProductInfo } from './ProductInfo';
 import { ProductTrustStrip } from './ProductTrustStrip';
@@ -19,8 +18,9 @@ export interface ProductVariant {
   sku?: string | null;
   price: number;
   discountPrice?: number | null;
+  originalPrice?: number | null;
   stock: number;
-  attributes?: Record<string, string>;
+  attributes?: Record<string, any> | null;
   imageUrl?: string | null;
   images?: string[];
   isDefault?: boolean;
@@ -29,6 +29,7 @@ export interface ProductVariant {
 export interface Product {
   id: string;
   name: string;
+  slug?: string;
   type?: "SIMPLE" | "VARIABLE";
   price: number;
   originalPrice?: number;
@@ -41,10 +42,20 @@ export interface Product {
   images: string[];
   mainCategory: string;
   subCategory: string;
-  sizes?: string[];
-  colors?: { name: string; hex: string }[];
+  brand?: string;
+  petSpecies?: string;
+  dietaryPreference?: string;
+  materials?: string;
+  descriptionTitle?: string;
   description?: string;
+  attributes?: Record<string, any>;
+  highlights?: any;
+  ingredients?: any;
+  feedingGuide?: any;
+  careInstructions?: string[];
+  sizeGuide?: any;
   variants?: ProductVariant[];
+  media?: any[];
 }
 
 interface ProductDetailProps {
@@ -107,7 +118,7 @@ export function ProductDetail({ product, isLoading }: ProductDetailProps) {
       {/* 4. Product Details + Size Guide (2-Column Row) */}
       <section className={styles.sectionPadding}>
         <div className={styles.container}>
-          <ProductSpecsAndSizeGuide />
+          <ProductSpecsAndSizeGuide product={product} />
         </div>
       </section>
 

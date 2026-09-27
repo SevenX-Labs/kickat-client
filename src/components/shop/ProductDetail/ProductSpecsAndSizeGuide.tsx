@@ -2,21 +2,12 @@
 
 import { ArrowRight, Droplets, Waves, Sun, Dog } from 'lucide-react';
 import styles from './ProductDetail.module.css';
+import { Product } from './ProductDetail';
 
 interface SpecsAndSizeGuideProps {
+  product?: Product;
   productDetails?: Record<string, string>;
 }
-
-const DEFAULT_SPECS = [
-  { label: 'Brand', value: 'Mim & Mate' },
-  { label: 'Material', value: 'Natural Rubber' },
-  { label: 'Suitable for', value: 'Dogs' },
-  { label: 'Life Stage', value: 'Puppy & Adult' },
-  { label: 'Size', value: 'S / M / L' },
-  { label: 'Color', value: 'Charcoal & Pumpkin, Beige' },
-  { label: 'Weight', value: '180 g (Medium)' },
-  { label: 'Country of Origin', value: 'India' },
-];
 
 const SIZE_CARDS = [
   { size: 'S', weight: 'Up to 5 kg', active: false },
@@ -24,11 +15,40 @@ const SIZE_CARDS = [
   { size: 'L', weight: '15 – 30 kg', active: false },
 ];
 
-export function ProductSpecsAndSizeGuide({ productDetails }: SpecsAndSizeGuideProps) {
+export function ProductSpecsAndSizeGuide({ product, productDetails }: SpecsAndSizeGuideProps) {
+  let specsList: { label: string; value: string }[] = [];
 
-  const specsList = productDetails
-    ? Object.entries(productDetails).map(([label, value]) => ({ label, value }))
-    : DEFAULT_SPECS;
+  if (productDetails) {
+    specsList = Object.entries(productDetails).map(([label, value]) => ({ label, value }));
+  } else if (product) {
+    specsList = [
+      { label: 'Brand', value: product.brand || 'KickAt' },
+      { label: 'Category', value: product.mainCategory || 'Pet Essentials' },
+      { label: 'Suitable for', value: product.petSpecies ? `${product.petSpecies.charAt(0).toUpperCase()}${product.petSpecies.slice(1).toLowerCase()}s` : 'All Pets' },
+      ...(product.materials ? [{ label: 'Material', value: product.materials }] : []),
+      ...(product.dietaryPreference ? [{ label: 'Dietary Type', value: product.dietaryPreference.replace('_', ' ') }] : []),
+      { label: 'Type', value: product.type === 'VARIABLE' ? 'Multi-Variant' : 'Standard' },
+      { label: 'Availability', value: (product.stock ?? 100) > 0 ? 'In Stock' : 'Out of Stock' },
+      { label: 'Country of Origin', value: 'India' },
+    ];
+
+    if (product.attributes && typeof product.attributes === 'object') {
+      Object.entries(product.attributes).forEach(([key, val]) => {
+        if (typeof val === 'string' || typeof val === 'number') {
+          const formattedLabel = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+          specsList.push({ label: formattedLabel, value: String(val) });
+        }
+      });
+    }
+  } else {
+    specsList = [
+      { label: 'Brand', value: 'KickAt' },
+      { label: 'Material', value: 'Pet-Safe Material' },
+      { label: 'Suitable for', value: 'All Pets' },
+      { label: 'Life Stage', value: 'All Ages' },
+      { label: 'Country of Origin', value: 'India' },
+    ];
+  }
 
   return (
     <div className={styles.specsSizeSectionGrid}>
@@ -49,10 +69,10 @@ export function ProductSpecsAndSizeGuide({ productDetails }: SpecsAndSizeGuidePr
       <div className={styles.sizeGuideCard}>
         <div className={styles.sizeGuideHeader}>
           <h3 className={styles.sizeGuideTitle}>Size Guide</h3>
-          <p className={styles.sizeGuideSubtitle}>Choose the right size for your dog.</p>
+          <p className={styles.sizeGuideSubtitle}>Choose the right size for your pet.</p>
         </div>
 
-        {/* 3 Size Cards (Static reference guide) */}
+        {/* 3 Size Cards */}
         <div className={styles.sizeCardsRow}>
           {SIZE_CARDS.map((card) => (
             <div key={card.size} className={styles.sizeCardTile}>
@@ -66,7 +86,7 @@ export function ProductSpecsAndSizeGuide({ productDetails }: SpecsAndSizeGuidePr
         </div>
 
         <button type="button" className={styles.viewDetailedSizeGuideLink}>
-          <span>Not sure? View detailed size guide</span>
+          <span>Not sure? View recommendations</span>
           <ArrowRight size={14} />
         </button>
 
