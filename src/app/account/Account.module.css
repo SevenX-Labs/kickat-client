@@ -1189,11 +1189,46 @@
 }
 
 .modalTitleGroup h2 {
-  font-family: var(--font-serif);
+  font-family: inherit;
   font-size: 20px;
   font-weight: 700;
-  color: var(--acc-text);
+  color: #111827;
+  letter-spacing: -0.01em;
   margin: 0;
+}
+
+.otpBoxesContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 14px 0 20px;
+}
+
+.otpBoxInput {
+  width: 48px;
+  height: 52px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+  background: #ffffff;
+  border: 1.5px solid #D1D5DB;
+  border-radius: 12px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.otpBoxInput:focus {
+  border-color: #F59E0B;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18);
+  background: #ffffff;
+}
+
+.otpBoxInput:disabled {
+  background: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
 }
 
 .modalCloseBtn {

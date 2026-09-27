@@ -12,6 +12,9 @@ import {
   AlertCircle,
   Loader2,
   Check,
+  ShoppingBag,
+  Sparkles,
+  ArrowRight,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { profileService, CreateAddressDto, CreatePetDto } from '../../services/profileService';
@@ -433,7 +436,7 @@ export default function OnboardingPage() {
           {/* STEP 2: Address with Granular Separate Fields */}
           {step === 2 && (
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
+              <div style={{ marginBottom: '0.85rem' }}>
                 <UseLocationButton 
                   onLocationDetected={(addr: DetectedAddress) => {
                     setFormData(prev => ({
@@ -448,21 +451,6 @@ export default function OnboardingPage() {
                     }));
                   }}
                 />
-                {(formData.latitude !== null && formData.longitude !== null) && (
-                  <span style={{ 
-                    display: 'inline-flex', 
-                    alignItems: 'center', 
-                    gap: '4px', 
-                    fontSize: '11px', 
-                    color: '#16A34A', 
-                    fontWeight: 600, 
-                    backgroundColor: '#DCFCE7', 
-                    padding: '0.25rem 0.55rem', 
-                    borderRadius: '6px' 
-                  }}>
-                    <CheckCircle2 size={13} /> {formData.latitude.toFixed(4)}°, {formData.longitude.toFixed(4)}°
-                  </span>
-                )}
               </div>
 
               {/* Row 1: Flat / House No. & Building / Society Name */}
@@ -675,16 +663,70 @@ export default function OnboardingPage() {
           {/* STEP 4: Success Screen */}
           {step === 4 && (
             <div className={styles.successContainer}>
-              <div className={styles.successIcon}>
-                <CheckCircle2 size={36} strokeWidth={2.5} />
+              <div className={styles.successBadgeWrapper}>
+                <div className={styles.successPulseRing} />
+                <div className={styles.successIcon}>
+                  <CheckCircle2 size={38} strokeWidth={2.5} />
+                </div>
               </div>
-              <h2 className={styles.successTitle}>Profile Complete!</h2>
+
+              <h2 className={styles.successTitle}>
+                Welcome to KickAt, {formData.firstName.trim() || user?.name?.split(' ')[0] || 'Friend'}! 🎉
+              </h2>
               <p className={styles.successSubtitle}>
-                Welcome to KickAt. We've saved your profile, default delivery address, and pet details.
+                Your profile is officially active. We&apos;ve saved your delivery preferences and tailored recommendations for {formData.petName.trim() || 'your pet'}.
               </p>
-              <button className={styles.btnPrimary} onClick={finishOnboarding}>
-                Go to Account
-              </button>
+
+              {/* 3 Summary Badges */}
+              <div className={styles.summaryGrid}>
+                <div className={styles.summaryCard}>
+                  <div className={styles.summaryIconBox} style={{ backgroundColor: '#FEF3C7', color: '#D97706' }}>
+                    <Bone size={17} />
+                  </div>
+                  <div className={styles.summaryCardTitle}>Pet Profile</div>
+                  <div className={styles.summaryCardValue}>
+                    {formData.petName.trim() || 'Pet'} ({formData.petType.charAt(0) + formData.petType.slice(1).toLowerCase()})
+                  </div>
+                </div>
+
+                <div className={styles.summaryCard}>
+                  <div className={styles.summaryIconBox} style={{ backgroundColor: '#DBEAFE', color: '#2563EB' }}>
+                    <MapPin size={17} />
+                  </div>
+                  <div className={styles.summaryCardTitle}>Default Delivery</div>
+                  <div className={styles.summaryCardValue}>
+                    {formData.city.trim() || 'Default'}, {formData.pincode.trim()}
+                  </div>
+                </div>
+
+                <div className={styles.summaryCard}>
+                  <div className={styles.summaryIconBox} style={{ backgroundColor: '#DCFCE7', color: '#16A34A' }}>
+                    <ShieldCheck size={17} />
+                  </div>
+                  <div className={styles.summaryCardTitle}>Account Status</div>
+                  <div className={styles.summaryCardValue}>
+                    Verified Member
+                  </div>
+                </div>
+              </div>
+
+              {/* Perk Banner */}
+              <div className={styles.perkBanner}>
+                <Sparkles size={16} style={{ flexShrink: 0, color: '#D97706' }} />
+                <span>Special Welcome Perk: Free delivery & personalized nutrition deals are waiting for you!</span>
+              </div>
+
+              {/* Action Buttons */}
+              <div className={styles.actionGroup}>
+                <button className={styles.btnPrimary} onClick={() => router.push('/shop')}>
+                  <ShoppingBag size={17} />
+                  <span>Start Shopping</span>
+                </button>
+                <button className={styles.btnSecondary} onClick={() => router.push('/account')}>
+                  <span>Go to Account</span>
+                  <ArrowRight size={16} />
+                </button>
+              </div>
             </div>
           )}
         </div>

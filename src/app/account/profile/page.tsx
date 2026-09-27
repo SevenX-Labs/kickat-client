@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -140,10 +140,21 @@ function ProfileDetailsContent() {
 
   // OTP Verification Modal State
   const [verifyModalType, setVerifyModalType] = useState<"PHONE" | "EMAIL" | null>(null);
-  const [otpCode, setOtpCode] = useState("");
-  const [isSendingOtp, setIsSendingOtp] = useState(false);
+  const [otpDigits, setOtpDigits] = useState<string[]>(["", "", "", "", "", ""]);
+  const [isResending, setIsResending] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [otpError, setOtpError] = useState<string | null>(null);
+  const [resentSuccessMsg, setResentSuccessMsg] = useState<string | null>(null);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Resend OTP countdown timer
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => setResendCooldown((prev) => prev - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCooldown]);
 
   const showToast = (msg: string) => {
     setToastMsg(msg);
@@ -203,45 +214,126 @@ function ProfileDetailsContent() {
   // Trigger Send OTP for verification
   const handleOpenVerifyModal = async (type: "PHONE" | "EMAIL") => {
     setVerifyModalType(type);
-    setOtpCode("");
+    setOtpDigits(["", "", "", "", "", ""]);
     setOtpError(null);
-    setIsSendingOtp(true);
+    setResentSuccessMsg(null);
+    setIsResending(false);
+
+    // If cooldown expired, send verification code in background
+    if (resendCooldown <= 0) {
+      setResendCooldown(60);
+      try {
+        if (type === "PHONE") {
+          await authService.sendUserMobileVerification(user?.phone || userData.phone);
+        } else {
+          await authService.sendUserEmailVerification(user?.email || userData.email);
+        }
+      } catch (err: any) {
+        setOtpError(err?.message || "Failed to send verification code. You can click Resend OTP to try again.");
+      }
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (resendCooldown > 0 || isResending || isVerifyingOtp || !verifyModalType) return;
+    setIsResending(true);
+    setOtpError(null);
+    setResentSuccessMsg(null);
+
+    const targetDestination = verifyModalType === "PHONE"
+      ? (user?.phone || userData.phone)
+      : (user?.email || userData.email);
+
     try {
-      if (type === "PHONE") {
+      if (verifyModalType === "PHONE") {
         await authService.sendUserMobileVerification(user?.phone || userData.phone);
       } else {
         await authService.sendUserEmailVerification(user?.email || userData.email);
       }
+      setResendCooldown(60);
+      setResentSuccessMsg(`OTP resent successfully to ${targetDestination}!`);
     } catch (err: any) {
-      setOtpError(err?.message || "Failed to send OTP code. Please try again.");
+      setOtpError(err?.message || "Failed to resend OTP code. Please wait a moment.");
     } finally {
-      setIsSendingOtp(false);
+      setIsResending(false);
     }
+  };
+
+  const handleDigitChange = (index: number, val: string) => {
+    const cleaned = val.replace(/\D/g, "");
+    if (!cleaned) {
+      const next = [...otpDigits];
+      next[index] = "";
+      setOtpDigits(next);
+      return;
+    }
+
+    const next = [...otpDigits];
+    next[index] = cleaned[cleaned.length - 1];
+    setOtpDigits(next);
+
+    if (index < 5) {
+      otpInputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleDigitKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" && !otpDigits[index] && index > 0) {
+      otpInputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleDigitPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const paste = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    if (!paste) return;
+    const next = [...otpDigits];
+    for (let i = 0; i < paste.length; i++) {
+      next[i] = paste[i];
+    }
+    setOtpDigits(next);
+    const focusIdx = Math.min(paste.length, 5);
+    otpInputRefs.current[focusIdx]?.focus();
   };
 
   // Submit OTP Verification
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!otpCode || otpCode.trim().length !== 6) {
-      setOtpError("Please enter a valid 6-digit OTP code");
+    const fullCode = otpDigits.join("");
+    if (fullCode.length !== 6) {
+      setOtpError("Please enter all 6 digits of the OTP code");
       return;
     }
 
     setIsVerifyingOtp(true);
     setOtpError(null);
     try {
+      let updatedUser: any = null;
       if (verifyModalType === "PHONE") {
-        await authService.verifyUserMobile(otpCode.trim(), user?.phone || userData.phone);
+        const res: any = await authService.verifyUserMobile(fullCode, user?.phone || userData.phone);
+        updatedUser = res?.user;
         showToast("Mobile number verified successfully!");
       } else {
-        await authService.verifyUserEmail(otpCode.trim(), user?.email || userData.email);
+        const res: any = await authService.verifyUserEmail(fullCode, user?.email || userData.email);
+        updatedUser = res?.user;
         showToast("Email address verified successfully!");
       }
+
+      if (updatedUser) {
+        setUser((prev: any) => ({
+          ...prev,
+          ...updatedUser,
+          isEmailVerified: verifyModalType === "EMAIL" ? true : prev?.isEmailVerified,
+          isPhoneVerified: verifyModalType === "PHONE" ? true : prev?.isPhoneVerified,
+        }));
+      }
+
       setVerifyModalType(null);
-      setOtpCode("");
+      setOtpDigits(["", "", "", "", "", ""]);
+      setResentSuccessMsg(null);
       await fetchFullProfile();
     } catch (err: any) {
-      setOtpError(err?.message || "Invalid OTP code. Please try again.");
+      setOtpError(err?.message || "Invalid OTP code. Please check and try again.");
     } finally {
       setIsVerifyingOtp(false);
     }
@@ -582,7 +674,7 @@ function ProfileDetailsContent() {
           <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <div className={styles.modalTitleGroup}>
-                <ShieldCheck size={20} color="#F28C0F" />
+                <ShieldCheck size={22} color="#F59E0B" />
                 <h2>Verify {verifyModalType === "PHONE" ? "Mobile Number" : "Email Address"}</h2>
               </div>
               <button
@@ -590,63 +682,126 @@ function ProfileDetailsContent() {
                 className={styles.modalCloseBtn}
                 onClick={() => setVerifyModalType(null)}
                 disabled={isVerifyingOtp}
+                aria-label="Close"
               >
                 <X size={20} />
               </button>
             </div>
 
             <form onSubmit={handleVerifyOtp} className={styles.modalForm}>
-              <p style={{ fontSize: 13, color: "#6E6259", margin: "0 0 12px 0" }}>
-                We sent a 6-digit OTP code to{" "}
-                <strong>
+              <p style={{ fontSize: '0.88rem', color: '#4B5563', margin: '0 0 16px 0', lineHeight: 1.5 }}>
+                We sent a 6-digit verification code to{" "}
+                <strong style={{ color: '#111827' }}>
                   {verifyModalType === "PHONE" ? user?.phone || userData.phone : user?.email || userData.email}
                 </strong>
-                .
+                . Enter the code below to complete verification.
               </p>
 
-              {otpError && (
-                <div style={{ background: "#FEE2E2", color: "#DC2626", padding: "10px 14px", borderRadius: 10, fontSize: 13 }}>
-                  {otpError}
+              {resentSuccessMsg && !otpError && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  background: '#ECFDF5',
+                  border: '1px solid #A7F3D0',
+                  color: '#065F46',
+                  padding: '10px 14px',
+                  borderRadius: 10,
+                  fontSize: 13,
+                  marginBottom: 16
+                }}>
+                  <CheckCircle2 size={16} style={{ flexShrink: 0, color: '#10B981' }} />
+                  <span>{resentSuccessMsg}</span>
                 </div>
               )}
 
-              <div className={styles.inputGroup}>
-                <label className={styles.inputLabel}>Enter 6-Digit OTP</label>
-                <input
-                  type="text"
-                  required
-                  maxLength={6}
-                  className={styles.modalInput}
-                  placeholder="123456"
-                  value={otpCode}
-                  onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
-                  disabled={isVerifyingOtp || isSendingOtp}
-                  style={{ textAlign: "center", letterSpacing: "4px", fontSize: 18, fontWeight: 700 }}
-                />
+              {otpError && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  background: '#FEE2E2',
+                  border: '1px solid #FCA5A5',
+                  color: '#991B1B',
+                  padding: '10px 14px',
+                  borderRadius: 10,
+                  fontSize: 13,
+                  marginBottom: 16
+                }}>
+                  <AlertCircle size={16} style={{ flexShrink: 0 }} />
+                  <span>{otpError}</span>
+                </div>
+              )}
+
+              <div style={{ textAlign: 'center', margin: '8px 0 20px' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  color: '#4B5563',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                  marginBottom: '10px'
+                }}>
+                  Enter 6-Digit OTP Code
+                </label>
+                <div className={styles.otpBoxesContainer}>
+                  {otpDigits.map((digit, idx) => (
+                    <input
+                      key={idx}
+                      ref={(el) => { otpInputRefs.current[idx] = el; }}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      autoFocus={idx === 0}
+                      className={styles.otpBoxInput}
+                      value={digit}
+                      onChange={(e) => handleDigitChange(idx, e.target.value)}
+                      onKeyDown={(e) => handleDigitKeyDown(idx, e)}
+                      onPaste={handleDigitPaste}
+                      disabled={isVerifyingOtp}
+                    />
+                  ))}
+                </div>
               </div>
 
               <div className={styles.modalFooterActions}>
                 <button
                   type="button"
                   className={styles.actionBtn}
-                  onClick={() => handleOpenVerifyModal(verifyModalType)}
-                  disabled={isSendingOtp || isVerifyingOtp}
+                  onClick={handleResendOtp}
+                  disabled={resendCooldown > 0 || isResending || isVerifyingOtp}
+                  style={{ minWidth: '135px' }}
                 >
-                  {isSendingOtp ? "Resending..." : "Resend OTP"}
+                  {isResending ? (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+                      <Loader2 size={14} className="animate-spin" /> Sending...
+                    </span>
+                  ) : resendCooldown > 0 ? (
+                    `Resend in ${resendCooldown}s`
+                  ) : (
+                    "Resend OTP"
+                  )}
                 </button>
                 <button
                   type="submit"
                   className={`${styles.actionBtn} ${styles.primaryBtn}`}
-                  disabled={isVerifyingOtp || otpCode.length !== 6}
+                  disabled={isVerifyingOtp || otpDigits.join('').length !== 6}
                 >
-                  {isVerifyingOtp ? "Verifying..." : "Verify & Save"}
+                  {isVerifyingOtp ? (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <Loader2 size={16} className="animate-spin" /> Verifying...
+                    </span>
+                  ) : (
+                    "Verify & Save"
+                  )}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
-    </>
+</>
   );
 }
 
