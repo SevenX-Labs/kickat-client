@@ -693,7 +693,7 @@ export default function CheckoutPage() {
                             <ChevronDown size={14} color="#888" />
                           </div>
                           <div className={styles.verticalDividerAlt}></div>
-                          <input type="tel" required className={`${styles.inputAlt} ${styles.inputWithPrefixAlt} ${isValidPhone ? styles.inputValid : ''} ${isInvalidPhone ? styles.inputInvalid : ''}`} placeholder="98765 43210" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                          <input type="tel" required className={`${styles.inputAlt} ${styles.inputWithPrefixAlt} ${isValidPhone ? styles.inputValid : ''} ${isInvalidPhone ? styles.inputInvalid : ''}`} placeholder="Enter 10-digit mobile number" value={phone} onChange={(e) => setPhone(e.target.value)} />
                         </div>
                       </div>
                       <div className={styles.inputGroup}>

@@ -12,8 +12,10 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { UseLocationButton } from '@/components/ui/UseLocationButton';
 import { DetectedAddress } from '@/services/locationService';
 import { profileService } from '@/services/profileService';
+import { useAuth } from '@/context/AuthContext';
 
 function SavedAddressesContent() {
+  const { user } = useAuth();
   const [addresses, setAddresses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -77,13 +79,15 @@ function SavedAddressesContent() {
 
   const handleOpenAdd = () => {
     resetForm();
+    if (user?.name) setFormName(user.name);
+    if (user?.phone) setFormPhone(user.phone.replace('+91', '').trim());
     setIsAddOpen(true);
   };
 
   const handleOpenEdit = (addr: any) => {
     setEditingAddress(addr);
-    setFormName(addr.name || addr.fullName || '');
-    setFormPhone(addr.phone || '');
+    setFormName(addr.name || addr.fullName || user?.name || '');
+    setFormPhone(addr.phone || (user?.phone ? user.phone.replace('+91', '').trim() : ''));
     setFormHouseFlat(addr.houseFlat || '');
     setFormAddressLine(addr.buildingStreet || addr.addressLine || addr.street || '');
     setFormCity(addr.city || '');
@@ -207,10 +211,10 @@ function SavedAddressesContent() {
                 </div>
                 
                 <div className={styles.addressBody}>
-                  <p className={styles.addressName}>{addr.name || 'Saved Address'}</p>
+                  <p className={styles.addressName}>{addr.name || user?.name || 'Saved Address'}</p>
                   <p className={styles.addressText}>{addr.houseFlat ? `${addr.houseFlat}, ` : ''}{addr.buildingStreet || addr.addressLine}</p>
                   <p className={styles.addressText}>{addr.city}, {addr.state} {addr.pincode || addr.pin}</p>
-                  {addr.phone && <p className={styles.addressPhone}>{addr.phone}</p>}
+                  {(addr.phone || user?.phone) && <p className={styles.addressPhone}>{addr.phone || user?.phone}</p>}
                 </div>
 
                 <div className={styles.addressFooterRow}>
@@ -293,7 +297,7 @@ function SavedAddressesContent() {
                   <label className={styles.formLabel}>Mobile Number</label>
                   <input 
                     type="tel" 
-                    placeholder="98765 43210" 
+                    placeholder="Enter 10-digit mobile number" 
                     value={formPhone} 
                     onChange={e => setFormPhone(e.target.value)} 
                     className={styles.formInput} 
