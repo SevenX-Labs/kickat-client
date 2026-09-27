@@ -1,6 +1,8 @@
 'use client';
 
-import React, { useState, useCallback, useMemo, memo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
+import { wishlistService } from '@/services/wishlistService';
+import { useAuth } from '@/context/AuthContext';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -21,6 +23,9 @@ export interface HomeProduct {
   brand?: string;
   badge?: string;
   description?: string;
+  variantId?: string;
+  selectedVariantId?: string;
+  isWishlisted?: boolean;
 }
 
 interface HomeProductCardProps {
@@ -30,10 +35,18 @@ interface HomeProductCardProps {
 
 function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProductCardProps) {
   const router = useRouter();
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const [isWishlisted, setIsWishlisted] = useState(Boolean(product.isWishlisted));
+  const [isWishlistLoading, setIsWishlistLoading] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const { addToCart } = useCart();
+
+  useEffect(() => {
+    if (typeof product.isWishlisted === 'boolean') {
+      setIsWishlisted(product.isWishlisted);
+    }
+  }, [product.isWishlisted]);
 
   const rating = product.rating || 4.8;
   const reviewsCount = product.reviewsCount || 64;
@@ -44,15 +57,51 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
       : product.badge === 'Sale' ? 25 : 20;
   }, [product.originalPrice, product.price, product.badge]);
 
-  const handleWishlistClick = useCallback((e: React.MouseEvent) => {
+  const handleWishlistClick = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (onRemoveFromWishlist) {
       onRemoveFromWishlist(product.id);
-    } else {
-      setIsWishlisted((prev) => !prev);
+      return;
     }
-  }, [onRemoveFromWishlist, product.id]);
+
+    if (isWishlistLoading) return;
+
+    if (!isAuthenticated) {
+      const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/';
+      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+      return;
+    }
+
+    const variantId = product.variantId || product.selectedVariantId || undefined;
+
+    setIsWishlistLoading(true);
+    if (!isWishlisted) {
+      try {
+        await wishlistService.addToWishlist(product.id, variantId);
+        setIsWishlisted(true);
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('wishlist-updated', { detail: { productId: product.id, action: 'add' } }));
+        }
+      } catch (err: any) {
+        console.error('Failed to add to wishlist:', err);
+      } finally {
+        setIsWishlistLoading(false);
+      }
+    } else {
+      try {
+        await wishlistService.removeFromWishlist(product.id, variantId);
+        setIsWishlisted(false);
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('wishlist-updated', { detail: { productId: product.id, action: 'remove' } }));
+        }
+      } catch (err: any) {
+        console.error('Failed to remove from wishlist:', err);
+      } finally {
+        setIsWishlistLoading(false);
+      }
+    }
+  }, [onRemoveFromWishlist, product.id, product.variantId, product.selectedVariantId, isWishlisted, isWishlistLoading, isAuthenticated, router]);
 
   const handleAddToCart = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -164,8 +213,9 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
         ) : (
           <button 
             className={`${styles.cardWishlistBtn} ${isWishlisted ? styles.wishlistedActive : ''}`} 
-            aria-label="Add to wishlist"
+            aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
             onClick={handleWishlistClick}
+            disabled={isWishlistLoading}
           >
             <Heart
               size={16}
