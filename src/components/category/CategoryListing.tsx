@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { categoryService } from '@/services/categoryService';
 import { Category, CategoryProductsQuery } from '@/types/category';
+import { productService } from '@/services/productService';
 import { mapBackendProductToCard } from '@/types/product';
 import { Skeleton } from '@/components/ui/Skeleton';
 import styles from './CategoryListing.module.css';
@@ -88,7 +89,7 @@ export function CategoryListing({ categorySlug, subcategorySlug }: CategoryListi
         const treePromise = categoryService.getCategoryTree().catch(() => ({ success: false, categories: [] }));
         
         // Attempt fetching target category
-        let catRes = await categoryService.getCategoryById(targetSlug).catch(async (err) => {
+        let catRes = await categoryService.getCategoryById(targetSlug).catch(async () => {
           // If 404 and slug is e.g. "dogs" or "dog", try alternative slug
           if (targetSlug.endsWith('s')) {
             const singular = targetSlug.slice(0, -1);
@@ -180,6 +181,10 @@ export function CategoryListing({ categorySlug, subcategorySlug }: CategoryListi
       }
 
       const activeIdOrSlug = category?.slug || category?.id || targetSlug;
+      let rawProducts: any[] = [];
+      let totalCount = 0;
+      let totalPagesCount = 1;
+
       let res = await categoryService.getCategoryProducts(activeIdOrSlug, queryParams).catch(async () => {
         // Alternative fallback if plural/singular mismatch
         if (activeIdOrSlug.endsWith('s')) {
@@ -189,26 +194,49 @@ export function CategoryListing({ categorySlug, subcategorySlug }: CategoryListi
         }
       });
 
-      if (res && res.success) {
-        let mapped = (res.products || []).map(mapBackendProductToCard);
-
-        // Client-side search and rating filter
-        if (searchQuery.trim()) {
-          const q = searchQuery.toLowerCase();
-          mapped = mapped.filter((p) => p.name.toLowerCase().includes(q) || (p.brand && p.brand.toLowerCase().includes(q)));
-        }
-        if (minRating > 0) {
-          mapped = mapped.filter((p) => (p.rating || 0) >= minRating);
-        }
-
-        setProducts(mapped);
-        setTotalProducts(res.meta?.total ?? mapped.length);
-        setTotalPages(res.meta?.totalPages ?? Math.max(1, Math.ceil((res.meta?.total || mapped.length) / ITEMS_PER_PAGE)));
+      if (res && res.success && Array.isArray(res.products) && res.products.length > 0) {
+        rawProducts = res.products;
+        totalCount = res.meta?.total ?? rawProducts.length;
+        totalPagesCount = res.meta?.totalPages ?? Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
       } else {
-        setProducts([]);
-        setTotalProducts(0);
-        setTotalPages(1);
+        // Fallback: Query general products by pet species
+        let speciesParam: string | undefined = undefined;
+        const normCat = (parentCategory?.slug || categorySlug || '').toLowerCase();
+        if (normCat.includes('dog')) speciesParam = 'dog';
+        else if (normCat.includes('cat')) speciesParam = 'cat';
+        else if (normCat.includes('fish')) speciesParam = 'fish';
+        else if (normCat.includes('bird')) speciesParam = 'bird';
+
+        const fallbackRes = await productService.getProducts({
+          page: currentPage,
+          limit: ITEMS_PER_PAGE,
+          sort: apiSort,
+          petSpecies: speciesParam,
+          priceMax: maxPrice < 6000 ? maxPrice : undefined,
+          inStock: inStockOnly || undefined,
+        }).catch(() => null);
+
+        if (fallbackRes && fallbackRes.success && Array.isArray(fallbackRes.products)) {
+          rawProducts = fallbackRes.products;
+          totalCount = fallbackRes.meta?.total ?? rawProducts.length;
+          totalPagesCount = fallbackRes.meta?.totalPages ?? Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
+        }
       }
+
+      let mapped = rawProducts.map(mapBackendProductToCard);
+
+      // Client-side search and rating filter
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        mapped = mapped.filter((p) => p.name.toLowerCase().includes(q) || (p.brand && p.brand.toLowerCase().includes(q)));
+      }
+      if (minRating > 0) {
+        mapped = mapped.filter((p) => (p.rating || 0) >= minRating);
+      }
+
+      setProducts(mapped);
+      setTotalProducts(totalCount || mapped.length);
+      setTotalPages(totalPagesCount || Math.max(1, Math.ceil((totalCount || mapped.length) / ITEMS_PER_PAGE)));
     } catch (err: any) {
       console.error("Failed to load category products:", err);
       setError("Unable to load products for this category.");
@@ -216,7 +244,7 @@ export function CategoryListing({ categorySlug, subcategorySlug }: CategoryListi
     } finally {
       setLoading(false);
     }
-  }, [category, targetSlug, currentPage, sortBy, maxPrice, inStockOnly, searchQuery, minRating, notFound]);
+  }, [category, targetSlug, categorySlug, parentCategory, currentPage, sortBy, maxPrice, inStockOnly, searchQuery, minRating, notFound]);
 
   useEffect(() => {
     fetchProducts();
@@ -261,8 +289,6 @@ export function CategoryListing({ categorySlug, subcategorySlug }: CategoryListi
 
   // Display Name & Breadcrumb
   const categoryDisplayName = category?.name || (categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1));
-  const pageTitle = category ? category.name : categoryDisplayName;
-  const pageSubcopy = `Explore premium ${categoryDisplayName.toLowerCase()} essentials, supplies, and care products curated by pet experts.`;
 
   // 404 Not Found State
   if (notFound && !categoryLoading) {
@@ -275,7 +301,7 @@ export function CategoryListing({ categorySlug, subcategorySlug }: CategoryListi
             <p className={styles.emptySubtitle}>
               The category you requested could not be found or is currently inactive.
             </p>
-            <Link href="/category" className={styles.resetBtn}>
+            <Link href="/categories" className={styles.resetBtn}>
               <ArrowLeft size={16} /> Browse All Categories
             </Link>
           </div>
@@ -295,15 +321,15 @@ export function CategoryListing({ categorySlug, subcategorySlug }: CategoryListi
       )}
 
       <div className={styles.topContainer}>
-        {/* 1. Breadcrumbs */}
+        {/* Breadcrumbs */}
         <nav className={styles.breadcrumb} aria-label="Breadcrumb">
           <Link href="/" className={styles.breadcrumbLink}>Home</Link>
           <span className={styles.breadcrumbSep}>/</span>
-          <Link href="/category" className={styles.breadcrumbLink}>Categories</Link>
+          <Link href="/categories" className={styles.breadcrumbLink}>Categories</Link>
           <span className={styles.breadcrumbSep}>/</span>
           {parentCategory ? (
             <>
-              <Link href={`/category/${parentCategory.slug}`} className={styles.breadcrumbLink}>
+              <Link href={`/categories/${parentCategory.slug}`} className={styles.breadcrumbLink}>
                 {parentCategory.name}
               </Link>
               <span className={styles.breadcrumbSep}>/</span>
@@ -313,57 +339,11 @@ export function CategoryListing({ categorySlug, subcategorySlug }: CategoryListi
             <span className={styles.breadcrumbCurrent}>{categoryDisplayName}</span>
           )}
         </nav>
-
-        {/* 2. Header Banner */}
-        <div className={styles.pageHeader}>
-          <div className={styles.headerTitleRow}>
-            <div>
-              <span className={styles.eyebrow}>CURATED COLLECTION</span>
-              <h1 className={styles.pageTitle}>{pageTitle}</h1>
-            </div>
-            {category?.imageUrl && (
-              <div className="relative w-14 h-14 rounded-full overflow-hidden border-2 border-[#F99205]/20 shadow-sm hidden sm:block">
-                <Image
-                  src={category.imageUrl}
-                  alt={category.name}
-                  fill
-                  sizes="56px"
-                  style={{ objectFit: 'cover' }}
-                />
-              </div>
-            )}
-          </div>
-          <p className={styles.pageSubcopy}>{pageSubcopy}</p>
-
-          {/* Subcategory Pills */}
-          {availableSubcategories.length > 0 && (
-            <div className={styles.subcatPillsRow}>
-              <Link
-                href={`/category/${parentCategory?.slug || category?.slug || categorySlug}`}
-                className={`${styles.subcatPill} ${!subcategorySlug ? styles.subcatPillActive : ''}`}
-              >
-                All {parentCategory?.name || category?.name}
-              </Link>
-              {availableSubcategories.map((sub) => {
-                const isActive = sub.slug === subcategorySlug || sub.id === targetSlug;
-                return (
-                  <button
-                    key={sub.id}
-                    onClick={() => handleSubcategoryClick(sub.slug)}
-                    className={`${styles.subcatPill} ${isActive ? styles.subcatPillActive : ''}`}
-                  >
-                    {sub.name}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
       </div>
 
       {/* Main Layout: Sidebar Filters + Main Content */}
       <div className={styles.mainLayout}>
-        {/* 3. Sidebar Filters Column (Sticky) */}
+        {/* Sidebar Filters Column (Sticky) */}
         <aside className={`${styles.sidebar} ${mobileFilterOpen ? styles.sidebarMobileOpen : ''}`}>
           <div className={styles.sidebarHeader}>
             <div className={styles.sidebarTitleRow}>

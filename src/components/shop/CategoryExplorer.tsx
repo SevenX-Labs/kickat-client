@@ -114,12 +114,15 @@ export function CategoryExplorer({
       };
     }
 
+    const normCat = selectedMainCat.toLowerCase();
     const found = categoriesTree.find(
-      (c) => c.slug.toLowerCase() === selectedMainCat.toLowerCase() ||
+      (c) => c.slug.toLowerCase() === normCat ||
              c.id === selectedMainCat ||
-             (c.slug === 'dog' && (selectedMainCat === 'dogs' || selectedMainCat === 'dog')) ||
-             (c.slug === 'cat' && (selectedMainCat === 'cats' || selectedMainCat === 'cat')) ||
-             (c.slug === 'birds' && (selectedMainCat === 'bird' || selectedMainCat === 'birds'))
+             (c.slug === 'dog' && (normCat === 'dogs' || normCat === 'dog')) ||
+             (c.slug === 'cat' && (normCat === 'cats' || normCat === 'cat')) ||
+             (c.slug === 'fish' && (normCat === 'fish' || normCat === 'fishes')) ||
+             (c.slug === 'birds' && (normCat === 'bird' || normCat === 'birds')) ||
+             c.slug.toLowerCase().replace(/s$/, '') === normCat.replace(/s$/, '')
     );
 
     if (found) {
@@ -138,7 +141,12 @@ export function CategoryExplorer({
   // Active Sub Category Object
   const activeSubCatObj = useMemo(() => {
     if (selectedSubCat === 'all') return null;
-    return (activeMainCatObj.children || []).find((s) => s.slug === selectedSubCat || s.id === selectedSubCat) || null;
+    const normSub = selectedSubCat.toLowerCase();
+    return (activeMainCatObj.children || []).find(
+      (s) => s.slug.toLowerCase() === normSub ||
+             s.id === selectedSubCat ||
+             s.slug.toLowerCase().replace(/s$/, '') === normSub.replace(/s$/, '')
+    ) || null;
   }, [activeMainCatObj, selectedSubCat]);
 
   // Fetch real products from backend API
@@ -164,10 +172,11 @@ export function CategoryExplorer({
 
       if (!res || !res.success) {
         let speciesParam: string | undefined = undefined;
-        if (selectedMainCat === 'dogs' || selectedMainCat === 'dog') speciesParam = 'dog';
-        else if (selectedMainCat === 'cats' || selectedMainCat === 'cat') speciesParam = 'cat';
-        else if (selectedMainCat === 'fish') speciesParam = 'fish';
-        else if (selectedMainCat === 'birds' || selectedMainCat === 'bird') speciesParam = 'bird';
+        const normMain = selectedMainCat.toLowerCase();
+        if (normMain === 'dogs' || normMain === 'dog') speciesParam = 'dog';
+        else if (normMain === 'cats' || normMain === 'cat') speciesParam = 'cat';
+        else if (normMain === 'fish') speciesParam = 'fish';
+        else if (normMain === 'birds' || normMain === 'bird') speciesParam = 'bird';
 
         res = await productService.getProducts({
           page: currentPage,
@@ -218,12 +227,14 @@ export function CategoryExplorer({
     setCurrentPage(1);
 
     if (typeof window !== 'undefined') {
-      window.history.pushState(null, '', `/categories/${catSlug}`);
+      const basePath = window.location.pathname.startsWith('/category') && !window.location.pathname.startsWith('/categories') ? '/category' : '/categories';
+      window.history.pushState(null, '', `${basePath}/${catSlug}`);
     }
   };
 
   const handleSubCategoryClick = (subSlug: string) => {
-    router.push(`/category/${selectedMainCat}/${subSlug}`);
+    const mainSlug = activeMainCatObj.slug || selectedMainCat;
+    router.push(`/category/${mainSlug}/${subSlug}`);
   };
 
   const handleBackToSubCategories = () => {
@@ -231,7 +242,8 @@ export function CategoryExplorer({
     setCurrentPage(1);
 
     if (typeof window !== 'undefined') {
-      window.history.pushState(null, '', `/categories/${selectedMainCat}`);
+      const basePath = window.location.pathname.startsWith('/category') && !window.location.pathname.startsWith('/categories') ? '/category' : '/categories';
+      window.history.pushState(null, '', `${basePath}/${selectedMainCat}`);
     }
   };
 
@@ -259,120 +271,145 @@ export function CategoryExplorer({
             {selectedSubCat !== 'all' && (
               <button
                 onClick={handleBackToSubCategories}
-                className={styles.backNavBtn}
+                className={styles.backToSubCatsBtn}
               >
-                <ArrowLeft size={14} /> Back to {activeMainCatObj.name}
+                <ArrowLeft size={16} /> Back to {activeMainCatObj.name}
               </button>
             )}
 
-            {/* Main Categories Vertical Rail */}
-            <div className={styles.railList}>
-              {/* All Categories Item */}
-              <button
-                onClick={() => handleMainCategoryClick('all')}
-                className={`${styles.railItem} ${selectedMainCat === 'all' ? styles.railItemActive : ''}`}
-              >
-                <div className={styles.allAvatarWrap}>
-                  <LayoutGrid size={22} className={selectedMainCat === 'all' ? styles.activeIcon : styles.railIcon} />
-                </div>
-                <span className={styles.railLabel}>All</span>
-              </button>
-
-              {/* Backend Categories */}
-              {categoriesTree.map((cat) => {
-                const isSelected = selectedMainCat.toLowerCase() === cat.slug.toLowerCase() ||
-                                   (cat.slug === 'dog' && selectedMainCat === 'dogs') ||
-                                   (cat.slug === 'cat' && selectedMainCat === 'cats') ||
-                                   (cat.slug === 'birds' && selectedMainCat === 'bird');
-
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => handleMainCategoryClick(cat.slug)}
-                    className={`${styles.railItem} ${isSelected ? styles.railItemActive : ''}`}
-                  >
-                    <div className={styles.railAvatarWrap}>
-                      {cat.imageUrl ? (
-                        <Image
-                          src={cat.imageUrl}
-                          alt={cat.name}
-                          fill
-                          sizes="50px"
-                          className={styles.railAvatar}
-                        />
-                      ) : (
-                        <LayoutGrid size={22} className={isSelected ? styles.activeIcon : styles.railIcon} />
-                      )}
-                    </div>
-                    <span className={styles.railLabel}>{cat.name}</span>
-                  </button>
-                );
-              })}
+            {/* Sidebar Rail Header */}
+            <div className={styles.railHeader}>
+              <span className={styles.railHeaderTitle}>CATEGORIES</span>
             </div>
 
-            {/* Additional Subcategory Filters (Shown in Step 2 Product Listing) */}
-            {selectedSubCat !== 'all' && (
-              <div className={styles.filtersBlock}>
-                <div className={styles.filterActivePill}>
-                  <Filter size={12} />
-                  <span>FILTERING: {activeSubCatObj?.name || selectedSubCat}</span>
+            <div className={styles.categoriesRail}>
+              {/* All Categories Item */}
+              <button
+                key="all-cats"
+                onClick={() => handleMainCategoryClick('all')}
+                className={`${styles.categoryRailItem} ${selectedMainCat === 'all' ? styles.categoryRailItemActive : ''}`}
+              >
+                <div className={styles.railItemIcon}>
+                  <div className={styles.allAvatarWrap}>
+                    <LayoutGrid size={18} />
+                  </div>
                 </div>
+                <span className={styles.categoryRailLabel}>All</span>
+              </button>
+
+              {/* Dynamic Categories from Backend Tree */}
+              {categoriesLoading ? (
+                Array.from({ length: 4 }).map((_, idx) => (
+                  <div key={idx} className="flex flex-col items-center gap-1 p-2">
+                    <Skeleton style={{ width: 44, height: 44, borderRadius: 999 }} />
+                    <Skeleton style={{ width: 36, height: 12 }} />
+                  </div>
+                ))
+              ) : (
+                categoriesTree.map((cat) => {
+                  const isActive =
+                    selectedMainCat.toLowerCase() === cat.slug.toLowerCase() ||
+                    selectedMainCat === cat.id ||
+                    (cat.slug === 'dog' && (selectedMainCat.toLowerCase() === 'dogs' || selectedMainCat.toLowerCase() === 'dog')) ||
+                    (cat.slug === 'cat' && (selectedMainCat.toLowerCase() === 'cats' || selectedMainCat.toLowerCase() === 'cat')) ||
+                    (cat.slug === 'birds' && (selectedMainCat.toLowerCase() === 'bird' || selectedMainCat.toLowerCase() === 'birds'));
+
+                  return (
+                    <button
+                      key={cat.id || cat.slug}
+                      onClick={() => handleMainCategoryClick(cat.slug)}
+                      className={`${styles.categoryRailItem} ${isActive ? styles.categoryRailItemActive : ''}`}
+                    >
+                      <div className={styles.railItemIcon}>
+                        {cat.imageUrl ? (
+                          <div className={styles.categoryImageWrap}>
+                            <Image
+                              src={cat.imageUrl}
+                              alt={cat.name}
+                              fill
+                              sizes="44px"
+                              style={{ objectFit: 'cover' }}
+                            />
+                          </div>
+                        ) : (
+                          <div className={styles.allAvatarWrap}>
+                            <LayoutGrid size={18} />
+                          </div>
+                        )}
+                      </div>
+                      <span className={styles.categoryRailLabel}>{cat.name}</span>
+                    </button>
+                  );
+                })
+              )}
+            </div>
+
+            {/* In Step 2 (Product list view), render Size & Color filters below Rail */}
+            {selectedSubCat !== 'all' && (
+              <div className={styles.filterWidgets}>
+                <div className={styles.widgetDivider} />
 
                 {/* Size Filter */}
-                <div className={styles.filterGroup}>
-                  <span className={styles.filterGroupTitle}>Size</span>
-                  <div className={styles.sizePillsGrid}>
-                    {AVAILABLE_SIZES.map((sz) => (
+                <div className={styles.filterWidgetGroup}>
+                  <span className={styles.filterWidgetTitle}>Size</span>
+                  <div className={styles.sizeOptionsGrid}>
+                    {AVAILABLE_SIZES.map((size) => (
                       <button
-                        key={sz}
-                        onClick={() => setSelectedSize(selectedSize === sz ? null : sz)}
-                        className={`${styles.sizeBtn} ${selectedSize === sz ? styles.sizeActive : ''}`}
+                        key={size}
+                        onClick={() => setSelectedSize(selectedSize === size ? null : size)}
+                        className={`${styles.sizeBtn} ${selectedSize === size ? styles.sizeBtnActive : ''}`}
                       >
-                        {sz}
+                        {size}
                       </button>
                     ))}
                   </div>
                 </div>
 
-                {/* Color Filter */}
-                <div className={styles.filterGroup}>
-                  <span className={styles.filterGroupTitle}>Color</span>
-                  <div className={styles.colorRow}>
+                {/* Color Swatch Filter */}
+                <div className={styles.filterWidgetGroup}>
+                  <span className={styles.filterWidgetTitle}>Color</span>
+                  <div className={styles.colorSwatchesGrid}>
                     {COLOR_SWATCHES.map((col) => (
                       <button
                         key={col.name}
-                        onClick={() => setSelectedColor(selectedColor === col.hex ? null : col.hex)}
-                        className={`${styles.colorSwatch} ${selectedColor === col.hex ? styles.colorActive : ''}`}
+                        onClick={() => setSelectedColor(selectedColor === col.name ? null : col.name)}
+                        className={`${styles.colorSwatch} ${selectedColor === col.name ? styles.colorSwatchActive : ''}`}
                         style={{ backgroundColor: col.hex }}
                         title={col.name}
-                      >
-                        {selectedColor === col.hex && <Check size={12} color="#fff" />}
-                      </button>
+                      />
                     ))}
                   </div>
                 </div>
+
+                {(selectedSize || selectedColor) && (
+                  <button onClick={resetFilters} className={styles.sidebarResetBtn}>
+                    Clear Filters
+                  </button>
+                )}
               </div>
             )}
+
           </aside>
 
-          {/* RIGHT MAIN PANEL */}
-          <main className={styles.mainPanel}>
+          {/* MAIN CONTENT AREA */}
+          <main className={styles.mainContent}>
+            
+            {/* Active Header Section */}
+            <div className={styles.contentHeader}>
+              <div className={styles.headerTitleWrap}>
+                <span className={styles.headerSubtitle}>
+                  {selectedSubCat === 'all' && hasSubcategories ? 'SUBCATEGORIES' : 'PRODUCTS'}
+                </span>
+                <h1 className={styles.headerTitle}>
+                  {activeSubCatObj ? activeSubCatObj.name : activeMainCatObj.name}
+                </h1>
+              </div>
+            </div>
 
-            {/* ── STEP 1: SUBCATEGORIES TILES VIEW (Only shown when selectedSubCat === 'all' AND subcategories exist) ── */}
+            {/* ── STEP 1: SUBCATEGORIES GRID VIEW (Shown when main category is selected and has subcategories) ── */}
             {selectedSubCat === 'all' && hasSubcategories && (
-              <div className={`${styles.subCategoriesSection} ${styles.viewTransition}`}>
-                <div className={styles.subCatSectionHeader}>
-                  <div>
-                    <span className={styles.subCatEyebrow}>SUBCATEGORIES</span>
-                    <h1 className={styles.subCatMainTitle}>{activeMainCatObj.name}</h1>
-                  </div>
-                  {totalCount > 0 && (
-                    <span className={styles.subCatCountBadge}>{totalCount} Products</span>
-                  )}
-                </div>
-
-                {/* Grid of Sub-Category Cards */}
-                <div className={styles.subCategoriesGrid}>
+              <div className={styles.subCategorySection}>
+                <div className={styles.subCategoryGrid}>
                   {(activeMainCatObj.children || []).map((sub) => (
                     <div
                       key={sub.id || sub.slug}
@@ -407,7 +444,7 @@ export function CategoryExplorer({
               </div>
             )}
 
-            {/* ── STEP 2: PRODUCT LISTING VIEW (Shown if subcategory selected OR if category has no nested subcategories) ── */}
+            {/* ── STEP 2: PRODUCT LISTING VIEW (Shown if category has no nested subcategories) ── */}
             {(selectedSubCat !== 'all' || !hasSubcategories) && (
               <div className={`${styles.productListingSection} ${styles.viewTransition}`}>
                 

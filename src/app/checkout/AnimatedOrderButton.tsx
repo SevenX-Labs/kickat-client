@@ -1,29 +1,57 @@
 'use client';
 import { useState } from 'react';
 import styles from './AnimatedOrderButton.module.css';
+import { Loader2 } from 'lucide-react';
 
 interface Props {
   onValidate?: () => boolean;
+  onTriggerOrder?: () => Promise<boolean>;
   onComplete?: () => void;
+  isSubmitting?: boolean;
+  disabled?: boolean;
   className?: string;
+  label?: string;
 }
 
-export function AnimatedOrderButton({ onValidate, onComplete, className = '' }: Props) {
+export function AnimatedOrderButton({
+  onValidate,
+  onTriggerOrder,
+  onComplete,
+  isSubmitting = false,
+  disabled = false,
+  className = '',
+  label = 'Complete Order',
+}: Props) {
   const [isAnimating, setIsAnimating] = useState(false);
 
-  const handleClick = (e: React.MouseEvent) => {
-    if (onValidate && !onValidate()) {
-      return; // Do nothing if validation fails (let browser show HTML5 tooltips if it's a submit button)
+  const handleClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    if (disabled || isSubmitting || isAnimating) {
+      return;
     }
 
-    e.preventDefault(); // Prevent form submission so we can animate and manually route
+    if (onValidate && !onValidate()) {
+      return;
+    }
+
+    if (onTriggerOrder) {
+      try {
+        const success = await onTriggerOrder();
+        if (!success) {
+          return;
+        }
+      } catch {
+        return;
+      }
+    }
 
     if (!isAnimating) {
       setIsAnimating(true);
       setTimeout(() => {
         if (onComplete) onComplete();
-      }, 3400); // 3.4s fast smooth completion
-      
+      }, 3400);
+
       setTimeout(() => {
         setIsAnimating(false);
       }, 4500);
@@ -31,12 +59,22 @@ export function AnimatedOrderButton({ onValidate, onComplete, className = '' }: 
   };
 
   return (
-    <button 
-      className={`${styles.order} ${isAnimating ? styles.animate : ''} ${className}`} 
+    <button
+      className={`${styles.order} ${isAnimating ? styles.animate : ''} ${className}`}
       onClick={handleClick}
-      type="submit"
+      disabled={disabled || isSubmitting || isAnimating}
+      type="button"
+      style={disabled ? { opacity: 0.6, cursor: 'not-allowed' } : undefined}
     >
-      <span className={styles.default}>Complete Order</span>
+      <span className={styles.default}>
+        {isSubmitting ? (
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            <Loader2 className="animate-spin" size={18} style={{ animation: 'spin 1s linear infinite' }} /> Processing...
+          </span>
+        ) : (
+          label
+        )}
+      </span>
       <span className={styles.success}>
         Order Placed
         <svg viewBox="0 0 12 10">

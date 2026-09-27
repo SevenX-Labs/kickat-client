@@ -1,95 +1,306 @@
 "use client";
 
-import { profileService } from '@/services/profileService';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import {
+  Check,
+  Truck,
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  CreditCard,
+  Smartphone,
+  ChevronDown,
+  User,
+  MapPin,
+  Lock,
+  Edit3,
+  X,
+  Shield,
+  AlertCircle,
+  Plus,
+  Loader2,
+  Calendar,
+  Mail,
+  Package,
+  ShoppingBag,
+  Heart,
+  RotateCcw,
+  Headphones,
+  PawPrint,
+  Sparkles,
+  Wallet,
+  Building2,
+  AlertTriangle,
+} from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { useCart } from '@/context/CartContext';
+import { checkoutService } from '@/services/checkoutService';
+import { profileService, CreateAddressDto } from '@/services/profileService';
 import { authService } from '@/services/authService';
 import { UseLocationButton } from '@/components/ui/UseLocationButton';
 import { DetectedAddress } from '@/services/locationService';
-import { useState, useEffect } from 'react';
+import {
+  CheckoutResponse,
+  CheckoutAddress,
+  ValidateAddressResponse,
+  PaymentMethodItem,
+  CheckoutPaymentMethodType,
+  PlaceOrderResponse,
+} from '@/types/checkout';
 import { AnimatedOrderButton } from './AnimatedOrderButton';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Check, Truck, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, CreditCard, Smartphone, ChevronDown, User, MapPin, Lock, Edit3, X, Home, Shield, AlertCircle,  Plus, Loader2, Calendar, Mail, Package, ShoppingBag, Download, Heart, RotateCcw, Headphones, PawPrint, Sparkles } from 'lucide-react';
 import styles from './Checkout.module.css';
 
-// Mock Cart Data for Checkout
-const checkoutItems = [
-  {
-    id: '1',
-    name: 'Precision Digital Thermostat Submersible Heater 200W',
-    price: 1499,
-    quantity: 1,
-    image: '/hero-products/pet_bowl.png'
-  },
-  {
-    id: '2',
-    name: 'Premium Leather Dog Collar',
-    price: 899,
-    quantity: 2,
-    image: '/hero-products/dog_food.png'
-  },
-  {
-    id: '3',
-    name: 'Ultra Soft Pet Bed Cushion',
-    price: 1299,
-    quantity: 1,
-    image: '/hero-products/pet_bowl.png'
-  },
-  {
-    id: '4',
-    name: 'Interactive Cat Teaser Toy',
-    price: 399,
-    quantity: 3,
-    image: '/hero-products/dog_food.png'
-  },
-  {
-    id: '5',
-    name: 'Stainless Steel Non-Slip Pet Bowl',
-    price: 499,
-    quantity: 2,
-    image: '/hero-products/pet_bowl.png'
-  },
-  {
-    id: '6',
-    name: 'Adjustable Mesh Dog Harness',
-    price: 799,
-    quantity: 1,
-    image: '/hero-products/dog_food.png'
+function generateUUID(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
   }
-];
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
 
 export default function CheckoutPage() {
+  const router = useRouter();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { items: cartItems, refreshCart, isLoading: cartLoading } = useCart();
+
+  // Step Management
   const [currentStep, setCurrentStep] = useState<number>(1);
-  const [paymentMethod, setPaymentMethod] = useState('card');
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    document.title = isSubmitted ? "Order Placed Successfully! | KickAt" : "Checkout - Secure Payment | KickAt";
-  }, [isSubmitted]);
+  // Checkout Session State
+  const [checkoutData, setCheckoutData] = useState<CheckoutResponse | null>(null);
+  const [isCheckoutLoading, setIsCheckoutLoading] = useState<boolean>(true);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
-  // Form states for validation checkmarks (pre-filled with dummy data)
-  const [firstName, setFirstName] = useState('Eduard');
-  const [flat, setFlat] = useState('');
-  const [street, setStreet] = useState('');
-  const [city, setCity] = useState('');
-  const [stateName, setStateName] = useState('');
+  // Address Management State
+  const [savedAddresses, setSavedAddresses] = useState<CheckoutAddress[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string>('');
+  const [isAddingNewAddress, setIsAddingNewAddress] = useState<boolean>(false);
+  const [isValidatingAddress, setIsValidatingAddress] = useState<boolean>(false);
+  const [addressValidation, setAddressValidation] = useState<ValidateAddressResponse | null>(null);
+  const [addressValidationError, setAddressValidationError] = useState<string | null>(null);
+
+  // New Address Form State
+  const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+  const [houseFlat, setHouseFlat] = useState('');
+  const [buildingStreet, setBuildingStreet] = useState('');
+  const [landmark, setLandmark] = useState('');
+  const [city, setCity] = useState('');
+  const [stateName, setStateName] = useState('');
   const [zipCode, setZipCode] = useState('');
-  const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
-  const [hasSavedAddress, setHasSavedAddress] = useState(false);
-  const [selectedAddressIndex, setSelectedAddressIndex] = useState(0);
+  const [isSavingNewAddress, setIsSavingNewAddress] = useState(false);
 
+  // Payment Methods State
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethodItem[]>([]);
+  const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState<boolean>(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<CheckoutPaymentMethodType>('COD');
+  const [paymentMethodError, setPaymentMethodError] = useState<string | null>(null);
+  const [upiId, setUpiId] = useState('');
+  const [deliveryInstructions, setDeliveryInstructions] = useState('');
+
+  // Order Placement State
+  const [isSubmittingOrder, setIsSubmittingOrder] = useState<boolean>(false);
+  const [orderError, setOrderError] = useState<string | null>(null);
+  const [placedOrder, setPlacedOrder] = useState<PlaceOrderResponse | null>(null);
+  const idempotencyKeyRef = useRef<string>(generateUUID());
+
+  // UI Accordions & Visuals
+  const [isPriceDetailsOpen, setIsPriceDetailsOpen] = useState<boolean>(false);
+  const [isPromoOpen, setIsPromoOpen] = useState<boolean>(false);
+  const [isItemsExpanded, setIsItemsExpanded] = useState<boolean>(false);
+  const [particles, setParticles] = useState<{ id: number; tx: string; ty: string; color: string }[]>([]);
+
+  // Phone Verification Modal
   const [isPhoneVerified, setIsPhoneVerified] = useState(true);
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
-  const [phoneOtp, setPhoneOtp] = useState("");
+  const [phoneOtp, setPhoneOtp] = useState('');
   const [isSendingPhoneOtp, setIsSendingPhoneOtp] = useState(false);
   const [isVerifyingPhoneOtp, setIsVerifyingPhoneOtp] = useState(false);
   const [phoneOtpError, setPhoneOtpError] = useState<string | null>(null);
 
+  // Title effect
+  useEffect(() => {
+    document.title = placedOrder
+      ? `Order ${placedOrder.orderNumber || ''} Placed! | KickAt`
+      : 'Checkout - Secure Payment | KickAt';
+  }, [placedOrder]);
+
+  // Prepopulate user details when user profile is loaded
+  useEffect(() => {
+    if (user) {
+      if (user.phone) setPhone(user.phone);
+      if (user.email) setEmail(user.email);
+      if (user.name) setFullName(user.name);
+      if (typeof user.isPhoneVerified === 'boolean') {
+        setIsPhoneVerified(user.isPhoneVerified);
+      }
+    }
+  }, [user]);
+
+  // 1. Load Checkout Session
+  const loadCheckoutSession = useCallback(async () => {
+    if (!isAuthenticated && !authLoading) {
+      setIsCheckoutLoading(false);
+      return;
+    }
+
+    try {
+      setIsCheckoutLoading(true);
+      setCheckoutError(null);
+      const res = await checkoutService.getCheckout();
+      setCheckoutData(res);
+
+      const addrs = res.addresses || [];
+      setSavedAddresses(addrs);
+
+      if (addrs.length > 0) {
+        setIsAddingNewAddress(false);
+        const defaultAddr = addrs.find((a) => a.isDefault) || addrs[0];
+        setSelectedAddressId(defaultAddr.id);
+      } else {
+        setIsAddingNewAddress(true);
+      }
+    } catch (err: any) {
+      console.error('[Checkout] Failed to load checkout session:', err);
+      setCheckoutError(err?.message || 'Failed to load checkout details');
+    } finally {
+      setIsCheckoutLoading(false);
+    }
+  }, [isAuthenticated, authLoading]);
+
+  useEffect(() => {
+    if (!authLoading) {
+      loadCheckoutSession();
+    }
+  }, [authLoading, loadCheckoutSession]);
+
+  // 2. Validate Address & Fetch Eligible Payment Methods
+  const validateAndFetchMethods = useCallback(
+    async (addressId: string, grandTotal?: number) => {
+      if (!addressId) return;
+
+      const currentAddress = savedAddresses.find((a) => a.id === addressId);
+      const pincode = currentAddress?.pincode;
+
+      setIsValidatingAddress(true);
+      setAddressValidationError(null);
+
+      try {
+        const valRes = await checkoutService.validateAddress(addressId);
+        setAddressValidation(valRes);
+
+        if (!valRes.serviceable) {
+          setAddressValidationError(valRes.message || 'Pincode is currently not serviceable');
+          setPaymentMethods([]);
+          return;
+        }
+
+        // Fetch eligible payment methods using backend grand total and pincode
+        if (pincode) {
+          const totalAmount = grandTotal || checkoutData?.summary?.grandTotal || 1;
+          setIsLoadingPaymentMethods(true);
+          try {
+            const pmRes = await checkoutService.getPaymentMethods(totalAmount, pincode);
+            if (pmRes.methods && Array.isArray(pmRes.methods)) {
+              setPaymentMethods(pmRes.methods);
+
+              // Auto-select first available payment method
+              const firstAvailable = pmRes.methods.find((m) => m.available);
+              if (firstAvailable) {
+                setSelectedPaymentMethod(firstAvailable.type);
+              }
+            }
+          } catch (pmErr: any) {
+            console.error('[Checkout] Failed to fetch payment methods:', pmErr);
+            setPaymentMethodError(pmErr?.message || 'Could not fetch payment methods');
+          } finally {
+            setIsLoadingPaymentMethods(false);
+          }
+        }
+      } catch (err: any) {
+        console.error('[Checkout] Address validation failed:', err);
+        setAddressValidationError(err?.message || 'Address validation failed. Please check pincode.');
+        setAddressValidation(null);
+      } finally {
+        setIsValidatingAddress(false);
+      }
+    },
+    [savedAddresses, checkoutData?.summary?.grandTotal]
+  );
+
+  // Trigger validation whenever selectedAddressId changes
+  useEffect(() => {
+    if (selectedAddressId && savedAddresses.length > 0) {
+      validateAndFetchMethods(selectedAddressId, checkoutData?.summary?.grandTotal);
+    }
+  }, [selectedAddressId, savedAddresses, validateAndFetchMethods, checkoutData?.summary?.grandTotal]);
+
+  // Add and Save New Address
+  const handleSaveNewAddress = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!phone || phone.replace(/\D/g, '').length !== 10) {
+      alert('Please enter a valid 10-digit mobile number');
+      return;
+    }
+    if (!zipCode || !/^\d{6}$/.test(zipCode.trim())) {
+      alert('Please enter a valid 6-digit pincode');
+      return;
+    }
+    if (!buildingStreet || !city || !stateName) {
+      alert('Please fill in all required address fields');
+      return;
+    }
+
+    setIsSavingNewAddress(true);
+    setAddressValidationError(null);
+
+    try {
+      const newAddressDto: CreateAddressDto = {
+        houseFlat: houseFlat || undefined,
+        buildingStreet: buildingStreet,
+        city: city,
+        state: stateName,
+        pincode: zipCode.trim(),
+        landmark: landmark || undefined,
+        type: 'HOME',
+        isDefault: savedAddresses.length === 0,
+      };
+
+      const savedRes: any = await profileService.addAddress(newAddressDto);
+      const createdAddress: CheckoutAddress =
+        savedRes?.address || {
+          id: savedRes?.id || generateUUID(),
+          ...newAddressDto,
+          fullName: fullName || user?.name || 'Customer',
+          phone: phone || user?.phone || '',
+        };
+
+      const updatedAddresses = [...savedAddresses, createdAddress];
+      setSavedAddresses(updatedAddresses);
+      setSelectedAddressId(createdAddress.id);
+      setIsAddingNewAddress(false);
+
+      // Validate newly added address
+      await validateAndFetchMethods(createdAddress.id);
+    } catch (err: any) {
+      console.error('[Checkout] Failed to save address:', err);
+      setAddressValidationError(err?.message || 'Failed to save address. Please try again.');
+    } finally {
+      setIsSavingNewAddress(false);
+    }
+  };
+
+  // Phone OTP Verification Handlers
   const handleSendCheckoutPhoneOtp = async () => {
     if (!phone) {
-      alert("Please enter a phone number first.");
+      alert('Please enter a phone number first.');
       return;
     }
     setPhoneOtpError(null);
@@ -98,7 +309,7 @@ export default function CheckoutPage() {
     try {
       await authService.sendUserMobileVerification(phone);
     } catch (err: any) {
-      setPhoneOtpError(err?.message || "Failed to send OTP. Please try again.");
+      setPhoneOtpError(err?.message || 'Failed to send OTP. Please try again.');
     } finally {
       setIsSendingPhoneOtp(false);
     }
@@ -107,7 +318,7 @@ export default function CheckoutPage() {
   const handleVerifyCheckoutPhoneOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!phoneOtp || phoneOtp.trim().length !== 6) {
-      setPhoneOtpError("Please enter a 6-digit OTP code");
+      setPhoneOtpError('Please enter a 6-digit OTP code');
       return;
     }
     setIsVerifyingPhoneOtp(true);
@@ -116,131 +327,241 @@ export default function CheckoutPage() {
       await authService.verifyUserMobile(phoneOtp.trim(), phone);
       setIsPhoneVerified(true);
       setIsPhoneModalOpen(false);
-      setPhoneOtp("");
+      setPhoneOtp('');
     } catch (err: any) {
-      setPhoneOtpError(err?.message || "Invalid OTP. Please try again.");
+      setPhoneOtpError(err?.message || 'Invalid OTP. Please try again.');
     } finally {
       setIsVerifyingPhoneOtp(false);
     }
   };
 
-
-  useEffect(() => {
-    let isMounted = true;
-    const fetchUserData = async () => {
-      try {
-        const res: any = await profileService.getProfile();
-        if (isMounted && res && res.user) {
-          if (res.user.phone) setPhone(res.user.phone);
-          setIsPhoneVerified(Boolean(res.user.isPhoneVerified));
-          if (res.user.email) setEmail(res.user.email);
-          if (res.user.name) setFirstName(res.user.name.split(' ')[0] || '');
-
-          if (Array.isArray(res.user.addresses) && res.user.addresses.length > 0) {
-            setSavedAddresses(res.user.addresses);
-            setHasSavedAddress(true);
-          } else {
-            setSavedAddresses([]);
-            setHasSavedAddress(false);
-          }
-        }
-      } catch (err) {
-        console.error('Failed to load user profile in checkout:', err);
-      }
-    };
-    fetchUserData();
-    return () => { isMounted = false; };
-  }, []);
-  
-  // Promo code toggle state
-  const [isPromoOpen, setIsPromoOpen] = useState(false);
-  
-  // Price details toggle state
-  const [isPriceDetailsOpen, setIsPriceDetailsOpen] = useState(false);
-  
-  // Items list toggle state
-  const [isItemsExpanded, setIsItemsExpanded] = useState(false);
-
-  const phoneDigits = phone.replace(/\D/g, '').length;
-  const isValidPhone = phoneDigits === 10;
-  const isInvalidPhone = phoneDigits > 10;
-  
-  const isValidEmail = email.includes('@') && email.includes('.');
-  const isValidZip = zipCode.trim().length >= 5;
-
-  const subtotal = checkoutItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  const tax = subtotal * 0.18; // 18% GST mock
-  const shipping = subtotal >= 2000 ? 0 : 150;
-  const total = subtotal + tax + shipping;
-  const totalItemsCount = checkoutItems.reduce((acc, item) => acc + item.quantity, 0);
-
-  const displayedItems = isItemsExpanded ? checkoutItems : checkoutItems.slice(0, 2);
-  const hiddenItemsCount = checkoutItems.length - 2;
-
-  const [orderNumber, setOrderNumber] = useState(0);
-  const [particles, setParticles] = useState<{id: number, tx: string, ty: string, color: string}[]>([]);
-
-  const handleAddressSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validateStep1()) {
-      setCurrentStep(2);
+  // Step 1 Validation Check
+  const validateStep1 = () => {
+    if (isAddingNewAddress) {
+      const validPhone = phone.replace(/\D/g, '').length === 10;
+      const validZip = /^\d{6}$/.test(zipCode.trim());
+      const hasStreet = buildingStreet.trim().length > 0;
+      const hasCity = city.trim().length > 0;
+      const hasState = stateName.trim().length > 0;
+      return validPhone && validZip && hasStreet && hasCity && hasState;
     }
+    return Boolean(selectedAddressId && addressValidation?.serviceable);
   };
 
-  const handleCityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    setCity(val);
-    if (val.toLowerCase().trim() === 'mumbai') {
-      setStateName('Maharashtra');
+  // Proceed to Step 2
+  const handleProceedToPayment = () => {
+    if (isAddingNewAddress) {
+      alert('Please save your address before proceeding.');
+      return;
     }
-  };
 
-  const handleAnimatedComplete = () => {
-    setIsSubmitted(true);
-    setOrderNumber(Math.floor(100000 + Math.random() * 900000));
-    setParticles(Array.from({ length: 60 }).map((_, i) => {
-      const angle = (i * 6) * (Math.PI / 180);
-      const velocity = 80 + Math.random() * 120;
-      const tx = Math.cos(angle) * velocity;
-      const ty = Math.sin(angle) * velocity;
-      const colors = ['#F99205', '#10B981', '#F59E0B', '#3B82F6', '#EC4899', '#8B5CF6', '#F43F5E'];
-      return { id: i, tx: `${tx}px`, ty: `${ty}px`, color: colors[i % colors.length] };
-    }));
+    if (!selectedAddressId) {
+      alert('Please select a delivery address.');
+      return;
+    }
+
+    if (addressValidationError || (addressValidation && !addressValidation.serviceable)) {
+      alert('Selected address is not serviceable. Please choose another address.');
+      return;
+    }
+
+    setCurrentStep(2);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const validateStep1 = () => {
-    return isValidPhone && isValidEmail && isValidZip;
+  // Step 2 Form Validation
+  const validatePlaceOrderForm = () => {
+    if (!isAuthenticated) {
+      alert('Please login to complete your order.');
+      return false;
+    }
+    if (!selectedAddressId) {
+      alert('Please select a valid delivery address.');
+      return false;
+    }
+    if (addressValidation && !addressValidation.serviceable) {
+      alert('Selected address is not serviceable.');
+      return false;
+    }
+    if (!selectedPaymentMethod) {
+      alert('Please select a payment method.');
+      return false;
+    }
+    return true;
   };
 
-  const validateForm = () => {
-    return validateStep1() && paymentMethod !== '';
+  // Place Order Action (Async handler triggered by AnimatedOrderButton)
+  const handleTriggerOrder = async (): Promise<boolean> => {
+    if (!validatePlaceOrderForm()) {
+      return false;
+    }
+
+    if (isSubmittingOrder) {
+      return false;
+    }
+
+    setIsSubmittingOrder(true);
+    setOrderError(null);
+
+    const idempotencyKey = idempotencyKeyRef.current;
+
+    try {
+      const orderPayload = {
+        addressId: selectedAddressId,
+        paymentMethod: selectedPaymentMethod,
+        deliveryInstructions: deliveryInstructions.trim() || undefined,
+        expectedTotal: checkoutData?.summary?.grandTotal,
+        upiId: selectedPaymentMethod === 'UPI' ? (upiId.trim() || 'user@upi') : undefined,
+      };
+
+      const res = await checkoutService.placeOrder(orderPayload, idempotencyKey);
+
+      setPlacedOrder(res);
+
+      // Refresh cart context so cart icon and items reflect the new empty state
+      await refreshCart();
+
+      return true;
+    } catch (err: any) {
+      console.error('[Checkout] Place order failed:', err);
+      const msg = err?.message || 'Failed to place order. Please try again.';
+      setOrderError(msg);
+      alert(msg);
+      // Generate new idempotency key for next fresh attempt if needed
+      idempotencyKeyRef.current = generateUUID();
+      return false;
+    } finally {
+      setIsSubmittingOrder(false);
+    }
   };
 
-  if (isSubmitted) {
+  // Completion Animation trigger
+  const handleAnimatedComplete = () => {
+    setParticles(
+      Array.from({ length: 60 }).map((_, i) => {
+        const angle = i * 6 * (Math.PI / 180);
+        const velocity = 80 + Math.random() * 120;
+        const tx = Math.cos(angle) * velocity;
+        const ty = Math.sin(angle) * velocity;
+        const colors = ['#F99205', '#10B981', '#F59E0B', '#3B82F6', '#EC4899', '#8B5CF6', '#F43F5E'];
+        return { id: i, tx: `${tx}px`, ty: `${ty}px`, color: colors[i % colors.length] };
+      })
+    );
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // ----------------------------------------------------
+  // RENDER: Unauthenticated State
+  // ----------------------------------------------------
+  if (!authLoading && !isAuthenticated) {
+    return (
+      <div className={styles.pageBg}>
+        <main className={styles.container}>
+          <div style={{ maxWidth: '600px', margin: '4rem auto', textAlign: 'center', background: '#fff', padding: '3rem 2rem', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
+            <Lock size={48} color="#F99205" style={{ margin: '0 auto 1.5rem auto' }} />
+            <h2 style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '0.75rem', color: '#1A1816' }}>
+              Please Log In to Checkout
+            </h2>
+            <p style={{ color: '#666', marginBottom: '2rem', lineHeight: 1.6 }}>
+              You need to be logged in with your KickAt account to select delivery addresses, review cart totals, and place orders securely.
+            </p>
+            <Link
+              href="/auth/login?redirect=/checkout"
+              className={styles.nextStepBtnAlt}
+              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', margin: '0 auto' }}
+            >
+              Sign In to Continue <ArrowRight size={18} style={{ marginLeft: 8 }} />
+            </Link>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // ----------------------------------------------------
+  // RENDER: Loading Skeleton
+  // ----------------------------------------------------
+  if (authLoading || isCheckoutLoading) {
+    return (
+      <div className={styles.pageBg}>
+        <main className={styles.container}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '50vh', gap: '1rem' }}>
+            <Loader2 size={40} className="animate-spin" color="#F99205" style={{ animation: 'spin 1s linear infinite' }} />
+            <p style={{ color: '#666', fontSize: '1.1rem', fontWeight: 500 }}>
+              Loading checkout & calculating live totals...
+            </p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // ----------------------------------------------------
+  // RENDER: Empty Cart
+  // ----------------------------------------------------
+  const hasNoItems =
+    (!checkoutData && !cartLoading) ||
+    (checkoutData?.summary?.itemCount === 0 && (!cartItems || cartItems.length === 0));
+
+  if (hasNoItems && !placedOrder) {
+    return (
+      <div className={styles.pageBg}>
+        <main className={styles.container}>
+          <div style={{ maxWidth: '540px', margin: '4rem auto', textAlign: 'center', background: '#fff', padding: '3.5rem 2rem', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
+            <ShoppingBag size={52} color="#F99205" style={{ margin: '0 auto 1.5rem auto' }} />
+            <h2 style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '0.75rem', color: '#1A1816' }}>
+              Your Cart is Empty
+            </h2>
+            <p style={{ color: '#666', marginBottom: '2rem', lineHeight: 1.6 }}>
+              There are currently no items ready for checkout. Explore our premium pet catalog and add your favorites!
+            </p>
+            <Link
+              href="/shop"
+              className={styles.nextStepBtnAlt}
+              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', margin: '0 auto' }}
+            >
+              <ShoppingBag size={18} style={{ marginRight: 8 }} /> Explore Products
+            </Link>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // ----------------------------------------------------
+  // RENDER: Order Placed Success View (COD or Order Confirmation)
+  // ----------------------------------------------------
+  if (placedOrder) {
+    const isCod = selectedPaymentMethod === 'COD';
+    const selectedAddr = savedAddresses.find((a) => a.id === selectedAddressId) || savedAddresses[0];
+    const orderDateStr = new Intl.DateTimeFormat('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date());
+
     return (
       <main className={styles.container}>
         <div className={styles.successWrapper}>
-          
           <div className={styles.confettiContainer}>
-            {particles.map(p => (
-              <div 
-                key={p.id} 
-                className={styles.particle} 
-                style={{ 
-                  backgroundColor: p.color, 
-                  '--tx': p.tx, 
-                  '--ty': p.ty 
-                } as React.CSSProperties} 
+            {particles.map((p) => (
+              <div
+                key={p.id}
+                className={styles.particle}
+                style={{
+                  backgroundColor: p.color,
+                  '--tx': p.tx,
+                  '--ty': p.ty,
+                } as React.CSSProperties}
               />
             ))}
           </div>
 
-          {/* Animated Celebration Icon Badge with Floating Paws & Aura */}
+          {/* Celebration Badge */}
           <div className={styles.successIconBadgeWrapper}>
             <div className={styles.successAuraRing} />
-
-            {/* Orbiting Paws */}
             <div className={`${styles.orbitItem} ${styles.pawTopRight}`}>
               <PawPrint size={24} fill="#F99205" color="#F99205" />
             </div>
@@ -248,78 +569,67 @@ export default function CheckoutPage() {
               <PawPrint size={22} fill="#F99205" color="#F99205" />
             </div>
             <div className={`${styles.orbitItem} ${styles.pawTopLeft}`}>
-              <PawPrint size={18} fill="#F99205" color="#F99205" />
+              <Sparkles size={20} color="#F99205" />
             </div>
-            <div className={`${styles.orbitItem} ${styles.pawBottomRight}`}>
-              <PawPrint size={20} fill="#F99205" color="#F99205" />
-            </div>
-
-            {/* Spark Rays */}
-            <div className={`${styles.orbitItem} ${styles.sparkTop}`}>
-              <div className={styles.sparkRayPair}>
-                <span className={`${styles.sparkRay} ${styles.ray1}`} />
-                <span className={`${styles.sparkRay} ${styles.ray2}`} />
-              </div>
-            </div>
-            <div className={`${styles.orbitItem} ${styles.sparkRight}`}>
-              <div className={styles.sparkRayPair}>
-                <span className={`${styles.sparkRay} ${styles.ray1}`} />
-                <span className={`${styles.sparkRay} ${styles.ray2}`} />
-              </div>
-            </div>
-            <div className={`${styles.orbitItem} ${styles.sparkLeft}`}>
-              <div className={styles.sparkRayPair}>
-                <span className={`${styles.sparkRay} ${styles.ray1}`} />
-                <span className={`${styles.sparkRay} ${styles.ray2}`} />
-              </div>
-            </div>
-
-            {/* Central Green Checkmark Circle */}
             <div className={styles.successIconBadge}>
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={styles.animatedCheck}>
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
+              <Check size={44} strokeWidth={3.5} color="#FFFFFF" className={styles.animatedCheck} />
             </div>
           </div>
-          
+
           <h1 className={styles.successTitle}>
-            Order Placed <span className={styles.successTitleOrange}>Successfully!</span>
+            {isCod ? 'Order Placed' : 'Order Created'}{' '}
+            <span className={styles.successTitleOrange}>Successfully!</span>
           </h1>
           <p className={styles.successSubtitle}>
-            Thank you for shopping with KickAt. We&apos;ve sent a confirmation email with live tracking details to your inbox.
+            {isCod
+              ? 'Thank you for your purchase! We are preparing your order for quick dispatch.'
+              : 'Your order has been recorded. Proceed with online payment to finalize delivery.'}
           </p>
-          
+
           <div className={styles.confirmationPill}>
             <Mail size={16} color="#10B981" style={{ flexShrink: 0 }} />
-            <span>Confirmation sent to <strong className={styles.pillEmail}>{email || 'sahil.hode@gmail.com'}</strong></span>
+            <span>
+              Confirmation sent to{' '}
+              <strong className={styles.pillEmail}>{email || user?.email || 'your registered email'}</strong>
+            </span>
           </div>
 
-          {/* Ultra Premium Success Card */}
+          {/* Premium Order Details Card */}
           <div className={styles.successCard}>
             <div className={styles.successCardHeader}>
               <div className={styles.cardHeaderItem}>
                 <span className={styles.cardHeaderLabel}>ORDER NUMBER</span>
-                <span className={styles.cardHeaderValueMono}>#KCK-{orderNumber}</span>
+                <span className={styles.cardHeaderValueMono}>#{placedOrder.orderNumber}</span>
               </div>
               <div className={`${styles.cardHeaderItem} ${styles.cardHeaderItemBorder}`}>
                 <span className={styles.cardHeaderLabel}>ORDER DATE</span>
-                <span className={styles.cardHeaderValue}><Calendar size={14}/> 26 May, 2025 • 10:24 AM</span>
+                <span className={styles.cardHeaderValue}>
+                  <Calendar size={14} /> {orderDateStr}
+                </span>
               </div>
               <div className={`${styles.cardHeaderItem} ${styles.cardHeaderItemBorder} ${styles.cardHeaderItemRight}`}>
-                <span className={styles.cardHeaderLabel}>TOTAL AMOUNT</span>
-                <span className={styles.cardHeaderValueOrange}>₹{total.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                <span className={styles.cardHeaderLabel}>TOTAL PAYABLE</span>
+                <span className={styles.cardHeaderValueOrange}>
+                  ₹{(placedOrder.grandTotal || checkoutData?.summary?.grandTotal || 0).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                  })}
+                </span>
               </div>
             </div>
 
-            {/* Live Order Progress Tracker */}
+            {/* Live Order Tracker */}
             <div className={styles.trackerContainer}>
               <div className={styles.trackerHeader}>
                 <span className={styles.trackerLabel}>LIVE ORDER STATUS</span>
-                <span className={styles.trackerStatusBadge}>Order Confirmed</span>
+                <span className={styles.trackerStatusBadge}>
+                  {placedOrder.status || 'Order Confirmed'}
+                </span>
               </div>
               <div className={styles.trackerStepsRow}>
                 <div className={`${styles.trackerStep} ${styles.trackerStepCompleted}`}>
-                  <div className={styles.trackerDot}><Check size={12} strokeWidth={3} /></div>
+                  <div className={styles.trackerDot}>
+                    <Check size={12} strokeWidth={3} />
+                  </div>
                   <span>Confirmed</span>
                 </div>
                 <div className={styles.trackerLineActive}></div>
@@ -340,91 +650,871 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* Order Items List */}
-            <div className={styles.successItemsList}>
-              {checkoutItems.map((item) => (
-                <div key={item.id} className={styles.successItem}>
-                  <div className={styles.successItemThumb}>
-                    <Image src={item.image} alt={item.name} fill style={{ objectFit: 'contain' }} />
-                  </div>
-                  <div className={styles.successItemDetails}>
-                    <div className={styles.successItemName}>{item.name}</div>
-                    <div className={styles.successItemMeta}>Qty: {item.quantity}</div>
-                  </div>
-                  <div className={styles.successItemPrice}>
-                    ₹{(item.price * item.quantity).toLocaleString(undefined, {minimumFractionDigits: 2})}
-                  </div>
-                </div>
-              ))}
-            </div>
-
             {/* Delivery Estimate Box */}
             <div className={styles.deliveryEstimateCard}>
               <div className={styles.deliveryIconWrapper}>
                 <Truck size={20} color="#ea580c" />
               </div>
               <div className={styles.deliveryText}>
-                <div className={styles.deliveryTitle}>Estimated Delivery</div>
-                <div className={styles.deliveryDate}>Arriving <strong>Aug 28 – Aug 30</strong></div>
+                <div className={styles.deliveryTitle}>Delivery Address</div>
+                <div className={styles.deliveryDate}>
+                  <strong>{selectedAddr?.houseFlat || selectedAddr?.houseNumber ? `${selectedAddr?.houseFlat || selectedAddr?.houseNumber}, ` : ''}{selectedAddr?.buildingStreet || selectedAddr?.street || ''}</strong>, {selectedAddr?.city || ''} ({selectedAddr?.pincode || ''})
+                </div>
               </div>
             </div>
           </div>
-          
+
           {/* Trust Features Strip */}
           <div className={styles.featuresRow}>
             <div className={styles.featureBox}>
-              <div className={styles.featureIconCircle}><Truck size={20} /></div>
+              <div className={styles.featureIconCircle}>
+                <Truck size={20} />
+              </div>
               <div>
                 <div className={styles.featureBoxTitle}>Fast Delivery</div>
                 <div className={styles.featureBoxDesc}>On-time delivery guaranteed</div>
               </div>
             </div>
             <div className={styles.featureBox}>
-              <div className={styles.featureIconCircle}><Shield size={20} /></div>
+              <div className={styles.featureIconCircle}>
+                <Shield size={20} />
+              </div>
               <div>
-                <div className={styles.featureBoxTitle}>Secure Payment</div>
+                <div className={styles.featureBoxTitle}>Secure Checkout</div>
                 <div className={styles.featureBoxDesc}>100% safe & encrypted</div>
               </div>
             </div>
             <div className={styles.featureBox}>
-              <div className={styles.featureIconCircle}><RotateCcw size={20} /></div>
+              <div className={styles.featureIconCircle}>
+                <RotateCcw size={20} />
+              </div>
               <div>
                 <div className={styles.featureBoxTitle}>Easy Returns</div>
-                <div className={styles.featureBoxDesc}>30 day hassle-free returns</div>
+                <div className={styles.featureBoxDesc}>Hassle-free 30 day returns</div>
               </div>
             </div>
             <div className={styles.featureBox}>
-              <div className={styles.featureIconCircle}><Headphones size={20} /></div>
+              <div className={styles.featureIconCircle}>
+                <Headphones size={20} />
+              </div>
               <div>
-                <div className={styles.featureBoxTitle}>Customer Support</div>
-                <div className={styles.featureBoxDesc}>24/7 dedicated assistance</div>
+                <div className={styles.featureBoxTitle}>24/7 Support</div>
+                <div className={styles.featureBoxDesc}>Dedicated customer care</div>
               </div>
             </div>
           </div>
 
-          {/* Action CTAs */}
+          {/* CTAs */}
           <div className={styles.successCtaGroup}>
-            <Link href={orderNumber ? `/orders/KCK-${orderNumber}` : "/orders"} className={styles.primarySuccessBtn}>
-              <Package size={20} /> View Order Status <ArrowRight size={20} />
+            <Link href={`/orders/${placedOrder.orderId}`} className={styles.primarySuccessBtn}>
+              <Package size={20} /> View Order Details <ArrowRight size={20} />
             </Link>
             <div className={styles.secondaryActionsRow}>
               <Link href="/shop" className={styles.outlineBtnAlt}>
                 <ShoppingBag size={16} /> Continue Shopping
               </Link>
-              <Link href={orderNumber ? `/orders/KCK-${orderNumber}/invoice` : "/orders/ORD-89241/invoice"} className={styles.outlineBtnAlt} target="_blank">
-                <Download size={16} /> Download Invoice
-              </Link>
             </div>
           </div>
-          
+
           <div className={styles.successFooter}>
-            <Heart size={14} fill="#ea580c" color="#ea580c" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} />
-            Thanks for choosing KickAt!<br/>
+            <Heart
+              size={14}
+              fill="#ea580c"
+              color="#ea580c"
+              style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}
+            />
+            Thanks for shopping with KickAt!<br />
             <span style={{ color: '#888', fontSize: '0.85rem' }}>Your pet&apos;s happiness is our priority.</span>
           </div>
-          
         </div>
-      
+      </main>
+    );
+  }
+
+  // ----------------------------------------------------
+  // RENDER: Active Checkout Flow (Steps 1 & 2)
+  // ----------------------------------------------------
+  const summary = checkoutData?.summary;
+  const subtotal = summary?.subtotal ?? 0;
+  const deliveryFee = summary?.deliveryFee ?? 0;
+  const gstAmount = summary?.gstAmount ?? 0;
+  const gstPercentage = summary?.gstPercentage;
+  const codFee = summary?.codFee ?? 0;
+  const extraFeeAmount = summary?.extraFeeAmount ?? 0;
+  const extraFeeName = summary?.extraFeeName;
+  const grandTotal = summary?.grandTotal ?? 0;
+  const totalItemsCount = summary?.itemCount ?? cartItems?.reduce((acc, i) => acc + i.quantity, 0) ?? 0;
+
+  const displayedItems = isItemsExpanded ? (cartItems || []) : (cartItems || []).slice(0, 2);
+  const hiddenItemsCount = Math.max(0, (cartItems || []).length - 2);
+
+  const selectedAddr = savedAddresses.find((a) => a.id === selectedAddressId);
+
+  return (
+    <div className={styles.pageBg}>
+      <main className={styles.container}>
+        {/* Header Row */}
+        <div className={styles.headerRow}>
+          <div className={styles.checkoutHeader}>
+            <h1 className={styles.title}>
+              <Link href="/cart" className={styles.titleIcon} title="Back to Cart">
+                <ChevronLeft size={24} />
+              </Link>
+              Secure Checkout
+            </h1>
+          </div>
+
+          {/* Stepper Indicator */}
+          <div className={styles.stepperContainer}>
+            <div
+              className={`${styles.stepItem} ${currentStep === 1 ? styles.active : ''}`}
+              onClick={() => setCurrentStep(1)}
+              style={{ cursor: 'pointer' }}
+            >
+              <div className={styles.stepIcon}>1</div>
+              <span>Shipping & Delivery</span>
+            </div>
+            <div className={styles.stepDivider} />
+            <div
+              className={`${styles.stepItem} ${currentStep === 2 ? styles.active : ''}`}
+              onClick={() => {
+                if (validateStep1()) setCurrentStep(2);
+              }}
+              style={{ cursor: validateStep1() ? 'pointer' : 'not-allowed' }}
+            >
+              <div className={currentStep === 2 ? styles.stepIcon : styles.stepIconOutline}>2</div>
+              <span>Payment & Review</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Global Error Banner */}
+        {orderError && (
+          <div
+            style={{
+              background: '#FEE2E2',
+              border: '1px solid #F87171',
+              color: '#B91C1C',
+              padding: '12px 16px',
+              borderRadius: '8px',
+              marginBottom: '1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontSize: '14px',
+            }}
+          >
+            <AlertCircle size={18} />
+            <span>{orderError}</span>
+          </div>
+        )}
+
+        <div className={styles.checkoutLayout}>
+          {/* Left Column: Multi-Step Forms */}
+          <div className={styles.formSection}>
+            <div className={styles.mainCard}>
+              {/* Header Box */}
+              <div className={styles.mainCardHeader}>
+                <div className={styles.mainCardHeaderInner}>
+                  <div className={styles.mainCardIcon}>
+                    {currentStep === 1 ? <MapPin size={22} color="#ea580c" /> : <CreditCard size={22} color="#ea580c" />}
+                  </div>
+                  <div>
+                    <h2 className={styles.mainCardTitle}>
+                      {currentStep === 1 ? '1. Shipping Address' : '2. Payment Method'}
+                    </h2>
+                    <p className={styles.mainCardSubtitle}>
+                      {currentStep === 1
+                        ? 'Select or add your delivery address'
+                        : 'Choose your preferred payment method'}
+                    </p>
+                  </div>
+                </div>
+
+                {currentStep === 2 && (
+                  <button
+                    type="button"
+                    className={styles.editChangeBtn}
+                    onClick={() => setCurrentStep(1)}
+                  >
+                    <Edit3 size={14} /> Change Address
+                  </button>
+                )}
+              </div>
+
+              {/* STEP 1: SHIPPING & ADDRESS */}
+              {currentStep === 1 && (
+                <div className={styles.stepBodyAlt}>
+                  {savedAddresses.length > 0 && !isAddingNewAddress ? (
+                    <div className={styles.savedAddressContainer}>
+                      <div
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+                          gap: '12px',
+                          marginBottom: '1.5rem',
+                        }}
+                      >
+                        {savedAddresses.map((addr) => {
+                          const isSelected = addr.id === selectedAddressId;
+                          return (
+                            <div
+                              key={addr.id}
+                              onClick={() => setSelectedAddressId(addr.id)}
+                              style={{
+                                border: isSelected ? '2px solid #F99205' : '1px solid #E5E7EB',
+                                backgroundColor: isSelected ? '#FFF8ED' : '#FAFAFA',
+                                borderRadius: '12px',
+                                padding: '14px',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                position: 'relative',
+                              }}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                <span
+                                  style={{
+                                    fontSize: '11px',
+                                    fontWeight: 700,
+                                    textTransform: 'uppercase',
+                                    color: '#F99205',
+                                    background: '#FEEAD2',
+                                    padding: '2px 8px',
+                                    borderRadius: '4px',
+                                  }}
+                                >
+                                  {addr.type || 'HOME'}
+                                </span>
+                                {addr.isDefault && (
+                                  <span style={{ fontSize: '11px', color: '#10B981', fontWeight: 600 }}>Default</span>
+                                )}
+                              </div>
+                              <div style={{ fontWeight: 600, fontSize: '14px', color: '#1F2937', marginBottom: '4px' }}>
+                                {addr.fullName || user?.name || 'Customer'}
+                              </div>
+                              <div style={{ fontSize: '13px', color: '#4B5563', lineHeight: 1.4, marginBottom: '6px' }}>
+                                {addr.houseFlat || addr.houseNumber ? `${addr.houseFlat || addr.houseNumber}, ` : ''}
+                                {addr.buildingStreet || addr.street || ''}
+                                <br />
+                                {addr.city}, {addr.state} - <strong>{addr.pincode}</strong>
+                              </div>
+                              <div style={{ fontSize: '12px', color: '#6B7280' }}>
+                                📞 {addr.phone || user?.phone || 'Phone on file'}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Address Serviceability Validation Feedback */}
+                      {isValidatingAddress && (
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            fontSize: '13px',
+                            color: '#6B7280',
+                            padding: '10px 14px',
+                            background: '#F3F4F6',
+                            borderRadius: '8px',
+                            marginBottom: '1rem',
+                          }}
+                        >
+                          <Loader2 size={16} className="animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
+                          <span>Validating delivery serviceability for pincode {selectedAddr?.pincode}...</span>
+                        </div>
+                      )}
+
+                      {!isValidatingAddress && addressValidation && addressValidation.serviceable && (
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            fontSize: '13px',
+                            color: '#065F46',
+                            padding: '10px 14px',
+                            background: '#D1FAE5',
+                            border: '1px solid #A7F3D0',
+                            borderRadius: '8px',
+                            marginBottom: '1rem',
+                          }}
+                        >
+                          <Check size={16} color="#10B981" />
+                          <span>
+                            <strong>Pincode {selectedAddr?.pincode} is serviceable!</strong> Estimated delivery:{' '}
+                            {addressValidation.estimatedDays || '2-4 business days'}.
+                          </span>
+                        </div>
+                      )}
+
+                      {!isValidatingAddress && addressValidationError && (
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            fontSize: '13px',
+                            color: '#B91C1C',
+                            padding: '10px 14px',
+                            background: '#FEE2E2',
+                            border: '1px solid #FCA5A5',
+                            borderRadius: '8px',
+                            marginBottom: '1rem',
+                          }}
+                        >
+                          <AlertTriangle size={16} />
+                          <span>{addressValidationError}</span>
+                        </div>
+                      )}
+
+                      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+                        <button
+                          type="button"
+                          className={styles.addNewAddressBtn}
+                          onClick={() => setIsAddingNewAddress(true)}
+                        >
+                          <Plus size={16} /> Add New Address
+                        </button>
+
+                        <button
+                          type="button"
+                          className={styles.nextStepBtnAlt}
+                          onClick={handleProceedToPayment}
+                          disabled={Boolean(isValidatingAddress || addressValidationError || (addressValidation && !addressValidation.serviceable))}
+                          style={
+                            Boolean(isValidatingAddress || addressValidationError || (addressValidation && !addressValidation.serviceable))
+                              ? { opacity: 0.6, cursor: 'not-allowed' }
+                              : undefined
+                          }
+                        >
+                          Proceed to Payment <ChevronRight size={18} />
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Add New Address Form */
+                    <form onSubmit={handleSaveNewAddress}>
+                      <div className={styles.formSectionAlt}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                          <h3 className={styles.sectionTitleAlt}>
+                            <User size={18} strokeWidth={1.5} /> Contact & Delivery Information
+                          </h3>
+                          {savedAddresses.length > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => setIsAddingNewAddress(false)}
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                color: '#F99205',
+                                fontWeight: 600,
+                                fontSize: '13px',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              ← Back to Saved Addresses
+                            </button>
+                          )}
+                        </div>
+
+                        <div className={styles.formGrid}>
+                          <div className={styles.inputGroup}>
+                            <label className={styles.label}>Full Name</label>
+                            <div className={styles.inputWrapper}>
+                              <input
+                                type="text"
+                                required
+                                className={styles.input}
+                                placeholder="e.g. Sahil Hode"
+                                value={fullName}
+                                onChange={(e) => setFullName(e.target.value)}
+                              />
+                            </div>
+                          </div>
+
+                          <div className={styles.inputGroup}>
+                            <label className={styles.labelAlt}>Phone Number</label>
+                            <div className={`${styles.inputWrapper} ${styles.phoneInputWrapper}`}>
+                              <div className={styles.phonePrefixAlt}>
+                                <span>🇮🇳</span>
+                                <span>+91</span>
+                              </div>
+                              <div className={styles.verticalDividerAlt}></div>
+                              <input
+                                type="tel"
+                                required
+                                className={styles.inputAlt}
+                                placeholder="10-digit mobile number"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div style={{ marginTop: '1.5rem' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                            <h4 style={{ fontSize: '14px', fontWeight: 600, color: '#374151' }}>Address Details</h4>
+                            <UseLocationButton
+                              onLocationDetected={(addr: DetectedAddress) => {
+                                if (addr.pincode) setZipCode(addr.pincode);
+                                if (addr.city) setCity(addr.city);
+                                if (addr.state) setStateName(addr.state);
+                                if (addr.street) setBuildingStreet(addr.street);
+                                if (addr.houseFlat) setHouseFlat(addr.houseFlat);
+                              }}
+                            />
+                          </div>
+
+                          <div className={styles.formGrid}>
+                            <div className={styles.inputGroup}>
+                              <label className={styles.label}>Flat / House No.</label>
+                              <div className={styles.inputWrapper}>
+                                <input
+                                  type="text"
+                                  className={styles.input}
+                                  placeholder="e.g. Flat 402, Building A"
+                                  value={houseFlat}
+                                  onChange={(e) => setHouseFlat(e.target.value)}
+                                />
+                              </div>
+                            </div>
+
+                            <div className={styles.inputGroup}>
+                              <label className={styles.label}>Building / Society / Street *</label>
+                              <div className={styles.inputWrapper}>
+                                <input
+                                  type="text"
+                                  required
+                                  className={styles.input}
+                                  placeholder="e.g. Sunshine Residency, MG Road"
+                                  value={buildingStreet}
+                                  onChange={(e) => setBuildingStreet(e.target.value)}
+                                />
+                              </div>
+                            </div>
+
+                            <div className={styles.inputGroup}>
+                              <label className={styles.label}>Landmark (Optional)</label>
+                              <div className={styles.inputWrapper}>
+                                <input
+                                  type="text"
+                                  className={styles.input}
+                                  placeholder="e.g. Opposite Metro Station"
+                                  value={landmark}
+                                  onChange={(e) => setLandmark(e.target.value)}
+                                />
+                              </div>
+                            </div>
+
+                            <div className={styles.inputGroup}>
+                              <label className={styles.label}>City *</label>
+                              <div className={styles.inputWrapper}>
+                                <input
+                                  type="text"
+                                  required
+                                  className={styles.input}
+                                  placeholder="e.g. Mumbai"
+                                  value={city}
+                                  onChange={(e) => setCity(e.target.value)}
+                                />
+                              </div>
+                            </div>
+
+                            <div className={styles.inputGroup}>
+                              <label className={styles.label}>State *</label>
+                              <div className={styles.inputWrapper}>
+                                <input
+                                  type="text"
+                                  required
+                                  className={styles.input}
+                                  placeholder="e.g. Maharashtra"
+                                  value={stateName}
+                                  onChange={(e) => setStateName(e.target.value)}
+                                />
+                              </div>
+                            </div>
+
+                            <div className={styles.inputGroup}>
+                              <label className={styles.label}>Pincode *</label>
+                              <div className={styles.inputWrapper}>
+                                <input
+                                  type="text"
+                                  required
+                                  maxLength={6}
+                                  className={styles.input}
+                                  placeholder="6-digit pincode"
+                                  value={zipCode}
+                                  onChange={(e) => setZipCode(e.target.value)}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {addressValidationError && (
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              fontSize: '13px',
+                              color: '#B91C1C',
+                              padding: '10px 14px',
+                              background: '#FEE2E2',
+                              border: '1px solid #FCA5A5',
+                              borderRadius: '8px',
+                              marginTop: '1rem',
+                            }}
+                          >
+                            <AlertTriangle size={16} />
+                            <span>{addressValidationError}</span>
+                          </div>
+                        )}
+
+                        <div style={{ marginTop: '1.5rem', display: 'flex', gap: '12px' }}>
+                          <button
+                            type="submit"
+                            className={styles.nextStepBtnAlt}
+                            disabled={isSavingNewAddress}
+                          >
+                            {isSavingNewAddress ? (
+                              <>
+                                <Loader2 size={16} className="animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
+                                Saving Address...
+                              </>
+                            ) : (
+                              <>Save & Continue to Payment <ChevronRight size={18} /></>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  )}
+                </div>
+              )}
+
+              {/* STEP 2: PAYMENT METHOD SELECTION */}
+              {currentStep === 2 && (
+                <div className={styles.stepBodyAlt}>
+                  <div style={{ marginBottom: '1.5rem', padding: '12px 16px', background: '#F9FAFB', borderRadius: '8px', border: '1px solid #E5E7EB' }}>
+                    <div style={{ fontSize: '13px', color: '#6B7280', marginBottom: '2px' }}>Delivering to:</div>
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: '#1F2937' }}>
+                      {selectedAddr?.houseFlat || selectedAddr?.houseNumber ? `${selectedAddr?.houseFlat || selectedAddr?.houseNumber}, ` : ''}{selectedAddr?.buildingStreet || selectedAddr?.street}, {selectedAddr?.city} ({selectedAddr?.pincode})
+                    </div>
+                  </div>
+
+                  <h3 className={styles.sectionTitleAlt} style={{ marginBottom: '1rem' }}>
+                    <CreditCard size={18} strokeWidth={1.5} /> Eligible Payment Methods
+                  </h3>
+
+                  {isLoadingPaymentMethods && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '16px', color: '#666' }}>
+                      <Loader2 size={18} className="animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
+                      <span>Checking eligible payment methods for your order amount and pincode...</span>
+                    </div>
+                  )}
+
+                  {!isLoadingPaymentMethods && paymentMethods.length === 0 && (
+                    <div className={styles.paymentOptionsGrid}>
+                      {/* Fallback standard methods if list is empty */}
+                      <div
+                        className={`${styles.paymentOptionCard} ${selectedPaymentMethod === 'COD' ? styles.selected : ''}`}
+                        onClick={() => setSelectedPaymentMethod('COD')}
+                      >
+                        <div className={styles.paymentOptionHeader}>
+                          <div className={styles.paymentOptionIcon}>
+                            <Truck size={20} color="#ea580c" />
+                          </div>
+                          <div className={styles.paymentOptionDetails}>
+                            <p className={styles.paymentOptionTitle}>Cash on Delivery (COD)</p>
+                            <p className={styles.paymentOptionSubtitle}>Pay with cash when your package arrives</p>
+                          </div>
+                          <div className={styles.paymentRadioCircle}>
+                            <div className={styles.paymentRadioDot} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {!isLoadingPaymentMethods && paymentMethods.length > 0 && (
+                    <div className={styles.paymentOptionsGrid}>
+                      {paymentMethods.map((method) => {
+                        const isSelected = selectedPaymentMethod === method.type;
+                        const isAvailable = method.available;
+
+                        const getMethodIcon = () => {
+                          switch (method.type) {
+                            case 'UPI':
+                              return <Smartphone size={20} color="#ea580c" />;
+                            case 'CARD':
+                              return <CreditCard size={20} color="#ea580c" />;
+                            case 'WALLET':
+                              return <Wallet size={20} color="#ea580c" />;
+                            case 'NETBANKING':
+                              return <Building2 size={20} color="#ea580c" />;
+                            case 'COD':
+                            default:
+                              return <Truck size={20} color="#ea580c" />;
+                          }
+                        };
+
+                        return (
+                          <div
+                            key={method.type}
+                            className={`${styles.paymentOptionCard} ${isSelected ? styles.selected : ''}`}
+                            onClick={() => {
+                              if (isAvailable) setSelectedPaymentMethod(method.type);
+                            }}
+                            style={!isAvailable ? { opacity: 0.5, cursor: 'not-allowed', background: '#F3F4F6' } : undefined}
+                          >
+                            <div className={styles.paymentOptionHeader}>
+                              <div className={styles.paymentOptionIcon}>{getMethodIcon()}</div>
+                              <div className={styles.paymentOptionDetails}>
+                                <p className={styles.paymentOptionTitle}>
+                                  {method.name || method.type}
+                                  {method.extraFee ? (
+                                    <span style={{ fontSize: '12px', color: '#ea580c', marginLeft: 6 }}>
+                                      (+₹{method.extraFee} fee)
+                                    </span>
+                                  ) : null}
+                                </p>
+                                <p className={styles.paymentOptionSubtitle}>
+                                  {isAvailable
+                                    ? method.type === 'COD'
+                                      ? 'Pay upon package arrival'
+                                      : 'Fast & encrypted online payment'
+                                    : method.reason || 'Not available for this order'}
+                                </p>
+                              </div>
+                              <div className={styles.paymentRadioCircle}>
+                                {isSelected && <div className={styles.paymentRadioDot} />}
+                              </div>
+                            </div>
+
+                            {/* Additional field for UPI */}
+                            {isSelected && method.type === 'UPI' && (
+                              <div className={styles.paymentOptionBody}>
+                                <input
+                                  type="text"
+                                  className={styles.dummyInput}
+                                  placeholder="Enter your UPI ID (e.g. mobile@upi)"
+                                  value={upiId}
+                                  onChange={(e) => setUpiId(e.target.value)}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Delivery Notes / Instructions */}
+                  <div style={{ marginTop: '1.5rem' }}>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
+                      Delivery Instructions (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      className={styles.input}
+                      placeholder="e.g. Please deliver after 5 PM / Leave at security gate"
+                      value={deliveryInstructions}
+                      onChange={(e) => setDeliveryInstructions(e.target.value)}
+                      maxLength={300}
+                    />
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div style={{ marginTop: '2rem' }}>
+                    <AnimatedOrderButton
+                      onValidate={validatePlaceOrderForm}
+                      onTriggerOrder={handleTriggerOrder}
+                      onComplete={handleAnimatedComplete}
+                      isSubmitting={isSubmittingOrder}
+                      disabled={isSubmittingOrder || !selectedPaymentMethod}
+                      label={selectedPaymentMethod === 'COD' ? 'Place Order (COD)' : 'Proceed with Order'}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Right Column: Floating Order Summary */}
+          <div className={styles.summaryColumn}>
+            <div className={styles.floatingSummaryCard}>
+              <h2
+                className={styles.summaryTitleAlt}
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+              >
+                Order Summary
+                <span style={{ fontSize: '0.85rem', color: '#666', fontWeight: 500 }}>
+                  ({totalItemsCount} {totalItemsCount === 1 ? 'item' : 'items'})
+                </span>
+              </h2>
+
+              {/* Items List */}
+              <div className={styles.checkoutStaticList}>
+                {displayedItems.map((item) => {
+                  const itemPrice = item.variant ? (item.variant.discountPrice ?? item.variant.price) : (item.product?.discountPrice ?? item.product?.price ?? 0);
+                  const itemImage = item.product?.imageUrl || '/hero-products/pet_bowl.png';
+                  const itemName = item.product?.name || 'Pet Product';
+                  const variantName = item.variant?.name;
+
+                  return (
+                    <div key={item.id} className={styles.staticProductCard}>
+                      <div className={styles.staticProductImage}>
+                        <Image
+                          src={itemImage}
+                          alt={itemName}
+                          fill
+                          style={{ objectFit: 'contain' }}
+                          sizes="(max-width: 768px) 60px, 80px"
+                        />
+                      </div>
+                      <div className={styles.staticProductInfo}>
+                        <div className={styles.staticProductTop}>
+                          <h3 className={styles.staticProductName}>{itemName}</h3>
+                          <div className={styles.staticProductPrice}>
+                            ₹{(itemPrice * item.quantity).toLocaleString()}
+                          </div>
+                        </div>
+                        {variantName && (
+                          <div style={{ fontSize: '12px', color: '#6B7280', marginTop: '2px' }}>
+                            Variant: {variantName}
+                          </div>
+                        )}
+                        <div className={styles.staticProductQty}>Qty: {item.quantity}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {hiddenItemsCount > 0 && (
+                <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                  <button
+                    type="button"
+                    onClick={() => setIsItemsExpanded(!isItemsExpanded)}
+                    className={styles.expandItemsBtn}
+                  >
+                    {isItemsExpanded ? 'Show less ↑' : `+ ${hiddenItemsCount} more items ↓`}
+                  </button>
+                </div>
+              )}
+
+              {/* Price Details Dropdown Toggle */}
+              <div
+                className={styles.priceDetailsToggle}
+                onClick={() => setIsPriceDetailsOpen(!isPriceDetailsOpen)}
+                style={{ cursor: 'pointer' }}
+              >
+                <span>Price Details</span>
+                <ChevronDown
+                  size={16}
+                  color="#888"
+                  style={{
+                    transform: isPriceDetailsOpen ? 'rotate(180deg)' : 'none',
+                    transition: 'transform 0.2s',
+                  }}
+                />
+              </div>
+
+              {isPriceDetailsOpen && (
+                <div className={styles.priceDetailsDropdown}>
+                  <div className={styles.summaryRowAlt}>
+                    <span>Subtotal</span>
+                    <span className={styles.summaryValueAlt}>₹{subtotal.toLocaleString()}</span>
+                  </div>
+                  {gstAmount > 0 && (
+                    <div className={styles.summaryRowAlt}>
+                      <span>Tax / GST {gstPercentage ? `(${gstPercentage}%)` : ''}</span>
+                      <span className={styles.summaryValueAlt}>₹{gstAmount.toLocaleString()}</span>
+                    </div>
+                  )}
+                  <div className={styles.summaryRowAlt}>
+                    <span>Shipping & Delivery</span>
+                    <span className={styles.shippingValueAlt}>
+                      {deliveryFee === 0 ? 'FREE' : `₹${deliveryFee.toLocaleString()}`}
+                    </span>
+                  </div>
+                  {codFee > 0 && selectedPaymentMethod === 'COD' && (
+                    <div className={styles.summaryRowAlt}>
+                      <span>COD Fee</span>
+                      <span className={styles.summaryValueAlt}>₹{codFee.toLocaleString()}</span>
+                    </div>
+                  )}
+                  {extraFeeAmount > 0 && (
+                    <div className={styles.summaryRowAlt}>
+                      <span>{extraFeeName || 'Handling Fee'}</span>
+                      <span className={styles.summaryValueAlt}>₹{extraFeeAmount.toLocaleString()}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Promo Code Section */}
+              <div className={styles.promoContainerAlt}>
+                <div
+                  className={styles.promoHeaderAlt}
+                  onClick={() => setIsPromoOpen(!isPromoOpen)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+                      <line x1="7" y1="7" x2="7.01" y2="7" />
+                    </svg>
+                    Have a coupon code?
+                  </div>
+                  <ChevronDown
+                    size={16}
+                    color="#888"
+                    style={{
+                      transform: isPromoOpen ? 'rotate(180deg)' : 'none',
+                      transition: 'transform 0.2s',
+                    }}
+                  />
+                </div>
+                {isPromoOpen && (
+                  <div className={styles.promoInputWrapperAlt}>
+                    <input type="text" className={styles.promoInputAlt} placeholder="Enter coupon code" />
+                    <button type="button" className={styles.promoBtnAlt}>
+                      Apply
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Grand Total Row */}
+              <div className={styles.totalRowAlt}>
+                <span className={styles.totalLabelAlt}>
+                  Grand Total <span style={{ fontSize: '0.75rem', fontWeight: 'normal', color: '#888' }}>(incl. taxes)</span>
+                </span>
+                <span>₹{grandTotal.toLocaleString()}</span>
+              </div>
+
+              <div className={styles.sslFooter}>
+                <Lock size={12} /> Secure 256-bit SSL Checkout
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
       {/* Phone OTP Verification Modal */}
       {isPhoneModalOpen && (
         <div className={styles.modalBackdrop} onClick={() => !isVerifyingPhoneOtp && setIsPhoneModalOpen(false)}>
@@ -445,535 +1535,42 @@ export default function CheckoutPage() {
             </div>
 
             <form onSubmit={handleVerifyCheckoutPhoneOtp} className={styles.modalForm}>
-              <p style={{ fontSize: 13, color: "#6E6259", margin: "0 0 12px 0" }}>
+              <p style={{ fontSize: 13, color: '#6E6259', margin: '0 0 12px 0' }}>
                 We sent a 6-digit OTP code to <strong>{phone}</strong>.
               </p>
 
+              <div className={styles.inputGroup} style={{ marginBottom: 12 }}>
+                <label className={styles.label}>6-Digit OTP</label>
+                <input
+                  type="text"
+                  maxLength={6}
+                  className={styles.input}
+                  placeholder="Enter 6-digit code"
+                  value={phoneOtp}
+                  onChange={(e) => setPhoneOtp(e.target.value.replace(/\D/g, ''))}
+                  disabled={isVerifyingPhoneOtp}
+                  required
+                />
+              </div>
+
               {phoneOtpError && (
-                <div style={{ background: "#FEE2E2", color: "#DC2626", padding: "10px 14px", borderRadius: 10, fontSize: 13, marginBottom: 12 }}>
+                <div style={{ color: '#EF4444', fontSize: 12, marginBottom: 12 }}>
                   {phoneOtpError}
                 </div>
               )}
 
-              <div className={styles.inputGroup}>
-                <label className={styles.labelAlt}>Enter 6-Digit OTP</label>
-                <input
-                  type="text"
-                  required
-                  maxLength={6}
-                  className={styles.inputAlt}
-                  placeholder="123456"
-                  value={phoneOtp}
-                  onChange={(e) => setPhoneOtp(e.target.value.replace(/\D/g, ""))}
-                  disabled={isVerifyingPhoneOtp || isSendingPhoneOtp}
-                  style={{ textAlign: "center", letterSpacing: "4px", fontSize: 18, fontWeight: 700 }}
-                />
-              </div>
-
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 20 }}>
-                <button
-                  type="button"
-                  className={styles.editChangeBtn}
-                  onClick={handleSendCheckoutPhoneOtp}
-                  disabled={isSendingPhoneOtp || isVerifyingPhoneOtp}
-                >
-                  {isSendingPhoneOtp ? "Resending..." : "Resend OTP"}
-                </button>
-                <button
-                  type="submit"
-                  className={styles.saveAddressSubmitBtn}
-                  disabled={isVerifyingPhoneOtp || phoneOtp.length !== 6}
-                >
-                  {isVerifyingPhoneOtp ? "Verifying..." : "Verify & Continue"}
-                </button>
-              </div>
+              <button
+                type="submit"
+                className={styles.nextStepBtnAlt}
+                style={{ width: '100%' }}
+                disabled={isVerifyingPhoneOtp || phoneOtp.trim().length !== 6}
+              >
+                {isVerifyingPhoneOtp ? 'Verifying OTP...' : 'Verify & Confirm'}
+              </button>
             </form>
           </div>
         </div>
       )}
-
-      </main>
-    );
-  }
-
-  return (
-    <div className={styles.pageBg}>
-      <main className={styles.container}>
-        
-        <div className={styles.headerRow}>
-          <div className={styles.checkoutHeader}>
-            <Link href="/cart" className={styles.titleIcon}>
-              <ArrowLeft size={28} />
-            </Link>
-            <h1 className={styles.title}>Checkout</h1>
-          </div>
-
-          <div className={styles.stepperContainer}>
-            <div 
-              className={`${styles.stepItem} ${currentStep >= 1 ? styles.active : ''}`}
-              onClick={() => setCurrentStep(1)}
-              style={{ cursor: 'pointer' }}
-            >
-              <span className={currentStep >= 1 ? styles.stepIcon : styles.stepIconOutline}>1</span> Shipping
-            </div>
-            <div className={styles.stepDivider}></div>
-            <div className={`${styles.stepItem} ${currentStep >= 2 ? styles.active : ''}`}>
-              <span className={currentStep >= 2 ? styles.stepIcon : styles.stepIconOutline}>2</span> Payment
-            </div>
-            <div className={styles.stepDivider}></div>
-            <div className={`${styles.stepItem} ${currentStep >= 3 ? styles.active : ''}`}>
-              <span className={currentStep >= 3 ? styles.stepIcon : styles.stepIconOutline}>3</span> Review
-            </div>
-          </div>
-        </div>
-        
-        <form className={styles.checkoutLayout}>
-          {/* Left Column: Forms */}
-          <div className={styles.formsColumn}>
-            
-            <div className={styles.mainCard}>
-              
-              {!isPhoneVerified && (
-                <div style={{ background: "#FFF9F0", border: "1px solid #F28C0F", borderRadius: 16, padding: "16px 20px", marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    <AlertCircle size={22} color="#F28C0F" />
-                    <div>
-                      <strong style={{ fontSize: 14, color: "#2D261E", display: "block" }}>Phone Number Unverified</strong>
-                      <span style={{ fontSize: 12, color: "#6E6259" }}>Verify your phone number via OTP to receive live tracking SMS & delivery updates.</span>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    style={{ background: "#F28C0F", color: "#FFFFFF", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 12, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}
-                    onClick={handleSendCheckoutPhoneOtp}
-                  >
-                    Verify Phone OTP
-                  </button>
-                </div>
-              )}
-
-              {currentStep === 1 && (
-              <div className={styles.mainCardHeader}>
-                <div className={styles.mainCardHeaderInner}>
-                  <div>
-                    <h2 className={styles.mainCardTitle}>Delivery Address</h2>
-                    <p className={styles.mainCardSubtitle}>Your order will be delivered to this address</p>
-                  </div>
-                  {currentStep === 1 && hasSavedAddress && (
-                    <button type="button" className={styles.editChangeBtn} onClick={() => setHasSavedAddress(false)}>
-                      <Edit3 size={14} /> Edit / Change
-                    </button>
-                  )}
-                </div>
-              </div>
-              )}
-
-              {/* Step 1: Address Container */}
-              <div className={styles.stepContainerAlt}>
-                {currentStep === 3 && (
-                <div className={styles.collapsedSummary}>
-                  <div className={styles.summaryName}>
-                    {firstName || 'Customer'}
-                  </div>
-                  <div className={styles.summaryAddress}>
-                    {[flat, street, city, zipCode].filter(Boolean).join(', ') || 'Address not filled'}
-                  </div>
-                  <div className={styles.summaryPhone}>{phone}</div>
-                </div>
-              )}
-              
-                {currentStep === 1 && (
-                  <div className={styles.stepBodyAlt}>
-                    
-                    {hasSavedAddress && savedAddresses.length > 0 ? (
-                      <div className={styles.savedAddressContainer}>
-                        {savedAddresses.length > 1 && (
-                          <div style={{ display: 'flex', gap: '8px', marginBottom: '14px', overflowX: 'auto', paddingBottom: '4px' }}>
-                            {savedAddresses.map((addr: any, idx: number) => (
-                              <button
-                                key={addr.id || idx}
-                                type="button"
-                                onClick={() => setSelectedAddressIndex(idx)}
-                                style={{
-                                  padding: '8px 14px',
-                                  borderRadius: '8px',
-                                  border: selectedAddressIndex === idx ? '2px solid #f97316' : '1px solid #EFE7DA',
-                                  background: selectedAddressIndex === idx ? '#FFF4E6' : '#FFFFFF',
-                                  color: selectedAddressIndex === idx ? '#f97316' : '#1E1B18',
-                                  fontWeight: selectedAddressIndex === idx ? 700 : 500,
-                                  fontSize: '0.85rem',
-                                  cursor: 'pointer',
-                                  whiteSpace: 'nowrap'
-                                }}
-                              >
-                                {addr.type || addr.label || `Address ${idx + 1}`} {selectedAddressIndex === idx && '✓'}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                        <div className={styles.savedAddressBlock}>
-                          <div className={styles.savedAddressTop}>
-                            <div className={styles.homeIconWrapper}><Home size={24} color="#f97316" /></div>
-                            <div className={styles.savedAddressDetails}>
-                              <div className={styles.savedAddressName}>
-                                {(savedAddresses[selectedAddressIndex] || savedAddresses[0]).name || firstName || 'KickAt Customer'} <span className={styles.homeTag}>{(savedAddresses[selectedAddressIndex] || savedAddresses[0]).type || 'Home'}</span>
-                              </div>
-                              <div className={styles.savedAddressText}>
-                                {(savedAddresses[selectedAddressIndex] || savedAddresses[0]).houseFlat ? `${(savedAddresses[selectedAddressIndex] || savedAddresses[0]).houseFlat}, ` : ''}
-                                {(savedAddresses[selectedAddressIndex] || savedAddresses[0]).buildingStreet || (savedAddresses[selectedAddressIndex] || savedAddresses[0]).addressLine}<br/>
-                                {(savedAddresses[selectedAddressIndex] || savedAddresses[0]).city}, {(savedAddresses[selectedAddressIndex] || savedAddresses[0]).state} - {(savedAddresses[selectedAddressIndex] || savedAddresses[0]).pincode || (savedAddresses[selectedAddressIndex] || savedAddresses[0]).pin}
-                              </div>
-                              {(savedAddresses[selectedAddressIndex] || savedAddresses[0]).phone && <div className={styles.savedAddressPhone}>{(savedAddresses[selectedAddressIndex] || savedAddresses[0]).phone}</div>}
-                            </div>
-                          </div>
-                          <div className={styles.savedAddressDivider}></div>
-                          <div className={styles.savedAddressFeatures}>
-                            <div className={styles.featureItem}>
-                              <div className={styles.featureIconGreen}><Check size={16} strokeWidth={3} color="#10b981" /></div>
-                              <div><strong>Delivery here</strong><br/><span>Usually in 24-48 hrs</span></div>
-                            </div>
-                            <div className={styles.featureItem}>
-                              <div className={styles.featureIcon}><MapPin size={16} /></div>
-                              <div><strong>Near you</strong><br/><span>{(savedAddresses[selectedAddressIndex] || savedAddresses[0]).city || 'India'}</span></div>
-                            </div>
-                            <div className={styles.featureItem}>
-                              <div className={styles.featureIcon}><Shield size={16} /></div>
-                              <div><strong>Safe & Secure</strong><br/><span>100% Secure Delivery</span></div>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <button type="button" className={styles.addNewAddressBtn} onClick={() => setHasSavedAddress(false)}>
-                          <Plus size={16} /> Add New Address
-                        </button>
-                        
-                        <button 
-                          type="button" 
-                          className={styles.nextStepBtnAlt} 
-                          onClick={() => {
-                            const chosen = savedAddresses[selectedAddressIndex] || (savedAddresses[selectedAddressIndex] || savedAddresses[0]);
-                            if (chosen) {
-                              if (chosen.houseFlat) setFlat(chosen.houseFlat);
-                              if (chosen.buildingStreet || chosen.addressLine) setStreet(chosen.buildingStreet || chosen.addressLine);
-                              if (chosen.city) setCity(chosen.city);
-                              if (chosen.state) setStateName(chosen.state);
-                              if (chosen.pincode || chosen.pin) setZipCode(chosen.pincode || chosen.pin);
-                            }
-                            setCurrentStep(2);
-                          }} 
-                          style={{ marginTop: '1.5rem' }}
-                        >
-                          Proceed to Payment <ChevronRight size={18} />
-                        </button>
-                      </div>
-                    ) : (
-                      <>
-                        {/* Contact Info */}
-                        <div className={styles.formSectionAlt}>
-                          <h3 className={styles.sectionTitleAlt}><User size={18} strokeWidth={1.5} /> Contact Information</h3>
-                      <div className={styles.formGrid}>
-                      <div className={styles.inputGroup}>
-                        <label className={styles.label}>First Name</label>
-                        <div className={styles.inputWrapper}>
-                          <input type="text" required className={styles.input} placeholder="e.g. Eduard" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
-                        </div>
-                      </div>
-                      <div className={styles.inputGroup}>
-                        <label className={styles.label}>Last Name</label>
-                        <div className={styles.inputWrapper}>
-                          <input type="text" required className={styles.input} placeholder="e.g. Franz" defaultValue="Franz" />
-                        </div>
-                      </div>
-                      <div className={styles.inputGroup}>
-                        <label className={styles.labelAlt}>Phone Number</label>
-                        <div className={`${styles.inputWrapper} ${styles.phoneInputWrapper}`}>
-                          <div className={styles.phonePrefixAlt}>
-                            <span>🇮🇳</span>
-                            <span>+91</span>
-                            <ChevronDown size={14} color="#888" />
-                          </div>
-                          <div className={styles.verticalDividerAlt}></div>
-                          <input type="tel" required className={`${styles.inputAlt} ${styles.inputWithPrefixAlt} ${isValidPhone ? styles.inputValid : ''} ${isInvalidPhone ? styles.inputInvalid : ''}`} placeholder="Enter 10-digit mobile number" value={phone} onChange={(e) => setPhone(e.target.value)} />
-                        </div>
-                      </div>
-                      <div className={styles.inputGroup}>
-                        <label className={styles.labelAlt}>Email Address</label>
-                        <div className={styles.inputWrapper}>
-                          <input type="email" required className={`${styles.inputAlt} ${isValidEmail ? styles.inputValid : ''}`} placeholder="e.g. email@domain.com" value={email} onChange={(e) => setEmail(e.target.value)} />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                    {/* Home Address */}
-                    <div className={styles.formSectionAlt} style={{ marginTop: '2rem' }}>
-                      <h3 className={styles.sectionTitleAlt}><MapPin size={18} strokeWidth={1.5} /> Shipping Address</h3>
-                      <UseLocationButton 
-                        onLocationDetected={(addr: DetectedAddress) => {
-                          if (addr.pincode) setZipCode(addr.pincode);
-                          if (addr.city) setCity(addr.city);
-                          if (addr.state) setStateName(addr.state);
-                          if (addr.street) setStreet(addr.street);
-                          if (addr.houseFlat) setFlat(addr.houseFlat);
-                        }}
-                      />
-                      <div className={styles.formGrid}>
-                      <div className={styles.inputGroup}>
-                        <label className={styles.label}>Flat, House no.</label>
-                        <div className={styles.inputWrapper}>
-                          <input type="text" required className={styles.input} placeholder="e.g. Flat 101" value={flat} onChange={(e) => setFlat(e.target.value)} />
-                        </div>
-                      </div>
-                      <div className={styles.inputGroup}>
-                        <label className={styles.labelAlt}>Building, Company</label>
-                        <div className={styles.inputWrapper}>
-                          <input type="text" className={styles.inputAlt} placeholder="e.g. Sunshine Apartments" />
-                        </div>
-                      </div>
-                      <div className={styles.inputGroup}>
-                        <label className={styles.label}>Street, Sector</label>
-                        <div className={styles.inputWrapper}>
-                          <input type="text" required className={styles.input} placeholder="Street Address" value={street} onChange={(e) => setStreet(e.target.value)} />
-                        </div>
-                      </div>
-                      <div className={styles.inputGroup}>
-                        <label className={styles.label}>City</label>
-                        <div className={styles.inputWrapper}>
-                          <input type="text" required className={styles.input} placeholder="Mumbai" value={city} onChange={handleCityChange} />
-                        </div>
-                      </div>
-                      <div className={styles.inputGroup}>
-                        <label className={styles.labelAlt}>State</label>
-                        <div className={styles.inputWrapper}>
-                          <input type="text" required className={styles.inputAlt} placeholder="Maharashtra" value={stateName} onChange={(e) => setStateName(e.target.value)} />
-                        </div>
-                      </div>
-                      <div className={styles.inputGroup}>
-                        <label className={styles.labelAlt}>PIN Code</label>
-                        <div className={styles.inputWrapper}>
-                          <input type="text" required className={`${styles.inputAlt} ${isValidZip ? styles.inputValid : ''}`} placeholder="400001" value={zipCode} onChange={(e) => setZipCode(e.target.value)} />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className={styles.saveAddressToggle}>
-                    <label className={styles.customCheckboxContainer}>
-                      <input type="checkbox" defaultChecked />
-                      <span className={styles.checkmark}></span>
-                      Save this address for future orders
-                    </label>
-                  </div>
-
-                  <button 
-                    type="button" 
-                    className={styles.nextStepBtnAlt}
-                    onClick={() => {
-                      if (validateStep1()) {
-                        setCurrentStep(2);
-                      } else {
-                        // Triggers HTML5 validation
-                        (document.querySelector('form') as HTMLFormElement)?.reportValidity();
-                      }
-                    }}
-                  >
-                    Proceed to Payment <ChevronRight size={18} />
-                  </button>
-                      </>
-                    )}
-                </div>
-              )}
-            </div>
-
-            {/* Step 2: Payment Container */}
-            {currentStep === 2 && (
-              <div className={styles.stepContainerAlt} style={{ marginTop: 0 }}>
-                <div className={`${styles.stepHeader} ${styles.activeStepHeader}`}>
-                  <div className={styles.stepHeaderTitle}>
-                    <span className={styles.stepNumberBadge}>2</span>
-                    Payment Method
-                  </div>
-                </div>
-                
-                <div className={styles.stepBodyAlt}>
-                  <div className={styles.paymentMethodsList}>
-                    
-                    {/* Card Option */}
-                    <div className={`${styles.paymentOptionCard} ${paymentMethod === 'card' ? styles.selected : ''}`}>
-                      <div className={styles.paymentOptionHeader} onClick={() => setPaymentMethod('card')}>
-                        <div className={styles.paymentOptionIcon}>
-                          <CreditCard size={20} />
-                        </div>
-                        <div className={styles.paymentOptionDetails}>
-                          <p className={styles.paymentOptionTitle}>Credit or Debit Card</p>
-                          <p className={styles.paymentOptionSubtitle}>Pay securely with your bank card</p>
-                        </div>
-                        <div className={styles.paymentRadioCircle}>
-                          <div className={styles.paymentRadioDot}></div>
-                        </div>
-                      </div>
-                      
-                      {paymentMethod === 'card' && (
-                        <div className={styles.paymentOptionBody}>
-                          <input type="text" className={styles.dummyInput} placeholder="Card Number (e.g. 4242 4242 4242 4242)" />
-                          <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                            <input type="text" className={styles.dummyInput} placeholder="MM/YY" style={{ marginTop: 0 }} />
-                            <input type="text" className={styles.dummyInput} placeholder="CVC" style={{ marginTop: 0 }} />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* UPI Option */}
-                    <div className={`${styles.paymentOptionCard} ${paymentMethod === 'upi' ? styles.selected : ''}`}>
-                      <div className={styles.paymentOptionHeader} onClick={() => setPaymentMethod('upi')}>
-                        <div className={styles.paymentOptionIcon}>
-                          <Smartphone size={20} />
-                        </div>
-                        <div className={styles.paymentOptionDetails}>
-                          <p className={styles.paymentOptionTitle}>UPI ID / QR</p>
-                          <p className={styles.paymentOptionSubtitle}>Google Pay, PhonePe, Paytm, etc.</p>
-                        </div>
-                        <div className={styles.paymentRadioCircle}>
-                          <div className={styles.paymentRadioDot}></div>
-                        </div>
-                      </div>
-                      
-                      {paymentMethod === 'upi' && (
-                        <div className={styles.paymentOptionBody}>
-                          <input type="text" className={styles.dummyInput} placeholder="Enter your UPI ID (e.g. name@okhdfcbank)" />
-                        </div>
-                      )}
-                    </div>
-
-                    {/* COD Option */}
-                    <div className={`${styles.paymentOptionCard} ${paymentMethod === 'cod' ? styles.selected : ''}`}>
-                      <div className={styles.paymentOptionHeader} onClick={() => setPaymentMethod('cod')}>
-                        <div className={styles.paymentOptionIcon}>
-                          <Truck size={20} />
-                        </div>
-                        <div className={styles.paymentOptionDetails}>
-                          <p className={styles.paymentOptionTitle}>Cash on Delivery</p>
-                          <p className={styles.paymentOptionSubtitle}>Pay with cash when your order arrives</p>
-                        </div>
-                        <div className={styles.paymentRadioCircle}>
-                          <div className={styles.paymentRadioDot}></div>
-                        </div>
-                      </div>
-                    </div>
-
-                  </div>
-                  
-                  <div style={{ marginTop: '2rem' }}>
-                    <AnimatedOrderButton 
-                      onValidate={validateForm} 
-                      onComplete={handleAnimatedComplete}
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            </div>
-            
-          </div>
-
-          {/* Right Column: Floating Order Summary */}
-          <div className={styles.summaryColumn}>
-            <div className={styles.floatingSummaryCard}>
-              <h2 className={styles.summaryTitleAlt} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                Order Summary
-                <span style={{ fontSize: '0.85rem', color: '#666', fontWeight: 500 }}>({totalItemsCount} items)</span>
-              </h2>
-              
-              <div className={styles.checkoutStaticList}>
-                {displayedItems.map((item) => (
-                  <div key={item.id} className={styles.staticProductCard}>
-                    <div className={styles.staticProductImage}>
-                      <Image src={item.image} alt={item.name} fill style={{ objectFit: 'contain' }} />
-                    </div>
-                    <div className={styles.staticProductInfo}>
-                      <div className={styles.staticProductTop}>
-                        <h3 className={styles.staticProductName}>{item.name}</h3>
-                        <div className={styles.staticProductPrice}>₹{(item.price * item.quantity).toLocaleString()}</div>
-                      </div>
-                      <div className={styles.staticProductQty}>Qty: {item.quantity}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {hiddenItemsCount > 0 && (
-                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                  <button 
-                    type="button"
-                    onClick={() => setIsItemsExpanded(!isItemsExpanded)}
-                    className={styles.expandItemsBtn}
-                  >
-                    {isItemsExpanded ? 'Show less ↑' : `+ ${hiddenItemsCount} more items ↓`}
-                  </button>
-                </div>
-              )}
-
-              <div className={styles.priceDetailsToggle} onClick={() => setIsPriceDetailsOpen(!isPriceDetailsOpen)}>
-                <span>Price Details</span>
-                <ChevronDown 
-                  size={16} 
-                  color="#888" 
-                  style={{ transform: isPriceDetailsOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} 
-                />
-              </div>
-
-              {isPriceDetailsOpen && (
-                <div className={styles.priceDetailsDropdown}>
-                  <div className={styles.summaryRowAlt}>
-                    <span>Subtotal</span>
-                    <span className={styles.summaryValueAlt}>₹{subtotal.toLocaleString()}</span>
-                  </div>
-                  <div className={styles.summaryRowAlt}>
-                    <span>Discount</span>
-                    <span className={styles.discountValueAlt}>-₹0</span>
-                  </div>
-                  <div className={styles.summaryRowAlt}>
-                    <span>Shipping</span>
-                    <span className={styles.shippingValueAlt}>{shipping === 0 ? 'FREE' : `₹${shipping}`}</span>
-                  </div>
-                </div>
-              )}
-              
-              <div className={styles.promoContainerAlt}>
-                <div className={styles.promoHeaderAlt} onClick={() => setIsPromoOpen(!isPromoOpen)}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
-                    Have a promo code?
-                  </div>
-                  <ChevronDown 
-                    size={16} 
-                    color="#888" 
-                    style={{ transform: isPromoOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} 
-                  />
-                </div>
-                {isPromoOpen && (
-                  <div className={styles.promoInputWrapperAlt}>
-                    <input type="text" className={styles.promoInputAlt} placeholder="Enter code" />
-                    <button type="button" className={styles.promoBtnAlt}>Apply</button>
-                  </div>
-                )}
-              </div>
-              
-              <div className={styles.totalRowAlt}>
-                <span className={styles.totalLabelAlt}>Total <span style={{fontSize:'0.75rem', fontWeight:'normal', color:'#888'}}>(incl. taxes)</span></span>
-                <span>₹{total.toLocaleString()}</span>
-              </div>
-              
-              <div className={styles.sslFooter}>
-                <Lock size={12} /> Secure 256-bit SSL checkout
-              </div>
-            </div>
-
-          </div>
-        </form>
-      </main>
     </div>
   );
 }

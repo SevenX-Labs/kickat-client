@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { CategoryListing } from '@/components/category/CategoryListing';
+import { CategoryExplorer } from '@/components/shop/CategoryExplorer';
 import { categoryService } from '@/services/categoryService';
 
 interface PageProps {
@@ -20,15 +20,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
     if (res && res.success && res.category) {
       return {
-        title: `${res.category.name} | KickAt`,
-        description: `Shop premium ${res.category.name.toLowerCase()} products, accessories, food, and essentials at KickAt.`,
+        title: `${res.category.name} Categories | KickAt`,
+        description: `Shop premium ${res.category.name.toLowerCase()} essentials and products at KickAt.`,
       };
     }
   } catch {}
 
   const formattedName = categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1);
   return {
-    title: `${formattedName} | KickAt`,
+    title: `${formattedName} Categories | KickAt`,
     description: `Shop premium ${categorySlug} products and essentials at KickAt.`,
   };
 }
@@ -36,5 +36,5 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function CategoryPage({ params }: PageProps) {
   const { categorySlug } = await params;
 
-  return <CategoryListing categorySlug={categorySlug} />;
+  return <CategoryExplorer initialMainCat={categorySlug} />;
 }

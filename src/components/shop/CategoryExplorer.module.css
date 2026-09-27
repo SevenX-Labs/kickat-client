@@ -97,8 +97,7 @@
   display: none;
 }
 
-/* Back Navigation Button in Step 2 */
-.backNavBtn {
+.backToSubCatsBtn {
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -115,7 +114,7 @@
   width: 100%;
 }
 
-.backNavBtn:hover {
+.backToSubCatsBtn:hover {
   background: #211C15;
   color: #ffffff;
   border-color: #211C15;
@@ -128,7 +127,7 @@
   padding: 0 0.5rem;
 }
 
-.railTitle {
+.railHeaderTitle {
   font-family: var(--font-ibm-plex-mono), monospace;
   font-size: 0.65rem;
   font-weight: 600;
@@ -136,7 +135,7 @@
   color: rgba(33, 28, 21, 0.45);
 }
 
-.railList {
+.categoriesRail {
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
@@ -147,171 +146,154 @@
   box-shadow: 0 4px 20px rgba(33, 28, 21, 0.02);
 }
 
-.railItem {
+.categoryRailItem {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0.85rem 0.4rem;
+  padding: 0.75rem 0.4rem;
   border-radius: 16px;
   background: transparent;
-  border: 1.5px solid transparent;
+  border: 1px solid transparent;
   cursor: pointer;
   position: relative;
-  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-  gap: 0.45rem;
+  transition: all 0.2s ease;
+  gap: 0.35rem;
+  width: 100%;
 }
 
-.railItem:hover {
+.categoryRailItem:hover {
   background: #FAF7F2;
 }
 
-.railItemActive {
-  background: #FFF8F0;
-  border-color: rgba(249, 146, 5, 0.2);
+.categoryRailItemActive {
+  background: #FFF9F2;
+  border: 1px solid rgba(249, 146, 5, 0.25);
 }
 
-.railAvatarWrap {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
+.railItemIcon {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #FBF7EE;
-  border: 2px solid rgba(33, 28, 21, 0.06);
-  position: relative;
-  overflow: hidden;
-  transition: all 0.25s ease;
-  box-shadow: 0 2px 8px rgba(33, 28, 21, 0.04);
 }
 
-.railItem:hover .railAvatarWrap {
-  transform: scale(1.05);
+.categoryImageWrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+  background: #FBF7EE;
+  border: 1px solid rgba(33, 28, 21, 0.08);
+  transition: all 0.2s ease;
+}
+
+.categoryRailItem:hover .categoryImageWrap {
   border-color: rgba(249, 146, 5, 0.3);
 }
 
-.railItemActive .railAvatarWrap {
+.categoryRailItemActive .categoryImageWrap {
   background: #ffffff;
-  border-color: #F99205;
-  box-shadow: 0 0 0 2.5px #F99205, 0 4px 12px rgba(249, 146, 5, 0.25);
-  transform: scale(1.06);
-}
-
-.railAvatar {
-  object-fit: cover;
-  border-radius: 50%;
+  border: 1.5px solid rgba(249, 146, 5, 0.5);
+  box-shadow: 0 0 0 2px rgba(249, 146, 5, 0.1);
 }
 
 .allAvatarWrap {
-  width: 50px;
-  height: 50px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #FBF7EE;
-  border: 2px solid rgba(33, 28, 21, 0.06);
-  transition: all 0.25s ease;
+  border: 1px solid rgba(33, 28, 21, 0.08);
+  color: #211C15;
+  transition: all 0.2s ease;
 }
 
-.railItemActive .allAvatarWrap {
+.categoryRailItemActive .allAvatarWrap {
   background: #F99205;
   border-color: #F99205;
-  box-shadow: 0 4px 14px rgba(249, 146, 5, 0.35);
-}
-
-.railIcon {
-  color: #211C15;
-}
-
-.activeIcon {
   color: #ffffff;
 }
 
-.railLabel {
+.categoryRailLabel {
   font-family: var(--font-sans), Inter, sans-serif;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 500;
   color: #211C15;
   text-align: center;
   line-height: 1.2;
 }
 
-.railItemActive .railLabel {
+.categoryRailItemActive .categoryRailLabel {
   color: #F99205;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* Sidebar Additional Filters */
-.filtersBlock {
+.filterWidgets {
   display: flex;
   flex-direction: column;
   gap: 1rem;
   background: #ffffff;
-  border-radius: 18px;
+  border-radius: 20px;
   padding: 1.25rem;
   border: 1px solid rgba(33, 28, 21, 0.06);
 }
 
-.filterActivePill {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-family: var(--font-ibm-plex-mono), monospace;
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  color: #F99205;
-  background: rgba(249, 146, 5, 0.1);
-  padding: 0.35rem 0.65rem;
-  border-radius: 6px;
+.widgetDivider {
+  height: 1px;
+  background: rgba(33, 28, 21, 0.06);
+  margin-bottom: 0.5rem;
 }
 
-.filterGroup {
+.filterWidgetGroup {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
-.filterGroupTitle {
+.filterWidgetTitle {
   font-family: var(--font-ibm-plex-mono), monospace;
   font-size: 0.65rem;
   font-weight: 600;
-  letter-spacing: 0.1em;
-  color: rgba(33, 28, 21, 0.5);
+  letter-spacing: 0.14em;
+  color: rgba(33, 28, 21, 0.45);
   text-transform: uppercase;
 }
 
-.sizePillsGrid {
+.sizeOptionsGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 
 .sizeBtn {
-  padding: 0.35rem;
-  background: #FBF7EE;
-  border: 1px solid rgba(33, 28, 21, 0.08);
-  border-radius: 6px;
+  padding: 0.4rem 0;
+  border-radius: 8px;
+  border: 1px solid rgba(33, 28, 21, 0.1);
+  background: #ffffff;
   font-family: var(--font-ibm-plex-mono), monospace;
   font-size: 0.75rem;
   font-weight: 500;
   color: #211C15;
   cursor: pointer;
   transition: all 0.2s ease;
+  text-align: center;
 }
 
 .sizeBtn:hover,
-.sizeActive {
-  background: #F99205;
-  border-color: #F99205;
+.sizeBtnActive {
+  background: #211C15;
   color: #ffffff;
+  border-color: #211C15;
 }
 
-.colorRow {
+.colorSwatchesGrid {
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .colorSwatch {
@@ -321,126 +303,113 @@
   border: 2px solid #ffffff;
   box-shadow: 0 0 0 1px rgba(33, 28, 21, 0.15);
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .colorSwatch:hover,
-.colorActive {
+.colorSwatchActive {
   transform: scale(1.15);
-  box-shadow: 0 0 0 2px #F99205;
+  box-shadow: 0 0 0 2px #E7A03B;
 }
 
-/* ── 2. Right Main Panel ────────────────────────────────── */
-.mainPanel {
+.sidebarResetBtn {
+  background: none;
+  border: none;
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-size: 0.7rem;
+  color: #D97D02;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  text-align: left;
+}
+
+/* ── 2. Main Content Area ───────────────────────────────── */
+.mainContent {
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
+  gap: 2rem;
+  min-width: 0;
 }
 
-/* Smooth Page View Transitions */
-@keyframes viewFadeSlide {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.contentHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(33, 28, 21, 0.08);
+  padding-bottom: 1.25rem;
 }
 
-.viewTransition {
-  animation: viewFadeSlide 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+.headerTitleWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
-/* ── STEP 1: SUBCATEGORIES TILES VIEW ────────────────────── */
-.subCategoriesSection {
+.headerSubtitle {
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: #D97D02;
+}
+
+.headerTitle {
+  font-family: var(--font-fraunces), serif;
+  font-size: 2.25rem;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: #211C15;
+  margin: 0;
+}
+
+/* ── STEP 1: SUBCATEGORIES GRID ─────────────────────────── */
+.subCategorySection {
   background: #ffffff;
-  border-radius: 20px;
+  border-radius: 24px;
   padding: 2.25rem;
   border: 1px solid rgba(33, 28, 21, 0.06);
-  box-shadow: 0 4px 20px rgba(33, 28, 21, 0.02);
+  box-shadow: 0 8px 30px rgba(33, 28, 21, 0.02);
 }
 
-.subCatSectionHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 2rem;
-  padding-bottom: 1.25rem;
-  border-bottom: 1px solid rgba(33, 28, 21, 0.06);
-}
-
-.subCatEyebrow {
-  font-family: var(--font-ibm-plex-mono), monospace;
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  color: #F99205;
-  display: block;
-  margin-bottom: 0.25rem;
-}
-
-.subCatMainTitle {
-  font-family: var(--font-fraunces), serif;
-  font-size: clamp(1.75rem, 3vw, 2.25rem);
-  font-weight: 400;
-  color: #211C15;
-}
-
-.subCatCountBadge {
-  font-family: var(--font-ibm-plex-mono), monospace;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: #333F2B;
-  background: rgba(51, 63, 43, 0.08);
-  padding: 0.4rem 1rem;
-  border-radius: 9999px;
-}
-
-/* Sub-Categories Grid */
-.subCategoriesGrid {
+.subCategoryGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 260px));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1.5rem;
 }
 
 .subCategoryCard {
   background: #FBF7EE;
-  border-radius: 24px;
-  padding: 1.75rem 1.5rem;
-  border: 1px solid rgba(33, 28, 21, 0.06);
+  border-radius: 20px;
+  padding: 1.5rem 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
+  justify-content: center;
+  border: 1px solid rgba(33, 28, 21, 0.06);
   cursor: pointer;
-  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease, border-color 0.35s ease, background-color 0.35s ease;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+  text-align: center;
 }
 
 .subCategoryCard:hover {
-  transform: translateY(-6px);
-  background: #FFFBF4;
-  border-color: #F99205;
-  box-shadow: 0 16px 36px rgba(249, 146, 5, 0.12);
+  transform: translateY(-4px);
+  box-shadow: 0 14px 28px rgba(33, 28, 21, 0.06);
+  border-color: rgba(231, 160, 59, 0.3);
+  background: #FFFDF9;
 }
 
 .subCardImgWrap {
   width: 140px;
   height: 140px;
-  margin-bottom: 1.15rem;
   background: #ffffff;
   border-radius: 20px;
-  padding: 14px;
-  border: 1px solid rgba(33, 28, 21, 0.08);
-  box-shadow: 0 4px 14px rgba(33, 28, 21, 0.03);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
+  margin-bottom: 1.25rem;
+  padding: 12px;
+  box-shadow: 0 4px 16px rgba(33, 28, 21, 0.04);
 }
 
 .subCardImgInner {
@@ -450,45 +419,32 @@
 }
 
 .subCardImg {
-  object-fit: contain !important;
-  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.subCategoryCard:hover .subCardImg {
-  transform: scale(1.08);
+  object-fit: contain;
 }
 
 .subCardInfo {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.35rem;
-  width: 100%;
-}
-
-.subCardCount {
-  font-family: var(--font-ibm-plex-mono), monospace;
-  font-size: 0.7rem;
-  color: rgba(33, 28, 21, 0.45);
+  gap: 0.4rem;
 }
 
 .subCardTitle {
   font-family: var(--font-fraunces), serif;
-  font-size: 1.18rem;
+  font-size: 1.15rem;
   font-weight: 500;
   color: #211C15;
-  line-height: 1.3;
   margin: 0;
 }
 
 .subCardLink {
-  margin-top: 0.65rem;
-  font-size: 0.85rem;
+  font-family: var(--font-sans), Inter, sans-serif;
+  font-size: 0.8rem;
   font-weight: 600;
   color: #F99205;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.35rem;
   transition: gap 0.2s ease, color 0.2s ease;
 }
 
@@ -818,69 +774,34 @@
     display: none;
   }
 
-  .railList {
+  .categoriesRail {
     padding: 0.5rem 0.35rem;
     border-radius: 14px;
     gap: 0.4rem;
   }
 
-  .railItem {
+  .categoryRailItem {
     padding: 0.65rem 0.35rem;
     gap: 0.35rem;
     border-radius: 12px;
   }
 
-  .railAvatarWrap {
+  .categoryImageWrap {
     width: 44px;
     height: 44px;
   }
 
-  .railLabel {
+  .categoryRailLabel {
     font-size: 0.8rem;
     line-height: 1.15;
   }
 
-  .mainPanel {
-    height: 100%;
-    max-height: 100%;
-    overflow-y: auto;
-    padding-right: 0.15rem;
-    gap: 1rem;
-    min-width: 0;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .mainPanel::-webkit-scrollbar {
-    display: none;
-  }
-
-  .subCategoriesSection {
+  .subCategorySection {
     padding: 1rem 0.75rem;
     border-radius: 16px;
   }
 
-  .subCatSectionHeader {
-    margin-bottom: 0.85rem;
-    padding-bottom: 0.55rem;
-  }
-
-  .subCatEyebrow {
-    font-size: 0.58rem;
-    letter-spacing: 0.12em;
-    margin-bottom: 0.15rem;
-  }
-
-  .subCatMainTitle {
-    font-size: 1.35rem;
-  }
-
-  .subCatCountBadge {
-    font-size: 0.68rem;
-    padding: 0.25rem 0.65rem;
-  }
-
-  .subCategoriesGrid {
+  .subCategoryGrid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 0.5rem !important;
   }
