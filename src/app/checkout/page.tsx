@@ -50,6 +50,9 @@ import {
   CheckoutPaymentMethodType,
   PlaceOrderResponse,
 } from '@/types/checkout';
+import { paymentService } from '@/services/paymentService';
+import { loadRazorpayScript } from '@/utils/razorpay';
+import { PaymentMethodType, RazorpayOptions } from '@/types/payment';
 import { AnimatedOrderButton } from './AnimatedOrderButton';
 import styles from './Checkout.module.css';
 
@@ -110,6 +113,12 @@ export default function CheckoutPage() {
   const [orderError, setOrderError] = useState<string | null>(null);
   const [placedOrder, setPlacedOrder] = useState<PlaceOrderResponse | null>(null);
   const idempotencyKeyRef = useRef<string>(generateUUID());
+
+  // Payment Lifecycle State
+  const [paymentFlowState, setPaymentFlowState] = useState<'idle' | 'creating_order' | 'gateway_open' | 'verifying' | 'success' | 'failed' | 'cancelled'>('idle');
+  const [paymentStatusText, setPaymentStatusText] = useState<string>('');
+  const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
+  const [pendingOrderNumber, setPendingOrderNumber] = useState<string | null>(null);
 
   // UI Accordions & Visuals
   const [isPriceDetailsOpen, setIsPriceDetailsOpen] = useState<boolean>(false);
@@ -402,6 +411,7 @@ export default function CheckoutPage() {
 
     setIsSubmittingOrder(true);
     setOrderError(null);
+    setPaymentStatusText('Creating your order...');
 
     const idempotencyKey = idempotencyKeyRef.current;
 
@@ -414,20 +424,132 @@ export default function CheckoutPage() {
         upiId: selectedPaymentMethod === 'UPI' ? (upiId.trim() || 'user@upi') : undefined,
       };
 
-      const res = await checkoutService.placeOrder(orderPayload, idempotencyKey);
+      if (selectedPaymentMethod === 'COD') {
+        setPaymentStatusText('Placing Cash on Delivery order...');
+        const res = await checkoutService.placeOrder(orderPayload, idempotencyKey);
+        try {
+          await paymentService.confirmCod({ orderId: res.orderId }, idempotencyKey);
+        } catch (codErr) {
+          console.warn('[Checkout] COD confirmation note:', codErr);
+        }
+        setPlacedOrder(res);
+        await refreshCart();
+        return true;
+      }
 
-      setPlacedOrder(res);
+      // Online Gateway Payment Flow (Razorpay)
+      setPaymentFlowState('creating_order');
+      setPaymentStatusText('Creating secure order...');
+      const orderRes = await checkoutService.placeOrder(orderPayload, idempotencyKey);
+      setPendingOrderId(orderRes.orderId);
+      setPendingOrderNumber(orderRes.orderNumber);
 
-      // Refresh cart context so cart icon and items reflect the new empty state
-      await refreshCart();
+      setPaymentStatusText('Initializing Razorpay gateway...');
+      const paymentIdempotencyKey = generateUUID();
+      const methodLower = (
+        selectedPaymentMethod === 'CARD'
+          ? 'card'
+          : selectedPaymentMethod === 'NETBANKING'
+          ? 'netbanking'
+          : selectedPaymentMethod === 'WALLET'
+          ? 'wallet'
+          : 'upi'
+      ) as PaymentMethodType;
 
-      return true;
+      const paymentRes = await paymentService.createPaymentOrder(
+        {
+          orderId: orderRes.orderId,
+          paymentMethod: methodLower,
+          upiId: selectedPaymentMethod === 'UPI' ? (upiId.trim() || 'user@upi') : undefined,
+        },
+        paymentIdempotencyKey
+      );
+
+      if (!paymentRes.razorpayOrderId || !paymentRes.key) {
+        throw new Error(paymentRes.message || 'Could not create gateway payment order.');
+      }
+
+      setPaymentStatusText('Loading payment window...');
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded || !window.Razorpay) {
+        throw new Error('Could not load payment gateway SDK. Please check your internet connection.');
+      }
+
+      setPaymentFlowState('gateway_open');
+      setPaymentStatusText('Payment window open. Please complete payment in Razorpay...');
+
+      return new Promise<boolean>((resolve) => {
+        const options: RazorpayOptions = {
+          key: paymentRes.key!,
+          amount: Math.round((paymentRes.amount || checkoutData?.summary?.grandTotal || 0) * 100),
+          currency: paymentRes.currency || 'INR',
+          name: 'KickAt',
+          description: `Order ${orderRes.orderNumber || ''}`,
+          order_id: paymentRes.razorpayOrderId!,
+          handler: async (rzpRes) => {
+            setPaymentFlowState('verifying');
+            setPaymentStatusText('Verifying payment with KickAt server...');
+            try {
+              const verifyRes = await paymentService.verifyPayment({
+                orderId: orderRes.orderId,
+                razorpayOrderId: rzpRes.razorpay_order_id,
+                razorpayPaymentId: rzpRes.razorpay_payment_id,
+                signature: rzpRes.razorpay_signature,
+              });
+
+              if (verifyRes.success) {
+                setPaymentFlowState('success');
+                await refreshCart();
+                setPlacedOrder(orderRes);
+                resolve(true);
+              } else {
+                setPaymentFlowState('failed');
+                setOrderError('Payment verification failed. Please check order status.');
+                resolve(false);
+              }
+            } catch (verifyErr: any) {
+              console.error('[Checkout] Verification failed:', verifyErr);
+              setPaymentFlowState('failed');
+              setOrderError(verifyErr?.message || 'Payment verification failed.');
+              resolve(false);
+            }
+          },
+          prefill: {
+            name: fullName || user?.name || undefined,
+            email: email || user?.email || undefined,
+            contact: phone || user?.phone || undefined,
+          },
+          theme: {
+            color: '#F99205',
+          },
+          modal: {
+            ondismiss: () => {
+              setPaymentFlowState((current) => {
+                if (current === 'verifying' || current === 'success') return current;
+                setOrderError('Payment was cancelled or closed. You can retry paying for this order anytime.');
+                return 'cancelled';
+              });
+              resolve(false);
+            },
+          },
+        };
+
+        const rzp = new window.Razorpay!(options);
+        rzp.on('payment.failed', function (resp: any) {
+          console.error('[Razorpay] Payment failed event:', resp.error);
+          const reason = resp.error?.description || resp.error?.reason || 'Payment failed';
+          setPaymentFlowState('failed');
+          setOrderError(`Payment failed: ${reason}`);
+          resolve(false);
+        });
+        rzp.open();
+      });
     } catch (err: any) {
-      console.error('[Checkout] Place order failed:', err);
+      console.error('[Checkout] Place order / payment failed:', err);
       const msg = err?.message || 'Failed to place order. Please try again.';
+      setPaymentFlowState('failed');
       setOrderError(msg);
-      alert(msg);
-      // Generate new idempotency key for next fresh attempt if needed
+      // Generate new idempotency key for next fresh attempt
       idempotencyKeyRef.current = generateUUID();
       return false;
     } finally {
@@ -1328,6 +1450,68 @@ export default function CheckoutPage() {
                     />
                   </div>
 
+                  {/* Payment Error / Retry Banner */}
+                  {orderError && (
+                    <div
+                      style={{
+                        marginTop: '1.5rem',
+                        padding: '1rem',
+                        borderRadius: '12px',
+                        background: '#FEF2F2',
+                        border: '1px solid #FCA5A5',
+                        color: '#991B1B',
+                        fontSize: '0.9rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.5rem',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600 }}>
+                        <AlertCircle size={18} color="#DC2626" />
+                        <span>Payment Notice</span>
+                      </div>
+                      <p style={{ margin: 0, lineHeight: 1.4 }}>{orderError}</p>
+                      {pendingOrderId && (
+                        <div style={{ marginTop: '0.5rem' }}>
+                          <Link
+                            href={`/payments/retry?orderId=${pendingOrderId}`}
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              padding: '8px 14px',
+                              backgroundColor: '#DC2626',
+                              color: '#FFFFFF',
+                              borderRadius: '8px',
+                              textDecoration: 'none',
+                              fontSize: '0.85rem',
+                              fontWeight: 600,
+                            }}
+                          >
+                            <RotateCcw size={14} /> Retry Payment for Order #{pendingOrderNumber || pendingOrderId}
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {isSubmittingOrder && paymentStatusText && (
+                    <div
+                      style={{
+                        marginTop: '1rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        fontSize: '13px',
+                        color: '#D97706',
+                        fontWeight: 500,
+                      }}
+                    >
+                      <Loader2 size={16} className="animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
+                      <span>{paymentStatusText}</span>
+                    </div>
+                  )}
+
                   {/* Action Buttons */}
                   <div style={{ marginTop: '2rem' }}>
                     <AnimatedOrderButton
@@ -1336,7 +1520,7 @@ export default function CheckoutPage() {
                       onComplete={handleAnimatedComplete}
                       isSubmitting={isSubmittingOrder}
                       disabled={isSubmittingOrder || !selectedPaymentMethod}
-                      label={selectedPaymentMethod === 'COD' ? 'Place Order (COD)' : 'Proceed with Order'}
+                      label={selectedPaymentMethod === 'COD' ? 'Place Order (COD)' : 'Proceed to Pay'}
                     />
                   </div>
                 </div>
