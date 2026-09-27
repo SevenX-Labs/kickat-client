@@ -41,9 +41,15 @@ export interface CartSummary {
   freeDeliveryThreshold?: number;
   taxAmount?: number;
   tax?: number;
+  gstAmount?: number;
+  gstPercentage?: number;
   platformFee?: number;
+  extraFeeAmount?: number;
+  extraFeeName?: string | null;
+  codFee?: number;
   totalAmount?: number;
   total?: number;
+  grandTotal?: number;
 }
 
 export interface CartResponse {
@@ -68,7 +74,9 @@ export interface BuyNowResponse {
     deliveryFee?: number;
     isFreeDelivery?: boolean;
     taxAmount?: number;
+    gstAmount?: number;
     platformFee?: number;
     totalAmount?: number;
+    grandTotal?: number;
   };
 }

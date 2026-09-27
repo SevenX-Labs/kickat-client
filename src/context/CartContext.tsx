@@ -1,11 +1,11 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { useAuth } from './AuthContext';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { cartService } from '@/services/cartService';
 import { CartResponse, CartItem, CartSummary, BuyNowResponse } from '@/types/cart';
+import { useAuth } from '@/context/AuthContext';
 
-interface CartContextType {
+export interface CartContextType {
   cart: CartResponse | null;
   items: CartItem[];
   summary: CartSummary | null;
@@ -24,15 +24,47 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const GUEST_SESSION_KEY = 'kickat_guest_cart_session_id';
+const UUID_V4_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-const getOrCreateGuestSessionId = (): string => {
-  if (typeof window === 'undefined') return '';
-  let id = localStorage.getItem(GUEST_SESSION_KEY);
-  if (!id) {
-    id = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `guest-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-    localStorage.setItem(GUEST_SESSION_KEY, id);
+/**
+ * Generate a strict RFC 4122 v4 UUID
+ */
+const generateUUIDv4 = (): string => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
   }
-  return id;
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+};
+
+/**
+ * Retrieve stored guestSessionId only if it is a valid UUID v4
+ */
+const getStoredGuestSessionId = (): string | null => {
+  if (typeof window === 'undefined') return null;
+  const stored = localStorage.getItem(GUEST_SESSION_KEY);
+  if (stored && UUID_V4_REGEX.test(stored)) {
+    return stored;
+  }
+  if (stored) {
+    localStorage.removeItem(GUEST_SESSION_KEY);
+  }
+  return null;
+};
+
+/**
+ * Get or create a valid UUID v4 guestSessionId and persist to localStorage
+ */
+const getOrCreateGuestSessionId = (): string => {
+  if (typeof window === 'undefined') return generateUUIDv4();
+  const validStored = getStoredGuestSessionId();
+  if (validStored) return validStored;
+  const newId = generateUUIDv4();
+  localStorage.setItem(GUEST_SESSION_KEY, newId);
+  return newId;
 };
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -43,11 +75,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [error, setError] = useState<string | null>(null);
   const [guestSessionId, setGuestSessionId] = useState<string | null>(null);
 
-  // Initialize Guest Session ID on client mount
+  const isMergingRef = useRef<boolean>(false);
+  const wasAuthenticatedRef = useRef<boolean>(isAuthenticated);
+
+  // Initialize Guest Session ID on client mount if previously active
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const sessionId = getOrCreateGuestSessionId();
-      setGuestSessionId(sessionId);
+      const storedId = getStoredGuestSessionId();
+      setGuestSessionId(storedId);
     }
   }, []);
 
@@ -57,44 +92,92 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null);
     try {
       if (isAuthenticated) {
-        // Authenticated user: fetch persistent cart
+        // Authenticated user: fetch persistent server cart
         const res = await cartService.getCart();
         setCart(res);
       } else {
-        // Guest user: fetch guest cart by sessionId
-        const sessionId = getOrCreateGuestSessionId();
-        if (sessionId) {
-          const res = await cartService.getGuestCart(sessionId);
+        // Guest user: fetch guest cart only if an active session exists
+        const storedId = getStoredGuestSessionId();
+        if (storedId) {
+          const res = await cartService.getGuestCart(storedId);
           setCart(res);
+          setGuestSessionId(storedId);
+        } else {
+          // Clean empty cart state without making unnecessary network requests
+          setCart({
+            success: true,
+            summary: {
+              itemCount: 0,
+              subtotal: 0,
+              productDiscount: 0,
+              deliveryFee: 0,
+              taxAmount: 0,
+              totalAmount: 0,
+            },
+            items: [],
+          });
+          setGuestSessionId(null);
         }
       }
     } catch (err: any) {
       console.warn('[CartContext] Failed to fetch cart:', err);
       setError(err?.message || 'Failed to load cart');
+      if (!isAuthenticated) {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem(GUEST_SESSION_KEY);
+        }
+        setGuestSessionId(null);
+      }
       setCart(null);
     } finally {
       setIsLoading(false);
     }
   }, [isAuthenticated]);
 
-  // Handle guest cart merging upon login
+  // Handle guest cart merging upon login & cart reset on logout
   useEffect(() => {
     if (authLoading) return;
 
     const handleAuthSync = async () => {
-      if (isAuthenticated) {
-        const storedGuestId = typeof window !== 'undefined' ? localStorage.getItem(GUEST_SESSION_KEY) : null;
-        if (storedGuestId) {
+      // Transition: User logged out -> immediately clear cart data to avoid exposure
+      if (!isAuthenticated && wasAuthenticatedRef.current) {
+        wasAuthenticatedRef.current = false;
+        setCart(null);
+        setGuestSessionId(null);
+        await fetchCart();
+        return;
+      }
+
+      // Transition: User logged in -> check for active guest cart to merge
+      if (isAuthenticated && !wasAuthenticatedRef.current) {
+        wasAuthenticatedRef.current = true;
+        const storedGuestId = getStoredGuestSessionId();
+
+        if (storedGuestId && !isMergingRef.current) {
+          isMergingRef.current = true;
           try {
-            // Merge guest cart items into authenticated user cart
-            await cartService.mergeCart(storedGuestId);
-          } catch (mergeErr) {
+            // Verify guest cart has items before triggering merge API
+            const guestCart = await cartService.getGuestCart(storedGuestId).catch(() => null);
+            if (guestCart && guestCart.items && guestCart.items.length > 0) {
+              const mergedCart = await cartService.mergeCart(storedGuestId);
+              setCart(mergedCart);
+            }
+          } catch (mergeErr: any) {
             console.warn('[CartContext] Guest cart merge warning:', mergeErr);
           } finally {
-            localStorage.removeItem(GUEST_SESSION_KEY);
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem(GUEST_SESSION_KEY);
+            }
+            setGuestSessionId(null);
+            isMergingRef.current = false;
           }
         }
+        await fetchCart();
+        return;
       }
+
+      // Initial mount or stable auth state
+      wasAuthenticatedRef.current = isAuthenticated;
       await fetchCart();
     };
 
@@ -103,6 +186,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Add Item to Cart (Auth or Guest)
   const addToCart = async (productId: string, variantId?: string, quantity: number = 1) => {
+    if (quantity <= 0) return;
     setIsUpdating(true);
     setError(null);
     try {
@@ -111,6 +195,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updatedCart = await cartService.addCartItem(productId, variantId, quantity);
       } else {
         const sessionId = getOrCreateGuestSessionId();
+        setGuestSessionId(sessionId);
         updatedCart = await cartService.addGuestCartItem(sessionId, productId, variantId, quantity);
       }
       setCart(updatedCart);
@@ -141,30 +226,44 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         // Guest user item quantity update
         const existingItem = cart?.items.find((i) => i.id === itemId);
-        if (existingItem) {
-          const delta = quantity - existingItem.quantity;
-          const sessionId = getOrCreateGuestSessionId();
-          if (delta > 0) {
-            const updatedCart = await cartService.addGuestCartItem(sessionId, existingItem.productId, existingItem.variantId || undefined, delta);
-            setCart(updatedCart);
-          } else {
-            // If delta < 0 in guest mode, update local items representation
-            const updatedItems = cart!.items.map((item) =>
-              item.id === itemId ? { ...item, quantity, totalPrice: item.unitPrice * quantity } : item
-            );
-            const subtotal = updatedItems.reduce((acc, i) => acc + i.totalPrice, 0);
-            const itemCount = updatedItems.reduce((acc, i) => acc + i.quantity, 0);
+        if (!existingItem) return;
 
-            setCart({
-              ...cart!,
-              items: updatedItems,
-              summary: {
-                ...cart!.summary,
-                itemCount,
-                subtotal,
-                totalAmount: subtotal + (cart!.summary.taxAmount || 0) + (cart!.summary.deliveryFee || 0),
-              },
-            });
+        const currentGuestSessionId = getStoredGuestSessionId();
+        if (!currentGuestSessionId) return;
+
+        const delta = quantity - existingItem.quantity;
+        if (delta > 0) {
+          // Increase: Call addGuestCartItem with positive delta
+          const updatedCart = await cartService.addGuestCartItem(
+            currentGuestSessionId,
+            existingItem.productId,
+            existingItem.variantId || undefined,
+            delta
+          );
+          setCart(updatedCart);
+        } else if (delta < 0) {
+          // Decrease: Rotate to a fresh session with updated quantities
+          // Keeps backend database 100% authoritative and in sync
+          const remainingItems = cart!.items.map((item) =>
+            item.id === itemId ? { ...item, quantity } : item
+          );
+          const freshSessionId = generateUUIDv4();
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(GUEST_SESSION_KEY, freshSessionId);
+          }
+          setGuestSessionId(freshSessionId);
+
+          let finalCart: CartResponse | null = null;
+          for (const item of remainingItems) {
+            finalCart = await cartService.addGuestCartItem(
+              freshSessionId,
+              item.productId,
+              item.variantId || undefined,
+              item.quantity
+            );
+          }
+          if (finalCart) {
+            setCart(finalCart);
           }
         }
       }
@@ -186,22 +285,45 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await cartService.removeCartItem(itemId);
         await fetchCart();
       } else {
-        // Guest user remove item
-        if (cart) {
-          const updatedItems = cart.items.filter((item) => item.id !== itemId);
-          const subtotal = updatedItems.reduce((acc, i) => acc + i.totalPrice, 0);
-          const itemCount = updatedItems.reduce((acc, i) => acc + i.quantity, 0);
-
+        // Guest user remove item:
+        // Rotate to a fresh session containing only remaining items
+        const remainingItems = (cart?.items || []).filter((item) => item.id !== itemId);
+        if (remainingItems.length === 0) {
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem(GUEST_SESSION_KEY);
+          }
+          setGuestSessionId(null);
           setCart({
-            ...cart,
-            items: updatedItems,
+            success: true,
             summary: {
-              ...cart.summary,
-              itemCount,
-              subtotal,
-              totalAmount: subtotal + (cart.summary.taxAmount || 0) + (cart.summary.deliveryFee || 0),
+              itemCount: 0,
+              subtotal: 0,
+              productDiscount: 0,
+              deliveryFee: 0,
+              taxAmount: 0,
+              totalAmount: 0,
             },
+            items: [],
           });
+        } else {
+          const freshSessionId = generateUUIDv4();
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(GUEST_SESSION_KEY, freshSessionId);
+          }
+          setGuestSessionId(freshSessionId);
+
+          let finalCart: CartResponse | null = null;
+          for (const item of remainingItems) {
+            finalCart = await cartService.addGuestCartItem(
+              freshSessionId,
+              item.productId,
+              item.variantId || undefined,
+              item.quantity
+            );
+          }
+          if (finalCart) {
+            setCart(finalCart);
+          }
         }
       }
     } catch (err: any) {

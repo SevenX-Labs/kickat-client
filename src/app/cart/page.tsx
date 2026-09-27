@@ -2,8 +2,13 @@
 
 import { useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, CreditCard, ShieldCheck, ShoppingBag, Trash2, RefreshCw, AlertCircle } from 'lucide-react';
+import {
+  ArrowLeft, CreditCard, ShieldCheck, ShoppingBag,
+  Trash2, RefreshCw, AlertCircle, Sparkles, Heart,
+  ArrowRight
+} from 'lucide-react';
 import styles from './Cart.module.css';
 import { RelatedProducts } from '@/components/shop/ProductDetail/RelatedProducts';
 import { TrustStrip } from '@/components/common/TrustStrip/TrustStrip';
@@ -38,11 +43,11 @@ export default function CartPage() {
   const amountToFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
   const shippingProgress = Math.min(100, (subtotal / freeShippingThreshold) * 100);
 
-  // Delivery fee calculation
+  // Delivery fee calculation from server authoritative summary
   const deliveryFee = isFreeShipping ? 0 : (summary?.deliveryFee ?? 150);
-  const taxAmount = summary?.taxAmount ?? summary?.tax ?? Math.round(subtotal * 0.18);
-  const platformFee = summary?.platformFee ?? 0;
-  const grandTotal = summary?.totalAmount ?? summary?.total ?? (subtotal + taxAmount + deliveryFee + platformFee);
+  const taxAmount = summary?.gstAmount ?? summary?.taxAmount ?? summary?.tax ?? Math.round(subtotal * 0.18);
+  const platformFee = summary?.extraFeeAmount ?? summary?.platformFee ?? 0;
+  const grandTotal = summary?.grandTotal ?? summary?.totalAmount ?? summary?.total ?? (subtotal + taxAmount + deliveryFee + platformFee);
 
   const handleCheckout = () => {
     if (!isAuthenticated) {
@@ -90,14 +95,46 @@ export default function CartPage() {
           <div className={styles.skeletonSummary} />
         </div>
       ) : items.length === 0 ? (
-        /* Empty Cart State */
-        <div className={styles.emptyState}>
-          <ShoppingBag size={48} strokeWidth={1.4} />
-          <h2>Your cart is empty.</h2>
-          <p>Browse our latest pet essentials and bring your favorites back here.</p>
-          <button onClick={() => router.push('/categories')} className={styles.checkoutBtn}>
-            Explore Products
-          </button>
+        /* Premium Empty Cart State */
+        <div className={styles.emptyStateCard}>
+          <div className={styles.emptyIllustrationArea}>
+            <div className={styles.emptyGlowAura} />
+            <div className={styles.emptyIconCircle}>
+              <ShoppingBag size={40} strokeWidth={1.8} className={styles.emptyBagIcon} />
+              <div className={styles.emptyPawFloatingBadge}>
+                <span>🐾</span>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.emptyTextContent}>
+            <div className={styles.emptyBadgePill}>
+              <Sparkles size={13} color="#F28C0F" />
+              <span>Your bowl is waiting</span>
+            </div>
+            <h2 className={styles.emptyTitle}>Your Cart is Empty</h2>
+            <p className={styles.emptyDescription}>
+              Looks like you haven&apos;t added any pet treats or essentials yet. Explore our veterinarian-approved nutrition, toys, and grooming gear crafted for happier pets.
+            </p>
+          </div>
+
+          <div className={styles.emptyActionButtons}>
+            <button
+              type="button"
+              onClick={() => router.push('/categories')}
+              className={styles.emptyPrimaryBtn}
+            >
+              <Sparkles size={16} />
+              <span>Explore Pet Essentials</span>
+              <ArrowRight size={16} />
+            </button>
+            <Link href="/wishlist" className={styles.emptySecondaryBtn}>
+              <Heart size={16} />
+              <span>Saved Wishlist</span>
+            </Link>
+          </div>
+
+
         </div>
       ) : (
         /* Cart Items & Order Summary Layout */

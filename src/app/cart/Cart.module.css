@@ -558,3 +558,176 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* ==========================================================================
+   ENHANCED EMPTY CART HERO & DISCOVERY
+   ========================================================================== */
+
+.emptyStateCard {
+  max-width: 680px;
+  margin: 1.5rem auto 3.5rem;
+  padding: 3rem 2rem 2.5rem;
+  text-align: center;
+  background: #ffffff;
+  border: 1px solid rgba(242, 140, 15, 0.16);
+  border-radius: 24px;
+  box-shadow: 0 16px 40px rgba(33, 28, 21, 0.04), 0 2px 8px rgba(242, 140, 15, 0.04);
+  position: relative;
+  overflow: hidden;
+}
+
+.emptyIllustrationArea {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emptyGlowAura {
+  position: absolute;
+  inset: -16px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(254, 215, 170, 0.5) 0%, rgba(255, 247, 237, 0) 70%);
+  animation: pulseAura 3s ease-in-out infinite alternate;
+}
+
+@keyframes pulseAura {
+  0% { transform: scale(0.92); opacity: 0.7; }
+  100% { transform: scale(1.08); opacity: 1; }
+}
+
+.emptyIconCircle {
+  position: relative;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: #FFF7ED;
+  border: 2px solid #FED7AA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(242, 140, 15, 0.15);
+}
+
+.emptyBagIcon {
+  color: #F28C0F;
+}
+
+.emptyPawFloatingBadge {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1.5px solid #FDBA74;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  animation: floatPaw 2.5s ease-in-out infinite;
+}
+
+@keyframes floatPaw {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.emptyBadgePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: #FFF9F0;
+  border: 1px solid rgba(242, 140, 15, 0.25);
+  border-radius: 20px;
+  color: #D97706;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.emptyTitle {
+  font-family: var(--font-fraunces), serif;
+  font-size: 2rem;
+  color: #17130F;
+  margin: 0 0 0.65rem;
+  font-weight: 700;
+}
+
+.emptyDescription {
+  color: #6B6258;
+  font-size: 0.96rem;
+  line-height: 1.6;
+  max-width: 480px;
+  margin: 0 auto 1.85rem;
+}
+
+.emptyActionButtons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 0;
+}
+
+.emptyPrimaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0.9rem 1.65rem;
+  background: linear-gradient(135deg, #F28C0F 0%, #D97706 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  font-size: 0.98rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(242, 140, 15, 0.28);
+  transition: all 0.2s ease;
+}
+
+.emptyPrimaryBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(242, 140, 15, 0.38);
+}
+
+.emptySecondaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0.9rem 1.45rem;
+  background: #ffffff;
+  color: #374151;
+  border: 1px solid #D1D5DB;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.emptySecondaryBtn:hover {
+  background: #FFF9F0;
+  border-color: #F28C0F;
+  color: #D97706;
+}
+
+@media (max-width: 640px) {
+  .emptyStateCard {
+    padding: 2.25rem 1.25rem 2rem;
+    border-radius: 18px;
+  }
+  .emptyTitle {
+    font-size: 1.6rem;
+  }
+}

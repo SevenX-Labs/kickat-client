@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { useRouter } from 'next/navigation';
-import { Star, ShoppingBag, Zap, Ruler, Minus, Plus, Check, X, Dog, Droplets, Waves, Sun } from 'lucide-react';
+import { Star, ShoppingBag, Zap, Ruler, Minus, Plus, Check, X, Dog, Droplets, Waves, Sun, Loader2 } from 'lucide-react';
 import styles from './ProductDetail.module.css';
  // import Product
 
@@ -25,6 +25,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const [hasAdded, setHasAdded] = useState(false);
+  const [isBuyingNow, setIsBuyingNow] = useState(false);
   const [isSizeGuideModalOpen, setIsSizeGuideModalOpen] = useState(false);
 
   const title = product.name || "Mim & Mate Natural Rubber Chew Toy";
@@ -127,33 +128,36 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
       router.push("/cart");
       return;
     }
-    if (isAdding) return;
+    if (isAdding || isBuyingNow) return;
     const buttonElem = e.currentTarget;
     setIsAdding(true);
-    animateFlyToCart(buttonElem);
     try {
       await addToCart(product.id, selectedVariant?.id, quantity);
-    } catch (err) {
+      animateFlyToCart(buttonElem);
+      setHasAdded(true);
+    } catch (err: any) {
       console.error("Error adding to cart:", err);
+      alert(err?.message || "Could not add item to cart. Please try again.");
     } finally {
-      setTimeout(() => {
-        setIsAdding(false);
-        setHasAdded(true);
-      }, 1200);
+      setIsAdding(false);
     }
   };
 
   const handleBuyNow = async () => {
+    if (isBuyingNow || isAdding) return;
     if (!isAuthenticated) {
       router.push(`/login?redirect=${encodeURIComponent("/checkout")}`);
       return;
     }
+    setIsBuyingNow(true);
     try {
       await buyNow(product.id, selectedVariant?.id, quantity);
       router.push("/checkout");
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error with Buy Now:", err);
-      router.push("/checkout");
+      alert(err?.message || "Buy now session could not be created. Please try again.");
+    } finally {
+      setIsBuyingNow(false);
     }
   };
 
@@ -287,9 +291,13 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
           type="button"
           className={`${styles.addToCartMainBtn} ${hasAdded ? styles.addedState : ''}`}
           onClick={handleAddToCart}
+          disabled={isAdding || isBuyingNow}
         >
           {isAdding ? (
-            <span>Adding...</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <Loader2 size={18} className="animate-spin" />
+              <span>Adding...</span>
+            </span>
           ) : hasAdded ? (
             <>
               <Check size={18} />
@@ -307,9 +315,19 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
           type="button"
           className={styles.buyNowMainBtn}
           onClick={handleBuyNow}
+          disabled={isBuyingNow || isAdding}
         >
-          <Zap size={18} fill="#ffffff" color="#ffffff" />
-          <span>Buy Now</span>
+          {isBuyingNow ? (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <Loader2 size={18} className="animate-spin" />
+              <span>Processing...</span>
+            </span>
+          ) : (
+            <>
+              <Zap size={18} fill="#ffffff" color="#ffffff" />
+              <span>Buy Now</span>
+            </>
+          )}
         </button>
       </div>
 
