@@ -205,21 +205,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
             </span>
           </>
         ) : (
-          <>
-            <div className={styles.starsGroup}>
-              {[...Array(5)].map((_, i) => (
-                <Star 
-                  key={i} 
-                  size={14} 
-                  fill="#E5E7EB" 
-                  color="#E5E7EB" 
-                  strokeWidth={0} 
-                />
-              ))}
-            </div>
-            <span className={styles.ratingDivider}>|</span>
-            <span className={styles.reviewsCountText}>0 Reviews</span>
-          </>
+          <span className={styles.reviewsCountText}>No reviews yet</span>
         )}
         {product.badge && (
           <span className={styles.verifiedBadge}>

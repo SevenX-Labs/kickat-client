@@ -229,7 +229,7 @@ export function mapBackendProductToCards(p: BackendProduct): ProductCardData[] {
         baseName: p.name,
         price: effectivePrice,
         originalPrice,
-        rating: p.rating ?? 0,
+        rating: (p.reviewsCount && p.reviewsCount > 0) ? (p.rating ?? 0) : 0,
         reviewsCount: p.reviewsCount || 0,
         image: variantImage,
         mainCategory: p.category?.name || p.category?.slug || 'Pet Care',
@@ -241,7 +241,7 @@ export function mapBackendProductToCards(p: BackendProduct): ProductCardData[] {
         slug: p.slug,
         stock: v.stock,
         type: p.type,
-        isTopRated: (p.rating || 0) >= 4.7,
+        isTopRated: Boolean(p.reviewsCount && p.reviewsCount > 0 && (p.rating || 0) >= 4.7),
         variants: uniqueVariants,
       };
     });
@@ -338,7 +338,7 @@ export function transformBackendProduct(bp: BackendProduct) {
     discountPrice: bp.discountPrice,
     stock: bp.stock,
     badge: bp.isBestSeller ? 'Best Seller' : bp.isTrending ? 'Trending' : undefined,
-    rating: bp.rating ?? 0,
+    rating: (bp.reviewsCount && bp.reviewsCount > 0) ? (bp.rating ?? 0) : 0,
     reviewsCount: bp.reviewsCount || 0,
     image: bp.imageUrl || allImages[0],
     images: allImages,

@@ -327,22 +327,24 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
           <h3 className={styles.cardTitle}>{product.name}</h3>
         </Link>
         
-        {/* Rating Row */}
-        <div className={styles.cardRatingRow}>
-          <div className={styles.starsGroup}>
-            {[1, 2, 3, 4, 5].map((star) => (
-              <Star 
-                key={star} 
-                size={13} 
-                fill={star <= Math.floor(rating) ? "#F99205" : star - rating < 1 ? "#F99205" : "#E5E7EB"} 
-                color={star <= Math.floor(rating) ? "#F99205" : star - rating < 1 ? "#F99205" : "#E5E7EB"} 
-                strokeWidth={0} 
-              />
-            ))}
+        {/* Rating Row (only shown when there are genuine verified reviews) */}
+        {reviewsCount > 0 && rating > 0 && (
+          <div className={styles.cardRatingRow}>
+            <div className={styles.starsGroup}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star 
+                  key={star} 
+                  size={13} 
+                  fill={star <= Math.floor(rating) ? "#F99205" : star - rating < 1 ? "#F99205" : "#E5E7EB"} 
+                  color={star <= Math.floor(rating) ? "#F99205" : star - rating < 1 ? "#F99205" : "#E5E7EB"} 
+                  strokeWidth={0} 
+                />
+              ))}
+            </div>
+            <span className={styles.cardRatingScore}>{rating.toFixed(1)}</span>
+            <span className={styles.cardReviewsCount}>({reviewsCount})</span>
           </div>
-          <span className={styles.cardRatingScore}>{rating.toFixed(1)}</span>
-          <span className={styles.cardReviewsCount}>({reviewsCount})</span>
-        </div>
+        )}
 
         {/* Price Row */}
         <div className={styles.priceContainer}>
