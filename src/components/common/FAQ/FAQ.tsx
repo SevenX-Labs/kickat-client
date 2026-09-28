@@ -3,32 +3,46 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import styles from './FAQ.module.css';
-
-const faqs = [
-  {
-    question: "What is your shipping policy?",
-    answer: "We offer free standard shipping on all orders over ₹999 within India. For orders under ₹999, a flat rate of ₹99 applies. Standard shipping typically takes 3-5 business days."
-  },
-  {
-    question: "Can I return open pet food if my pet doesn't like it?",
-    answer: "Yes! We have a 100% Satisfaction Guarantee. If your pet turns their nose up at a new food, you can return the open bag within 14 days for a full store credit to try something else."
-  },
-  {
-    question: "How do I track my order?",
-    answer: "Once your order ships, you will receive an email with a tracking number. You can also view real-time tracking information by logging into your Account and visiting the Orders page."
-  },
-  {
-    question: "Are your grooming products safe for sensitive skin?",
-    answer: "Absolutely. All KickAt grooming products are formulated with natural, hypoallergenic ingredients specifically designed to be gentle on sensitive pet skin. We never use harsh chemicals or artificial parabens."
-  },
-  {
-    question: "Do you offer subscription discounts?",
-    answer: "Yes! When you subscribe to regular deliveries for food or treats, you save 15% on every order. You can easily skip, pause, or cancel your subscription at any time from your account dashboard."
-  }
-];
+import { usePublicSettings } from '@/hooks/usePublicSettings';
 
 export function FAQ() {
   const [activeIndex, setActiveIndex] = useState<number | null>(0);
+  const { delivery } = usePublicSettings();
+
+  const isFreeDeliveryAll = delivery ? (!delivery.deliveryFeeEnabled || delivery.freeDeliveryThreshold === 0) : false;
+  const daysText = delivery?.estimatedDays ? `${delivery.estimatedDays} business days` : '2-4 business days';
+
+  let shippingAnswer = `We offer fast standard shipping across India (${daysText}).`;
+  if (delivery) {
+    if (isFreeDeliveryAll) {
+      shippingAnswer = `We offer free standard shipping on all orders within India. Standard delivery typically takes ${daysText}.`;
+    } else {
+      shippingAnswer = `We offer free standard shipping on all orders over ₹${delivery.freeDeliveryThreshold} within India. For orders under ₹${delivery.freeDeliveryThreshold}, a standard delivery rate of ₹${delivery.deliveryFee} applies. Standard shipping typically takes ${daysText}.`;
+    }
+  }
+
+  const faqs = [
+    {
+      question: "What is your shipping policy?",
+      answer: shippingAnswer,
+    },
+    {
+      question: "Can I return open pet food if my pet doesn't like it?",
+      answer: "Yes! We have a 100% Satisfaction Guarantee. If your pet turns their nose up at a new food, you can return the open bag within 14 days for a full store credit to try something else."
+    },
+    {
+      question: "How do I track my order?",
+      answer: "Once your order ships, you will receive an email with a tracking number. You can also view real-time tracking information by logging into your Account and visiting the Orders page."
+    },
+    {
+      question: "Are your grooming products safe for sensitive skin?",
+      answer: "Absolutely. All KickAt grooming products are formulated with natural, hypoallergenic ingredients specifically designed to be gentle on sensitive pet skin. We never use harsh chemicals or artificial parabens."
+    },
+    {
+      question: "Do you offer subscription discounts?",
+      answer: "Yes! When you subscribe to regular deliveries for food or treats, you save 15% on every order. You can easily skip, pause, or cancel your subscription at any time from your account dashboard."
+    }
+  ];
 
   const toggleAccordion = (index: number) => {
     setActiveIndex(activeIndex === index ? null : index);

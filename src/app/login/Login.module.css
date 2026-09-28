@@ -405,6 +405,127 @@
   text-decoration: underline;
 }
 
+
+/* 6-Digit OTP Verification Styles */
+.otpSection {
+  margin: 1rem 0 1.5rem;
+}
+
+.otpHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.otpLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0;
+}
+
+.otpMaskToggleBtn {
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #4b5563;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  padding: 4px 9px;
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.otpMaskToggleBtn:hover {
+  color: #d97706;
+  border-color: #fcd34d;
+  background: #fffdf5;
+}
+
+.otpBoxesGrid {
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.otpBox {
+  flex: 1;
+  min-width: 0;
+  max-width: 54px;
+  height: 58px;
+  border-radius: 12px;
+  border: 1.5px solid #e5e7eb;
+  background: #f9fafb;
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #111827;
+  font-family: inherit;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.otpBoxMasked {
+  font-size: 1.8rem;
+  letter-spacing: 0;
+  -webkit-text-security: disc;
+}
+
+.otpBox:focus {
+  border-color: #f59e0b;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.18);
+  transform: translateY(-2px);
+}
+
+.otpBoxFilled {
+  border-color: #f59e0b;
+  background: #fffdf5;
+}
+
+.phoneTargetBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  color: #374151;
+  margin-top: 0.5rem;
+  width: fit-content;
+}
+
+.phoneChangeLink {
+  background: none;
+  border: none;
+  color: #d97706;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 4px;
+  text-decoration: underline;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.phoneChangeLink:hover {
+  color: #b45309;
+}
+
 /* Mobile Responsive Optimization (< 1024px) */
 @media (max-width: 1023px) {
   :global(body:has([class*="loginPageWrapper"])) {
@@ -516,6 +637,20 @@
     height: 48px;
     font-size: 0.95rem;
   }
+  .otpBoxesGrid {
+    gap: 6px;
+  }
+
+  .otpBox {
+    height: 50px;
+    font-size: 1.2rem;
+    border-radius: 10px;
+  }
+
+  .otpBoxMasked {
+    font-size: 1.45rem;
+  }
+
 
   .footer {
     margin-top: 1rem;

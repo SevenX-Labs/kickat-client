@@ -9,7 +9,8 @@ import styles from "./Navbar.module.css";
 import { megaMenuData } from "@/data/megaMenuData";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
-import { FREE_DELIVERY_THRESHOLD, CURRENCY_FORMATTER } from "@/utils/constants";
+import { CURRENCY_FORMATTER } from "@/utils/constants";
+import { usePublicSettings } from "@/hooks/usePublicSettings";
 
 
 const taxonomy = {
@@ -167,10 +168,17 @@ export function Navbar() {
     setOpenMobileCategory(null);
   };
 
+  const { delivery } = usePublicSettings();
+  const isFreeDeliveryAll = delivery ? (!delivery.deliveryFeeEnabled || delivery.freeDeliveryThreshold === 0) : false;
+  const deliveryMarqueeText = !delivery
+    ? "Free Delivery on orders"
+    : isFreeDeliveryAll
+    ? "Free Delivery on all orders"
+    : `Free Delivery on orders over ${CURRENCY_FORMATTER.format(delivery.freeDeliveryThreshold)}`;
+
   const items = [
-    { text: `Free Delivery on orders over ${CURRENCY_FORMATTER.format(FREE_DELIVERY_THRESHOLD)}`, Icon: Truck },
+    { text: deliveryMarqueeText, Icon: Truck },
     { text: "Available on Amazon, Flipkart, JioMart & Meesho", Icon: ShoppingBag },
-    { text: "Get 20% off your first purchase", Icon: Percent },
     { text: "Premium pet accessories", Icon: Crown },
   ];
   // Duplicate to ensure the marquee fills wide screens

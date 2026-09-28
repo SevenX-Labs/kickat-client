@@ -2,35 +2,45 @@
 
 import { ShieldCheck, Truck, RotateCcw, Lock } from 'lucide-react';
 import styles from './ProductDetail.module.css';
-
-const TRUST_ITEMS = [
-  {
-    icon: ShieldCheck,
-    title: 'Pet Safe',
-    subtitle: 'Non-toxic materials',
-  },
-  {
-    icon: Truck,
-    title: 'Fast Delivery',
-    subtitle: 'On orders above ₹999',
-  },
-  {
-    icon: RotateCcw,
-    title: 'Easy Returns',
-    subtitle: '7-day hassle free',
-  },
-  {
-    icon: Lock,
-    title: 'Secure Payment',
-    subtitle: '100% protected',
-  },
-];
+import { usePublicSettings } from '@/hooks/usePublicSettings';
 
 export function ProductTrustStrip() {
+  const { delivery } = usePublicSettings();
+  
+  const isFreeDeliveryAll = delivery ? (!delivery.deliveryFeeEnabled || delivery.freeDeliveryThreshold === 0) : false;
+  const deliverySubtitle = !delivery
+    ? "Fast shipping available"
+    : isFreeDeliveryAll
+    ? "Free on all orders"
+    : `On orders above ₹${delivery.freeDeliveryThreshold}`;
+
+  const trustItems = [
+    {
+      icon: ShieldCheck,
+      title: 'Pet Safe',
+      subtitle: 'Non-toxic materials',
+    },
+    {
+      icon: Truck,
+      title: 'Fast Delivery',
+      subtitle: deliverySubtitle,
+    },
+    {
+      icon: RotateCcw,
+      title: 'Easy Returns',
+      subtitle: '7-day hassle free',
+    },
+    {
+      icon: Lock,
+      title: 'Secure Payment',
+      subtitle: '100% protected',
+    },
+  ];
+
   return (
     <div className={styles.trustStripWrapper}>
       <div className={styles.trustStripGrid}>
-        {TRUST_ITEMS.map((item, idx) => {
+        {trustItems.map((item, idx) => {
           const IconComponent = item.icon;
           return (
             <div key={idx} className={styles.trustItemCard}>

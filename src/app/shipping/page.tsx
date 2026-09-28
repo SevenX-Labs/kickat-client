@@ -1,12 +1,17 @@
-import Link from 'next/link';
-import { ArrowLeft, Truck, RefreshCw, Clock, MapPin, CheckCircle2 } from 'lucide-react';
+"use client";
 
-export const metadata = {
-  title: 'Shipping & Returns Policy | KickAt',
-  description: 'Learn about KickAt fast shipping, tracking, and 30-day hassle-free return policy.',
-};
+import Link from 'next/link';
+import { ArrowLeft, Truck, RefreshCw, Clock, MapPin } from 'lucide-react';
+import { usePublicSettings } from '@/hooks/usePublicSettings';
 
 export default function ShippingPage() {
+  const { delivery } = usePublicSettings();
+  
+  const isFreeDeliveryAll = delivery ? (!delivery.deliveryFeeEnabled || delivery.freeDeliveryThreshold === 0) : false;
+  const days = delivery?.estimatedDays ?? 3;
+  const threshold = delivery?.freeDeliveryThreshold ?? 0;
+  const fee = delivery?.deliveryFee ?? 0;
+
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '3rem 1.5rem 6rem', minHeight: '70vh' }}>
       <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: '#F99205', fontWeight: 600, marginBottom: '2rem', textDecoration: 'none' }}>
@@ -29,8 +34,21 @@ export default function ShippingPage() {
             <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111C24' }}>Shipping Options & Timelines</h2>
           </div>
           <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', color: '#4B5563', fontSize: '0.95rem', paddingLeft: '1.25rem' }}>
-            <li><strong>Standard Shipping (2-4 business days):</strong> Free on all orders over ₹499. Flat ₹49 for orders under ₹499.</li>
-            <li><strong>Express Shipping (Next Day):</strong> Available for select metro locations at ₹99.</li>
+            <li>
+              <strong>Standard Shipping ({days}-{days + 2} business days):</strong>{' '}
+              {!delivery ? (
+                'Fast and reliable shipping across India.'
+              ) : isFreeDeliveryAll ? (
+                'Free on all orders within India.'
+              ) : (
+                `Free on all orders over ₹${threshold}. Flat ₹${fee} for orders under ₹${threshold}.`
+              )}
+            </li>
+            {delivery?.extraFeeEnabled && (delivery.extraFeeAmount ?? 0) > 0 && (
+              <li>
+                <strong>{delivery.extraFeeName || 'Handling / Processing Fee'}:</strong> ₹{delivery.extraFeeAmount} per order.
+              </li>
+            )}
             <li><strong>Order Processing:</strong> Orders placed before 2:00 PM IST are dispatched on the same business day.</li>
           </ul>
         </section>

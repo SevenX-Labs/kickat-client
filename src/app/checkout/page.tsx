@@ -38,6 +38,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
+import { usePublicSettings } from '@/hooks/usePublicSettings';
 import { checkoutService } from '@/services/checkoutService';
 import { profileService, CreateAddressDto } from '@/services/profileService';
 import { authService } from '@/services/authService';
@@ -69,6 +70,7 @@ function generateUUID(): string {
 }
 
 export default function CheckoutPage() {
+  const { settings: publicSettings, delivery: publicDelivery, payment: publicPayment } = usePublicSettings();
   const router = useRouter();
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { items: cartItems, refreshCart, isLoading: cartLoading } = useCart();
@@ -417,7 +419,8 @@ export default function CheckoutPage() {
 
     try {
       const currentMethod = paymentMethods.find((m) => m.type === selectedPaymentMethod);
-      const currentCodFee = selectedPaymentMethod === 'COD' ? (checkoutData?.summary?.codFee || currentMethod?.extraFee || 10) : 0;
+      const codConfigFee = (publicPayment?.cod?.extraFeeEnabled ? (publicPayment.cod.extraFee ?? 0) : 0);
+      const currentCodFee = selectedPaymentMethod === 'COD' ? (checkoutData?.summary?.codFee ?? currentMethod?.extraFee ?? codConfigFee) : 0;
       const effectiveExpectedTotal = (checkoutData?.summary?.grandTotal ?? 0) + currentCodFee;
       const cleanUpiId = selectedPaymentMethod === 'UPI' ? (upiId.trim() || 'qr@razorpay') : undefined;
 
@@ -894,16 +897,17 @@ export default function CheckoutPage() {
   // ----------------------------------------------------
   const summary = checkoutData?.summary;
   const subtotal = summary?.subtotal ?? 0;
-  const deliveryFee = summary?.deliveryFee ?? 0;
+  const deliveryFee = summary?.deliveryFee ?? (publicDelivery ? (publicDelivery.deliveryFeeEnabled ? publicDelivery.deliveryFee : 0) : 0);
   const gstAmount = summary?.gstAmount ?? 0;
-  const gstPercentage = summary?.gstPercentage;
-  const codFee = summary?.codFee ?? 0;
-  const extraFeeAmount = summary?.extraFeeAmount ?? 0;
-  const extraFeeName = summary?.extraFeeName;
+  const gstPercentage = summary?.gstPercentage ?? publicSettings?.tax?.gstPercentage;
+  const codFee = summary?.codFee;
+  const extraFeeAmount = summary?.extraFeeAmount ?? (publicDelivery?.extraFeeEnabled ? (publicDelivery.extraFeeAmount ?? 0) : 0);
+  const extraFeeName = summary?.extraFeeName ?? publicDelivery?.extraFeeName;
   const currentMethodItem = paymentMethods.find((m) => m.type === selectedPaymentMethod);
-  const activeCodFee = selectedPaymentMethod === 'COD' ? (codFee || currentMethodItem?.extraFee || 10) : 0;
+  const serverCodFee = publicPayment?.cod?.extraFeeEnabled ? (publicPayment.cod.extraFee ?? 0) : 0;
+  const activeCodFee = selectedPaymentMethod === 'COD' ? (codFee ?? currentMethodItem?.extraFee ?? serverCodFee) : 0;
   const grandTotal = summary?.grandTotal ?? 0;
-  const effectiveGrandTotal = grandTotal + activeCodFee;
+  const effectiveGrandTotal = (grandTotal > 0 ? grandTotal : (subtotal + deliveryFee + gstAmount + extraFeeAmount)) + activeCodFee;
   const totalItemsCount = summary?.itemCount ?? cartItems?.reduce((acc, i) => acc + i.quantity, 0) ?? 0;
 
   const displayedItems = isItemsExpanded ? (cartItems || []) : (cartItems || []).slice(0, 2);

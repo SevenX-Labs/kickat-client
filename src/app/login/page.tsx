@@ -1,10 +1,20 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Smartphone, Loader2, AlertCircle, ShieldCheck } from "lucide-react";
+import { 
+  ArrowLeft, 
+  Smartphone, 
+  Loader2, 
+  AlertCircle, 
+  ShieldCheck, 
+  Eye, 
+  EyeOff, 
+  Edit2,
+  Lock
+} from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { authService } from "@/services/authService";
 import { OtpSuccessModal } from "@/components/common/OtpSuccessModal/OtpSuccessModal";
@@ -17,35 +27,47 @@ function LoginContent() {
 
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [otp, setOtp] = useState("");
+  const [otpDigits, setOtpDigits] = useState<string[]>(["", "", "", "", "", ""]);
+  const [isMasked, setIsMasked] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
-  // Parse error query parameter if redirected back from Google OAuth
-  useEffect(() => {
-    const errorParam = searchParams.get("error");
-    if (errorParam) {
-      setErrorMessage(errorParam);
-    }
-  }, [searchParams]);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  // If already authenticated and success modal is not active, redirect to target
+  // If already authenticated and not showing success modal, redirect
   useEffect(() => {
     if (isAuthenticated && !isSuccessModalOpen) {
       const redirectTo = searchParams.get("redirect") || "/";
-      router.push(redirectTo);
+      const isProfileComplete = Boolean(
+        user?.isProfileComplete ||
+        user?.profileCompleted ||
+        (user?.name && (user?.email || user?.phone))
+      );
+      const redirectTarget = !isProfileComplete ? "/onboarding" : redirectTo;
+      router.push(redirectTarget);
     }
-  }, [isAuthenticated, isSuccessModalOpen, router, searchParams]);
+  }, [isAuthenticated, isSuccessModalOpen, router, searchParams, user]);
 
-  // Resend OTP countdown timer
+  // Resend cooldown timer
   useEffect(() => {
+    let timer: NodeJS.Timeout;
     if (resendCooldown > 0) {
-      const timer = setTimeout(() => setResendCooldown((prev) => prev - 1), 1000);
+      timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [resendCooldown]);
+
+  // Auto focus first OTP box when entering OTP step
+  useEffect(() => {
+    if (step === "otp") {
+      const timer = setTimeout(() => {
+        inputRefs.current[0]?.focus();
+      }, 100);
       return () => clearTimeout(timer);
     }
-  }, [resendCooldown]);
+  }, [step]);
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,6 +79,7 @@ function LoginContent() {
     try {
       await sendMobileOtp(phoneNumber);
       setStep("otp");
+      setOtpDigits(["", "", "", "", "", ""]);
       setResendCooldown(60);
     } catch (err: any) {
       setErrorMessage(err?.message || "Failed to send OTP. Please try again.");
@@ -74,6 +97,8 @@ function LoginContent() {
     try {
       await sendMobileOtp(phoneNumber);
       setResendCooldown(60);
+      setOtpDigits(["", "", "", "", "", ""]);
+      inputRefs.current[0]?.focus();
     } catch (err: any) {
       setErrorMessage(err?.message || "Failed to resend OTP.");
     } finally {
@@ -81,15 +106,76 @@ function LoginContent() {
     }
   };
 
+  const handleDigitChange = (index: number, value: string) => {
+    const cleanDigits = value.replace(/\D/g, "");
+    if (!cleanDigits) {
+      const next = [...otpDigits];
+      next[index] = "";
+      setOtpDigits(next);
+      return;
+    }
+
+    const lastChar = cleanDigits[cleanDigits.length - 1];
+    const next = [...otpDigits];
+    next[index] = lastChar;
+    setOtpDigits(next);
+
+    if (index < 5 && lastChar) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace") {
+      if (!otpDigits[index] && index > 0) {
+        const next = [...otpDigits];
+        next[index - 1] = "";
+        setOtpDigits(next);
+        inputRefs.current[index - 1]?.focus();
+      } else {
+        const next = [...otpDigits];
+        next[index] = "";
+        setOtpDigits(next);
+      }
+    } else if (e.key === "ArrowLeft" && index > 0) {
+      e.preventDefault();
+      inputRefs.current[index - 1]?.focus();
+    } else if (e.key === "ArrowRight" && index < 5) {
+      e.preventDefault();
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pasteData = e.clipboardData.getData("text");
+    const clean = pasteData.replace(/\D/g, "").slice(0, 6);
+    if (!clean) return;
+
+    const next = ["", "", "", "", "", ""];
+    clean.split("").forEach((ch, idx) => {
+      if (idx < 6) next[idx] = ch;
+    });
+    setOtpDigits(next);
+
+    const focusIdx = Math.min(clean.length, 5);
+    inputRefs.current[focusIdx]?.focus();
+  };
+
+  const otpCode = otpDigits.join("");
+
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (otp.length < 6) return;
+    if (otpCode.length < 6) {
+      setErrorMessage("Please enter all 6 digits of the verification code.");
+      return;
+    }
 
     setIsSubmitting(true);
     setErrorMessage(null);
 
     try {
-      const res = await verifyMobileOtp(phoneNumber, otp);
+      const res = await verifyMobileOtp(phoneNumber, otpCode);
       if (res.success) {
         setIsSuccessModalOpen(true);
         const redirectTo = searchParams.get("redirect") || "/";
@@ -117,33 +203,40 @@ function LoginContent() {
     window.location.href = googleLoginUrl;
   };
 
+  const handleBackToPhone = () => {
+    setStep("phone");
+    setErrorMessage(null);
+    setOtpDigits(["", "", "", "", "", ""]);
+  };
+
   return (
     <div className={styles.loginPageWrapper}>
-      {/* Animated Success Dialog Box */}
+      {/* 2.5s Pop-up Modal on Successful OTP Verification */}
       <OtpSuccessModal
         isOpen={isSuccessModalOpen}
         phone={phoneNumber}
-        userName={user?.name}
-        title="OTP Verified Successfully!"
+        title="Welcome to KickAt!"
+        subtitle="You have successfully logged in. Redirecting to your destination..."
       />
 
-      {/* Left Branding Section (Visible on Desktop) */}
+      {/* Left Branding Section */}
       <div className={styles.brandingSection}>
+        <div className={styles.brandingLogo}>
+          <Image
+            src="/logo-clean.png"
+            alt="KickAt Logo"
+            width={180}
+            height={55}
+            className={styles.brandLogoImage}
+            priority
+          />
+        </div>
+
         <div className={styles.brandingContent}>
-          <Link href="/" className={styles.brandLogoHeader} aria-label="KickAt Home">
-            <Image
-              src="/logo-clean.png"
-              alt="KickAt Logo"
-              width={160}
-              height={70}
-              style={{ objectFit: 'contain', width: 'auto', height: 'auto', maxHeight: '55px' }}
-              priority
-            />
-          </Link>
-          <h1 className={styles.brandingTitle}>
-            Premium Care for<br/>Your <span className={styles.highlight}>Best Friend.</span>
-          </h1>
-          <p className={styles.brandingSubtitle}>
+          <h2 className={styles.brandingHeading}>
+            Everything your pet needs, delivered with care.
+          </h2>
+          <p className={styles.brandingText}>
             Join the KickAt family to unlock exclusive rewards, track your orders, and shop the finest pet essentials.
           </p>
         </div>
@@ -164,12 +257,9 @@ function LoginContent() {
         <div className={styles.loginCard}>
           {step === "otp" && (
             <button
+              type="button"
               className={styles.backBtn}
-              onClick={() => {
-                setStep("phone");
-                setErrorMessage(null);
-                setOtp("");
-              }}
+              onClick={handleBackToPhone}
               disabled={isSubmitting}
             >
               <ArrowLeft size={16} /> Back
@@ -189,10 +279,25 @@ function LoginContent() {
             </div>
             <h1 className={styles.title}>Welcome Back</h1>
             <p className={styles.subtitle}>
-              {step === "phone"
-                ? "Sign in to access your account, orders, and wishlist."
-                : `Enter the 6-digit code sent to +91 ${phoneNumber}`
-              }
+              {step === "phone" ? (
+                "Sign in to access your account, orders, and wishlist."
+              ) : (
+                <>
+                  <span>Enter the 6-digit code sent to</span>
+                  <span className={styles.phoneTargetBadge}>
+                    <Smartphone size={13} />
+                    <span>+91 {phoneNumber}</span>
+                    <button
+                      type="button"
+                      onClick={handleBackToPhone}
+                      className={styles.phoneChangeLink}
+                      title="Change phone number"
+                    >
+                      <Edit2 size={11} /> Change
+                    </button>
+                  </span>
+                </>
+              )}
             </p>
           </div>
 
@@ -267,35 +372,57 @@ function LoginContent() {
             </>
           ) : (
             <form onSubmit={handleVerifyOtp}>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>One Time Password (OTP)</label>
-                <div className={styles.inputWrapper}>
-                  <span className={styles.prefix}><Smartphone size={18} /></span>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    autoComplete="one-time-code"
-                    className={styles.input}
-                    placeholder="Enter 6-digit OTP"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    onPaste={(e) => {
-                      e.preventDefault();
-                      const pasteData = e.clipboardData.getData('text');
-                      const clean = pasteData.replace(/\D/g, '').slice(0, 6);
-                      setOtp(clean);
-                    }}
-                    maxLength={6}
-                    disabled={isSubmitting}
-                    required
-                    autoFocus
-                  />
+              <div className={styles.otpSection}>
+                <div className={styles.otpHeaderRow}>
+                  <label className={styles.otpLabel}>One Time Password (OTP)</label>
+                  <button
+                    type="button"
+                    onClick={() => setIsMasked(!isMasked)}
+                    className={styles.otpMaskToggleBtn}
+                    aria-label={isMasked ? "Show OTP numbers" : "Mask OTP with dots"}
+                  >
+                    {isMasked ? (
+                      <>
+                        <Eye size={13} />
+                        <span>Show OTP</span>
+                      </>
+                    ) : (
+                      <>
+                        <EyeOff size={13} />
+                        <span>Hide OTP</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <div className={styles.otpBoxesGrid}>
+                  {otpDigits.map((digit, index) => (
+                    <input
+                      key={index}
+                      ref={(el) => {
+                        inputRefs.current[index] = el;
+                      }}
+                      type={isMasked ? "password" : "text"}
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      autoComplete={index === 0 ? "one-time-code" : "off"}
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handleDigitChange(index, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(index, e)}
+                      onPaste={handlePaste}
+                      className={`${styles.otpBox} ${isMasked ? styles.otpBoxMasked : ''} ${digit ? styles.otpBoxFilled : ''}`}
+                      disabled={isSubmitting}
+                      required
+                    />
+                  ))}
                 </div>
               </div>
+
               <button
                 type="submit"
                 className={styles.primaryBtn}
-                disabled={otp.length < 6 || isSubmitting}
+                disabled={otpCode.length < 6 || isSubmitting}
               >
                 {isSubmitting ? (
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>

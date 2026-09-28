@@ -1,35 +1,47 @@
+"use client";
+
 import { Truck, ShieldCheck, RefreshCw, Lock, Headset } from 'lucide-react';
 import styles from './TrustStrip.module.css';
-
-const features = [
-  {
-    icon: Truck,
-    title: "Free & Fast Delivery",
-    subtitle: "On orders over ₹999"
-  },
-  {
-    icon: ShieldCheck,
-    title: "100% Authentic",
-    subtitle: "Trusted & Premium Quality"
-  },
-  {
-    icon: RefreshCw,
-    title: "Easy Returns",
-    subtitle: "Hassle-free Returns"
-  },
-  {
-    icon: Lock,
-    title: "Secure Payments",
-    subtitle: "Safe & Protected"
-  },
-  {
-    icon: Headset,
-    title: "24/7 Support",
-    subtitle: "We're Here to Help"
-  }
-];
+import { usePublicSettings } from '@/hooks/usePublicSettings';
 
 export function TrustStrip() {
+  const { delivery } = usePublicSettings();
+  
+  const isFreeDeliveryAll = delivery ? (!delivery.deliveryFeeEnabled || delivery.freeDeliveryThreshold === 0) : false;
+  const deliverySubtitle = !delivery
+    ? "Free standard shipping"
+    : isFreeDeliveryAll
+    ? "On all orders"
+    : `On orders over ₹${delivery.freeDeliveryThreshold}`;
+
+  const features = [
+    {
+      icon: Truck,
+      title: "Free & Fast Delivery",
+      subtitle: deliverySubtitle
+    },
+    {
+      icon: ShieldCheck,
+      title: "100% Authentic",
+      subtitle: "Trusted & Premium Quality"
+    },
+    {
+      icon: RefreshCw,
+      title: "Easy Returns",
+      subtitle: "Hassle-free Returns"
+    },
+    {
+      icon: Lock,
+      title: "Secure Payments",
+      subtitle: "Safe & Protected"
+    },
+    {
+      icon: Headset,
+      title: "24/7 Support",
+      subtitle: "We're Here to Help"
+    }
+  ];
+
   const trackContent = features.map((feature, idx) => {
     const Icon = feature.icon;
     return (

@@ -14,6 +14,7 @@ import { RelatedProducts } from '@/components/shop/ProductDetail/RelatedProducts
 import { TrustStrip } from '@/components/common/TrustStrip/TrustStrip';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
+import { usePublicSettings } from '@/hooks/usePublicSettings';
 
 export default function CartPage() {
   const { isAuthenticated } = useAuth();
@@ -37,16 +38,23 @@ export default function CartPage() {
   const subtotal = summary?.subtotal ?? items.reduce((acc, item) => acc + item.totalPrice, 0);
   const productDiscount = summary?.productDiscount ?? 0;
   
-  // Free delivery logic
-  const freeShippingThreshold = summary?.freeDeliveryThreshold ?? 2000;
-  const isFreeShipping = summary?.isFreeDelivery ?? (subtotal >= freeShippingThreshold);
+  const { delivery, tax } = usePublicSettings();
+  const freeShippingThreshold = summary?.freeDeliveryThreshold ?? (delivery?.freeDeliveryThreshold ?? 0);
+  const isFreeDeliveryEnabled = delivery ? delivery.deliveryFeeEnabled : true;
+  const isFreeShipping = !isFreeDeliveryEnabled || freeShippingThreshold === 0 || (summary?.isFreeDelivery ?? (subtotal >= freeShippingThreshold));
   const amountToFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
-  const shippingProgress = Math.min(100, (subtotal / freeShippingThreshold) * 100);
+  const shippingProgress = isFreeShipping ? 100 : (freeShippingThreshold > 0 ? Math.min(100, (subtotal / freeShippingThreshold) * 100) : 100);
 
-  // Delivery fee calculation from server authoritative summary
-  const deliveryFee = isFreeShipping ? 0 : (summary?.deliveryFee ?? 150);
-  const taxAmount = summary?.gstAmount ?? summary?.taxAmount ?? summary?.tax ?? Math.round(subtotal * 0.18);
-  const platformFee = summary?.extraFeeAmount ?? summary?.platformFee ?? 0;
+  // Delivery fee calculation from server authoritative summary or live delivery settings
+  const deliveryFee = isFreeShipping ? 0 : (summary?.deliveryFee ?? (delivery?.deliveryFee ?? 0));
+  
+  // Tax from server summary or live tax settings
+  const gstRate = ((summary?.gstPercentage ?? tax?.gstPercentage) ?? 0) / 100;
+  const isTaxEnabled = tax ? tax.gstEnabled : true;
+  const taxAmount = summary?.gstAmount ?? summary?.taxAmount ?? summary?.tax ?? (isTaxEnabled ? Math.round(subtotal * gstRate) : 0);
+  
+  // Extra / Handling fee directly from server
+  const platformFee = summary?.extraFeeAmount ?? (delivery?.extraFeeEnabled ? (delivery?.extraFeeAmount ?? 0) : 0);
   const grandTotal = summary?.grandTotal ?? summary?.totalAmount ?? summary?.total ?? (subtotal + taxAmount + deliveryFee + platformFee);
 
   const handleCheckout = () => {
