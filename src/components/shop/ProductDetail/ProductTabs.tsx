@@ -2,7 +2,21 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Shield, Sparkles, Droplets, Heart, PawPrint } from 'lucide-react';
+import {
+  ShieldCheck,
+  Sparkles,
+  HeartHandshake,
+  Award,
+  CheckCircle2,
+  Utensils,
+  BookOpen,
+  Truck,
+  RotateCcw,
+  PackageCheck,
+  Leaf,
+  PawPrint,
+  FileText,
+} from 'lucide-react';
 import styles from './ProductDetail.module.css';
 import { Product } from './ProductDetail';
 
@@ -10,125 +24,253 @@ interface ProductTabsProps {
   product: Product;
 }
 
-type TabType = 'Details' | 'Materials' | 'Size & Fit' | 'Shipping & Returns';
-
-const TABS: { id: TabType; label: string }[] = [
-  { id: 'Details', label: 'Details' },
-  { id: 'Materials', label: 'Materials' },
-  { id: 'Size & Fit', label: 'Size & Fit' },
-  { id: 'Shipping & Returns', label: 'Shipping & Returns' },
-];
-
 export function ProductTabs({ product }: ProductTabsProps) {
-  const [activeTab, setActiveTab] = useState<TabType>('Details');
+  // Parse highlights
+  let parsedHighlights: string[] = [];
+  if (Array.isArray(product.highlights)) {
+    parsedHighlights = product.highlights.map(String).filter(Boolean);
+  } else if (typeof product.highlights === 'object' && product.highlights !== null) {
+    parsedHighlights = Object.values(product.highlights).map(String).filter(Boolean);
+  } else if (typeof product.highlights === 'string' && product.highlights.trim().length > 0) {
+    parsedHighlights = product.highlights.split(/[;,\n]/).map((s: string) => s.trim()).filter(Boolean);
+  }
 
-  const renderTabContent = (tab: TabType) => {
-    switch (tab) {
-      case 'Details':
+  // Parse ingredients
+  let ingredientsText = '';
+  if (typeof product.ingredients === 'string') {
+    ingredientsText = product.ingredients;
+  } else if (Array.isArray(product.ingredients)) {
+    ingredientsText = product.ingredients.join(', ');
+  } else if (typeof product.ingredients === 'object' && product.ingredients !== null) {
+    ingredientsText = Object.values(product.ingredients).join(', ');
+  }
+
+  // Parse feeding guide
+  let feedingText = '';
+  if (typeof product.feedingGuide === 'string') {
+    feedingText = product.feedingGuide;
+  } else if (typeof product.feedingGuide === 'object' && product.feedingGuide !== null) {
+    feedingText = Object.entries(product.feedingGuide)
+      .map(([k, v]) => `${k}: ${v}`)
+      .join(' | ');
+  }
+
+  // Build dynamic tabs
+  const tabs: { id: string; label: string; icon: React.ReactNode }[] = [
+    { id: 'details', label: 'Details & Highlights', icon: <FileText size={15} /> },
+  ];
+
+  if (ingredientsText || product.dietaryPreference) {
+    tabs.push({ id: 'ingredients', label: 'Ingredients & Nutrition', icon: <Utensils size={15} /> });
+  }
+
+  if (feedingText) {
+    tabs.push({ id: 'feeding', label: 'Feeding & Usage Guide', icon: <BookOpen size={15} /> });
+  }
+
+  if (product.materials) {
+    tabs.push({ id: 'materials', label: 'Materials & Safety', icon: <ShieldCheck size={15} /> });
+  }
+
+  tabs.push({ id: 'shipping', label: 'Shipping & Returns', icon: <Truck size={15} /> });
+
+  const [activeTab, setActiveTab] = useState<string>('details');
+
+  const defaultHighlights = [
+    { title: '100% Pet-Safe Formula', desc: 'Crafted without harmful chemicals or fillers', icon: <ShieldCheck size={20} /> },
+    { title: 'Veterinarian Approved', desc: 'Formulated for everyday wellness & vitality', icon: <Award size={20} /> },
+    { title: 'Premium Sourced Ingredients', desc: 'Ethically selected for optimal nutrition', icon: <Sparkles size={20} /> },
+    { title: 'Happiness Guaranteed', desc: 'Designed for tails wagging & gentle comfort', icon: <HeartHandshake size={20} /> },
+  ];
+
+  const renderTabContent = (tabId: string) => {
+    switch (tabId) {
+      case 'details':
         return (
           <div className={styles.tabDetailsGrid}>
             {/* Left Column: Description & Highlights */}
             <div className={styles.tabDetailsLeftCol}>
               <h3 className={styles.tabSectionHeading}>
-                {product.descriptionTitle || 'Thoughtfully Crafted for Your Companion'}
+                {product.descriptionTitle || `Why Choose ${product.name}?`}
               </h3>
               <p className={styles.tabMainParagraph}>
-                {product.description || 'Crafted with premium materials for your pet’s health, comfort, and happiness. Engineered to withstand daily use while providing gentle care.'}
+                {product.description ||
+                  'Crafted with the finest ingredients and rigorous standards to bring wholesome wellness, energy, and joy to your furry companion. Engineered for pet safety, gentle care, and daily happiness.'}
               </p>
 
-              {/* 4 Feature Callouts Grid */}
+              {/* Dynamic Highlights */}
               <div className={styles.calloutGrid}>
-                <div className={styles.calloutItem}>
-                  <div className={styles.calloutIconWrap}>
-                    <Shield size={20} className={styles.calloutIcon} />
-                  </div>
-                  <div>
-                    <h4 className={styles.calloutTitle}>Premium Quality</h4>
-                    <p className={styles.calloutSub}>Tested for durability</p>
-                  </div>
-                </div>
-
-                <div className={styles.calloutItem}>
-                  <div className={styles.calloutIconWrap}>
-                    <Sparkles size={20} className={styles.calloutIcon} />
-                  </div>
-                  <div>
-                    <h4 className={styles.calloutTitle}>Gentle &amp; Safe</h4>
-                    <p className={styles.calloutSub}>Veterinarian approved</p>
-                  </div>
-                </div>
-
-                <div className={styles.calloutItem}>
-                  <div className={styles.calloutIconWrap}>
-                    <Droplets size={20} className={styles.calloutIcon} />
-                  </div>
-                  <div>
-                    <h4 className={styles.calloutTitle}>Easy Maintenance</h4>
-                    <p className={styles.calloutSub}>Hassle-free cleaning</p>
-                  </div>
-                </div>
-
-                <div className={styles.calloutItem}>
-                  <div className={styles.calloutIconWrap}>
-                    <Heart size={20} className={styles.calloutIcon} />
-                  </div>
-                  <div>
-                    <h4 className={styles.calloutTitle}>Non-Toxic &amp; Safe</h4>
-                    <p className={styles.calloutSub}>100% pet-friendly materials</p>
-                  </div>
-                </div>
+                {parsedHighlights.length > 0 ? (
+                  parsedHighlights.map((hl, idx) => (
+                    <div key={idx} className={styles.calloutItem}>
+                      <div className={styles.calloutIconWrap}>
+                        <CheckCircle2 size={18} className={styles.calloutIcon} />
+                      </div>
+                      <div>
+                        <h4 className={styles.calloutTitle}>{hl}</h4>
+                        <p className={styles.calloutSub}>KickAt Quality Guarantee</p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  defaultHighlights.map((item, idx) => (
+                    <div key={idx} className={styles.calloutItem}>
+                      <div className={styles.calloutIconWrap}>
+                        <span className={styles.calloutIcon}>{item.icon}</span>
+                      </div>
+                      <div>
+                        <h4 className={styles.calloutTitle}>{item.title}</h4>
+                        <p className={styles.calloutSub}>{item.desc}</p>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 
-            {/* Right Column: Lifestyle Banner Image with Overlay */}
+            {/* Right Column: Clean Lifestyle Product Banner */}
             <div className={styles.tabDetailsRightCol}>
               <div className={styles.lifestyleBannerWrap}>
                 <Image
                   src={product.image || product.images?.[0] || "/hero-products/dog_food.png"}
                   alt={product.name || "Product lifestyle preview"}
                   fill
+                  sizes="(max-width: 768px) 100vw, 500px"
                   className={styles.lifestyleImage}
-                  style={{ objectFit: 'contain' }}
                 />
-                {/* Cursive Overlay */}
-                <div className={styles.cursiveOverlayText}>
-                  <span>Play</span>
-                  <span>Love</span>
-                  <span>Cherish</span>
-                  <span className={styles.cursiveHeart}>♡</span>
-                </div>
-
-                {/* Bottom Right Badge */}
+                {/* Subtle Modern Badge */}
                 <div className={styles.lifestyleBadgeBottom}>
-                  <PawPrint size={16} fill="#F99205" color="#F99205" />
-                  <span>Happier Pets, Healthier Lives</span>
+                  <PawPrint size={15} fill="#F99205" color="#F99205" />
+                  <span>KickAt Certified Quality</span>
                 </div>
               </div>
             </div>
           </div>
         );
 
-      case 'Materials':
+      case 'ingredients':
         return (
-          <p className={styles.tabTextContent}>
-            {product.materials 
-              ? product.materials 
-              : '100% pet-safe, food-grade materials. Free from BPA, phthalates, and harsh chemical compounds. Sourced sustainably to ensure gentle, non-toxic contact with your pet.'}
-          </p>
+          <div className={styles.tabContentBlock}>
+            <div className={styles.tabContentHeader}>
+              <h3 className={styles.tabSectionHeading}>Ingredients &amp; Nutritional Facts</h3>
+              {product.dietaryPreference && (
+                <span className={styles.dietaryTagBadge}>
+                  <Leaf size={14} />
+                  <span>{product.dietaryPreference === 'VEG' ? '100% Vegetarian' : 'Non-Vegetarian'}</span>
+                </span>
+              )}
+            </div>
+
+            {ingredientsText ? (
+              <div className={styles.ingredientsCard}>
+                <p className={styles.ingredientsBodyText}>{ingredientsText}</p>
+              </div>
+            ) : (
+              <p className={styles.tabTextContent}>
+                Crafted using premium, wholesome ingredients carefully chosen to deliver balanced nutrition and great taste. Free from synthetic colorants, harsh artificial preservatives, or unnecessary fillers.
+              </p>
+            )}
+
+            <div className={styles.nutritionHighlightsGrid}>
+              <div className={styles.nutritionBox}>
+                <span className={styles.nutritionBoxTitle}>Zero Fillers</span>
+                <span className={styles.nutritionBoxSub}>No artificial additives</span>
+              </div>
+              <div className={styles.nutritionBox}>
+                <span className={styles.nutritionBoxTitle}>Gentle on Stomach</span>
+                <span className={styles.nutritionBoxSub}>Easy digestion formulation</span>
+              </div>
+              <div className={styles.nutritionBox}>
+                <span className={styles.nutritionBoxTitle}>Rich in Nutrients</span>
+                <span className={styles.nutritionBoxSub}>Vitamins &amp; minerals fortified</span>
+              </div>
+            </div>
+          </div>
         );
 
-      case 'Size & Fit':
+      case 'feeding':
         return (
-          <p className={styles.tabTextContent}>
-            Designed for optimal ergonomics and comfort. Available in multiple options to best suit your companion&apos;s size, breed, and weight requirements.
-          </p>
+          <div className={styles.tabContentBlock}>
+            <h3 className={styles.tabSectionHeading}>Feeding &amp; Usage Recommendations</h3>
+            <div className={styles.feedingGuideCard}>
+              <p className={styles.tabMainParagraph}>{feedingText}</p>
+            </div>
+            <div className={styles.feedingTipBox}>
+              <PawPrint size={16} color="#F99205" />
+              <span>
+                Always ensure clean, fresh drinking water is accessible to your pet throughout the day.
+              </span>
+            </div>
+          </div>
         );
 
-      case 'Shipping & Returns':
+      case 'materials':
         return (
-          <p className={styles.tabTextContent}>
-            Enjoy free express shipping on eligible orders. Standard delivery time is 2-4 business days. Easy returns accepted within 7 days of delivery for eligible items.
-          </p>
+          <div className={styles.tabContentBlock}>
+            <h3 className={styles.tabSectionHeading}>Pet-Safe Materials &amp; Standards</h3>
+            <p className={styles.tabTextContent}>
+              {product.materials ||
+                '100% pet-safe, non-toxic, and hypoallergenic materials. Rigorously tested to withstand daily wear while protecting your companion’s skin, paws, and digestion.'}
+            </p>
+            <div className={styles.safetyBadgesRow}>
+              <div className={styles.safetyPill}>
+                <CheckCircle2 size={15} color="#2E7D32" />
+                <span>BPA &amp; Phthalate Free</span>
+              </div>
+              <div className={styles.safetyPill}>
+                <CheckCircle2 size={15} color="#2E7D32" />
+                <span>Non-Toxic Compounds</span>
+              </div>
+              <div className={styles.safetyPill}>
+                <CheckCircle2 size={15} color="#2E7D32" />
+                <span>Lab Quality Tested</span>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'shipping':
+        return (
+          <div className={styles.tabContentBlock}>
+            <h3 className={styles.tabSectionHeading}>Shipping &amp; Return Policy</h3>
+            <div className={styles.shippingGrid}>
+              <div className={styles.shippingCard}>
+                <div className={styles.shippingIconWrap}>
+                  <Truck size={22} color="#F99205" />
+                </div>
+                <div>
+                  <h4 className={styles.shippingCardTitle}>Fast Express Delivery</h4>
+                  <p className={styles.shippingCardDesc}>
+                    Dispatched within 24 hours. Standard delivery takes 2–4 business days across India.
+                  </p>
+                </div>
+              </div>
+
+              <div className={styles.shippingCard}>
+                <div className={styles.shippingIconWrap}>
+                  <RotateCcw size={22} color="#F99205" />
+                </div>
+                <div>
+                  <h4 className={styles.shippingCardTitle}>7-Day Easy Returns</h4>
+                  <p className={styles.shippingCardDesc}>
+                    Hassle-free replacement or full refund within 7 days of delivery for eligible items.
+                  </p>
+                </div>
+              </div>
+
+              <div className={styles.shippingCard}>
+                <div className={styles.shippingIconWrap}>
+                  <PackageCheck size={22} color="#F99205" />
+                </div>
+                <div>
+                  <h4 className={styles.shippingCardTitle}>Tamper-Proof Packaging</h4>
+                  <p className={styles.shippingCardDesc}>
+                    Secure, sealed packaging ensures your products arrive fresh, clean, and undamaged.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         );
 
       default:
@@ -140,7 +282,7 @@ export function ProductTabs({ product }: ProductTabsProps) {
     <div className={styles.tabsSectionContainer}>
       {/* Horizontal Tabs Header Bar */}
       <div className={styles.tabsHeaderNav}>
-        {TABS.map((tab) => {
+        {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
             <button
@@ -149,7 +291,8 @@ export function ProductTabs({ product }: ProductTabsProps) {
               className={`${styles.tabNavBtn} ${isActive ? styles.tabNavBtnActive : ''}`}
               onClick={() => setActiveTab(tab.id)}
             >
-              {tab.label}
+              <span className={styles.tabBtnIcon}>{tab.icon}</span>
+              <span>{tab.label}</span>
             </button>
           );
         })}

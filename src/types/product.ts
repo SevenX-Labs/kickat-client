@@ -62,6 +62,7 @@ export interface BackendProduct {
   feedingGuide?: any | null;
   careInstructions?: string[];
   sizeGuide?: Record<string, any> | null;
+  faqs?: Array<{ question: string; answer: string }> | null;
   createdAt?: string;
   updatedAt?: string;
   category?: BackendCategory;
@@ -210,6 +211,7 @@ export function transformBackendProduct(bp: BackendProduct) {
     feedingGuide: bp.feedingGuide || undefined,
     careInstructions: bp.careInstructions || undefined,
     sizeGuide: bp.sizeGuide || undefined,
+    faqs: Array.isArray(bp.faqs) ? bp.faqs : typeof bp.faqs === "string" ? JSON.parse(bp.faqs) : undefined,
     variants: (bp.variants || []).map((v) => ({
       id: v.id,
       name: v.name,

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Play, Maximize, Heart, Share2, X, Loader2 } from 'lucide-react';
+import { Play, Maximize, Heart, Share2, X, Loader2, Sparkles } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { wishlistService } from '@/services/wishlistService';
 import styles from './ProductDetail.module.css';
@@ -12,9 +12,10 @@ interface ProductGalleryProps {
   images: string[];
   productId?: string;
   variantId?: string;
+  brand?: string;
 }
 
-export function ProductGallery({ images, productId, variantId }: ProductGalleryProps) {
+export function ProductGallery({ images, productId, variantId, brand = 'KickAt' }: ProductGalleryProps) {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
   const [activeIndex, setActiveIndex] = useState(0);
@@ -22,7 +23,7 @@ export function ProductGallery({ images, productId, variantId }: ProductGalleryP
   const [isWishlistLoading, setIsWishlistLoading] = useState(false);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
-  // Sync wishlist status from event or initial fetch if productId present
+  // Sync wishlist status
   useEffect(() => {
     if (!productId) return;
     const handleWishlistUpdated = (e: any) => {
@@ -84,6 +85,8 @@ export function ProductGallery({ images, productId, variantId }: ProductGalleryP
     src,
   }));
 
+  const activeSrc = thumbnails[activeIndex]?.src || currentImages[0];
+
   return (
     <div className={styles.galleryWrapper}>
       {/* Vertical Thumbnail Strip (Far Left on Desktop) */}
@@ -104,6 +107,7 @@ export function ProductGallery({ images, productId, variantId }: ProductGalleryP
                 fill
                 sizes="64px"
                 className={styles.thumbnailImage}
+                unoptimized={thumb.src.startsWith('data:')}
               />
               {thumb.type === 'video' && (
                 <div className={styles.videoPlayOverlay}>
@@ -115,14 +119,16 @@ export function ProductGallery({ images, productId, variantId }: ProductGalleryP
         })}
       </div>
 
-      {/* Large Main Image Box with Warm Background & Overlays */}
+      {/* Large Main Image Box */}
       <div className={styles.mainImageContainer}>
-        {/* Top Text Overlay */}
+        {/* Top Feature Tag */}
         <div className={styles.mainImageTopOverlay}>
-          <span className={styles.overlaySubtitle}>Natural &nbsp;|&nbsp; Safe &nbsp;|&nbsp; Premium Quality</span>
+          <span className={styles.overlaySubtitle}>
+            100% Pet-Safe &nbsp;|&nbsp; Premium Quality
+          </span>
         </div>
 
-        {/* Top Right Floating Actions: Wishlist (top) & Share (below) */}
+        {/* Top Right Floating Actions: Wishlist & Share */}
         <div className={styles.imageTopRightActions}>
           <button
             type="button"
@@ -144,7 +150,7 @@ export function ProductGallery({ images, productId, variantId }: ProductGalleryP
             onClick={() => {
               if (typeof window !== 'undefined') {
                 if (navigator.share) {
-                  navigator.share({ title: 'Check out this product', url: window.location.href }).catch(() => {});
+                  navigator.share({ title: 'Check out this product on KickAt', url: window.location.href }).catch(() => {});
                 } else {
                   navigator.clipboard.writeText(window.location.href);
                   alert('Link copied to clipboard!');
@@ -159,11 +165,12 @@ export function ProductGallery({ images, productId, variantId }: ProductGalleryP
         {/* Center Product Image */}
         <div className={styles.mainImageCenterWrap}>
           <Image
-            src={thumbnails[activeIndex]?.src || currentImages[0]}
+            src={activeSrc}
             alt="Product Image"
             fill
             className={styles.mainProductImage}
             priority
+            unoptimized={activeSrc.startsWith('data:')}
           />
           {thumbnails[activeIndex]?.type === 'video' && (
             <div className={styles.centerVideoPlayBtn}>
@@ -174,8 +181,8 @@ export function ProductGallery({ images, productId, variantId }: ProductGalleryP
 
         {/* Bottom Left Caption Bar */}
         <div className={styles.mainImageBottomCaption}>
-          <span className={styles.captionBrandTitle}>MIM &amp; MATE</span>
-          <span className={styles.captionBrandSub}>For a happier, healthier pet</span>
+          <span className={styles.captionBrandTitle}>{brand.toUpperCase()}</span>
+          <span className={styles.captionBrandSub}>For a happier, healthier companion</span>
         </div>
 
         {/* Bottom Right Expand Button */}
@@ -203,10 +210,11 @@ export function ProductGallery({ images, productId, variantId }: ProductGalleryP
             </button>
             <div className={styles.lightboxImageWrap}>
               <Image
-                src={thumbnails[activeIndex]?.src || currentImages[0]}
+                src={activeSrc}
                 alt="Enlarged Product View"
                 fill
                 className={styles.lightboxImage}
+                unoptimized={activeSrc.startsWith('data:')}
               />
             </div>
           </div>

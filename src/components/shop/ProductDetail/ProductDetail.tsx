@@ -55,6 +55,7 @@ export interface Product {
   feedingGuide?: any;
   careInstructions?: string[];
   sizeGuide?: any;
+  faqs?: Array<{ question: string; answer: string }>;
   variants?: ProductVariant[];
   media?: any[];
 }
@@ -101,12 +102,16 @@ export function ProductDetail({ product, isLoading }: ProductDetailProps) {
 
   return (
     <div className={styles.pageContainer}>
-
       {/* 1. Main Product Section (2-Column Desktop, Stacked Mobile) */}
       <section className={styles.mainProductSection}>
         <div className={styles.container}>
           <div className={styles.mainProductGrid}>
-            <ProductGallery images={activeImages} productId={product.id} variantId={selectedVariant?.id} />
+            <ProductGallery
+              images={activeImages}
+              productId={product.id}
+              variantId={selectedVariant?.id}
+              brand={product.brand || 'KickAt'}
+            />
             <ProductInfo
               product={product}
               selectedVariant={selectedVariant}
@@ -123,7 +128,7 @@ export function ProductDetail({ product, isLoading }: ProductDetailProps) {
         </div>
       </section>
 
-      {/* 3. Tabbed Content Section (Details, Materials, Size & Fit, Shipping & Returns) */}
+      {/* 3. Tabbed Content Section (Details & Highlights, Ingredients, Feeding, Safety, Shipping) */}
       <section className={styles.sectionPadding}>
         <div className={styles.container}>
           <ProductTabs product={product} />
@@ -144,10 +149,10 @@ export function ProductDetail({ product, isLoading }: ProductDetailProps) {
         </div>
       </section>
 
-      {/* 6. Frequently Asked Questions (FAQ) Section - Below Customer Reviews */}
+      {/* 6. Frequently Asked Questions (FAQ) Section */}
       <section className={styles.sectionPadding}>
         <div className={styles.container}>
-          <ProductFAQ />
+          <ProductFAQ faqs={product.faqs} />
         </div>
       </section>
 

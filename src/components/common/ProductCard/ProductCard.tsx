@@ -25,33 +25,18 @@ export interface Product {
   tags?: string[];
   sizes?: string[];
   color?: string;
+  colors?: string[];
   isTopRated?: boolean;
   description?: string;
   variantId?: string;
   selectedVariantId?: string;
   isWishlisted?: boolean;
+  stock?: number;
 }
 
 interface ProductCardProps {
   product: Product;
   onRemoveFromWishlist?: (id: string) => void;
-}
-
-const defaultSwatches = ['#F99205', '#F0E6D8', '#6B7280', '#2D2D2D'];
-
-const productDescriptions: Record<string, string> = {
-  'd-1': 'Grain-free organic kibble formulated for optimal nutrition, digestion, and coat health.',
-  'd-2': 'Heavyweight ceramic bowl with non-slip base, durable and dishwasher safe.',
-  'd-3': 'Durable natural rubber chew toy designed for teething and active daily play.',
-  'd-4': 'Reflective padded harness & leash set for safe, comfortable night walks.',
-  'c-1': 'Wild salmon & tuna crunch treats packed with natural omega-3 fatty acids.',
-  'c-2': 'Interactive spinning feather toy with USB rechargeable smart motor.',
-  'c-3': 'Natural clumping tofu cat litter, 100% dust-free, flushable, and odor controlling.',
-  'c-4': 'Whisker-friendly shallow ceramic dish designed for stress-free daily feeding.',
-};
-
-function getDescription(product: Product): string {
-  return product.description || productDescriptions[product.id] || (product.tags && product.tags.length > 0 ? product.tags.join(' · ') : 'Premium quality pet essential curated for health & comfort.');
 }
 
 function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProps) {
@@ -70,9 +55,17 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
     }
   }, [product.isWishlisted]);
 
-  const rating = product.rating || 4.8;
-  const reviewsCount = product.reviewsCount || 64;
-  
+  const rating = product.rating ?? 4.5;
+  const reviewsCount = product.reviewsCount ?? 0;
+  const isOutOfStock = typeof product.stock === 'number' && product.stock <= 0;
+
+  // Only show color swatches if genuine color options exist on the product
+  const availableColors = Array.isArray(product.colors) && product.colors.length > 0
+    ? product.colors
+    : product.color
+    ? [product.color]
+    : [];
+
   const discountPercent = useMemo(() => {
     return product.originalPrice && product.originalPrice > product.price 
       ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -128,6 +121,7 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
   const handleAddToCart = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (isOutOfStock) return;
     if (isAdded) {
       router.push('/cart');
       return;
@@ -136,7 +130,7 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
 
     setIsAdding(true);
     try {
-      await addToCart(product.id);
+      await addToCart(product.id, product.variantId || product.selectedVariantId);
       setIsAdded(true);
 
       const startElem = e.currentTarget as HTMLElement;
@@ -207,7 +201,7 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
     } finally {
       setIsAdding(false);
     }
-  }, [isAdded, isAdding, product.id, product.image, router, addToCart]);
+  }, [isAdded, isAdding, isOutOfStock, product.id, product.image, product.variantId, product.selectedVariantId, router, addToCart]);
 
   return (
     <div className={styles.productCard}>
@@ -223,7 +217,7 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
           </span>
         )}
 
-        {/* Mobile-only Wishlist Button (absolute over image for 2-col layout) */}
+        {/* Wishlist Button */}
         {onRemoveFromWishlist ? (
           <button 
             className={styles.cardRemoveBtn} 
@@ -255,6 +249,7 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             className={styles.cardImage}
             style={{ objectFit: 'contain' }}
+            unoptimized={product.image?.startsWith('data:')}
           />
         </Link>
       </div>
@@ -295,22 +290,24 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
           )}
         </div>
 
-        {/* Variant Selector Color Swatches */}
-        <div className={styles.colorSwatches}>
-          {defaultSwatches.map((color, idx) => (
-            <span
-              key={idx}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setSelectedSwatch(idx);
-              }}
-              className={`${styles.swatchDot} ${selectedSwatch === idx ? styles.swatchActive : ''}`}
-              style={{ backgroundColor: color }}
-              aria-label={`Select variant ${idx + 1}`}
-            />
-          ))}
-        </div>
+        {/* Real Variant Color Swatches (only rendered if product actually has color variants) */}
+        {availableColors.length > 0 && (
+          <div className={styles.colorSwatches}>
+            {availableColors.map((color, idx) => (
+              <span
+                key={idx}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setSelectedSwatch(idx);
+                }}
+                className={`${styles.swatchDot} ${selectedSwatch === idx ? styles.swatchActive : ''}`}
+                style={{ backgroundColor: color }}
+                aria-label={`Select color option ${idx + 1}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Desktop Vertical Divider */}
@@ -321,11 +318,13 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
         <div className={styles.rightActionsRow}>
           <button 
             className={styles.addToCartBtn}
-            disabled={isAdding}
-            aria-label="Add to cart"
+            disabled={isAdding || isOutOfStock}
+            aria-label={isOutOfStock ? "Out of stock" : "Add to cart"}
             onClick={handleAddToCart}
           >
-            {isAdded ? (
+            {isOutOfStock ? (
+              <span className={styles.btnText}>Out of Stock</span>
+            ) : isAdded ? (
               <>
                 <Check size={15} color="#ffffff" strokeWidth={2.5} />
                 <span className={styles.btnText}>Go to Cart</span>
@@ -368,14 +367,13 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
           )}
         </div>
 
-        {/* In Stock Indicator & Delivery Subtitle */}
+        {/* Stock Status Indicator */}
         <div className={styles.stockDeliveryGroup}>
           <div className={styles.inStockBadge}>
-            <span className={styles.greenPulseDot} />
+            <span className={isOutOfStock ? styles.redPulseDot : styles.greenPulseDot} />
             <Truck size={13} className={styles.truckIcon} />
-            <span>In Stock</span>
+            <span>{isOutOfStock ? 'Out of Stock' : 'In Stock'}</span>
           </div>
-          <span className={styles.deliveryText}>· Delivery Tomorrow</span>
         </div>
       </div>
     </div>

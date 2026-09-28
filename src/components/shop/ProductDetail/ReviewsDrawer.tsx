@@ -8,8 +8,8 @@ import {
   CheckCircle2,
   ThumbsUp,
   Edit3,
-  Image as ImageIcon,
-  MessageSquareQuote,
+  Camera,
+  MessageSquareHeart,
   Loader2,
 } from 'lucide-react';
 import styles from './ReviewsDrawer.module.css';
@@ -23,90 +23,6 @@ interface ReviewsDrawerProps {
   onClose: () => void;
   onWriteReview: () => void;
 }
-
-const FALLBACK_REVIEWS: ReviewItem[] = [
-  {
-    id: 'rev-1',
-    productId: '',
-    userName: 'Sarah Jenkins',
-    isVerifiedPurchase: true,
-    rating: 5,
-    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    title: 'Transformed my Golden Retriever’s coat!',
-    comment: 'I have tried 4 different shampoos for Buddy, but this anti-hair fall formula is genuinely magical. After 3 washes, his shedding decreased drastically, and his coat is noticeably softer and shinier. Smells so refreshing!',
-    photos: ['/hero-products/dog_food.png', '/hero-products/pet_toy.png'],
-    helpfulCount: 24,
-    status: 'APPROVED',
-    isSpam: false,
-    adminReply: 'Thank you Sarah! We are thrilled to hear Buddy is loving his baths and silky coat.',
-    adminReplyAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    id: 'rev-2',
-    productId: '',
-    userName: 'Vikram Sharma',
-    isVerifiedPurchase: true,
-    rating: 5,
-    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    title: 'Top tier quality & quick delivery',
-    comment: 'Packaging was 10/10. My cat usually hates bath time, but this shampoo lathers quickly and rinses off effortlessly. Very gentle on sensitive skin.',
-    photos: ['/hero-products/pet_bowl.png'],
-    helpfulCount: 18,
-    status: 'APPROVED',
-    isSpam: false,
-    adminReply: null,
-  },
-  {
-    id: 'rev-3',
-    productId: '',
-    userName: 'Ananya Roy',
-    isVerifiedPurchase: true,
-    rating: 4,
-    createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
-    title: 'Great scent, very gentle',
-    comment: 'Smells incredible and natural without harsh chemical perfumes. Reduced fur flying around the house by at least half. Highly recommend for long-haired breeds!',
-    photos: ['/hero-products/cat_treats.png'],
-    helpfulCount: 12,
-    status: 'APPROVED',
-    isSpam: false,
-    adminReply: null,
-  },
-  {
-    id: 'rev-4',
-    productId: '',
-    userName: 'Rohan Mehta',
-    isVerifiedPurchase: true,
-    rating: 5,
-    createdAt: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString(),
-    title: 'Best purchase for pet care this year',
-    comment: 'Worth every rupee. The bottle design is non-slip so it’s super easy to hold with wet hands in the shower.',
-    photos: [],
-    helpfulCount: 9,
-    status: 'APPROVED',
-    isSpam: false,
-    adminReply: null,
-  },
-  {
-    id: 'rev-5',
-    productId: '',
-    userName: 'Priya Nair',
-    isVerifiedPurchase: true,
-    rating: 5,
-    createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-    title: 'Super soft fur and zero irritation!',
-    comment: 'My Persian cat Luna usually gets dry skin after washes, but this formula kept her skin hydrated and coat silky smooth. Will definitely reorder!',
-    photos: ['/hero-products/pet_toy.png'],
-    helpfulCount: 15,
-    status: 'APPROVED',
-    isSpam: false,
-    adminReply: null,
-  },
-];
 
 function formatRelativeTime(dateString: string): string {
   try {
@@ -124,7 +40,7 @@ function formatRelativeTime(dateString: string): string {
     if (diffInDays === 1) return 'Yesterday';
     if (diffInDays < 30) return `${diffInDays} days ago`;
     const diffInMonths = Math.floor(diffInDays / 30);
-    if (diffInMonths < 12) return `${diffInMonths} month${diffInMonths > 1 ? 's' : ''} ago`;
+    if (diffInMonths < 12) return `${diffInMonths} mo ago`;
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   } catch {
     return dateString;
@@ -132,13 +48,12 @@ function formatRelativeTime(dateString: string): string {
 }
 
 export function ReviewsDrawer({ product, isOpen, onClose, onWriteReview }: ReviewsDrawerProps) {
-  const [reviews, setReviews] = useState<ReviewItem[]>(FALLBACK_REVIEWS);
+  const [reviews, setReviews] = useState<ReviewItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedFilter, setSelectedFilter] = useState<'all' | '5' | '4' | '3' | 'photos'>('all');
   const [helpfulVotes, setHelpfulVotes] = useState<Record<string, boolean>>({});
   const [helpfulCountMap, setHelpfulCountMap] = useState<Record<string, number>>({});
   const [previewPhoto, setPreviewPhoto] = useState<string | null>(null);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Fetch live reviews from backend
   const fetchReviews = useCallback(async () => {
@@ -147,17 +62,17 @@ export function ReviewsDrawer({ product, isOpen, onClose, onWriteReview }: Revie
     try {
       const res = await reviewService.getReviews({
         productId: product.id,
-        limit: 50,
+        limit: 100,
         sort: 'newest',
       });
-      if (res && res.reviews && res.reviews.length > 0) {
+      if (res && res.reviews) {
         setReviews(res.reviews);
       } else {
-        setReviews(FALLBACK_REVIEWS);
+        setReviews([]);
       }
     } catch (err) {
-      console.warn('Falling back to default reviews:', err);
-      setReviews(FALLBACK_REVIEWS);
+      console.warn('Could not fetch reviews in drawer:', err);
+      setReviews([]);
     } finally {
       setIsLoading(false);
     }
@@ -194,13 +109,9 @@ export function ReviewsDrawer({ product, isOpen, onClose, onWriteReview }: Revie
           ...prev,
           [revId]: res.helpfulCount,
         }));
-        setToastMessage(res.message || 'Updated helpful vote');
-        setTimeout(() => setToastMessage(null), 2500);
       }
     } catch (err: unknown) {
-      const errMsg = err instanceof Error ? err.message : 'Could not mark review as helpful';
-      setToastMessage(errMsg);
-      setTimeout(() => setToastMessage(null), 3000);
+      console.warn('Could not mark review as helpful:', err);
     }
   };
 
@@ -220,10 +131,15 @@ export function ReviewsDrawer({ product, isOpen, onClose, onWriteReview }: Revie
   const avgRating =
     totalReviewsCount > 0
       ? (reviews.reduce((acc, r) => acc + r.rating, 0) / totalReviewsCount).toFixed(1)
-      : (product.rating || 4.8).toFixed(1);
+      : (product.rating || 0).toFixed(1);
 
   // Aggregate all customer photos across reviews
   const allCustomerPhotos = reviews.flatMap((r) => r.photos || []).filter(Boolean);
+
+  const count5 = reviews.filter((r) => r.rating === 5).length;
+  const count4 = reviews.filter((r) => r.rating === 4).length;
+  const count3 = reviews.filter((r) => r.rating <= 3).length;
+  const countPhotos = allCustomerPhotos.length;
 
   return (
     <>
@@ -233,12 +149,15 @@ export function ReviewsDrawer({ product, isOpen, onClose, onWriteReview }: Revie
       {/* Slide-over Drawer */}
       <aside className={styles.drawerCard} aria-label="Customer Reviews Drawer">
         {/* Header */}
-        <div className={styles.drawerHeader}>
-          <div>
-            <h3 className={styles.drawerTitle}>Customer Feedback</h3>
-            <p className={styles.drawerSubtitle}>
-              {totalReviewsCount} verified reviews for {product.name || 'this item'}
-            </p>
+        <div className={styles.header}>
+          <div className={styles.headerTitleGroup}>
+            <h3 className={styles.title}>Customer Feedback</h3>
+            {totalReviewsCount > 0 && (
+              <span className={styles.badgeRating}>
+                <Star size={13} fill="#F99205" color="#F99205" strokeWidth={0} />
+                <span>{avgRating} ({totalReviewsCount})</span>
+              </span>
+            )}
           </div>
           <button
             type="button"
@@ -250,229 +169,263 @@ export function ReviewsDrawer({ product, isOpen, onClose, onWriteReview }: Revie
           </button>
         </div>
 
-        {/* Action Bar */}
-        <div className={styles.actionHeaderBar}>
-          <div className={styles.summaryBadgeInline}>
-            <div className={styles.scoreRow}>
-              <span className={styles.scoreVal}>{avgRating}</span>
-              <Star size={16} fill="#F99205" color="#F99205" strokeWidth={0} />
+        {/* Content Area */}
+        <div className={styles.contentScrollable}>
+          {isLoading ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 1rem', gap: '1rem' }}>
+              <Loader2 size={32} className="animate-spin" color="#F99205" />
+              <p style={{ color: '#78746D', fontSize: '0.9rem', margin: 0 }}>Loading reviews...</p>
             </div>
-            <span className={styles.countText}>{totalReviewsCount} Reviews</span>
-          </div>
-
-          <button
-            type="button"
-            className={styles.writeReviewCta}
-            onClick={() => {
-              onClose();
-              onWriteReview();
-            }}
-          >
-            <Edit3 size={15} />
-            <span>Write a Review</span>
-          </button>
-        </div>
-
-        {/* Notification Toast */}
-        {toastMessage && (
-          <div
-            style={{
-              padding: '0.6rem 1rem',
-              margin: '0.5rem 1.5rem',
-              background: '#FFFBEB',
-              border: '1px solid #FCD34D',
-              borderRadius: '8px',
-              color: '#92400E',
-              fontSize: '0.8rem',
-              fontWeight: '600',
-              animation: 'fadeIn 0.2s ease',
-            }}
-          >
-            {toastMessage}
-          </div>
-        )}
-
-        <div className={styles.scrollableContent}>
-          {/* Customer Photo Gallery Strip */}
-          {allCustomerPhotos.length > 0 && (
-            <div className={styles.photoGalleryStripSection}>
-              <h4 className={styles.galleryTitle}>Customer Photos ({allCustomerPhotos.length})</h4>
-              <div className={styles.drawerPhotoGrid}>
-                {allCustomerPhotos.map((src, i) => (
-                  <div
-                    key={i}
-                    className={styles.galleryPhotoWrap}
-                    onClick={() => setPreviewPhoto(src)}
-                  >
-                    <Image
-                      src={src}
-                      alt={`Customer review photo ${i + 1}`}
-                      fill
-                      sizes="80px"
-                      className={styles.thumbImg}
-                      unoptimized={src.startsWith('data:')}
-                    />
-                  </div>
-                ))}
+          ) : totalReviewsCount === 0 ? (
+            /* Clean Empty State */
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textAlign: 'center',
+              padding: '3rem 1.5rem',
+              background: '#FAF6F0',
+              borderRadius: '20px',
+              border: '1px solid #EBE5DB',
+              gap: '1rem',
+              marginTop: '1rem'
+            }}>
+              <div style={{
+                width: '60px',
+                height: '60px',
+                borderRadius: '50%',
+                background: '#FFF4E5',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#F99205'
+              }}>
+                <MessageSquareHeart size={30} />
               </div>
-            </div>
-          )}
-
-          {/* Filter Pills Bar */}
-          <div className={styles.filtersBar}>
-            <button
-              type="button"
-              className={`${styles.filterPill} ${selectedFilter === 'all' ? styles.activeFilterPill : ''}`}
-              onClick={() => setSelectedFilter('all')}
-            >
-              All ({reviews.length})
-            </button>
-            <button
-              type="button"
-              className={`${styles.filterPill} ${selectedFilter === '5' ? styles.activeFilterPill : ''}`}
-              onClick={() => setSelectedFilter('5')}
-            >
-              5 ★ ({reviews.filter((r) => r.rating === 5).length})
-            </button>
-            <button
-              type="button"
-              className={`${styles.filterPill} ${selectedFilter === '4' ? styles.activeFilterPill : ''}`}
-              onClick={() => setSelectedFilter('4')}
-            >
-              4 ★ ({reviews.filter((r) => r.rating === 4).length})
-            </button>
-            <button
-              type="button"
-              className={`${styles.filterPill} ${selectedFilter === '3' ? styles.activeFilterPill : ''}`}
-              onClick={() => setSelectedFilter('3')}
-            >
-              3 ★ & below ({reviews.filter((r) => r.rating <= 3).length})
-            </button>
-            {allCustomerPhotos.length > 0 && (
+              <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#1A1612', margin: 0 }}>
+                No customer reviews yet
+              </h4>
+              <p style={{ fontSize: '0.875rem', color: '#666055', lineHeight: 1.5, margin: 0, maxWidth: '320px' }}>
+                Be the first person to share your experience with {product.name || 'this item'}!
+              </p>
               <button
                 type="button"
-                className={`${styles.filterPill} ${selectedFilter === 'photos' ? styles.activeFilterPill : ''}`}
-                onClick={() => setSelectedFilter('photos')}
+                className={styles.writeBtn}
+                onClick={() => {
+                  onClose();
+                  onWriteReview();
+                }}
+                style={{ marginTop: '0.5rem' }}
               >
-                <ImageIcon size={13} />
-                With Photos ({reviews.filter((r) => r.photos && r.photos.length > 0).length})
+                <Edit3 size={15} />
+                <span>Write a Review</span>
               </button>
-            )}
-          </div>
-
-          {/* Reviews List */}
-          <div className={styles.reviewsList}>
-            {isLoading ? (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '3rem 0', gap: '0.5rem', color: '#888276' }}>
-                <Loader2 size={18} className="animate-spin" />
-                <span style={{ fontSize: '0.85rem' }}>Loading reviews...</span>
-              </div>
-            ) : filteredReviews.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '2.5rem 1rem', color: '#78746D', fontSize: '0.85rem' }}>
-                No reviews found for this filter.
-              </div>
-            ) : (
-              filteredReviews.map((rev) => {
-                const isVoted = !!helpfulVotes[rev.id];
-                const count = helpfulCountMap[rev.id] ?? rev.helpfulCount;
-
-                return (
-                  <div key={rev.id} className={styles.reviewCard}>
-                    {/* Card Header */}
-                    <div className={styles.reviewCardHeader}>
-                      <div className={styles.userInfo}>
-                        <div className={styles.userAvatar}>
-                          {(rev.userName || 'C').charAt(0).toUpperCase()}
-                        </div>
-                        <div className={styles.userNameBlock}>
-                          <span className={styles.userName}>{rev.userName || 'Verified Buyer'}</span>
-                          {rev.isVerifiedPurchase && (
-                            <span className={styles.verifiedBadge}>
-                              <CheckCircle2 size={11} /> Verified Purchase
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <span className={styles.reviewDate}>{formatRelativeTime(rev.createdAt)}</span>
+            </div>
+          ) : (
+            <>
+              {/* Summary Score Card */}
+              <div className={styles.summaryCard}>
+                <div className={styles.summaryScoreBlock}>
+                  <span className={styles.bigScore}>{avgRating}</span>
+                  <div className={styles.scoreSub}>
+                    <div className={styles.starsRow}>
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          size={16}
+                          fill={i < Math.round(Number(avgRating)) ? "#F99205" : "#E0DCD4"}
+                          color={i < Math.round(Number(avgRating)) ? "#F99205" : "#E0DCD4"}
+                          strokeWidth={0}
+                        />
+                      ))}
                     </div>
-
-                    {/* Stars & Body */}
-                    <div className={styles.reviewCardBody}>
-                      <div className={styles.starsRow}>
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            size={13}
-                            fill={i < rev.rating ? '#F99205' : '#E0DCD4'}
-                            color={i < rev.rating ? '#F99205' : '#E0DCD4'}
-                            strokeWidth={0}
-                          />
-                        ))}
-                      </div>
-
-                      {rev.title && <h4 className={styles.reviewCardTitle}>{rev.title}</h4>}
-                      <p className={styles.reviewCardText}>{rev.comment}</p>
-
-                      {/* Attached Photo Thumbnails */}
-                      {rev.photos && rev.photos.length > 0 && (
-                        <div className={styles.reviewPhotoRow}>
-                          {rev.photos.map((photo, i) => (
-                            <div
-                              key={i}
-                              className={styles.reviewPhotoThumb}
-                              onClick={() => setPreviewPhoto(photo)}
-                              style={{ cursor: 'pointer' }}
-                            >
-                              <Image
-                                src={photo}
-                                alt="Attached review photo"
-                                fill
-                                sizes="56px"
-                                className={styles.thumbImg}
-                                unoptimized={photo.startsWith('data:')}
-                              />
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* Official Store Reply Box */}
-                      {rev.adminReply && (
-                        <div className={styles.adminReplyBox}>
-                          <div className={styles.adminReplyHeader}>
-                            <span className={styles.adminReplyBadge}>
-                              <MessageSquareQuote size={12} />
-                              Store Response
-                            </span>
-                            {rev.adminReplyAt && (
-                              <span className={styles.adminReplyDate}>
-                                {formatRelativeTime(rev.adminReplyAt)}
-                              </span>
-                            )}
-                          </div>
-                          <p className={styles.adminReplyText}>&ldquo;{rev.adminReply}&rdquo;</p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Helpful Action */}
-                    <button
-                      type="button"
-                      className={`${styles.helpfulBtn} ${isVoted ? styles.helpfulActive : ''}`}
-                      onClick={() => toggleHelpful(rev.id)}
-                    >
-                      <ThumbsUp size={13} />
-                      <span>Helpful ({count})</span>
-                    </button>
+                    <span className={styles.totalText}>Based on {totalReviewsCount} reviews</span>
                   </div>
-                );
-              })
-            )}
-          </div>
+                </div>
+
+                <button
+                  type="button"
+                  className={styles.writeBtn}
+                  onClick={() => {
+                    onClose();
+                    onWriteReview();
+                  }}
+                >
+                  <Edit3 size={14} />
+                  <span>Write Review</span>
+                </button>
+              </div>
+
+              {/* Photo Gallery Strip if photos exist */}
+              {allCustomerPhotos.length > 0 && (
+                <div className={styles.photoSection}>
+                  <span className={styles.photoSectionTitle}>Customer Photos ({allCustomerPhotos.length})</span>
+                  <div className={styles.photoStrip}>
+                    {allCustomerPhotos.map((photo, pIdx) => (
+                      <div
+                        key={pIdx}
+                        className={styles.thumbTile}
+                        onClick={() => setPreviewPhoto(photo)}
+                      >
+                        <Image
+                          src={photo}
+                          alt={`Customer photo ${pIdx + 1}`}
+                          fill
+                          sizes="80px"
+                          className={styles.thumbImg}
+                          unoptimized={photo.startsWith('data:')}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Filter Pills Bar */}
+              <div className={styles.filtersBar}>
+                <button
+                  type="button"
+                  className={`${styles.filterPill} ${selectedFilter === 'all' ? styles.activeFilterPill : ''}`}
+                  onClick={() => setSelectedFilter('all')}
+                >
+                  All ({totalReviewsCount})
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.filterPill} ${selectedFilter === '5' ? styles.activeFilterPill : ''}`}
+                  onClick={() => setSelectedFilter('5')}
+                >
+                  5 ★ ({count5})
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.filterPill} ${selectedFilter === '4' ? styles.activeFilterPill : ''}`}
+                  onClick={() => setSelectedFilter('4')}
+                >
+                  4 ★ ({count4})
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.filterPill} ${selectedFilter === '3' ? styles.activeFilterPill : ''}`}
+                  onClick={() => setSelectedFilter('3')}
+                >
+                  3 ★ &amp; below ({count3})
+                </button>
+                {allCustomerPhotos.length > 0 && (
+                  <button
+                    type="button"
+                    className={`${styles.filterPill} ${selectedFilter === 'photos' ? styles.activeFilterPill : ''}`}
+                    onClick={() => setSelectedFilter('photos')}
+                  >
+                    <Camera size={13} />
+                    With Photos ({countPhotos})
+                  </button>
+                )}
+              </div>
+
+              {/* Reviews List */}
+              <div className={styles.reviewsList}>
+                {filteredReviews.length === 0 ? (
+                  <p style={{ textAlign: 'center', color: '#78746D', fontSize: '0.875rem', padding: '2rem 0' }}>
+                    No reviews match the selected filter.
+                  </p>
+                ) : (
+                  filteredReviews.map((rev) => {
+                    const userInitial = rev.userName ? rev.userName.charAt(0).toUpperCase() : 'U';
+                    const isHelpful = helpfulVotes[rev.id] ?? false;
+                    const helpfulCount = helpfulCountMap[rev.id] ?? rev.helpfulCount ?? 0;
+
+                    return (
+                      <div key={rev.id} className={styles.reviewCard}>
+                        <div className={styles.reviewCardHeader}>
+                          <div className={styles.userInfo}>
+                            <div className={styles.userAvatar}>{userInitial}</div>
+                            <div className={styles.userNameBlock}>
+                              <span className={styles.userName}>{rev.userName || 'Verified Customer'}</span>
+                              {rev.isVerifiedPurchase && (
+                                <span className={styles.verifiedBadge}>
+                                  <CheckCircle2 size={13} strokeWidth={2.5} />
+                                  <span>Verified Purchase</span>
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <span className={styles.reviewDate}>{formatRelativeTime(rev.createdAt)}</span>
+                        </div>
+
+                        <div className={styles.reviewCardBody}>
+                          <div className={styles.starsRow}>
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                size={14}
+                                fill={i < rev.rating ? "#F99205" : "#E0DCD4"}
+                                color={i < rev.rating ? "#F99205" : "#E0DCD4"}
+                                strokeWidth={0}
+                              />
+                            ))}
+                          </div>
+
+                          {rev.title && <h4 className={styles.reviewCardTitle}>{rev.title}</h4>}
+                          <p className={styles.reviewCardText}>{rev.comment}</p>
+
+                          {rev.photos && rev.photos.length > 0 && (
+                            <div className={styles.reviewPhotoRow}>
+                              {rev.photos.map((p, pIdx) => (
+                                <div
+                                  key={pIdx}
+                                  className={styles.reviewPhotoThumb}
+                                  onClick={() => setPreviewPhoto(p)}
+                                  style={{ cursor: 'pointer' }}
+                                >
+                                  <Image
+                                    src={p}
+                                    alt={`Review photo ${pIdx + 1}`}
+                                    fill
+                                    sizes="60px"
+                                    className={styles.thumbImg}
+                                    unoptimized={p.startsWith('data:')}
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          {rev.adminReply && (
+                            <div className={styles.adminReplyBox}>
+                              <div className={styles.adminReplyHeader}>
+                                <span className={styles.adminReplyBadge}>Official Store Reply</span>
+                                {rev.adminReplyAt && (
+                                  <span className={styles.adminReplyDate}>
+                                    {formatRelativeTime(rev.adminReplyAt)}
+                                  </span>
+                                )}
+                              </div>
+                              <p className={styles.adminReplyText}>{rev.adminReply}</p>
+                            </div>
+                          )}
+
+                          <button
+                            type="button"
+                            className={`${styles.helpfulBtn} ${isHelpful ? styles.helpfulActive : ''}`}
+                            onClick={() => toggleHelpful(rev.id)}
+                          >
+                            <ThumbsUp size={13} />
+                            <span>Helpful ({helpfulCount})</span>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </>
+          )}
         </div>
       </aside>
 
-      {/* Expanded Photo Preview Modal */}
+      {/* Lightbox photo preview */}
       {previewPhoto && (
         <div className={styles.imageModalBackdrop} onClick={() => setPreviewPhoto(null)}>
           <div className={styles.imageModalCard} onClick={(e) => e.stopPropagation()}>
@@ -486,10 +439,9 @@ export function ReviewsDrawer({ product, isOpen, onClose, onWriteReview }: Revie
             </button>
             <Image
               src={previewPhoto}
-              alt="Preview customer photo"
+              alt="Customer review full preview"
               fill
               style={{ objectFit: 'contain' }}
-              priority
               unoptimized={previewPhoto.startsWith('data:')}
             />
           </div>
