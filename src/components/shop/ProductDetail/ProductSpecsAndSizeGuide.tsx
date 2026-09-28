@@ -27,20 +27,24 @@ export function ProductSpecsAndSizeGuide({ product, productDetails }: SpecsAndSi
       ...(product.dietaryPreference
         ? [{ label: 'Dietary Type', value: product.dietaryPreference === 'VEG' ? 'Vegetarian' : 'Non-Vegetarian' }]
         : []),
-      ...(product.materials ? [{ label: 'Material', value: product.materials }] : []),
+      ...(product.materials && product.materials.length < 50 && !product.materials.toLowerCase().includes('ingredients') && !product.materials.toLowerCase().includes('storage')
+        ? [{ label: 'Material', value: product.materials }]
+        : []),
       { label: 'Product Type', value: product.type === 'VARIABLE' ? 'Multi-Variant Pack' : 'Standard Pack' },
       { label: 'Availability', value: (product.stock ?? 100) > 0 ? 'In Stock' : 'Out of Stock' },
       { label: 'Country of Origin', value: 'India' },
     ];
 
     if (product.attributes && typeof product.attributes === 'object') {
-      const excludedKeys = new Set(['ingredients', 'feedingGuide', 'description', 'highlights', 'images', 'media', 'careInstructions', 'sizeGuide']);
+      const excludedKeys = new Set(['ingredients', 'feedingguide', 'description', 'highlights', 'images', 'media', 'careinstructions', 'sizeguide', 'faqs']);
       Object.entries(product.attributes).forEach(([key, val]) => {
-        if (!excludedKeys.has(key.toLowerCase()) && (typeof val === 'string' || typeof val === 'number')) {
-          // If the text is reasonable length (< 120 chars), include in specs
-          if (String(val).length < 120) {
-            const formattedLabel = key.replace(/([A-Z])/g, ' ').replace(/^./, str => str.toUpperCase());
-            specsList.push({ label: formattedLabel, value: String(val) });
+        const lowerKey = key.toLowerCase();
+        if (!excludedKeys.has(lowerKey) && (typeof val === 'string' || typeof val === 'number')) {
+          const strVal = String(val).trim();
+          // Filter out long text or text containing instructions/ingredients
+          if (strVal.length > 0 && strVal.length < 60 && !strVal.toLowerCase().includes('ingredients') && !strVal.toLowerCase().includes('storage:')) {
+            const formattedLabel = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
+            specsList.push({ label: formattedLabel, value: strVal });
           }
         }
       });

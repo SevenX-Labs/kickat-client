@@ -155,11 +155,11 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
     }
     setIsBuyingNow(true);
     try {
-      await buyNow(product.id, selectedVariant?.id, quantity);
+      await addToCart(product.id, selectedVariant?.id, quantity);
       router.push("/checkout");
     } catch (err: any) {
       console.error("Error with Buy Now:", err);
-      alert(err?.message || "Buy now session could not be created. Please try again.");
+      alert(err?.message || "Could not proceed to checkout. Please try again.");
     } finally {
       setIsBuyingNow(false);
     }
@@ -245,7 +245,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
             <div className={styles.selectorHeader}>
               <span className={styles.selectorTitle}>Options:</span>
               <span className={styles.selectorValue}>
-                {selectedVariant ? selectedVariant.name : 'Select an option'}
+                {selectedVariant ? (selectedVariant.attributes && Object.values(selectedVariant.attributes)[0] ? String(Object.values(selectedVariant.attributes)[0]) : selectedVariant.name) : 'Select an option'}
               </span>
             </div>
             <button
@@ -262,6 +262,15 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
               const isSelected = selectedVariant?.id === variant.id;
               const isVarOutOfStock = variant.stock <= 0;
               const varPrice = variant.discountPrice && variant.discountPrice > 0 ? variant.discountPrice : variant.price;
+              
+              // Get clean variant label from attributes (e.g. 500g, 1kg) or variant name
+              let displayLabel = variant.name;
+              if (variant.attributes && typeof variant.attributes === 'object') {
+                const vals = Object.values(variant.attributes).filter(Boolean);
+                if (vals.length > 0) {
+                  displayLabel = String(vals[0]);
+                }
+              }
 
               return (
                 <button
@@ -275,7 +284,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
                   }}
                   title={isVarOutOfStock ? 'Out of stock' : `₹${varPrice}`}
                 >
-                  <span>{variant.name}</span>
+                  <span>{displayLabel}</span>
                 </button>
               );
             })}

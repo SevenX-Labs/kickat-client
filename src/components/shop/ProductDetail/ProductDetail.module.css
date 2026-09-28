@@ -2070,3 +2070,123 @@
 .noReviewsPromptLink:hover {
   color: #D96A00;
 }
+
+/* ── MOBILE EXCLUSIVE UI/UX ENHANCEMENTS (<= 640px) ── */
+@media (max-width: 640px) {
+  /* Trust Strip 2x2 Grid (matching Img 1) */
+  .trustStripWrapper {
+    padding: 1.25rem 1rem !important;
+    border-radius: 18px !important;
+  }
+
+  .trustStripGrid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 1.25rem 0.75rem !important;
+  }
+
+  .trustItemCard {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.65rem !important;
+  }
+
+  .trustIconWrap {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 50% !important;
+    background: #FFF7EE !important;
+    flex-shrink: 0 !important;
+  }
+
+  .trustTitle {
+    font-size: 0.85rem !important;
+    font-weight: 800 !important;
+    color: #1A1612 !important;
+    margin: 0 0 2px 0 !important;
+  }
+
+  .trustSubtitle {
+    font-size: 0.725rem !important;
+    color: #78746D !important;
+    line-height: 1.3 !important;
+    margin: 0 !important;
+  }
+
+  /* Segmented Pill Tabs Navigation on Mobile (matching Img 2 without cut-off or sliding needed) */
+  .tabsSectionContainer {
+    border-radius: 18px !important;
+  }
+
+  .tabsHeaderNav {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important;
+    gap: 0.4rem !important;
+    padding: 0.5rem !important;
+    background: #F5EFE6 !important;
+    overflow-x: visible !important;
+    border-bottom: 1px solid #EBE5DB !important;
+  }
+
+  .tabNavBtn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.35rem !important;
+    padding: 0.65rem 0.5rem !important;
+    border-radius: 12px !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    color: #666159 !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    white-space: normal !important;
+    text-align: center !important;
+    line-height: 1.25 !important;
+    min-height: 42px !important;
+  }
+
+  .tabNavBtnActive {
+    background: #FFFFFF !important;
+    color: #F99205 !important;
+    font-weight: 800 !important;
+    border-color: rgba(249, 146, 5, 0.25) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  }
+
+  .tabNavBtnActive::after {
+    display: none !important;
+  }
+
+  .tabBtnIcon {
+    flex-shrink: 0 !important;
+  }
+
+  .tabPanelBody {
+    padding: 1.25rem 1rem !important;
+  }
+
+  /* Specs Table on Mobile (Clean layout, no cramped text) */
+  .specsCard {
+    padding: 1.25rem 1rem !important;
+    border-radius: 18px !important;
+  }
+
+  .specsTableRow {
+    padding: 0.65rem 0 !important;
+    font-size: 0.825rem !important;
+    gap: 0.75rem !important;
+  }
+
+  .specsLabel {
+    font-size: 0.825rem !important;
+    color: #78746D !important;
+    font-weight: 500 !important;
+  }
+
+  .specsValue {
+    font-size: 0.825rem !important;
+    font-weight: 700 !important;
+    color: #1A1612 !important;
+    text-align: right !important;
+  }
+}

@@ -416,11 +416,14 @@ export default function CheckoutPage() {
     const idempotencyKey = idempotencyKeyRef.current;
 
     try {
+      const currentCodFee = selectedPaymentMethod === 'COD' ? (checkoutData?.summary?.codFee ?? 0) : 0;
+      const effectiveExpectedTotal = (checkoutData?.summary?.grandTotal ?? 0) + currentCodFee;
+
       const orderPayload = {
         addressId: selectedAddressId,
         paymentMethod: selectedPaymentMethod,
         deliveryInstructions: deliveryInstructions.trim() || undefined,
-        expectedTotal: checkoutData?.summary?.grandTotal,
+        expectedTotal: effectiveExpectedTotal,
         upiId: selectedPaymentMethod === 'UPI' ? (upiId.trim() || 'user@upi') : undefined,
       };
 
@@ -865,6 +868,7 @@ export default function CheckoutPage() {
   const extraFeeAmount = summary?.extraFeeAmount ?? 0;
   const extraFeeName = summary?.extraFeeName;
   const grandTotal = summary?.grandTotal ?? 0;
+  const effectiveGrandTotal = grandTotal + (selectedPaymentMethod === 'COD' ? codFee : 0);
   const totalItemsCount = summary?.itemCount ?? cartItems?.reduce((acc, i) => acc + i.quantity, 0) ?? 0;
 
   const displayedItems = isItemsExpanded ? (cartItems || []) : (cartItems || []).slice(0, 2);
@@ -1688,7 +1692,7 @@ export default function CheckoutPage() {
                 <span className={styles.totalLabelAlt}>
                   Grand Total <span style={{ fontSize: '0.75rem', fontWeight: 'normal', color: '#888' }}>(incl. taxes)</span>
                 </span>
-                <span>₹{grandTotal.toLocaleString()}</span>
+                <span>₹{effectiveGrandTotal.toLocaleString()}</span>
               </div>
 
               <div className={styles.sslFooter}>
