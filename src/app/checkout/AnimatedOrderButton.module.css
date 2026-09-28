@@ -1,31 +1,36 @@
 .order {
-  --primary: #E7A03B;
-  --primary-light: #F0B764;
-  --dark: #111;
-  --grey-dark: #3F4656;
-  --grey: #6C7486;
-  --grey-light: #CDD9ED;
-  --white: #FFF;
-  --green: #4caf50;
-  --sand: #fbbf24;
-  --sand-light: #fbbf24;
+  --primary: #F99205;
+  --primary-light: #FDBA74;
+  --dark: #1E293B;
+  --grey-dark: #334155;
+  --grey: #64748B;
+  --grey-light: #CBD5E1;
+  --white: #FFFFFF;
+  --green: #10B981;
+  --sand: #F59E0B;
+  --sand-light: #FDE68A;
 
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
   border: 0;
-  background: var(--dark);
+  background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
   position: relative;
   height: 56px;
   width: 100%;
   padding: 0;
   outline: none;
   cursor: pointer;
-  border-radius: 8px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.25);
   -webkit-mask-image: -webkit-radial-gradient(white, black);
   -webkit-tap-highlight-color: transparent;
   overflow: hidden;
-  transition: transform 0.3s ease;
+  transition: all 0.3s ease;
+}
+.order:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.35);
 }
 .order span {
   --o: 1;

@@ -11,6 +11,7 @@ interface Props {
   disabled?: boolean;
   className?: string;
   label?: string;
+  loadingText?: string;
 }
 
 export function AnimatedOrderButton({
@@ -21,6 +22,7 @@ export function AnimatedOrderButton({
   disabled = false,
   className = '',
   label = 'Complete Order',
+  loadingText = 'Processing Order...',
 }: Props) {
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -64,12 +66,13 @@ export function AnimatedOrderButton({
       onClick={handleClick}
       disabled={disabled || isSubmitting || isAnimating}
       type="button"
-      style={disabled ? { opacity: 0.6, cursor: 'not-allowed' } : undefined}
+      style={disabled && !isSubmitting ? { opacity: 0.6, cursor: 'not-allowed' } : undefined}
     >
       <span className={styles.default}>
         {isSubmitting ? (
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-            <Loader2 className="animate-spin" size={18} style={{ animation: 'spin 1s linear infinite' }} /> Processing...
+          <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            <Loader2 className="animate-spin" size={18} style={{ animation: 'spin 1s linear infinite' }} />
+            <span>{loadingText}</span>
           </span>
         ) : (
           label

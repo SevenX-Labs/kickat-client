@@ -832,7 +832,7 @@ export default function CheckoutPage() {
 
           {/* CTAs */}
           <div className={styles.successCtaGroup}>
-            <Link href={`/orders/${placedOrder.orderId}`} className={styles.primarySuccessBtn}>
+            <Link href={`/orders/${placedOrder.orderId || placedOrder.orderNumber}`} className={styles.primarySuccessBtn}>
               <Package size={20} /> View Order Details <ArrowRight size={20} />
             </Link>
             <div className={styles.secondaryActionsRow}>
@@ -1502,32 +1502,16 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
-                  {isSubmittingOrder && paymentStatusText && (
-                    <div
-                      style={{
-                        marginTop: '1rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        fontSize: '13px',
-                        color: '#D97706',
-                        fontWeight: 500,
-                      }}
-                    >
-                      <Loader2 size={16} className="animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
-                      <span>{paymentStatusText}</span>
-                    </div>
-                  )}
-
                   {/* Action Buttons */}
-                  <div style={{ marginTop: '2rem' }}>
+                  <div style={{ marginTop: '1.75rem' }}>
                     <AnimatedOrderButton
                       onValidate={validatePlaceOrderForm}
                       onTriggerOrder={handleTriggerOrder}
                       onComplete={handleAnimatedComplete}
                       isSubmitting={isSubmittingOrder}
                       disabled={isSubmittingOrder || !selectedPaymentMethod}
-                      label={selectedPaymentMethod === 'COD' ? 'Place Order (COD)' : 'Proceed to Pay'}
+                      label={selectedPaymentMethod === 'COD' ? 'Place Order (Cash on Delivery)' : 'Proceed to Pay Securely'}
+                      loadingText={paymentStatusText || (selectedPaymentMethod === 'COD' ? 'Placing Cash on Delivery order...' : 'Processing secure payment...')}
                     />
                   </div>
                 </div>
