@@ -117,6 +117,7 @@ export interface RazorpayOptions {
     name?: string;
     email?: string;
     contact?: string;
+    vpa?: string;
   };
   notes?: Record<string, string>;
   theme?: {

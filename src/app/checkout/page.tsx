@@ -34,6 +34,7 @@ import {
   Wallet,
   Building2,
   AlertTriangle,
+  QrCode,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
@@ -411,7 +412,6 @@ export default function CheckoutPage() {
 
     setIsSubmittingOrder(true);
     setOrderError(null);
-    setPaymentStatusText('Creating your order...');
 
     const idempotencyKey = idempotencyKeyRef.current;
 
@@ -419,13 +419,14 @@ export default function CheckoutPage() {
       const currentMethod = paymentMethods.find((m) => m.type === selectedPaymentMethod);
       const currentCodFee = selectedPaymentMethod === 'COD' ? (checkoutData?.summary?.codFee || currentMethod?.extraFee || 10) : 0;
       const effectiveExpectedTotal = (checkoutData?.summary?.grandTotal ?? 0) + currentCodFee;
+      const cleanUpiId = selectedPaymentMethod === 'UPI' ? (upiId.trim() || 'qr@razorpay') : undefined;
 
       const orderPayload = {
         addressId: selectedAddressId,
         paymentMethod: selectedPaymentMethod,
         deliveryInstructions: deliveryInstructions.trim() || undefined,
         expectedTotal: effectiveExpectedTotal,
-        upiId: selectedPaymentMethod === 'UPI' ? (upiId.trim() || 'user@upi') : undefined,
+        upiId: cleanUpiId,
       };
 
       if (selectedPaymentMethod === 'COD') {
@@ -441,15 +442,7 @@ export default function CheckoutPage() {
         return true;
       }
 
-      // Online Gateway Payment Flow (Razorpay)
-      setPaymentFlowState('creating_order');
-      setPaymentStatusText('Creating secure order...');
-      const orderRes = await checkoutService.placeOrder(orderPayload, idempotencyKey);
-      setPendingOrderId(orderRes.orderId);
-      setPendingOrderNumber(orderRes.orderNumber);
-
-      setPaymentStatusText('Initializing Razorpay gateway...');
-      const paymentIdempotencyKey = generateUUID();
+      // Online Gateway Payment Flow (Razorpay / UPI / Card / Netbanking / Wallet)
       const methodLower = (
         selectedPaymentMethod === 'CARD'
           ? 'card'
@@ -460,27 +453,57 @@ export default function CheckoutPage() {
           : 'upi'
       ) as PaymentMethodType;
 
-      const paymentRes = await paymentService.createPaymentOrder(
-        {
-          orderId: orderRes.orderId,
-          paymentMethod: methodLower,
-          upiId: selectedPaymentMethod === 'UPI' ? (upiId.trim() || 'user@upi') : undefined,
-        },
-        paymentIdempotencyKey
-      );
+      let activeOrderId = pendingOrderId;
+      let activeOrderNumber = pendingOrderNumber;
+      let activeOrderRes: PlaceOrderResponse | null = null;
 
-      if (!paymentRes.razorpayOrderId || !paymentRes.key) {
-        throw new Error(paymentRes.message || 'Could not create gateway payment order.');
+      if (!activeOrderId) {
+        setPaymentFlowState('creating_order');
+        setPaymentStatusText('Creating secure order...');
+        const orderRes = await checkoutService.placeOrder(orderPayload, idempotencyKey);
+        activeOrderId = orderRes.orderId;
+        activeOrderNumber = orderRes.orderNumber;
+        activeOrderRes = orderRes;
+        setPendingOrderId(orderRes.orderId);
+        setPendingOrderNumber(orderRes.orderNumber);
       }
 
-      setPaymentStatusText('Loading payment window...');
+      setPaymentStatusText('Initializing Razorpay gateway...');
+      let paymentRes: any = null;
+
+      try {
+        paymentRes = await paymentService.createPaymentOrder(
+          {
+            orderId: activeOrderId,
+            paymentMethod: methodLower,
+            upiId: cleanUpiId,
+          },
+          generateUUID()
+        );
+      } catch (createErr: any) {
+        console.warn('[Checkout] createPaymentOrder note, falling back to retryPayment:', createErr);
+        paymentRes = await paymentService.retryPayment(
+          {
+            orderId: activeOrderId,
+            paymentMethod: methodLower,
+            upiId: cleanUpiId,
+          },
+          generateUUID()
+        );
+      }
+
+      if (!paymentRes || (!paymentRes.razorpayOrderId && !paymentRes.key)) {
+        throw new Error(paymentRes?.message || 'Could not initialize payment gateway.');
+      }
+
+      setPaymentStatusText('Loading Razorpay payment window...');
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded || !window.Razorpay) {
-        throw new Error('Could not load payment gateway SDK. Please check your internet connection.');
+        throw new Error('Could not load Razorpay SDK. Please check your network connection.');
       }
 
       setPaymentFlowState('gateway_open');
-      setPaymentStatusText('Payment window open. Please complete payment in Razorpay...');
+      setPaymentStatusText('Payment window open. Please complete payment...');
 
       return new Promise<boolean>((resolve) => {
         const options: RazorpayOptions = {
@@ -488,14 +511,23 @@ export default function CheckoutPage() {
           amount: Math.round((paymentRes.amount || checkoutData?.summary?.grandTotal || 0) * 100),
           currency: paymentRes.currency || 'INR',
           name: 'KickAt',
-          description: `Order ${orderRes.orderNumber || ''}`,
+          description: `Order #${activeOrderNumber || activeOrderId}`,
           order_id: paymentRes.razorpayOrderId!,
+          prefill: {
+            name: fullName || user?.name || undefined,
+            email: email || user?.email || undefined,
+            contact: phone || user?.phone || undefined,
+            vpa: cleanUpiId,
+          },
+          theme: {
+            color: '#F99205',
+          },
           handler: async (rzpRes) => {
             setPaymentFlowState('verifying');
-            setPaymentStatusText('Verifying payment with KickAt server...');
+            setPaymentStatusText('Verifying payment with server...');
             try {
               const verifyRes = await paymentService.verifyPayment({
-                orderId: orderRes.orderId,
+                orderId: activeOrderId!,
                 razorpayOrderId: rzpRes.razorpay_order_id,
                 razorpayPaymentId: rzpRes.razorpay_payment_id,
                 signature: rzpRes.razorpay_signature,
@@ -504,11 +536,20 @@ export default function CheckoutPage() {
               if (verifyRes.success) {
                 setPaymentFlowState('success');
                 await refreshCart();
-                setPlacedOrder(orderRes);
+                setPlacedOrder(activeOrderRes || {
+                  success: true,
+                  message: 'Order placed successfully',
+                  orderId: activeOrderId!,
+                  orderNumber: activeOrderNumber || `ORD-${activeOrderId}`,
+                  status: 'PLACED',
+                  grandTotal: paymentRes.amount || checkoutData?.summary?.grandTotal || 0,
+                });
+                setPendingOrderId(null);
+                setPendingOrderNumber(null);
                 resolve(true);
               } else {
                 setPaymentFlowState('failed');
-                setOrderError('Payment verification failed. Please check order status.');
+                setOrderError('Payment verification failed. Please retry.');
                 resolve(false);
               }
             } catch (verifyErr: any) {
@@ -518,19 +559,11 @@ export default function CheckoutPage() {
               resolve(false);
             }
           },
-          prefill: {
-            name: fullName || user?.name || undefined,
-            email: email || user?.email || undefined,
-            contact: phone || user?.phone || undefined,
-          },
-          theme: {
-            color: '#F99205',
-          },
           modal: {
             ondismiss: () => {
               setPaymentFlowState((current) => {
                 if (current === 'verifying' || current === 'success') return current;
-                setOrderError('Payment was cancelled or closed. You can retry paying for this order anytime.');
+                setOrderError('Payment window was closed. You can retry paying anytime.');
                 return 'cancelled';
               });
               resolve(false);
@@ -550,10 +583,9 @@ export default function CheckoutPage() {
       });
     } catch (err: any) {
       console.error('[Checkout] Place order / payment failed:', err);
-      const msg = err?.message || 'Failed to place order. Please try again.';
+      const msg = err?.message || 'Failed to initialize payment. Please try again.';
       setPaymentFlowState('failed');
       setOrderError(msg);
-      // Generate new idempotency key for next fresh attempt
       idempotencyKeyRef.current = generateUUID();
       return false;
     } finally {
@@ -1424,16 +1456,39 @@ export default function CheckoutPage() {
                               </div>
                             </div>
 
-                            {/* Additional field for UPI */}
+                            {/* Integrated Razorpay UPI QR & Apps Banner */}
                             {isSelected && method.type === 'UPI' && (
-                              <div className={styles.paymentOptionBody}>
-                                <input
-                                  type="text"
-                                  className={styles.dummyInput}
-                                  placeholder="Enter your UPI ID (e.g. mobile@upi)"
-                                  value={upiId}
-                                  onChange={(e) => setUpiId(e.target.value)}
-                                />
+                              <div style={{
+                                marginTop: '0.85rem',
+                                padding: '0.85rem 1rem',
+                                background: '#FFF9F4',
+                                border: '1px solid rgba(242, 140, 15, 0.25)',
+                                borderRadius: '12px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '0.45rem',
+                              }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#B45309', fontWeight: 600, fontSize: '0.85rem' }}>
+                                  <QrCode size={18} color="#F28C0F" />
+                                  <span>Instant QR Code &amp; UPI Apps</span>
+                                </div>
+                                <p style={{ margin: 0, fontSize: '0.8rem', color: '#6B6157', lineHeight: 1.45 }}>
+                                  Razorpay will display a live dynamic QR code and 1-tap payment for Google Pay, PhonePe, Paytm, CRED or BHIM.
+                                </p>
+                                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '2px' }}>
+                                  <span style={{ background: '#FFFFFF', border: '1px solid #EFE7DA', padding: '3px 8px', borderRadius: '6px', fontSize: '0.725rem', fontWeight: 600, color: '#333' }}>
+                                    📸 Dynamic QR Code
+                                  </span>
+                                  <span style={{ background: '#FFFFFF', border: '1px solid #EFE7DA', padding: '3px 8px', borderRadius: '6px', fontSize: '0.725rem', fontWeight: 600, color: '#333' }}>
+                                    Google Pay
+                                  </span>
+                                  <span style={{ background: '#FFFFFF', border: '1px solid #EFE7DA', padding: '3px 8px', borderRadius: '6px', fontSize: '0.725rem', fontWeight: 600, color: '#333' }}>
+                                    PhonePe
+                                  </span>
+                                  <span style={{ background: '#FFFFFF', border: '1px solid #EFE7DA', padding: '3px 8px', borderRadius: '6px', fontSize: '0.725rem', fontWeight: 600, color: '#333' }}>
+                                    Paytm / Any UPI
+                                  </span>
+                                </div>
                               </div>
                             )}
                           </div>

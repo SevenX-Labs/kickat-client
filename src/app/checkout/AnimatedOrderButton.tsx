@@ -1,7 +1,8 @@
-'use client';
+"use client";
+
 import { useState } from 'react';
+import { Loader2, Lock, ShieldCheck, CheckCircle2, ArrowRight } from 'lucide-react';
 import styles from './AnimatedOrderButton.module.css';
-import { Loader2 } from 'lucide-react';
 
 interface Props {
   onValidate?: () => boolean;
@@ -21,15 +22,15 @@ export function AnimatedOrderButton({
   isSubmitting = false,
   disabled = false,
   className = '',
-  label = 'Complete Order',
+  label = 'Proceed to Pay Securely',
   loadingText = 'Processing Order...',
 }: Props) {
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleClick = async (e: React.MouseEvent) => {
     e.preventDefault();
 
-    if (disabled || isSubmitting || isAnimating) {
+    if (disabled || isSubmitting || isSuccess) {
       return;
     }
 
@@ -40,60 +41,51 @@ export function AnimatedOrderButton({
     if (onTriggerOrder) {
       try {
         const success = await onTriggerOrder();
-        if (!success) {
-          return;
+        if (success) {
+          setIsSuccess(true);
+          if (onComplete) {
+            setTimeout(() => {
+              onComplete();
+            }, 600);
+          }
         }
-      } catch {
-        return;
+      } catch (err) {
+        console.error('[OrderButton] Order trigger error:', err);
       }
-    }
-
-    if (!isAnimating) {
-      setIsAnimating(true);
-      setTimeout(() => {
-        if (onComplete) onComplete();
-      }, 3400);
-
-      setTimeout(() => {
-        setIsAnimating(false);
-      }, 4500);
     }
   };
 
+  const isCOD = label.toLowerCase().includes('cash on delivery') || label.toLowerCase().includes('cod');
+
   return (
     <button
-      className={`${styles.order} ${isAnimating ? styles.animate : ''} ${className}`}
+      className={`${styles.orderButton} ${isSuccess ? styles.orderSuccess : ''} ${className}`}
       onClick={handleClick}
-      disabled={disabled || isSubmitting || isAnimating}
+      disabled={disabled || isSubmitting || isSuccess}
       type="button"
-      style={disabled && !isSubmitting ? { opacity: 0.6, cursor: 'not-allowed' } : undefined}
     >
-      <span className={styles.default}>
+      <div className={styles.buttonInner}>
         {isSubmitting ? (
-          <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-            <Loader2 className="animate-spin" size={18} style={{ animation: 'spin 1s linear infinite' }} />
+          <div className={styles.loadingContainer}>
+            <Loader2 size={20} className="animate-spin" style={{ animation: 'spin 0.8s linear infinite' }} />
             <span>{loadingText}</span>
-          </span>
+          </div>
+        ) : isSuccess ? (
+          <div className={styles.successContainer}>
+            <CheckCircle2 size={22} strokeWidth={2.5} />
+            <span>Order Placed Successfully!</span>
+          </div>
         ) : (
-          label
+          <div className={styles.labelContainer}>
+            <div className={styles.iconCircle}>
+              {isCOD ? <ShieldCheck size={18} /> : <Lock size={16} />}
+            </div>
+            <span className={styles.labelText}>{label}</span>
+            <ArrowRight size={18} className={styles.arrowIcon} />
+          </div>
         )}
-      </span>
-      <span className={styles.success}>
-        Order Placed
-        <svg viewBox="0 0 12 10">
-          <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
-        </svg>
-      </span>
-      <div className={styles.box}></div>
-      <div className={styles.truck}>
-        <div className={styles.back}></div>
-        <div className={styles.front}>
-          <div className={styles.window}></div>
-        </div>
-        <div className={`${styles.light} ${styles.top}`}></div>
-        <div className={`${styles.light} ${styles.bottom}`}></div>
       </div>
-      <div className={styles.lines}></div>
+      <div className={styles.buttonShimmer} />
     </button>
   );
 }

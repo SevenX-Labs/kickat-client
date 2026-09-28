@@ -7,6 +7,7 @@ import {
   AlertCircle,
   CreditCard,
   Smartphone,
+  QrCode,
   RefreshCw,
   CheckCircle2,
   ShieldCheck,
@@ -91,6 +92,7 @@ function PaymentRetryContent() {
         {
           orderId,
           paymentMethod: method,
+          upiId: method === 'upi' ? 'qr@razorpay' : undefined,
         },
         idempotencyKey
       );
@@ -266,10 +268,10 @@ function PaymentRetryContent() {
                     checked={method === 'upi'}
                     onChange={() => setMethod('upi')}
                   />
-                  <Smartphone size={20} color={method === 'upi' ? '#E7A03B' : '#666'} />
+                  <QrCode size={20} color={method === 'upi' ? '#E7A03B' : '#666'} />
                   <div>
-                    <div className={styles.methodLabel}>UPI / QR Code</div>
-                    <div className={styles.methodDesc}>Google Pay, PhonePe, Paytm, BHIM</div>
+                    <div className={styles.methodLabel}>UPI QR Code &amp; Apps</div>
+                    <div className={styles.methodDesc}>Dynamic QR, Google Pay, PhonePe, Paytm, BHIM</div>
                   </div>
                 </label>
 
