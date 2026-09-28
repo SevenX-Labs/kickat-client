@@ -21,7 +21,7 @@ import {
 import { categoryService } from '@/services/categoryService';
 import { Category } from '@/types/category';
 import { productService } from '@/services/productService';
-import { mapBackendProductToCard } from '@/types/product';
+import { mapBackendProductListToCards } from '@/types/product';
 import { Skeleton } from '@/components/ui/Skeleton';
 import styles from './CategoryExplorer.module.css';
 
@@ -187,7 +187,7 @@ export function CategoryExplorer({
       }
 
       if (res && res.success && Array.isArray(res.products)) {
-        let mapped = res.products.map(mapBackendProductToCard);
+        let mapped = mapBackendProductListToCards(res.products);
 
         if (selectedSize) {
           mapped = mapped.filter((p: any) => p.sizes && p.sizes.includes(selectedSize));

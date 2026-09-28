@@ -132,6 +132,10 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
       router.push("/cart");
       return;
     }
+    if (hasVariants && !selectedVariant) {
+      alert("Please select an option before adding to cart.");
+      return;
+    }
     if (isAdding || isBuyingNow || isOutOfStock) return;
     const buttonElem = e.currentTarget;
     setIsAdding(true);
@@ -148,6 +152,10 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
   };
 
   const handleBuyNow = async () => {
+    if (hasVariants && !selectedVariant) {
+      alert("Please select an option before proceeding to checkout.");
+      return;
+    }
     if (isBuyingNow || isAdding || isOutOfStock) return;
     if (!isAuthenticated) {
       router.push(`/login?redirect=${encodeURIComponent("/checkout")}`);
@@ -238,12 +246,12 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
       {/* Short Description */}
       <p className={styles.shortDescription}>{description}</p>
 
-      {/* Real Variants Selector for VARIABLE Products */}
+      {/* Amazon-style Variety / Option Selector for VARIABLE Products */}
       {hasVariants && (
         <div className={styles.selectorBlock}>
           <div className={styles.selectorHeaderWithLink}>
             <div className={styles.selectorHeader}>
-              <span className={styles.selectorTitle}>Options:</span>
+              <span className={styles.selectorTitle}>Select Variety / Size:</span>
               <span className={styles.selectorValue}>
                 {selectedVariant ? (selectedVariant.attributes && Object.values(selectedVariant.attributes)[0] ? String(Object.values(selectedVariant.attributes)[0]) : selectedVariant.name) : 'Select an option'}
               </span>
@@ -257,13 +265,18 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
               <span>Guide</span>
             </button>
           </div>
-          <div className={styles.sizePillsRow}>
+
+          <div className={styles.varietyCardsGrid}>
             {variants.map((variant) => {
               const isSelected = selectedVariant?.id === variant.id;
               const isVarOutOfStock = variant.stock <= 0;
               const varPrice = variant.discountPrice && variant.discountPrice > 0 ? variant.discountPrice : variant.price;
+              const varOrigPrice = variant.originalPrice || (variant.discountPrice && variant.discountPrice > 0 ? variant.price : undefined);
+              const varDiscount = varOrigPrice && varOrigPrice > varPrice
+                ? Math.round(((varOrigPrice - varPrice) / varOrigPrice) * 100)
+                : null;
               
-              // Get clean variant label from attributes (e.g. 500g, 1kg) or variant name
+              // Get clean variant label from attributes (e.g. 500g, 1.2 Kg, 3 Kg) or variant name
               let displayLabel = variant.name;
               if (variant.attributes && typeof variant.attributes === 'object') {
                 const vals = Object.values(variant.attributes).filter(Boolean);
@@ -276,15 +289,27 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
                 <button
                   key={variant.id}
                   type="button"
-                  className={`${styles.sizePillBtn} ${isSelected ? styles.sizePillActive : ''}`}
+                  disabled={isVarOutOfStock}
+                  className={`${styles.varietyOptionCard} ${isSelected ? styles.varietyOptionCardActive : ''} ${isVarOutOfStock ? styles.varietyOptionCardDisabled : ''}`}
                   onClick={() => onSelectVariant?.(variant)}
-                  style={{
-                    opacity: isVarOutOfStock ? 0.5 : 1,
-                    textDecoration: isVarOutOfStock ? 'line-through' : 'none',
-                  }}
-                  title={isVarOutOfStock ? 'Out of stock' : `₹${varPrice}`}
+                  aria-pressed={isSelected}
+                  title={isVarOutOfStock ? `${displayLabel} (Out of stock)` : `${displayLabel} - ₹${varPrice}`}
                 >
-                  <span>{displayLabel}</span>
+                  <div className={styles.varietyCardName}>
+                    <span>{displayLabel}</span>
+                    {isSelected && <Check size={13} strokeWidth={3} color="#F99205" />}
+                  </div>
+                  <div className={styles.varietyCardPriceRow}>
+                    <span className={styles.varietyCardPrice}>₹{varPrice.toLocaleString()}</span>
+                    {varOrigPrice && varOrigPrice > varPrice && (
+                      <span className={styles.varietyCardOrigPrice}>₹{varOrigPrice.toLocaleString()}</span>
+                    )}
+                  </div>
+                  {varDiscount ? (
+                    <span className={styles.varietyCardDiscount}>{varDiscount}% OFF</span>
+                  ) : isVarOutOfStock ? (
+                    <span className={styles.varietyStockText}>Out of stock</span>
+                  ) : null}
                 </button>
               );
             })}
@@ -343,7 +368,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
           type="button"
           className={`${styles.addToCartMainBtn} ${hasAdded ? styles.addedState : ''}`}
           onClick={handleAddToCart}
-          disabled={isAdding || isBuyingNow || isOutOfStock}
+          disabled={isAdding || isBuyingNow || isOutOfStock || (hasVariants && !selectedVariant)}
         >
           {isAdding ? (
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
@@ -357,6 +382,8 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
             </>
           ) : isOutOfStock ? (
             <span>Out of Stock</span>
+          ) : hasVariants && !selectedVariant ? (
+            <span>Select an Option</span>
           ) : (
             <>
               <ShoppingBag size={18} />
@@ -369,8 +396,8 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
           type="button"
           className={styles.buyNowMainBtn}
           onClick={handleBuyNow}
-          disabled={isBuyingNow || isAdding || isOutOfStock}
-          style={{ opacity: isOutOfStock ? 0.5 : 1 }}
+          disabled={isBuyingNow || isAdding || isOutOfStock || (hasVariants && !selectedVariant)}
+          style={{ opacity: (isOutOfStock || (hasVariants && !selectedVariant)) ? 0.5 : 1 }}
         >
           {isBuyingNow ? (
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>

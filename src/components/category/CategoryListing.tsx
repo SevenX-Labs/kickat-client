@@ -20,7 +20,7 @@ import {
 import { categoryService } from '@/services/categoryService';
 import { Category, CategoryProductsQuery } from '@/types/category';
 import { productService } from '@/services/productService';
-import { mapBackendProductToCard } from '@/types/product';
+import { mapBackendProductListToCards } from '@/types/product';
 import { Skeleton } from '@/components/ui/Skeleton';
 import styles from './CategoryListing.module.css';
 
@@ -223,7 +223,7 @@ export function CategoryListing({ categorySlug, subcategorySlug }: CategoryListi
         }
       }
 
-      let mapped = rawProducts.map(mapBackendProductToCard);
+      let mapped = mapBackendProductListToCards(rawProducts);
 
       // Client-side search and rating filter
       if (searchQuery.trim()) {

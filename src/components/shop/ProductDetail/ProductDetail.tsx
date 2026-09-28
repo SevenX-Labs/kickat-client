@@ -73,6 +73,20 @@ export function ProductDetail({ product, isLoading }: ProductDetailProps) {
 
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(defaultVar);
 
+  useEffect(() => {
+    if (product.variants && product.variants.length > 0) {
+      const vars = product.variants;
+      setSelectedVariant((prev) => {
+        if (prev && vars.some((v) => v.id === prev.id)) {
+          return prev;
+        }
+        return vars.find((v) => v.isDefault) || vars[0];
+      });
+    } else {
+      setSelectedVariant(null);
+    }
+  }, [product.id, product.variants]);
+
   // Track product view in background
   useEffect(() => {
     if (product?.id) {

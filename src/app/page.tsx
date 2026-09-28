@@ -7,7 +7,7 @@ import { ShopByCategory } from "@/components/common/ShopByCategory";
 import { ProductRow } from "@/components/common/ProductRow";
 import { TrustStrip } from "@/components/common/TrustStrip";
 import { productService } from '@/services/productService';
-import { mapBackendProductToCard } from '@/types/product';
+import { mapBackendProductListToCards } from '@/types/product';
 import { CatalogProduct } from '@/data/categoryData';
 
 // Dynamic code-splitting for below-the-fold components
@@ -31,7 +31,7 @@ export default function Home() {
       try {
         const res = await productService.getBestSellers(4);
         if (isMounted && res && res.success && Array.isArray(res.products) && res.products.length > 0) {
-          const mapped = res.products.map(mapBackendProductToCard) as unknown as CatalogProduct[];
+          const mapped = mapBackendProductListToCards(res.products) as unknown as CatalogProduct[];
           setBestSellers(mapped);
         }
       } catch (err) {
@@ -42,7 +42,7 @@ export default function Home() {
       try {
         const res = await productService.getTrending(4);
         if (isMounted && res && res.success && Array.isArray(res.products) && res.products.length > 0) {
-          const mapped = res.products.map(mapBackendProductToCard) as unknown as CatalogProduct[];
+          const mapped = mapBackendProductListToCards(res.products) as unknown as CatalogProduct[];
           setTrending(mapped);
         }
       } catch (err) {
@@ -54,7 +54,7 @@ export default function Home() {
         const res = await productService.getNewArrivals(4);
         const list = res?.products;
         if (isMounted && list && Array.isArray(list) && list.length > 0) {
-          const mapped = list.map(mapBackendProductToCard) as unknown as CatalogProduct[];
+          const mapped = mapBackendProductListToCards(list) as unknown as CatalogProduct[];
           setNewArrivals(mapped);
         }
       } catch (err) {

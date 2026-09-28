@@ -13,6 +13,35 @@ import {
   SingleProductResponse,
 } from '@/types/product';
 
+const variantsCache: Record<string, BackendProductVariant[]> = {};
+
+async function enrichProductsWithVariants(products: BackendProduct[]): Promise<BackendProduct[]> {
+  if (!Array.isArray(products) || products.length === 0) return products;
+
+  const variableProducts = products.filter((p) => p && p.type === 'VARIABLE' && (!p.variants || p.variants.length === 0));
+  if (variableProducts.length === 0) return products;
+
+  await Promise.all(
+    variableProducts.map(async (p) => {
+      try {
+        if (variantsCache[p.id]) {
+          p.variants = variantsCache[p.id];
+          return;
+        }
+        const res = await api<ProductVariantsResponse>(`/products/${encodeURIComponent(p.id)}/variants`, { method: 'GET' });
+        if (res.success && Array.isArray(res.variants)) {
+          variantsCache[p.id] = res.variants;
+          p.variants = res.variants;
+        }
+      } catch (err) {
+        // silent fallback
+      }
+    })
+  );
+
+  return products;
+}
+
 export const productService = {
   /**
    * GET /api/v1/products
@@ -36,7 +65,11 @@ export const productService = {
 
     const qs = params.toString();
     const endpoint = `/products${qs ? `?${qs}` : ''}`;
-    return api<PaginatedProductsResponse>(endpoint, { method: 'GET' });
+    const res = await api<PaginatedProductsResponse>(endpoint, { method: 'GET' });
+    if (res && Array.isArray(res.products)) {
+      await enrichProductsWithVariants(res.products);
+    }
+    return res;
   },
 
   /**
@@ -52,7 +85,14 @@ export const productService = {
    * Fetch product variants with SKU, pricing, attributes and stock
    */
   async getProductVariants(id: string): Promise<ProductVariantsResponse> {
-    return api<ProductVariantsResponse>(`/products/${encodeURIComponent(id)}/variants`, { method: 'GET' });
+    if (variantsCache[id]) {
+      return { success: true, productId: id, variants: variantsCache[id] };
+    }
+    const res = await api<ProductVariantsResponse>(`/products/${encodeURIComponent(id)}/variants`, { method: 'GET' });
+    if (res && res.success && Array.isArray(res.variants)) {
+      variantsCache[id] = res.variants;
+    }
+    return res;
   },
 
   /**
@@ -84,7 +124,11 @@ export const productService = {
    * Fetch related products based on category and species
    */
   async getRelatedProducts(id: string, limit: number = 8): Promise<RelatedProductsResponse> {
-    return api<RelatedProductsResponse>(`/products/${encodeURIComponent(id)}/related?limit=${limit}`, { method: 'GET' });
+    const res = await api<RelatedProductsResponse>(`/products/${encodeURIComponent(id)}/related?limit=${limit}`, { method: 'GET' });
+    if (res && Array.isArray(res.relatedProducts)) {
+      await enrichProductsWithVariants(res.relatedProducts);
+    }
+    return res;
   },
 
   /**
@@ -104,14 +148,19 @@ export const productService = {
     const endpoint = `/products/${encodeURIComponent(id)}/reviews${qs ? `?${qs}` : ''}`;
     return api<any>(endpoint, { method: 'GET' });
   },
+
   /**
    * GET /api/v1/products/best-sellers
    * Fetch best-selling products from the database
    */
   async getBestSellers(limit: number = 8): Promise<{ success: boolean; products: BackendProduct[] }> {
-    return api<{ success: boolean; products: BackendProduct[] }>(`/products/best-sellers?limit=${limit}`, {
+    const res = await api<{ success: boolean; products: BackendProduct[] }>(`/products/best-sellers?limit=${limit}`, {
       method: 'GET',
     });
+    if (res && Array.isArray(res.products)) {
+      await enrichProductsWithVariants(res.products);
+    }
+    return res;
   },
 
   /**
@@ -119,9 +168,13 @@ export const productService = {
    * Fetch trending products from the database
    */
   async getTrending(limit: number = 8): Promise<{ success: boolean; products: BackendProduct[] }> {
-    return api<{ success: boolean; products: BackendProduct[] }>(`/products/trending?limit=${limit}`, {
+    const res = await api<{ success: boolean; products: BackendProduct[] }>(`/products/trending?limit=${limit}`, {
       method: 'GET',
     });
+    if (res && Array.isArray(res.products)) {
+      await enrichProductsWithVariants(res.products);
+    }
+    return res;
   },
 
   /**
@@ -129,8 +182,12 @@ export const productService = {
    * Fetch new arrival products from the database
    */
   async getNewArrivals(limit: number = 8): Promise<PaginatedProductsResponse> {
-    return api<PaginatedProductsResponse>(`/products?sort=newest&limit=${limit}`, {
+    const res = await api<PaginatedProductsResponse>(`/products?sort=newest&limit=${limit}`, {
       method: 'GET',
     });
+    if (res && Array.isArray(res.products)) {
+      await enrichProductsWithVariants(res.products);
+    }
+    return res;
   },
 };

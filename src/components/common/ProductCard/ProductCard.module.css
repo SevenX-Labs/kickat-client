@@ -627,3 +627,50 @@
     font-weight: 400;
   }
 }
+
+/* Amazon-style Variety Switcher Chips */
+.variantChipsRow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.variantChip {
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1.5px solid #E5E7EB;
+  background: #F9FAFB;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.variantChip:hover:not(:disabled) {
+  border-color: #F99205;
+  color: #F99205;
+  background: #FFFDF7;
+  transform: translateY(-1px);
+}
+
+.variantChipActive {
+  border-color: #F99205 !important;
+  background: #FFF9F2 !important;
+  color: #D97706 !important;
+  box-shadow: 0 0 0 2px rgba(249, 146, 5, 0.18);
+}
+
+.variantChipDisabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  text-decoration: line-through;
+  background: #F3F4F6;
+}

@@ -13,6 +13,7 @@ export interface BackendProductVariant {
   sku?: string | null;
   price: number;
   discountPrice?: number | null;
+  originalPrice?: number | null;
   stock: number;
   attributes?: Record<string, any> | null;
   imageUrl?: string | null;
@@ -48,21 +49,21 @@ export interface BackendProduct {
   petSpecies?: 'DOG' | 'CAT' | 'BIRD' | 'FISH' | 'RABBIT' | 'OTHER' | null;
   dietaryPreference?: 'VEG' | 'NON_VEG' | null;
   categoryId: string;
-  isTrending: boolean;
+  isPublished: boolean;
+  isFeatured: boolean;
   isBestSeller: boolean;
-  imageUrl: string;
-  images: string[];
-  status: 'ACTIVE' | 'INACTIVE' | 'DRAFT' | 'ARCHIVED';
+  isTrending: boolean;
   type: 'SIMPLE' | 'VARIABLE';
-  seoTitle?: string | null;
-  seoDescription?: string | null;
-  attributes?: Record<string, any> | null;
-  highlights?: any | null;
-  ingredients?: any | null;
-  feedingGuide?: any | null;
+  sku?: string | null;
+  highlights?: string[] | Record<string, any> | null;
+  ingredients?: any;
+  feedingGuide?: any;
   careInstructions?: string[];
-  sizeGuide?: Record<string, any> | null;
-  faqs?: Array<{ question: string; answer: string }> | null;
+  sizeGuide?: any;
+  attributes?: Record<string, any> | null;
+  faqs?: Array<{ question: string; answer: string }> | string | null;
+  imageUrl?: string | null;
+  images?: string[];
   createdAt?: string;
   updatedAt?: string;
   category?: BackendCategory;
@@ -133,10 +134,7 @@ export interface RelatedProductsResponse {
   relatedProducts: BackendProduct[];
 }
 
-export function mapBackendProductToCard(p: BackendProduct) {
-  const effectivePrice = p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price;
-  const originalPrice = p.discountPrice && p.discountPrice > 0 ? p.price : undefined;
-  
+function extractHighlights(p: BackendProduct): string[] {
   let tags: string[] = [];
   if (Array.isArray(p.highlights)) {
     tags = p.highlights.map((item: any) => {
@@ -155,10 +153,89 @@ export function mapBackendProductToCard(p: BackendProduct) {
       return String(item || '');
     }).filter((s) => s && s !== '[object Object]');
   }
+  return tags;
+}
 
-  return {
+export interface ProductCardData {
+  id: string;
+  name: string;
+  baseName: string;
+  price: number;
+  originalPrice?: number;
+  rating: number;
+  reviewsCount: number;
+  image: string;
+  mainCategory: string;
+  subCategory: string;
+  brand: string;
+  badge?: string;
+  tags: string[];
+  description: string;
+  slug?: string;
+  stock: number;
+  type: 'SIMPLE' | 'VARIABLE';
+  isTopRated: boolean;
+  variantId?: string;
+  selectedVariantId?: string;
+  variantName?: string;
+  variants?: BackendProductVariant[];
+}
+
+export function mapBackendProductToCards(p: BackendProduct): ProductCardData[] {
+  const tags = extractHighlights(p);
+
+  // If product is VARIABLE and has variants, create individual variant cards for each variety!
+  if (p.type === 'VARIABLE' && Array.isArray(p.variants) && p.variants.length > 0) {
+    return p.variants.map((v) => {
+      const effectivePrice = v.discountPrice && v.discountPrice > 0 ? v.discountPrice : v.price;
+      const originalPrice = v.discountPrice && v.discountPrice > 0 ? v.price : undefined;
+      const variantImage = v.imageUrl || (v.images && v.images[0]) || p.imageUrl || (p.images && p.images[0]) || '/hero-products/dog_food.png';
+
+      let displayLabel = v.name;
+      if (v.attributes && typeof v.attributes === 'object') {
+        const vals = Object.values(v.attributes).filter(Boolean);
+        if (vals.length > 0) {
+          displayLabel = String(vals[0]);
+        }
+      }
+
+      return {
+        id: p.id,
+        variantId: v.id,
+        selectedVariantId: v.id,
+        variantName: displayLabel,
+        name: `${p.name} – ${displayLabel}`,
+        baseName: p.name,
+        price: effectivePrice,
+        originalPrice,
+        rating: p.rating ?? 0,
+        reviewsCount: p.reviewsCount || 0,
+        image: variantImage,
+        mainCategory: p.category?.name || p.category?.slug || 'Pet Care',
+        subCategory: p.petSpecies ? `${p.petSpecies.toLowerCase()} essentials` : 'Essentials',
+        brand: p.brand || 'KickAt',
+        badge: p.isBestSeller ? 'Best Seller' : p.isTrending ? 'Trending' : undefined,
+        tags,
+        description: p.description || p.descriptionTitle || '',
+        slug: p.slug,
+        stock: v.stock,
+        type: p.type,
+        isTopRated: (p.rating || 0) >= 4.7,
+        variants: p.variants,
+      };
+    });
+  }
+
+  const effectivePrice = p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price;
+  const originalPrice = p.discountPrice && p.discountPrice > 0 ? p.price : undefined;
+
+  return [{
     id: p.id,
+    variantId: undefined,
+    selectedVariantId: undefined,
+    variantName: undefined,
     name: p.name,
+    baseName: p.name,
     price: effectivePrice,
     originalPrice,
     rating: p.rating ?? 0,
@@ -174,7 +251,18 @@ export function mapBackendProductToCard(p: BackendProduct) {
     stock: p.stock,
     type: p.type,
     isTopRated: (p.rating || 0) >= 4.7,
-  };
+    variants: p.variants,
+  }];
+}
+
+export function mapBackendProductToCard(p: BackendProduct): ProductCardData {
+  const cards = mapBackendProductToCards(p);
+  return cards[0];
+}
+
+export function mapBackendProductListToCards(products: BackendProduct[]): ProductCardData[] {
+  if (!Array.isArray(products)) return [];
+  return products.flatMap(mapBackendProductToCards);
 }
 
 export function transformBackendProduct(bp: BackendProduct) {

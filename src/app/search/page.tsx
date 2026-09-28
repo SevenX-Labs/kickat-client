@@ -24,7 +24,7 @@ import { SearchProductItem, SearchSort } from '@/types/search';
 import { useAuth } from '@/context/AuthContext';
 import ProductCard from '@/components/common/ProductCard/ProductCard';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { mapBackendProductToCard } from '@/types/product';
+import { mapBackendProductListToCards } from '@/types/product';
 import styles from './Search.module.css';
 
 function SearchPageContent() {
@@ -377,10 +377,9 @@ function SearchPageContent() {
               <>
                 {/* Products Grid */}
                 <div className={styles.resultsGrid}>
-                  {products.map((item) => {
-                    const cardProduct = mapBackendProductToCard(item as any);
-                    return <ProductCard key={item.id} product={cardProduct} />;
-                  })}
+                  {mapBackendProductListToCards(products as any).map((cardProduct, idx) => (
+                    <ProductCard key={cardProduct.variantId ? `${cardProduct.id}-${cardProduct.variantId}` : cardProduct.id || idx} product={cardProduct} />
+                  ))}
                 </div>
 
                 {/* Pagination Controls */}

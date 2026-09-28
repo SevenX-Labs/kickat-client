@@ -32,6 +32,12 @@ export interface CatalogProduct {
   isTopRated?: boolean;
   inStock?: boolean;
   description?: string;
+  stock?: number;
+  type?: "SIMPLE" | "VARIABLE";
+  slug?: string;
+  variantId?: string;
+  selectedVariantId?: string;
+  variants?: any[];
 }
 
 export type Product = CatalogProduct;

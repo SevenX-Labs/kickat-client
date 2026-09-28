@@ -7,7 +7,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
-import { Heart, Star, ShoppingCart, Trash2, Truck, Check } from 'lucide-react';
+import { Heart, Star, ShoppingCart, Trash2, Check, Truck, SlidersHorizontal } from 'lucide-react';
+import { VariantSelectorModal } from '@/components/shop/VariantSelectorModal/VariantSelectorModal';
+import { BackendProductVariant } from '@/types/product';
 import styles from './ProductCard.module.css';
 
 export interface Product {
@@ -18,20 +20,22 @@ export interface Product {
   rating: number;
   reviewsCount?: number;
   image: string;
-  mainCategory: string;
-  subCategory: string;
+  mainCategory?: string;
+  subCategory?: string;
   brand?: string;
   badge?: string;
   tags?: string[];
-  sizes?: string[];
+  description?: string;
   color?: string;
   colors?: string[];
-  isTopRated?: boolean;
-  description?: string;
   variantId?: string;
   selectedVariantId?: string;
+  variantName?: string;
   isWishlisted?: boolean;
   stock?: number;
+  type?: 'SIMPLE' | 'VARIABLE';
+  slug?: string;
+  variants?: BackendProductVariant[];
 }
 
 interface ProductCardProps {
@@ -42,12 +46,15 @@ interface ProductCardProps {
 function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProps) {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
-  const [selectedSwatch, setSelectedSwatch] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(Boolean(product.isWishlisted));
   const [isWishlistLoading, setIsWishlistLoading] = useState(false);
+  const [selectedSwatch, setSelectedSwatch] = useState(0);
   const [isAdded, setIsAdded] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
-  const { addToCart } = useCart();
+  const [isVariantModalOpen, setIsVariantModalOpen] = useState(false);
+
+  const initialVariantId = product.variantId || product.selectedVariantId || (product.variants && product.variants.length > 0 ? product.variants[0].id : undefined);
+  const [activeVariantId, setActiveVariantId] = useState<string | undefined>(initialVariantId);
 
   useEffect(() => {
     if (typeof product.isWishlisted === 'boolean') {
@@ -55,9 +62,42 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
     }
   }, [product.isWishlisted]);
 
+  useEffect(() => {
+    if (product.variantId || product.selectedVariantId) {
+      setActiveVariantId(product.variantId || product.selectedVariantId);
+    }
+  }, [product.variantId, product.selectedVariantId]);
+
+  const isSpecificVariantCard = Boolean(product.variantId || product.selectedVariantId);
+
+  const activeVariant = useMemo(() => {
+    if (isSpecificVariantCard || !product.variants || product.variants.length === 0) return null;
+    return product.variants.find((v) => v.id === activeVariantId) || null;
+  }, [isSpecificVariantCard, product.variants, activeVariantId]);
+
   const rating = product.rating ?? 0;
   const reviewsCount = product.reviewsCount ?? 0;
-  const isOutOfStock = typeof product.stock === 'number' && product.stock <= 0;
+
+  const currentPrice = (!isSpecificVariantCard && activeVariant)
+    ? (activeVariant.discountPrice && activeVariant.discountPrice > 0 ? activeVariant.discountPrice : activeVariant.price)
+    : product.price;
+
+  const currentOriginalPrice = (!isSpecificVariantCard && activeVariant)
+    ? (activeVariant.originalPrice || (activeVariant.discountPrice && activeVariant.discountPrice > 0 ? activeVariant.price : undefined))
+    : product.originalPrice;
+
+  const currentStock = (!isSpecificVariantCard && activeVariant)
+    ? activeVariant.stock
+    : (product.stock ?? 1);
+
+  const isOutOfStock = currentStock <= 0;
+
+  const activeImage = (!isSpecificVariantCard && activeVariant?.imageUrl)
+    || (!isSpecificVariantCard && activeVariant?.images && activeVariant.images[0])
+    || product.image 
+    || '/hero-products/dog_food.png';
+
+  const isVariable = product.type === 'VARIABLE' || (Array.isArray(product.variants) && product.variants.length > 0);
 
   // Only show color swatches if genuine color options exist on the product
   const availableColors = Array.isArray(product.colors) && product.colors.length > 0
@@ -67,10 +107,16 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
     : [];
 
   const discountPercent = useMemo(() => {
-    return product.originalPrice && product.originalPrice > product.price 
-      ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+    return currentOriginalPrice && currentOriginalPrice > currentPrice 
+      ? Math.round(((currentOriginalPrice - currentPrice) / currentOriginalPrice) * 100)
       : product.badge === 'Sale' ? 15 : null;
-  }, [product.originalPrice, product.price, product.badge]);
+  }, [currentOriginalPrice, currentPrice, product.badge]);
+
+  const handleSelectVariant = (variant: BackendProductVariant) => {
+    if (variant.stock <= 0) return;
+    setActiveVariantId(variant.id);
+    setIsAdded(false);
+  };
 
   const handleWishlistClick = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -88,12 +134,12 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
       return;
     }
 
-    const variantId = product.variantId || product.selectedVariantId || undefined;
+    const variantIdToUse = activeVariantId || product.variantId || product.selectedVariantId || undefined;
 
     setIsWishlistLoading(true);
     if (!isWishlisted) {
       try {
-        await wishlistService.addToWishlist(product.id, variantId);
+        await wishlistService.addToWishlist(product.id, variantIdToUse);
         setIsWishlisted(true);
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('wishlist-updated', { detail: { productId: product.id, action: 'add' } }));
@@ -105,7 +151,7 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
       }
     } else {
       try {
-        await wishlistService.removeFromWishlist(product.id, variantId);
+        await wishlistService.removeFromWishlist(product.id, variantIdToUse);
         setIsWishlisted(false);
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('wishlist-updated', { detail: { productId: product.id, action: 'remove' } }));
@@ -116,7 +162,9 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
         setIsWishlistLoading(false);
       }
     }
-  }, [onRemoveFromWishlist, product.id, product.variantId, product.selectedVariantId, isWishlisted, isWishlistLoading, isAuthenticated, router]);
+  }, [onRemoveFromWishlist, product.id, activeVariantId, product.variantId, product.selectedVariantId, isWishlisted, isWishlistLoading, isAuthenticated, router]);
+
+  const { addToCart } = useCart();
 
   const handleAddToCart = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -126,11 +174,21 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
       router.push('/cart');
       return;
     }
+
+    // Determine target variant ID
+    const effectiveVariantId = activeVariantId || product.variantId || product.selectedVariantId;
+
+    // If variable product has no variant selected or known, open variant modal
+    if (isVariable && !activeVariantId) {
+      setIsVariantModalOpen(true);
+      return;
+    }
+
     if (isAdding) return;
 
     setIsAdding(true);
     try {
-      await addToCart(product.id, product.variantId || product.selectedVariantId);
+      await addToCart(product.id, effectiveVariantId);
       setIsAdded(true);
 
       const startElem = e.currentTarget as HTMLElement;
@@ -139,14 +197,13 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
       const cartBtn = (bottomNavCart && window.getComputedStyle(bottomNavCart).display !== 'none' && bottomNavCart.offsetWidth > 0)
         ? bottomNavCart
         : topNavbarCart;
-      const imageSrc = product.image || '/hero-products/dog_food.png';
 
       if (cartBtn) {
         const startRect = startElem.getBoundingClientRect();
         const endRect = cartBtn.getBoundingClientRect();
 
         const flyingImg = document.createElement('img');
-        flyingImg.src = imageSrc;
+        flyingImg.src = activeImage;
         flyingImg.alt = 'Flying product preview';
 
         const width = 56;
@@ -201,10 +258,20 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
     } finally {
       setIsAdding(false);
     }
-  }, [isAdded, isAdding, isOutOfStock, product.id, product.image, product.variantId, product.selectedVariantId, router, addToCart]);
+  }, [isAdded, isAdding, isOutOfStock, isVariable, activeVariantId, product.id, product.variantId, product.selectedVariantId, activeImage, router, addToCart]);
 
   return (
     <div className={styles.productCard}>
+      {/* Variant Selector Modal for Variable Products */}
+      {isVariable && !isSpecificVariantCard && (
+        <VariantSelectorModal
+          isOpen={isVariantModalOpen}
+          onClose={() => setIsVariantModalOpen(false)}
+          product={product}
+          onAddToCartSuccess={() => setIsAdded(true)}
+        />
+      )}
+
       {/* Product Image Area */}
       <div className={styles.cardImageArea}>
         {product.badge && product.badge !== 'Best Seller' && product.badge !== 'Popular' && (
@@ -243,13 +310,13 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
 
         <Link href={`/product/${product.id}`} prefetch={true} target="_blank" rel="noopener noreferrer" className={styles.cardImageLink}>
           <Image
-            src={product.image}
+            src={activeImage}
             alt={product.name}
             fill
             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             className={styles.cardImage}
             style={{ objectFit: 'contain' }}
-            unoptimized={product.image?.startsWith('data:')}
+            unoptimized={activeImage?.startsWith('data:')}
           />
         </Link>
       </div>
@@ -280,15 +347,46 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
         {/* Price Row */}
         <div className={styles.priceContainer}>
           <div className={styles.priceRowUpper}>
-            <span className={styles.cardPrice}>₹{product.price.toLocaleString()}</span>
-            {product.originalPrice && (
-              <span className={styles.originalPrice}>₹{product.originalPrice.toLocaleString()}</span>
+            <span className={styles.cardPrice}>₹{currentPrice.toLocaleString()}</span>
+            {currentOriginalPrice && (
+              <span className={styles.originalPrice}>₹{currentOriginalPrice.toLocaleString()}</span>
             )}
           </div>
           {discountPercent && (
             <span className={styles.discountTag}>{discountPercent}% OFF</span>
           )}
         </div>
+
+        {/* Variety Switcher Chips (Only rendered when card is NOT an individual variant card) */}
+        {!isSpecificVariantCard && product.variants && product.variants.length > 1 && (
+          <div className={styles.variantChipsRow}>
+            {product.variants.map((v) => {
+              const isSelected = activeVariantId === v.id;
+              const isVarOutOfStock = v.stock <= 0;
+              let label = v.name;
+              if (v.attributes && typeof v.attributes === 'object') {
+                const vals = Object.values(v.attributes).filter(Boolean);
+                if (vals.length > 0) label = String(vals[0]);
+              }
+              return (
+                <button
+                  key={v.id}
+                  type="button"
+                  disabled={isVarOutOfStock}
+                  className={`${styles.variantChip} ${isSelected ? styles.variantChipActive : ''} ${isVarOutOfStock ? styles.variantChipDisabled : ''}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleSelectVariant(v);
+                  }}
+                  title={isVarOutOfStock ? `${label} (Out of stock)` : `${label} - ₹${v.discountPrice && v.discountPrice > 0 ? v.discountPrice : v.price}`}
+                >
+                  <span>{label}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         {/* Real Variant Color Swatches (only rendered if product actually has color variants) */}
         {availableColors.length > 0 && (
@@ -328,6 +426,11 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
               <>
                 <Check size={15} color="#ffffff" strokeWidth={2.5} />
                 <span className={styles.btnText}>Go to Cart</span>
+              </>
+            ) : isVariable && !activeVariantId ? (
+              <>
+                <SlidersHorizontal size={15} color="#ffffff" strokeWidth={2.2} />
+                <span className={styles.btnText}>Select Options</span>
               </>
             ) : (
               <>

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import HomeProductCard from '@/components/common/HomeProductCard/HomeProductCard';
 import { productService } from '@/services/productService';
-import { mapBackendProductToCard } from '@/types/product';
+import { mapBackendProductListToCards } from '@/types/product';
 import styles from './ProductDetail.module.css';
 import { Product } from './ProductDetail';
 
@@ -27,16 +27,15 @@ export function RelatedProducts({ currentProduct }: RelatedProductsProps) {
           // Product detail page context: fetch related products
           const res = await productService.getRelatedProducts(currentProduct.id, 4);
           if (isMounted && res.success && Array.isArray(res.relatedProducts)) {
-            const mapped = res.relatedProducts
-              .filter((p) => p.id !== currentProduct.id)
-              .map(mapBackendProductToCard);
+            const filtered = res.relatedProducts.filter((p) => p.id !== currentProduct.id);
+            const mapped = mapBackendProductListToCards(filtered);
             setRelated(mapped);
           }
         } else {
           // Cart page context: fetch live trending / best-sellers
           const res = await productService.getTrending(4);
           if (isMounted && res.success && Array.isArray(res.products)) {
-            const mapped = res.products.map(mapBackendProductToCard);
+            const mapped = mapBackendProductListToCards(res.products);
             setRelated(mapped);
           }
         }

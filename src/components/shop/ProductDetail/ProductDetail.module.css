@@ -2190,3 +2190,107 @@
     text-align: right !important;
   }
 }
+
+/* Amazon-style Variety Cards Selector */
+.varietyCardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 0.65rem;
+  width: 100%;
+  margin-top: 0.35rem;
+}
+
+.varietyOptionCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0.65rem 0.85rem;
+  border-radius: 12px;
+  border: 1.5px solid #E5E7EB;
+  background: #FFFFFF;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.varietyOptionCard:hover:not(:disabled) {
+  border-color: #F99205;
+  background: #FFFDF7;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(249, 146, 5, 0.12);
+}
+
+.varietyOptionCardActive {
+  border-color: #F99205 !important;
+  background: #FFF9F2 !important;
+  box-shadow: 0 0 0 1.5px #F99205, 0 4px 14px rgba(249, 146, 5, 0.18) !important;
+}
+
+.varietyOptionCardDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #F9FAFB;
+  border-color: #E5E7EB;
+}
+
+.varietyCardName {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.25;
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 0.35rem;
+}
+
+.varietyOptionCardActive .varietyCardName {
+  color: #D97706;
+}
+
+.varietyCardPriceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.varietyCardPrice {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.01em;
+}
+
+.varietyOptionCardActive .varietyCardPrice {
+  color: #B45309;
+}
+
+.varietyCardOrigPrice {
+  font-size: 0.75rem;
+  color: #9CA3AF;
+  text-decoration: line-through;
+  font-weight: 500;
+}
+
+.varietyCardDiscount {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #16A34A;
+  background: #DCFCE7;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  margin-top: 0.25rem;
+  display: inline-block;
+}
+
+.varietyStockText {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #DC2626;
+  margin-top: 0.25rem;
+}
