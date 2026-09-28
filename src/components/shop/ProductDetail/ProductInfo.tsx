@@ -27,11 +27,11 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
   // Dynamic pricing & stock based on selected variant or base product
   const effectivePrice = selectedVariant
     ? (selectedVariant.discountPrice && selectedVariant.discountPrice > 0 ? selectedVariant.discountPrice : selectedVariant.price)
-    : (product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price);
+    : product.price;
 
   const effectiveOriginalPrice = selectedVariant
-    ? (selectedVariant.discountPrice && selectedVariant.discountPrice > 0 ? selectedVariant.price : (product.originalPrice || undefined))
-    : (product.discountPrice && product.discountPrice > 0 ? product.price : (product.originalPrice || undefined));
+    ? (selectedVariant.originalPrice || (selectedVariant.discountPrice && selectedVariant.discountPrice > 0 ? selectedVariant.price : undefined))
+    : product.originalPrice;
 
   const currentStock = selectedVariant && selectedVariant.stock !== undefined
     ? selectedVariant.stock
@@ -209,9 +209,8 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
                 />
               ))}
             </div>
-            <a href="#reviews" className={styles.noReviewsPromptLink}>
-              0 Reviews (Be the first to review)
-            </a>
+            <span className={styles.ratingDivider}>|</span>
+            <span className={styles.reviewsCountText}>0 Reviews</span>
           </>
         )}
         {product.badge && (
