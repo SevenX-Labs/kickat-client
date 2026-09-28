@@ -18,18 +18,27 @@ export function RelatedProducts({ currentProduct }: RelatedProductsProps) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!currentProduct?.id) return;
     let isMounted = true;
 
     const fetchRelated = async () => {
       setLoading(true);
       try {
-        const res = await productService.getRelatedProducts(currentProduct.id, 4);
-        if (isMounted && res.success && Array.isArray(res.relatedProducts)) {
-          const mapped = res.relatedProducts
-            .filter((p) => p.id !== currentProduct.id)
-            .map(mapBackendProductToCard);
-          setRelated(mapped);
+        if (currentProduct?.id) {
+          // Product detail page context: fetch related products
+          const res = await productService.getRelatedProducts(currentProduct.id, 4);
+          if (isMounted && res.success && Array.isArray(res.relatedProducts)) {
+            const mapped = res.relatedProducts
+              .filter((p) => p.id !== currentProduct.id)
+              .map(mapBackendProductToCard);
+            setRelated(mapped);
+          }
+        } else {
+          // Cart page context: fetch live trending / best-sellers
+          const res = await productService.getTrending(4);
+          if (isMounted && res.success && Array.isArray(res.products)) {
+            const mapped = res.products.map(mapBackendProductToCard);
+            setRelated(mapped);
+          }
         }
       } catch (err) {
         console.error('Failed to load related products:', err);
@@ -52,7 +61,9 @@ export function RelatedProducts({ currentProduct }: RelatedProductsProps) {
   return (
     <div className={styles.relatedProductsWrapper}>
       <div className={styles.relatedProductsHeader}>
-        <h2 className={styles.relatedProductsTitle}>You may also like</h2>
+        <h2 className={styles.relatedProductsTitle}>
+          {currentProduct?.id ? "You may also like" : "Recommended for your Cart"}
+        </h2>
         <Link href="/category" className={styles.viewAllOrangeLink}>
           <span>View All</span>
           <ArrowRight size={16} />

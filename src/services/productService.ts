@@ -104,4 +104,33 @@ export const productService = {
     const endpoint = `/products/${encodeURIComponent(id)}/reviews${qs ? `?${qs}` : ''}`;
     return api<any>(endpoint, { method: 'GET' });
   },
+  /**
+   * GET /api/v1/products/best-sellers
+   * Fetch best-selling products from the database
+   */
+  async getBestSellers(limit: number = 8): Promise<{ success: boolean; products: BackendProduct[] }> {
+    return api<{ success: boolean; products: BackendProduct[] }>(`/products/best-sellers?limit=${limit}`, {
+      method: 'GET',
+    });
+  },
+
+  /**
+   * GET /api/v1/products/trending
+   * Fetch trending products from the database
+   */
+  async getTrending(limit: number = 8): Promise<{ success: boolean; products: BackendProduct[] }> {
+    return api<{ success: boolean; products: BackendProduct[] }>(`/products/trending?limit=${limit}`, {
+      method: 'GET',
+    });
+  },
+
+  /**
+   * GET /api/v1/products?sort=newest
+   * Fetch new arrival products from the database
+   */
+  async getNewArrivals(limit: number = 8): Promise<PaginatedProductsResponse> {
+    return api<PaginatedProductsResponse>(`/products?sort=newest&limit=${limit}`, {
+      method: 'GET',
+    });
+  },
 };

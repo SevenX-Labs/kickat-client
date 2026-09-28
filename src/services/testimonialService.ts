@@ -5,10 +5,10 @@ export interface TestimonialItem {
   name: string;
   rating: number;
   comment: string;
-  avatarUrl?: string;
-  location?: string;
-  petSpecies?: string;
-  petName?: string;
+  avatarUrl?: string | null;
+  location?: string | null;
+  petSpecies?: string | null;
+  petName?: string | null;
   isVerified?: boolean;
   order?: number;
   createdAt?: string;
@@ -17,18 +17,11 @@ export interface TestimonialItem {
 export const testimonialService = {
   /**
    * GET /api/v1/home/testimonials
-   * Fetch public customer testimonials
+   * Fetch active verified customer testimonials
    */
-  async getTestimonials(limit: number = 10): Promise<TestimonialItem[]> {
-    try {
-      const res = await api<{ success: boolean; data: TestimonialItem[] }>(
-        `/home/testimonials?limit=${limit}`,
-        { method: 'GET' }
-      );
-      return res?.data || [];
-    } catch (err) {
-      console.warn('Failed to fetch testimonials:', err);
-      return [];
-    }
+  async getTestimonials(limit: number = 10): Promise<{ success: boolean; data: TestimonialItem[] }> {
+    return api<{ success: boolean; data: TestimonialItem[] }>(`/home/testimonials?limit=${limit}`, {
+      method: 'GET',
+    });
   },
 };

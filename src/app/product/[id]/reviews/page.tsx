@@ -1,5 +1,7 @@
 "use client";
 
+import { productService } from '@/services/productService';
+
 import { useState, useEffect, useCallback, use } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Star, Edit3, CheckCircle2, ThumbsUp, Loader2 } from 'lucide-react';
@@ -79,14 +81,31 @@ export default function ReviewsPage({ params }: { params: Promise<{ id: string }
     return { stars: s, percent, count };
   });
 
-  const dummyProduct = {
+  const [productData, setProductData] = useState<any>(null);
+
+  useEffect(() => {
+    async function loadProd() {
+      if (!productId) return;
+      try {
+        const pRes = await productService.getProductById(productId);
+        if (pRes && pRes.success && pRes.product) {
+          setProductData(pRes.product);
+        }
+      } catch (err) {
+        console.warn('Failed to fetch product for reviews:', err);
+      }
+    }
+    loadProd();
+  }, [productId]);
+
+  const liveProduct = {
     id: productId,
-    name: 'Product',
-    price: 0,
+    name: productData?.name || 'Product Reviews',
+    price: productData?.price || 0,
     rating: Number(avgRating),
-    image: '',
-    images: [],
-    mainCategory: '',
+    image: productData?.imageUrl || '',
+    images: productData?.images || [],
+    mainCategory: productData?.category?.name || '',
     subCategory: '',
   };
 
@@ -216,7 +235,7 @@ export default function ReviewsPage({ params }: { params: Promise<{ id: string }
       </div>
 
       <WriteReviewModal
-        product={dummyProduct}
+        product={liveProduct}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmitSuccess={() => loadData()}
