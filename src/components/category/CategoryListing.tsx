@@ -585,7 +585,7 @@ export function CategoryListing({ categorySlug, subcategorySlug }: CategoryListi
             <>
               <div className={`${styles.productGrid} ${styles[`gridCols${gridCols}`]}`}>
                 {products.map((product) => (
-                  <ProductCard key={product.id} product={product as any} />
+                  <ProductCard key={product.variantId ? `${product.id}-${product.variantId}` : product.id} product={product as any} />
                 ))}
               </div>
 

@@ -1,0 +1,114 @@
+/* ══════════════════════════════════════════════════════════
+   PREMIUM RELATED PRODUCTS & RECOMMENDATIONS SECTION
+   ══════════════════════════════════════════════════════════ */
+
+.relatedProductsWrapper {
+  width: 100%;
+  margin: 3.5rem auto 1.5rem;
+  padding-top: 2.25rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.relatedProductsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #F99205;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.relatedProductsTitle {
+  font-family: var(--font-fraunces), serif;
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.02em;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  color: #6B7280;
+  margin: 0;
+}
+
+.viewAllOrangeLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  color: #F99205;
+  text-decoration: none;
+  border: 1.5px solid rgba(249, 146, 5, 0.35);
+  background-color: #FFFDF9;
+  padding: 0.45rem 1.15rem;
+  border-radius: 9999px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.viewAllOrangeLink:hover {
+  background-color: #F99205;
+  color: #ffffff;
+  border-color: #F99205;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(249, 146, 5, 0.28);
+}
+
+/* Responsive 4-Column Grid */
+.relatedProductsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.15rem;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .relatedProductsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .relatedProductsWrapper {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+  }
+
+  .relatedProductsHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .relatedProductsTitle {
+    font-size: 1.45rem;
+  }
+
+  .relatedProductsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.65rem;
+  }
+}

@@ -43,7 +43,7 @@ export function ProductRow({ eyebrow, title, subtitle, products, viewAllLink = '
 
         <div className={styles.grid}>
           {displayProducts.map(product => (
-            <HomeProductCard key={product.id} product={product as any} />
+            <HomeProductCard key={(product as any).variantId ? `${product.id}-${(product as any).variantId}` : product.id} product={product as any} />
           ))}
         </div>
       </div>

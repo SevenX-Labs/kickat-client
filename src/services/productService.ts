@@ -15,6 +15,28 @@ import {
 
 const variantsCache: Record<string, BackendProductVariant[]> = {};
 
+function deduplicateVariants(variants: BackendProductVariant[]): BackendProductVariant[] {
+  if (!Array.isArray(variants)) return [];
+  const seenIds = new Set<string>();
+  const seenLabels = new Set<string>();
+  return variants.filter((v) => {
+    if (!v || !v.id) return false;
+    let label = (v.name || '').trim();
+    if (v.attributes && typeof v.attributes === 'object') {
+      const vals = Object.values(v.attributes).filter(Boolean);
+      if (vals.length > 0) label = String(vals[0]).trim();
+    }
+    const idKey = v.id;
+    const labelKey = label ? label.toLowerCase() : '';
+    if (seenIds.has(idKey) || (labelKey && seenLabels.has(labelKey))) {
+      return false;
+    }
+    seenIds.add(idKey);
+    if (labelKey) seenLabels.add(labelKey);
+    return true;
+  });
+}
+
 async function enrichProductsWithVariants(products: BackendProduct[]): Promise<BackendProduct[]> {
   if (!Array.isArray(products) || products.length === 0) return products;
 
@@ -30,8 +52,9 @@ async function enrichProductsWithVariants(products: BackendProduct[]): Promise<B
         }
         const res = await api<ProductVariantsResponse>(`/products/${encodeURIComponent(p.id)}/variants`, { method: 'GET' });
         if (res.success && Array.isArray(res.variants)) {
-          variantsCache[p.id] = res.variants;
-          p.variants = res.variants;
+          const deduped = deduplicateVariants(res.variants);
+          variantsCache[p.id] = deduped;
+          p.variants = deduped;
         }
       } catch (err) {
         // silent fallback
@@ -90,7 +113,9 @@ export const productService = {
     }
     const res = await api<ProductVariantsResponse>(`/products/${encodeURIComponent(id)}/variants`, { method: 'GET' });
     if (res && res.success && Array.isArray(res.variants)) {
-      variantsCache[id] = res.variants;
+      const deduped = deduplicateVariants(res.variants);
+      variantsCache[id] = deduped;
+      return { success: true, productId: id, variants: deduped };
     }
     return res;
   },

@@ -545,7 +545,7 @@ export function CategoryExplorer({
                     }
                   >
                     {products.map((product) => (
-                      <ProductCard key={product.id} product={product} />
+                      <ProductCard key={product.variantId ? `${product.id}-${product.variantId}` : product.id} product={product} />
                     ))}
                   </div>
                 )}

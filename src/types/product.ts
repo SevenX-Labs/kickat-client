@@ -186,7 +186,28 @@ export function mapBackendProductToCards(p: BackendProduct): ProductCardData[] {
 
   // If product is VARIABLE and has variants, create individual variant cards for each variety!
   if (p.type === 'VARIABLE' && Array.isArray(p.variants) && p.variants.length > 0) {
-    return p.variants.map((v) => {
+    // 1. Deduplicate variants by id and normalized label/name
+    const seenVariantKeys = new Set<string>();
+    const uniqueVariants = p.variants.filter((v) => {
+      if (!v || !v.id) return false;
+      let label = (v.name || '').trim();
+      if (v.attributes && typeof v.attributes === 'object') {
+        const vals = Object.values(v.attributes).filter(Boolean);
+        if (vals.length > 0) {
+          label = String(vals[0]).trim();
+        }
+      }
+      const idKey = v.id;
+      const labelKey = label ? label.toLowerCase() : '';
+      if (seenVariantKeys.has(idKey) || (labelKey && seenVariantKeys.has(`lbl_${labelKey}`))) {
+        return false;
+      }
+      seenVariantKeys.add(idKey);
+      if (labelKey) seenVariantKeys.add(`lbl_${labelKey}`);
+      return true;
+    });
+
+    return uniqueVariants.map((v) => {
       const effectivePrice = v.discountPrice && v.discountPrice > 0 ? v.discountPrice : v.price;
       const originalPrice = v.discountPrice && v.discountPrice > 0 ? v.price : undefined;
       const variantImage = v.imageUrl || (v.images && v.images[0]) || p.imageUrl || (p.images && p.images[0]) || '/hero-products/dog_food.png';
@@ -221,7 +242,7 @@ export function mapBackendProductToCards(p: BackendProduct): ProductCardData[] {
         stock: v.stock,
         type: p.type,
         isTopRated: (p.rating || 0) >= 4.7,
-        variants: p.variants,
+        variants: uniqueVariants,
       };
     });
   }
@@ -262,7 +283,31 @@ export function mapBackendProductToCard(p: BackendProduct): ProductCardData {
 
 export function mapBackendProductListToCards(products: BackendProduct[]): ProductCardData[] {
   if (!Array.isArray(products)) return [];
-  return products.flatMap(mapBackendProductToCards);
+
+  // 1. Deduplicate source products by ID
+  const seenProductIds = new Set<string>();
+  const uniqueProducts = products.filter((p) => {
+    if (!p || !p.id) return false;
+    if (seenProductIds.has(p.id)) return false;
+    seenProductIds.add(p.id);
+    return true;
+  });
+
+  const cards = uniqueProducts.flatMap(mapBackendProductToCards);
+
+  // 2. Strictly deduplicate cards so no variant or product card appears twice
+  const seenCardKeys = new Set<string>();
+  return cards.filter((card) => {
+    const cardKey = card.variantId
+      ? `${card.id}-${card.variantId}`
+      : `${card.id}-${(card.variantName || card.name || 'base').trim().toLowerCase()}`;
+
+    if (seenCardKeys.has(cardKey)) {
+      return false;
+    }
+    seenCardKeys.add(cardKey);
+    return true;
+  });
 }
 
 export function transformBackendProduct(bp: BackendProduct) {
