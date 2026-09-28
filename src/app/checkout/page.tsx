@@ -416,7 +416,8 @@ export default function CheckoutPage() {
     const idempotencyKey = idempotencyKeyRef.current;
 
     try {
-      const currentCodFee = selectedPaymentMethod === 'COD' ? (checkoutData?.summary?.codFee ?? 0) : 0;
+      const currentMethod = paymentMethods.find((m) => m.type === selectedPaymentMethod);
+      const currentCodFee = selectedPaymentMethod === 'COD' ? (checkoutData?.summary?.codFee || currentMethod?.extraFee || 10) : 0;
       const effectiveExpectedTotal = (checkoutData?.summary?.grandTotal ?? 0) + currentCodFee;
 
       const orderPayload = {
@@ -867,8 +868,10 @@ export default function CheckoutPage() {
   const codFee = summary?.codFee ?? 0;
   const extraFeeAmount = summary?.extraFeeAmount ?? 0;
   const extraFeeName = summary?.extraFeeName;
+  const currentMethodItem = paymentMethods.find((m) => m.type === selectedPaymentMethod);
+  const activeCodFee = selectedPaymentMethod === 'COD' ? (codFee || currentMethodItem?.extraFee || 10) : 0;
   const grandTotal = summary?.grandTotal ?? 0;
-  const effectiveGrandTotal = grandTotal + (selectedPaymentMethod === 'COD' ? codFee : 0);
+  const effectiveGrandTotal = grandTotal + activeCodFee;
   const totalItemsCount = summary?.itemCount ?? cartItems?.reduce((acc, i) => acc + i.quantity, 0) ?? 0;
 
   const displayedItems = isItemsExpanded ? (cartItems || []) : (cartItems || []).slice(0, 2);
@@ -1595,55 +1598,39 @@ export default function CheckoutPage() {
                 </div>
               )}
 
-              {/* Price Details Dropdown Toggle */}
-              <div
-                className={styles.priceDetailsToggle}
-                onClick={() => setIsPriceDetailsOpen(!isPriceDetailsOpen)}
-                style={{ cursor: 'pointer' }}
-              >
-                <span>Price Details</span>
-                <ChevronDown
-                  size={16}
-                  color="#888"
-                  style={{
-                    transform: isPriceDetailsOpen ? 'rotate(180deg)' : 'none',
-                    transition: 'transform 0.2s',
-                  }}
-                />
-              </div>
-
-              {isPriceDetailsOpen && (
-                <div className={styles.priceDetailsDropdown}>
+              {/* Price Details Breakdown (Always visible, fully transparent) */}
+              <div style={{ padding: '0.5rem 0', borderBottom: '1px solid #E5E7EB', marginBottom: '0.75rem' }}>
+                <div className={styles.summaryRowAlt}>
+                  <span>Items Subtotal</span>
+                  <span className={styles.summaryValueAlt}>₹{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </div>
+                {gstAmount > 0 && (
                   <div className={styles.summaryRowAlt}>
-                    <span>Subtotal</span>
-                    <span className={styles.summaryValueAlt}>₹{subtotal.toLocaleString()}</span>
+                    <span>Tax / GST {gstPercentage ? `(${gstPercentage}%)` : ''}</span>
+                    <span className={styles.summaryValueAlt}>₹{gstAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
-                  {gstAmount > 0 && (
-                    <div className={styles.summaryRowAlt}>
-                      <span>Tax / GST {gstPercentage ? `(${gstPercentage}%)` : ''}</span>
-                      <span className={styles.summaryValueAlt}>₹{gstAmount.toLocaleString()}</span>
-                    </div>
-                  )}
-                  <div className={styles.summaryRowAlt}>
-                    <span>Shipping & Delivery</span>
-                    <span className={styles.shippingValueAlt}>
-                      {deliveryFee === 0 ? 'FREE' : `₹${deliveryFee.toLocaleString()}`}
+                )}
+                <div className={styles.summaryRowAlt}>
+                  <span>Shipping &amp; Delivery</span>
+                  <span className={styles.shippingValueAlt} style={{ color: deliveryFee === 0 ? '#16A34A' : '#111827', fontWeight: 700 }}>
+                    {deliveryFee === 0 ? 'FREE' : `₹${deliveryFee.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                  </span>
+                </div>
+                {selectedPaymentMethod === 'COD' && (
+                  <div className={styles.summaryRowAlt} style={{ color: '#ea580c', fontWeight: 600 }}>
+                    <span>Cash on Delivery Fee</span>
+                    <span className={styles.summaryValueAlt} style={{ color: '#ea580c' }}>
+                      +₹{activeCodFee.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
-                  {codFee > 0 && selectedPaymentMethod === 'COD' && (
-                    <div className={styles.summaryRowAlt}>
-                      <span>COD Fee</span>
-                      <span className={styles.summaryValueAlt}>₹{codFee.toLocaleString()}</span>
-                    </div>
-                  )}
-                  {extraFeeAmount > 0 && (
-                    <div className={styles.summaryRowAlt}>
-                      <span>{extraFeeName || 'Handling Fee'}</span>
-                      <span className={styles.summaryValueAlt}>₹{extraFeeAmount.toLocaleString()}</span>
-                    </div>
-                  )}
-                </div>
-              )}
+                )}
+                {extraFeeAmount > 0 && (
+                  <div className={styles.summaryRowAlt}>
+                    <span>{extraFeeName || 'Handling Fee'}</span>
+                    <span className={styles.summaryValueAlt}>₹{extraFeeAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  </div>
+                )}
+              </div>
 
               {/* Promo Code Section */}
               <div className={styles.promoContainerAlt}>
