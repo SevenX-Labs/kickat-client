@@ -44,7 +44,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
     : null;
 
   const title = product.name;
-  const rating = product.rating || 4.5;
+  const rating = product.rating ?? 0;
   const reviewsCount = product.reviewsCount || 0;
   const description = product.description || product.descriptionTitle || "Premium quality pet essential curated for health, safety, and everyday comfort.";
 
@@ -177,20 +177,43 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
 
       {/* Rating & Social Proof Row */}
       <div className={styles.ratingRow}>
-        <div className={styles.starsGroup}>
-          {[...Array(5)].map((_, i) => (
-            <Star 
-              key={i} 
-              size={15} 
-              fill={i < Math.floor(rating) ? "#F99205" : "#E5E7EB"} 
-              color={i < Math.floor(rating) ? "#F99205" : "#E5E7EB"} 
-              strokeWidth={1} 
-            />
-          ))}
-          <span className={styles.ratingScore}>{rating.toFixed(1)}</span>
-        </div>
-        <span className={styles.ratingDivider}>|</span>
-        <span className={styles.reviewsCountText}>{reviewsCount} Reviews</span>
+        {reviewsCount > 0 && rating > 0 ? (
+          <>
+            <div className={styles.starsGroup}>
+              {[...Array(5)].map((_, i) => (
+                <Star 
+                  key={i} 
+                  size={15} 
+                  fill={i < Math.floor(rating) ? "#F99205" : "#E5E7EB"} 
+                  color={i < Math.floor(rating) ? "#F99205" : "#E5E7EB"} 
+                  strokeWidth={0} 
+                />
+              ))}
+              <span className={styles.ratingScore}>{rating.toFixed(1)}</span>
+            </div>
+            <span className={styles.ratingDivider}>|</span>
+            <span className={styles.reviewsCountText}>
+              {reviewsCount} {reviewsCount === 1 ? 'Review' : 'Reviews'}
+            </span>
+          </>
+        ) : (
+          <>
+            <div className={styles.starsGroup}>
+              {[...Array(5)].map((_, i) => (
+                <Star 
+                  key={i} 
+                  size={14} 
+                  fill="#E5E7EB" 
+                  color="#E5E7EB" 
+                  strokeWidth={0} 
+                />
+              ))}
+            </div>
+            <a href="#reviews" className={styles.noReviewsPromptLink}>
+              0 Reviews (Be the first to review)
+            </a>
+          </>
+        )}
         {product.badge && (
           <span className={styles.verifiedBadge}>
             <Check size={12} strokeWidth={2.5} />

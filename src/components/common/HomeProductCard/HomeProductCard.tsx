@@ -48,8 +48,8 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
     }
   }, [product.isWishlisted]);
 
-  const rating = product.rating || 4.8;
-  const reviewsCount = product.reviewsCount || 64;
+  const rating = product.rating || 0;
+  const reviewsCount = product.reviewsCount || 0;
 
   const discountPercent = useMemo(() => {
     return product.originalPrice && product.originalPrice > product.price

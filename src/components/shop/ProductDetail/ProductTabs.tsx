@@ -5,8 +5,6 @@ import Image from 'next/image';
 import {
   ShieldCheck,
   Sparkles,
-  HeartHandshake,
-  Award,
   CheckCircle2,
   Utensils,
   BookOpen,
@@ -25,12 +23,28 @@ interface ProductTabsProps {
 }
 
 export function ProductTabs({ product }: ProductTabsProps) {
-  // Parse highlights
+  // Parse highlights safely without [object Object]
   let parsedHighlights: string[] = [];
   if (Array.isArray(product.highlights)) {
-    parsedHighlights = product.highlights.map(String).filter(Boolean);
+    parsedHighlights = product.highlights
+      .map((item: any) => {
+        if (typeof item === 'string') return item.trim();
+        if (typeof item === 'object' && item !== null) {
+          return String(item.title || item.text || item.value || item.name || item.highlight || Object.values(item)[0] || '');
+        }
+        return String(item || '');
+      })
+      .filter((s: string) => s && s !== '[object Object]' && s.trim().length > 0);
   } else if (typeof product.highlights === 'object' && product.highlights !== null) {
-    parsedHighlights = Object.values(product.highlights).map(String).filter(Boolean);
+    parsedHighlights = Object.values(product.highlights)
+      .map((item: any) => {
+        if (typeof item === 'string') return item.trim();
+        if (typeof item === 'object' && item !== null) {
+          return String(item.title || item.text || item.value || item.name || item.highlight || Object.values(item)[0] || '');
+        }
+        return String(item || '');
+      })
+      .filter((s: string) => s && s !== '[object Object]' && s.trim().length > 0);
   } else if (typeof product.highlights === 'string' && product.highlights.trim().length > 0) {
     parsedHighlights = product.highlights.split(/[;,\n]/).map((s: string) => s.trim()).filter(Boolean);
   }
@@ -76,32 +90,25 @@ export function ProductTabs({ product }: ProductTabsProps) {
 
   const [activeTab, setActiveTab] = useState<string>('details');
 
-  const defaultHighlights = [
-    { title: '100% Pet-Safe Formula', desc: 'Crafted without harmful chemicals or fillers', icon: <ShieldCheck size={20} /> },
-    { title: 'Veterinarian Approved', desc: 'Formulated for everyday wellness & vitality', icon: <Award size={20} /> },
-    { title: 'Premium Sourced Ingredients', desc: 'Ethically selected for optimal nutrition', icon: <Sparkles size={20} /> },
-    { title: 'Happiness Guaranteed', desc: 'Designed for tails wagging & gentle comfort', icon: <HeartHandshake size={20} /> },
-  ];
-
   const renderTabContent = (tabId: string) => {
     switch (tabId) {
       case 'details':
         return (
           <div className={styles.tabDetailsGrid}>
-            {/* Left Column: Description & Highlights */}
+            {/* Left Column: Description & Highlights (only if genuine highlights exist) */}
             <div className={styles.tabDetailsLeftCol}>
               <h3 className={styles.tabSectionHeading}>
                 {product.descriptionTitle || `Why Choose ${product.name}?`}
               </h3>
               <p className={styles.tabMainParagraph}>
                 {product.description ||
-                  'Crafted with the finest ingredients and rigorous standards to bring wholesome wellness, energy, and joy to your furry companion. Engineered for pet safety, gentle care, and daily happiness.'}
+                  'Crafted with high quality standards to bring wholesome wellness, energy, and joy to your companion. Engineered for pet safety, gentle care, and daily happiness.'}
               </p>
 
-              {/* Dynamic Highlights */}
-              <div className={styles.calloutGrid}>
-                {parsedHighlights.length > 0 ? (
-                  parsedHighlights.map((hl, idx) => (
+              {/* Only render highlights if real highlights exist */}
+              {parsedHighlights.length > 0 && (
+                <div className={styles.calloutGrid}>
+                  {parsedHighlights.map((hl, idx) => (
                     <div key={idx} className={styles.calloutItem}>
                       <div className={styles.calloutIconWrap}>
                         <CheckCircle2 size={18} className={styles.calloutIcon} />
@@ -111,24 +118,12 @@ export function ProductTabs({ product }: ProductTabsProps) {
                         <p className={styles.calloutSub}>KickAt Quality Guarantee</p>
                       </div>
                     </div>
-                  ))
-                ) : (
-                  defaultHighlights.map((item, idx) => (
-                    <div key={idx} className={styles.calloutItem}>
-                      <div className={styles.calloutIconWrap}>
-                        <span className={styles.calloutIcon}>{item.icon}</span>
-                      </div>
-                      <div>
-                        <h4 className={styles.calloutTitle}>{item.title}</h4>
-                        <p className={styles.calloutSub}>{item.desc}</p>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Right Column: Clean Lifestyle Product Banner */}
+            {/* Right Column: Clean Lifestyle Product Showcase */}
             <div className={styles.tabDetailsRightCol}>
               <div className={styles.lifestyleBannerWrap}>
                 <Image
@@ -138,7 +133,6 @@ export function ProductTabs({ product }: ProductTabsProps) {
                   sizes="(max-width: 768px) 100vw, 500px"
                   className={styles.lifestyleImage}
                 />
-                {/* Subtle Modern Badge */}
                 <div className={styles.lifestyleBadgeBottom}>
                   <PawPrint size={15} fill="#F99205" color="#F99205" />
                   <span>KickAt Certified Quality</span>
@@ -167,7 +161,7 @@ export function ProductTabs({ product }: ProductTabsProps) {
               </div>
             ) : (
               <p className={styles.tabTextContent}>
-                Crafted using premium, wholesome ingredients carefully chosen to deliver balanced nutrition and great taste. Free from synthetic colorants, harsh artificial preservatives, or unnecessary fillers.
+                Crafted using wholesome ingredients carefully chosen to deliver balanced nutrition and great taste. Free from synthetic colorants or unnecessary fillers.
               </p>
             )}
 
@@ -210,7 +204,7 @@ export function ProductTabs({ product }: ProductTabsProps) {
             <h3 className={styles.tabSectionHeading}>Pet-Safe Materials &amp; Standards</h3>
             <p className={styles.tabTextContent}>
               {product.materials ||
-                '100% pet-safe, non-toxic, and hypoallergenic materials. Rigorously tested to withstand daily wear while protecting your companion’s skin, paws, and digestion.'}
+                '100% pet-safe, non-toxic, and hypoallergenic materials. Rigorously tested to withstand daily wear while protecting your companion’s skin, paws, and health.'}
             </p>
             <div className={styles.safetyBadgesRow}>
               <div className={styles.safetyPill}>

@@ -2047,3 +2047,16 @@
     padding: 1.25rem 1rem;
   }
 }
+
+.noReviewsPromptLink {
+  color: #F99205;
+  font-size: 0.825rem;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.noReviewsPromptLink:hover {
+  color: #D96A00;
+}

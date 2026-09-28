@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Play, Maximize, Heart, Share2, X, Loader2, Sparkles } from 'lucide-react';
+import { Play, Maximize, Heart, Share2, X, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { wishlistService } from '@/services/wishlistService';
 import styles from './ProductDetail.module.css';
@@ -78,6 +78,10 @@ export function ProductGallery({ images, productId, variantId, brand = 'KickAt' 
   }, [productId, variantId, isWishlisted, isWishlistLoading, isAuthenticated, router]);
 
   // Reset activeIndex to 0 whenever images array changes (e.g. when variant selection changes)
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [images]);
+
   const currentImages = Array.isArray(images) && images.length > 0 ? images : ['/hero-products/dog_food.png'];
   
   const thumbnails = currentImages.map((src) => ({
@@ -99,6 +103,7 @@ export function ProductGallery({ images, productId, variantId, brand = 'KickAt' 
               type="button"
               className={`${styles.thumbnailBtn} ${isActive ? styles.thumbnailActive : ''}`}
               onClick={() => setActiveIndex(idx)}
+              onMouseEnter={() => setActiveIndex(idx)}
               aria-label={`View image thumbnail ${idx + 1}`}
             >
               <Image
@@ -119,15 +124,8 @@ export function ProductGallery({ images, productId, variantId, brand = 'KickAt' 
         })}
       </div>
 
-      {/* Large Main Image Box */}
+      {/* Large Main Image Box (Clean, without intrusive overlay labels covering product art) */}
       <div className={styles.mainImageContainer}>
-        {/* Top Feature Tag */}
-        <div className={styles.mainImageTopOverlay}>
-          <span className={styles.overlaySubtitle}>
-            100% Pet-Safe &nbsp;|&nbsp; Premium Quality
-          </span>
-        </div>
-
         {/* Top Right Floating Actions: Wishlist & Share */}
         <div className={styles.imageTopRightActions}>
           <button
@@ -162,27 +160,38 @@ export function ProductGallery({ images, productId, variantId, brand = 'KickAt' 
           </button>
         </div>
 
-        {/* Center Product Image */}
+        {/* Center Product Image Container with Instant Opacity Cross-fade Pre-rendering */}
         <div className={styles.mainImageCenterWrap}>
-          <Image
-            src={activeSrc}
-            alt="Product Image"
-            fill
-            className={styles.mainProductImage}
-            priority
-            unoptimized={activeSrc.startsWith('data:')}
-          />
+          {thumbnails.map((thumb, idx) => (
+            <div
+              key={idx}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                opacity: idx === activeIndex ? 1 : 0,
+                transition: 'opacity 0.12s ease-in-out',
+                pointerEvents: idx === activeIndex ? 'auto' : 'none',
+                zIndex: idx === activeIndex ? 2 : 1,
+              }}
+            >
+              <Image
+                src={thumb.src}
+                alt="Product Image"
+                fill
+                className={styles.mainProductImage}
+                priority={idx === 0}
+                loading={idx === 0 ? 'eager' : 'eager'}
+                sizes="(max-width: 768px) 100vw, 550px"
+                unoptimized={thumb.src.startsWith('data:')}
+              />
+            </div>
+          ))}
+
           {thumbnails[activeIndex]?.type === 'video' && (
             <div className={styles.centerVideoPlayBtn}>
               <Play size={28} fill="#ffffff" color="#ffffff" />
             </div>
           )}
-        </div>
-
-        {/* Bottom Left Caption Bar */}
-        <div className={styles.mainImageBottomCaption}>
-          <span className={styles.captionBrandTitle}>{brand.toUpperCase()}</span>
-          <span className={styles.captionBrandSub}>For a happier, healthier companion</span>
         </div>
 
         {/* Bottom Right Expand Button */}

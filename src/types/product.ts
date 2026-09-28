@@ -139,9 +139,21 @@ export function mapBackendProductToCard(p: BackendProduct) {
   
   let tags: string[] = [];
   if (Array.isArray(p.highlights)) {
-    tags = p.highlights;
+    tags = p.highlights.map((item: any) => {
+      if (typeof item === 'string') return item.trim();
+      if (typeof item === 'object' && item !== null) {
+        return (item.title || item.text || item.value || item.name || Object.values(item)[0] || '');
+      }
+      return String(item || '');
+    }).filter((s) => s && s !== '[object Object]');
   } else if (typeof p.highlights === 'object' && p.highlights !== null) {
-    tags = Object.values(p.highlights).map(String);
+    tags = Object.values(p.highlights).map((item: any) => {
+      if (typeof item === 'string') return item.trim();
+      if (typeof item === 'object' && item !== null) {
+        return (item.title || item.text || item.value || item.name || Object.values(item)[0] || '');
+      }
+      return String(item || '');
+    }).filter((s) => s && s !== '[object Object]');
   }
 
   return {
@@ -149,7 +161,7 @@ export function mapBackendProductToCard(p: BackendProduct) {
     name: p.name,
     price: effectivePrice,
     originalPrice,
-    rating: p.rating || 4.5,
+    rating: p.rating ?? 0,
     reviewsCount: p.reviewsCount || 0,
     image: p.imageUrl || (p.images && p.images[0]) || '/hero-products/dog_food.png',
     mainCategory: p.category?.name || p.category?.slug || 'Pet Care',
@@ -193,7 +205,7 @@ export function transformBackendProduct(bp: BackendProduct) {
     discountPrice: bp.discountPrice,
     stock: bp.stock,
     badge: bp.isBestSeller ? 'Best Seller' : bp.isTrending ? 'Trending' : undefined,
-    rating: bp.rating || 4.5,
+    rating: bp.rating ?? 0,
     reviewsCount: bp.reviewsCount || 0,
     image: bp.imageUrl || allImages[0],
     images: allImages,

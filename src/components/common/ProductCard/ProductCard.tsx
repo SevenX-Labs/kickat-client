@@ -55,7 +55,7 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
     }
   }, [product.isWishlisted]);
 
-  const rating = product.rating ?? 4.5;
+  const rating = product.rating ?? 0;
   const reviewsCount = product.reviewsCount ?? 0;
   const isOutOfStock = typeof product.stock === 'number' && product.stock <= 0;
 
