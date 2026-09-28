@@ -906,8 +906,10 @@ export default function CheckoutPage() {
   const currentMethodItem = paymentMethods.find((m) => m.type === selectedPaymentMethod);
   const serverCodFee = publicPayment?.cod?.extraFeeEnabled ? (publicPayment.cod.extraFee ?? 0) : 0;
   const activeCodFee = selectedPaymentMethod === 'COD' ? (codFee ?? currentMethodItem?.extraFee ?? serverCodFee) : 0;
+  const isTaxInclusive = publicSettings?.tax?.taxInclusive ?? false;
+  const taxForTotal = isTaxInclusive ? 0 : gstAmount;
   const grandTotal = summary?.grandTotal ?? 0;
-  const effectiveGrandTotal = (grandTotal > 0 ? grandTotal : (subtotal + deliveryFee + gstAmount + extraFeeAmount)) + activeCodFee;
+  const effectiveGrandTotal = (grandTotal > 0 ? grandTotal : (subtotal + deliveryFee + taxForTotal + extraFeeAmount)) + activeCodFee;
   const totalItemsCount = summary?.itemCount ?? cartItems?.reduce((acc, i) => acc + i.quantity, 0) ?? 0;
 
   const displayedItems = isItemsExpanded ? (cartItems || []) : (cartItems || []).slice(0, 2);
@@ -1649,8 +1651,12 @@ export default function CheckoutPage() {
                 </div>
                 {gstAmount > 0 && (
                   <div className={styles.summaryRowAlt}>
-                    <span>Tax / GST {gstPercentage ? `(${gstPercentage}%)` : ''}</span>
-                    <span className={styles.summaryValueAlt}>₹{gstAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    <span>{isTaxInclusive ? 'Inclusive Tax' : 'Tax / GST'} {gstPercentage ? `(${gstPercentage}%)` : ''}</span>
+                    <span className={styles.summaryValueAlt}>
+                      {isTaxInclusive
+                        ? `Included (₹${gstAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`
+                        : `₹${gstAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                    </span>
                   </div>
                 )}
                 <div className={styles.summaryRowAlt}>

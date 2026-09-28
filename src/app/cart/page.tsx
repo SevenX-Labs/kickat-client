@@ -32,6 +32,10 @@ export default function CartPage() {
   } = useCart();
 
   useEffect(() => {
+    refreshCart();
+  }, [refreshCart]);
+
+  useEffect(() => {
     document.title = `Your Shopping Cart (${cartCount}) | KickAt`;
   }, [cartCount]);
 
@@ -48,14 +52,19 @@ export default function CartPage() {
   // Delivery fee calculation from server authoritative summary or live delivery settings
   const deliveryFee = isFreeShipping ? 0 : (summary?.deliveryFee ?? (delivery?.deliveryFee ?? 0));
   
-  // Tax from server summary or live tax settings
-  const gstRate = ((summary?.gstPercentage ?? tax?.gstPercentage) ?? 0) / 100;
+  // Tax from server summary or live tax settings (Admin configurable)
   const isTaxEnabled = tax ? tax.gstEnabled : true;
-  const taxAmount = summary?.gstAmount ?? summary?.taxAmount ?? summary?.tax ?? (isTaxEnabled ? Math.round(subtotal * gstRate) : 0);
+  const isTaxInclusive = tax ? tax.taxInclusive : false;
+  const gstPercentage = summary?.gstPercentage ?? tax?.gstPercentage ?? 0;
+  const gstRate = gstPercentage / 100;
+  const taxAmount = summary?.gstAmount ?? summary?.taxAmount ?? summary?.tax ?? (isTaxEnabled ? (subtotal * gstRate) : 0);
   
   // Extra / Handling fee directly from server
   const platformFee = summary?.extraFeeAmount ?? (delivery?.extraFeeEnabled ? (delivery?.extraFeeAmount ?? 0) : 0);
-  const grandTotal = summary?.grandTotal ?? summary?.totalAmount ?? summary?.total ?? (subtotal + taxAmount + deliveryFee + platformFee);
+  const extraFeeName = summary?.extraFeeName || delivery?.extraFeeName || 'Platform Fee';
+  
+  const taxForTotal = isTaxInclusive ? 0 : taxAmount;
+  const grandTotal = summary?.grandTotal ?? summary?.totalAmount ?? summary?.total ?? (subtotal + taxForTotal + deliveryFee + platformFee);
 
   const handleCheckout = () => {
     if (!isAuthenticated) {
@@ -141,8 +150,6 @@ export default function CartPage() {
               <span>Saved Wishlist</span>
             </Link>
           </div>
-
-
         </div>
       ) : (
         /* Cart Items & Order Summary Layout */
@@ -174,12 +181,12 @@ export default function CartPage() {
                       >
                         {item.product?.name || 'Pet Product'}
                       </button>
-                      <span className={styles.itemPrice}>₹{itemTotal.toLocaleString()}</span>
+                      <span className={styles.itemPrice}>₹{itemTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
 
                     <div className={styles.itemMeta}>
                       {variantName && <span>{variantName}</span>}
-                      <span>₹{unitPrice.toLocaleString()} each</span>
+                      <span>₹{unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} each</span>
                     </div>
 
                     <div className={styles.itemActions}>
@@ -242,36 +249,48 @@ export default function CartPage() {
 
             <div className={styles.summaryRow}>
               <span>Subtotal</span>
-              <span>₹{subtotal.toLocaleString()}</span>
+              <span>₹{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             </div>
 
             {productDiscount > 0 && (
               <div className={`${styles.summaryRow} ${styles.discountRow}`}>
                 <span>Product Savings</span>
-                <span>-₹{productDiscount.toLocaleString()}</span>
+                <span>-₹{productDiscount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              </div>
+            )}
+
+            {isTaxEnabled && (taxAmount > 0 || gstPercentage > 0) && (
+              <div className={styles.summaryRow}>
+                <span>
+                  {isTaxInclusive ? 'Inclusive GST' : 'Estimated Tax'}
+                  {gstPercentage > 0 ? ` (${gstPercentage}% GST)` : ''}
+                </span>
+                <span>
+                  {isTaxInclusive
+                    ? `Included (₹${taxAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`
+                    : `₹${taxAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                  }
+                </span>
               </div>
             )}
 
             <div className={styles.summaryRow}>
-              <span>Estimated Tax (18% GST)</span>
-              <span>₹{taxAmount.toLocaleString()}</span>
-            </div>
-
-            <div className={styles.summaryRow}>
               <span>Delivery Fee</span>
-              <span>{isFreeShipping ? 'FREE' : `₹${deliveryFee}`}</span>
+              <span style={{ color: deliveryFee === 0 ? '#16A34A' : '#111827', fontWeight: deliveryFee === 0 ? 700 : 500 }}>
+                {deliveryFee === 0 ? 'FREE' : `₹${deliveryFee.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+              </span>
             </div>
 
             {platformFee > 0 && (
               <div className={styles.summaryRow}>
-                <span>Platform Fee</span>
-                <span>₹{platformFee.toLocaleString()}</span>
+                <span>{extraFeeName}</span>
+                <span>₹{platformFee.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
             )}
 
             <div className={styles.totalRow}>
               <span>Total Amount</span>
-              <span>₹{grandTotal.toLocaleString()}</span>
+              <span>₹{grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             </div>
 
             <button onClick={handleCheckout} className={styles.checkoutBtn} disabled={isUpdating}>
