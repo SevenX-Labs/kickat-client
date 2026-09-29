@@ -58,6 +58,7 @@ import {
   PaymentMethodItem,
   CheckoutPaymentMethodType,
   PlaceOrderResponse,
+  PlaceOrderDto,
 } from '@/types/checkout';
 import { paymentService } from '@/services/paymentService';
 import { loadRazorpayScript } from '@/utils/razorpay';
@@ -429,18 +430,12 @@ export default function CheckoutPage() {
     const idempotencyKey = idempotencyKeyRef.current;
 
     try {
-      const currentMethod = paymentMethods.find((m) => m.type === selectedPaymentMethod);
-      const isCodFeeActive = Boolean(publicPayment?.cod?.extraFeeEnabled);
-      const configuredCodFee = isCodFeeActive ? Number(currentMethod?.extraFee ?? publicPayment?.cod?.extraFee ?? 0) : 0;
-      const currentCodFee = selectedPaymentMethod === 'COD' ? (checkoutData?.summary?.codFee ?? configuredCodFee) : 0;
-      const effectiveExpectedTotal = (checkoutData?.summary?.grandTotal ?? 0) + currentCodFee;
       const cleanUpiId = selectedPaymentMethod === 'UPI' ? (upiId.trim() || 'qr@razorpay') : undefined;
 
-      const orderPayload = {
+      const orderPayload: PlaceOrderDto = {
         addressId: selectedAddressId,
         paymentMethod: selectedPaymentMethod,
         deliveryInstructions: deliveryInstructions.trim() || undefined,
-        expectedTotal: effectiveExpectedTotal,
         upiId: cleanUpiId,
       };
 
