@@ -4,9 +4,10 @@
 }
 
 .container {
-  max-width: 1100px;
+  max-width: 1380px;
+  width: 100%;
   margin: 0 auto;
-  padding: 1rem 2rem;
+  padding: 1.5rem 2rem;
 }
 
 .headerRow {
@@ -97,18 +98,15 @@
 
 .checkoutLayout {
   display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: 4rem;
+  grid-template-columns: minmax(0, 1fr) 420px;
+  gap: 2.25rem;
   align-items: start;
 }
 
 /* Left Column: Forms */
 .formSection {
   margin-bottom: 2rem;
-  background: white;
-  border: 1px solid #e0dcd2;
-  border-radius: 16px;
-  padding: 2.5rem;
+  min-width: 0;
 }
 
 .sectionTitle {
@@ -201,15 +199,15 @@
 /* Premium Layout CSS */
 .mainCard {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
   overflow: hidden;
-  border: 1px solid rgba(0,0,0,0.03);
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .mainCardHeader {
-  padding: 1.5rem;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #F3F4F6;
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -253,7 +251,7 @@
 }
 
 .stepBodyAlt {
-  padding: 1.5rem;
+  padding: 1.75rem 2rem;
 }
 
 .formSectionAlt {
@@ -666,11 +664,14 @@
 }
 
 .floatingSummaryCard {
-  background-color: white;
-  border-radius: 20px;
-  padding: 2.5rem;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  position: sticky;
+  top: 1.5rem;
+  margin-top: 0;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+  padding: 1.75rem 2rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .summaryTitle {
@@ -1114,12 +1115,12 @@
 .floatingSummaryCard {
   position: sticky;
   top: 1.5rem;
-  margin-top: -3.5rem;
+  margin-top: 0;
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-  padding: 2rem;
-  border: 1px solid rgba(0,0,0,0.03);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+  padding: 1.75rem 2rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .summaryTitleAlt {
@@ -2104,12 +2105,15 @@
     position: static;
   }
   .floatingSummaryCard {
-    position: static;
-    margin-top: 1rem;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-    padding: 1.5rem;
-  }
+  position: sticky;
+  top: 1.5rem;
+  margin-top: 0;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+  padding: 1.75rem 2rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
 }
 
 @media (max-width: 768px) {
@@ -2271,8 +2275,15 @@
   }
 
   .floatingSummaryCard {
-    padding: 1rem;
-  }
+  position: sticky;
+  top: 1.5rem;
+  margin-top: 0;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+  padding: 1.75rem 2rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
 
   .successCard {
     padding: 1rem;

@@ -907,7 +907,12 @@ export default function CheckoutPage() {
   const extraFeeName = summary?.extraFeeName ?? publicDelivery?.extraFeeName;
   const currentMethodItem = paymentMethods.find((m) => m.type === selectedPaymentMethod);
   const serverCodFee = publicPayment?.cod?.extraFeeEnabled ? (publicPayment.cod.extraFee ?? 0) : 0;
-  const activeCodFee = selectedPaymentMethod === 'COD' ? (codFee ?? currentMethodItem?.extraFee ?? serverCodFee) : 0;
+  const rawCodFee = (summary?.codFee !== undefined && summary.codFee > 0)
+    ? summary.codFee
+    : (currentMethodItem?.extraFee !== undefined && currentMethodItem.extraFee > 0)
+    ? currentMethodItem.extraFee
+    : (serverCodFee > 0 ? serverCodFee : 0);
+  const activeCodFee = (selectedPaymentMethod === 'COD' && rawCodFee > 0) ? rawCodFee : 0;
   const isTaxInclusive = publicSettings?.tax?.taxInclusive ?? false;
   const taxForTotal = isTaxInclusive ? 0 : gstAmount;
   const grandTotal = summary?.grandTotal ?? 0;
@@ -1458,7 +1463,9 @@ export default function CheckoutPage() {
                                 <div className={styles.paymentOptionTitleRow}>
                                   <p className={styles.paymentOptionTitle}>{method.name || method.type}</p>
                                   {method.type === 'UPI' && <span className={styles.recommendedBadge}>FASTEST ⚡</span>}
-                                  {method.extraFee ? (
+                                  {method.type === 'COD' && activeCodFee > 0 ? (
+                                    <span className={styles.extraFeeBadge}>+₹{activeCodFee} fee</span>
+                                  ) : method.type !== 'COD' && method.extraFee && method.extraFee > 0 ? (
                                     <span className={styles.extraFeeBadge}>+₹{method.extraFee} fee</span>
                                   ) : null}
                                 </div>
@@ -1680,7 +1687,7 @@ export default function CheckoutPage() {
                     {deliveryFee === 0 ? 'FREE' : `₹${deliveryFee.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                   </span>
                 </div>
-                {selectedPaymentMethod === 'COD' && (
+                {selectedPaymentMethod === 'COD' && activeCodFee > 0 && (
                   <div className={styles.summaryRowAlt} style={{ color: '#ea580c', fontWeight: 600 }}>
                     <span>Cash on Delivery Fee</span>
                     <span className={styles.summaryValueAlt} style={{ color: '#ea580c' }}>
