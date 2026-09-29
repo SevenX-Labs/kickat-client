@@ -111,6 +111,7 @@ export default function CheckoutPage() {
   const [paymentMethodError, setPaymentMethodError] = useState<string | null>(null);
   const [upiId, setUpiId] = useState('');
   const [deliveryInstructions, setDeliveryInstructions] = useState('');
+  const [showInstructions, setShowInstructions] = useState<boolean>(false);
 
   // Order Placement State
   const [isSubmittingOrder, setIsSubmittingOrder] = useState<boolean>(false);
@@ -1367,27 +1368,39 @@ export default function CheckoutPage() {
               {/* STEP 2: PAYMENT METHOD SELECTION */}
               {currentStep === 2 && (
                 <div className={styles.stepBodyAlt}>
-                  <div style={{ marginBottom: '1.5rem', padding: '12px 16px', background: '#F9FAFB', borderRadius: '8px', border: '1px solid #E5E7EB' }}>
-                    <div style={{ fontSize: '13px', color: '#6B7280', marginBottom: '2px' }}>Delivering to:</div>
-                    <div style={{ fontSize: '14px', fontWeight: 600, color: '#1F2937' }}>
-                      {selectedAddr?.houseFlat || selectedAddr?.houseNumber ? `${selectedAddr?.houseFlat || selectedAddr?.houseNumber}, ` : ''}{selectedAddr?.buildingStreet || selectedAddr?.street}, {selectedAddr?.city} ({selectedAddr?.pincode})
+                  {/* Compact Delivery Summary Chip */}
+                  <div className={styles.deliverySummaryBanner}>
+                    <div className={styles.deliverySummaryContent}>
+                      <div className={styles.deliveryPinIcon}>
+                        <MapPin size={16} color="#EA580C" />
+                      </div>
+                      <div className={styles.deliveryTextWrap}>
+                        <span className={styles.deliveryLabel}>Deliver to:</span>{' '}
+                        <span className={styles.deliveryAddressText}>
+                          {selectedAddr?.fullName ? <strong>{selectedAddr.fullName} — </strong> : ''}
+                          {selectedAddr?.houseFlat || selectedAddr?.houseNumber ? `${selectedAddr?.houseFlat || selectedAddr?.houseNumber}, ` : ''}
+                          {selectedAddr?.buildingStreet || selectedAddr?.street}, {selectedAddr?.city} ({selectedAddr?.pincode})
+                        </span>
+                      </div>
                     </div>
+                    <button
+                      type="button"
+                      className={styles.changeAddressPillBtn}
+                      onClick={() => setCurrentStep(1)}
+                    >
+                      Change
+                    </button>
                   </div>
-
-                  <h3 className={styles.sectionTitleAlt} style={{ marginBottom: '1rem' }}>
-                    <CreditCard size={18} strokeWidth={1.5} /> Eligible Payment Methods
-                  </h3>
 
                   {isLoadingPaymentMethods && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '16px', color: '#666' }}>
                       <Loader2 size={18} className="animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
-                      <span>Checking eligible payment methods for your order amount and pincode...</span>
+                      <span>Checking eligible payment methods...</span>
                     </div>
                   )}
 
                   {!isLoadingPaymentMethods && paymentMethods.length === 0 && (
                     <div className={styles.paymentOptionsGrid}>
-                      {/* Fallback standard methods if list is empty */}
                       <div
                         className={`${styles.paymentOptionCard} ${selectedPaymentMethod === 'COD' ? styles.selected : ''}`}
                         onClick={() => setSelectedPaymentMethod('COD')}
@@ -1417,16 +1430,16 @@ export default function CheckoutPage() {
                         const getMethodIcon = () => {
                           switch (method.type) {
                             case 'UPI':
-                              return <Smartphone size={20} color="#ea580c" />;
+                              return <Smartphone size={18} color="#EA580C" />;
                             case 'CARD':
-                              return <CreditCard size={20} color="#ea580c" />;
+                              return <CreditCard size={18} color="#EA580C" />;
                             case 'WALLET':
-                              return <Wallet size={20} color="#ea580c" />;
+                              return <Wallet size={18} color="#EA580C" />;
                             case 'NETBANKING':
-                              return <Building2 size={20} color="#ea580c" />;
+                              return <Building2 size={18} color="#EA580C" />;
                             case 'COD':
                             default:
-                              return <Truck size={20} color="#ea580c" />;
+                              return <Truck size={18} color="#EA580C" />;
                           }
                         };
 
@@ -1437,24 +1450,25 @@ export default function CheckoutPage() {
                             onClick={() => {
                               if (isAvailable) setSelectedPaymentMethod(method.type);
                             }}
-                            style={!isAvailable ? { opacity: 0.5, cursor: 'not-allowed', background: '#F3F4F6' } : undefined}
+                            style={!isAvailable ? { opacity: 0.5, cursor: 'not-allowed', background: '#F9FAFB' } : undefined}
                           >
                             <div className={styles.paymentOptionHeader}>
                               <div className={styles.paymentOptionIcon}>{getMethodIcon()}</div>
                               <div className={styles.paymentOptionDetails}>
-                                <p className={styles.paymentOptionTitle}>
-                                  {method.name || method.type}
+                                <div className={styles.paymentOptionTitleRow}>
+                                  <p className={styles.paymentOptionTitle}>{method.name || method.type}</p>
+                                  {method.type === 'UPI' && <span className={styles.recommendedBadge}>FASTEST ⚡</span>}
                                   {method.extraFee ? (
-                                    <span style={{ fontSize: '12px', color: '#ea580c', marginLeft: 6 }}>
-                                      (+₹{method.extraFee} fee)
-                                    </span>
+                                    <span className={styles.extraFeeBadge}>+₹{method.extraFee} fee</span>
                                   ) : null}
-                                </p>
+                                </div>
                                 <p className={styles.paymentOptionSubtitle}>
                                   {isAvailable
-                                    ? method.type === 'COD'
+                                    ? method.type === 'UPI'
+                                      ? 'Google Pay, PhonePe, Paytm, QR & all UPI Apps'
+                                      : method.type === 'COD'
                                       ? 'Pay upon package arrival'
-                                      : 'Fast & encrypted online payment'
+                                      : 'Fast & 100% encrypted online payment'
                                     : method.reason || 'Not available for this order'}
                                 </p>
                               </div>
@@ -1463,39 +1477,14 @@ export default function CheckoutPage() {
                               </div>
                             </div>
 
-                            {/* Integrated Razorpay UPI QR & Apps Banner */}
+                            {/* Compact UPI Apps Strip */}
                             {isSelected && method.type === 'UPI' && (
-                              <div style={{
-                                marginTop: '0.85rem',
-                                padding: '0.85rem 1rem',
-                                background: '#FFF9F4',
-                                border: '1px solid rgba(242, 140, 15, 0.25)',
-                                borderRadius: '12px',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '0.45rem',
-                              }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#B45309', fontWeight: 600, fontSize: '0.85rem' }}>
-                                  <QrCode size={18} color="#F28C0F" />
-                                  <span>Instant QR Code &amp; UPI Apps</span>
-                                </div>
-                                <p style={{ margin: 0, fontSize: '0.8rem', color: '#6B6157', lineHeight: 1.45 }}>
-                                  Razorpay will display a live dynamic QR code and 1-tap payment for Google Pay, PhonePe, Paytm, CRED or BHIM.
-                                </p>
-                                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '2px' }}>
-                                  <span style={{ background: '#FFFFFF', border: '1px solid #EFE7DA', padding: '3px 8px', borderRadius: '6px', fontSize: '0.725rem', fontWeight: 600, color: '#333' }}>
-                                    📸 Dynamic QR Code
-                                  </span>
-                                  <span style={{ background: '#FFFFFF', border: '1px solid #EFE7DA', padding: '3px 8px', borderRadius: '6px', fontSize: '0.725rem', fontWeight: 600, color: '#333' }}>
-                                    Google Pay
-                                  </span>
-                                  <span style={{ background: '#FFFFFF', border: '1px solid #EFE7DA', padding: '3px 8px', borderRadius: '6px', fontSize: '0.725rem', fontWeight: 600, color: '#333' }}>
-                                    PhonePe
-                                  </span>
-                                  <span style={{ background: '#FFFFFF', border: '1px solid #EFE7DA', padding: '3px 8px', borderRadius: '6px', fontSize: '0.725rem', fontWeight: 600, color: '#333' }}>
-                                    Paytm / Any UPI
-                                  </span>
-                                </div>
+                              <div className={styles.compactUpiStrip}>
+                                <span className={styles.upiPill}>📸 Dynamic QR</span>
+                                <span className={styles.upiPill}>Google Pay</span>
+                                <span className={styles.upiPill}>PhonePe</span>
+                                <span className={styles.upiPill}>Paytm</span>
+                                <span className={styles.upiPill}>CRED</span>
                               </div>
                             )}
                           </div>
@@ -1504,56 +1493,66 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
-                  {/* Delivery Notes / Instructions */}
-                  <div style={{ marginTop: '1.5rem' }}>
-                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
-                      Delivery Instructions (Optional)
-                    </label>
-                    <input
-                      type="text"
-                      className={styles.input}
-                      placeholder="e.g. Please deliver after 5 PM / Leave at security gate"
-                      value={deliveryInstructions}
-                      onChange={(e) => setDeliveryInstructions(e.target.value)}
-                      maxLength={300}
-                    />
+                  {/* Optional Delivery Instructions */}
+                  <div className={styles.instructionsContainer}>
+                    {!showInstructions && !deliveryInstructions ? (
+                      <button
+                        type="button"
+                        className={styles.toggleInstructionsBtn}
+                        onClick={() => setShowInstructions(true)}
+                      >
+                        + Add delivery instructions or note (optional)
+                      </button>
+                    ) : (
+                      <div className={styles.instructionsInputBox}>
+                        <label className={styles.instructionsLabel}>Delivery Instructions (Optional)</label>
+                        <input
+                          type="text"
+                          className={styles.input}
+                          placeholder="e.g. Please deliver after 5 PM / Leave at gate"
+                          value={deliveryInstructions}
+                          onChange={(e) => setDeliveryInstructions(e.target.value)}
+                          maxLength={300}
+                        />
+                      </div>
+                    )}
                   </div>
 
                   {/* Payment Error / Retry Banner */}
                   {orderError && (
                     <div
                       style={{
-                        marginTop: '1.5rem',
-                        padding: '1rem',
-                        borderRadius: '12px',
+                        marginTop: '1rem',
+                        padding: '0.85rem 1rem',
+                        borderRadius: '10px',
                         background: '#FEF2F2',
                         border: '1px solid #FCA5A5',
                         color: '#991B1B',
-                        fontSize: '0.9rem',
+                        fontSize: '0.875rem',
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '0.5rem',
+                        gap: '0.4rem',
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600 }}>
-                        <AlertCircle size={18} color="#DC2626" />
+                        <AlertCircle size={17} color="#DC2626" />
                         <span>Payment Notice</span>
                       </div>
                       <p style={{ margin: 0, lineHeight: 1.4 }}>{orderError}</p>
                       {pendingOrderId && (
-                        <div style={{ marginTop: '0.5rem' }}>
+                        <div style={{ marginTop: '0.4rem' }}>
                           <Link
                             href={`/payments/retry?orderId=${pendingOrderId}`}
                             style={{
                               display: 'inline-flex',
                               alignItems: 'center',
                               gap: '6px',
-                              padding: '8px 14px',
+                              padding: '7px 13px',
                               backgroundColor: '#DC2626',
                               color: '#FFFFFF',
-                              borderRadius: '8px',
+                              borderRadius: '7px',
                               textDecoration: 'none',
-                              fontSize: '0.85rem',
+                              fontSize: '0.825rem',
                               fontWeight: 600,
                             }}
                           >
@@ -1564,17 +1563,31 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
-                  {/* Action Buttons */}
-                  <div style={{ marginTop: '1.75rem' }}>
+                  {/* Primary Order & Payment Action */}
+                  <div className={styles.actionBtnWrap}>
                     <AnimatedOrderButton
                       onValidate={validatePlaceOrderForm}
                       onTriggerOrder={handleTriggerOrder}
                       onComplete={handleAnimatedComplete}
                       isSubmitting={isSubmittingOrder}
                       disabled={isSubmittingOrder || !selectedPaymentMethod}
-                      label={selectedPaymentMethod === 'COD' ? 'Place Order (Cash on Delivery)' : 'Proceed to Pay Securely'}
-                      loadingText={paymentStatusText || (selectedPaymentMethod === 'COD' ? 'Placing Cash on Delivery order...' : 'Processing secure payment...')}
+                      label={
+                        selectedPaymentMethod === 'COD'
+                          ? `Place Order (Cash on Delivery) • ₹${effectiveGrandTotal.toLocaleString()}`
+                          : `Proceed to Pay ₹${effectiveGrandTotal.toLocaleString()} Securely`
+                      }
+                      loadingText={
+                        paymentStatusText ||
+                        (selectedPaymentMethod === 'COD'
+                          ? 'Placing Cash on Delivery order...'
+                          : 'Opening secure payment gateway...')
+                      }
                     />
+                    <div className={styles.trustBadgesRow}>
+                      <span>🔒 256-bit Encrypted Checkout</span>
+                      <span>🛡️ 100% Buyer Protection</span>
+                      <span>⚡ Instant Confirmation</span>
+                    </div>
                   </div>
                 </div>
               )}

@@ -2444,3 +2444,254 @@
     gap: 0.5rem;
   }
 }
+
+/* Compact Step 2 UI & UX Improvements */
+.deliverySummaryBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  margin-bottom: 1.15rem;
+  gap: 0.75rem;
+}
+
+.deliverySummaryContent {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.deliveryPinIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: #FFF7ED;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.deliveryTextWrap {
+  font-size: 0.875rem;
+  color: #374151;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .deliveryTextWrap {
+    white-space: normal;
+  }
+}
+
+.deliveryLabel {
+  color: #6B7280;
+  font-weight: 500;
+}
+
+.deliveryAddressText {
+  color: #111827;
+}
+
+.changeAddressPillBtn {
+  padding: 4px 12px;
+  background: #FFFFFF;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #EA580C;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.changeAddressPillBtn:hover {
+  background: #FFF7ED;
+  border-color: #EA580C;
+}
+
+.paymentOptionsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.paymentOptionCard {
+  display: flex;
+  flex-direction: column;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 12px;
+  background: #FFFFFF;
+  transition: all 0.18s ease;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.paymentOptionCard:hover {
+  border-color: #FDBA74;
+  background-color: #FFFDFB;
+}
+
+.paymentOptionCard.selected {
+  border-color: #F99205;
+  background-color: #FFFBF6;
+  box-shadow: 0 4px 14px rgba(249, 146, 5, 0.08);
+}
+
+.paymentOptionHeader {
+  display: flex;
+  align-items: center;
+  padding: 0.85rem 1.1rem;
+  gap: 0.85rem;
+}
+
+.paymentOptionIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  background: #F3F4F6;
+  border-radius: 10px;
+  color: #4B5563;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.paymentOptionCard.selected .paymentOptionIcon {
+  background: #FFF7ED;
+  color: #EA580C;
+}
+
+.paymentOptionDetails {
+  flex: 1;
+  min-width: 0;
+}
+
+.paymentOptionTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2px;
+}
+
+.paymentOptionTitle {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #111827;
+  margin: 0;
+}
+
+.recommendedBadge {
+  background: #FEF3C7;
+  color: #92400E;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+}
+
+.extraFeeBadge {
+  background: #FFEDD5;
+  color: #C2410C;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.paymentOptionSubtitle {
+  font-size: 0.8rem;
+  color: #6B7280;
+  margin: 0;
+}
+
+.compactUpiStrip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 0.5rem 1.1rem 0.75rem 1.1rem;
+  background: transparent;
+  border-top: 1px dashed rgba(249, 146, 5, 0.2);
+}
+
+.upiPill {
+  background: #FFFFFF;
+  border: 1px solid #FED7AA;
+  color: #7C2D12;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.instructionsContainer {
+  margin-top: 0.85rem;
+}
+
+.toggleInstructionsBtn {
+  background: none;
+  border: none;
+  color: #6B7280;
+  font-size: 0.825rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.15s ease;
+}
+
+.toggleInstructionsBtn:hover {
+  color: #EA580C;
+  text-decoration: underline;
+}
+
+.instructionsInputBox {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  animation: fadeIn 0.2s ease;
+}
+
+.instructionsLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #4B5563;
+}
+
+.actionBtnWrap {
+  margin-top: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.trustBadgesRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  font-size: 0.75rem;
+  color: #6B7280;
+  font-weight: 500;
+  flex-wrap: wrap;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
