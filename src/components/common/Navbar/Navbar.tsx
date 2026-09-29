@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
+import SafeImage from "@/components/ui/SafeImage";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { ChevronDown, Search, Heart, User, ShoppingBag, Package, Tag, MapPin, Bell, LogOut, Star, Truck, Percent, Crown, Menu, X, Dog, Cat, Fish, Bird, MessageCircle, BookOpen, Phone, ShieldQuestion, Headset, ArrowRight, Sun, Sparkles, ChevronRight } from "lucide-react";
@@ -325,7 +326,7 @@ export function Navbar() {
 
                 {/* Right Image */}
                 <div className={styles.megaImageCol}>
-                  <Image src={data.image} alt={category} fill className={styles.megaImage} style={{ objectFit: 'cover' }} />
+                  <SafeImage src={data.image} alt={category} fill className={styles.megaImage} style={{ objectFit: 'cover' }} categoryName={category} />
                 </div>
               </div>
             </div>

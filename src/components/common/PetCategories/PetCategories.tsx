@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import SafeImage from '@/components/ui/SafeImage';
 import styles from './PetCategories.module.css';
 
 const categories = [
@@ -54,8 +54,9 @@ export function PetCategories() {
               {/* Photo with double ring frame and soft glow */}
               <div className={styles.imageRing}>
                 <div className={styles.imageWrapper}>
-                  <Image
+                  <SafeImage
                     src={category.image}
+                    categoryName={category.name}
                     alt={`${category.name} category`}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
