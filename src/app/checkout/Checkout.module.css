@@ -1072,9 +1072,10 @@
 
 /* Premium Success State */
 .successWrapper {
-  max-width: 640px;
-  margin: 2rem auto;
-  padding: 3rem 2rem;
+  max-width: 880px;
+  width: 100%;
+  margin: 1.5rem auto 3rem auto;
+  padding: 2.5rem 1.5rem;
   background-color: transparent;
   text-align: center;
   display: flex;
@@ -1947,6 +1948,7 @@
 /* CTAs */
 .successCtaGroup {
   width: 100%;
+  max-width: 860px;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -2715,12 +2717,12 @@
 .receiptContainer {
   position: relative;
   width: 100%;
-  max-width: 680px;
+  max-width: 860px;
   margin: 0 auto 2.5rem auto;
   background: #ffffff;
   border: 1px solid #E5E7EB;
   border-radius: 20px;
-  padding: 2.25rem 2.5rem;
+  padding: 2.5rem 3rem;
   box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08), 0 2px 10px rgba(0, 0, 0, 0.03);
   text-align: left;
   opacity: 0;
@@ -2838,12 +2840,12 @@
 /* Receipt Meta Strip */
 .receiptMetaStrip {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 0.9fr);
-  gap: 1.25rem;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 1.5rem;
   background: #F9FAFB;
   border: 1px solid #F3F4F6;
   border-radius: 14px;
-  padding: 1.1rem 1.25rem;
+  padding: 1.25rem 1.5rem;
   margin-bottom: 1.5rem;
 }
 
