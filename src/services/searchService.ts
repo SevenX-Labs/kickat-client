@@ -1,3 +1,4 @@
+import { enrichProductsWithVariants } from "./productService";
 import { api } from './api';
 import {
   PopularSearchesResponse,
@@ -28,7 +29,11 @@ export const searchService = {
     if (query.brand) params.set('brand', query.brand);
 
     const qs = params.toString();
-    return api<SearchResponse>(`/search?${qs}`, { method: 'GET' });
+    const res = await api<SearchResponse>(`/search?${qs}`, { method: 'GET' });
+    if (res && Array.isArray(res.products)) {
+      await enrichProductsWithVariants(res.products as any);
+    }
+    return res;
   },
 
   /**

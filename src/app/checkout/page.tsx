@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
+import SafeImage from '@/components/ui/SafeImage';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -1604,8 +1605,9 @@ export default function CheckoutPage() {
                   return (
                     <div key={item.id} className={styles.staticProductCard}>
                       <div className={styles.staticProductImage}>
-                        <Image
-                          src={itemImage}
+                        <SafeImage
+                          src={item.product?.imageUrl}
+                          productName={itemName}
                           alt={itemName}
                           fill
                           style={{ objectFit: 'contain' }}

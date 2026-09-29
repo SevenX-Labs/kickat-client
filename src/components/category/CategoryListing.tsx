@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { categoryService } from '@/services/categoryService';
 import { Category, CategoryProductsQuery } from '@/types/category';
-import { productService } from '@/services/productService';
+import { productService, enrichProductsWithVariants } from '@/services/productService';
 import { mapBackendProductListToCards } from '@/types/product';
 import { Skeleton } from '@/components/ui/Skeleton';
 import styles from './CategoryListing.module.css';
@@ -223,6 +223,7 @@ export function CategoryListing({ categorySlug, subcategorySlug }: CategoryListi
         }
       }
 
+      await enrichProductsWithVariants(rawProducts);
       let mapped = mapBackendProductListToCards(rawProducts);
 
       // Client-side search and rating filter

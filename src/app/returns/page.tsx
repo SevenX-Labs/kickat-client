@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import SafeImage from '@/components/ui/SafeImage';
 import { 
   CheckCircle2, 
   XCircle, 
@@ -264,8 +265,9 @@ export default function ReturnsPage() {
                   <div className={styles.returnInfo}>
                     <div className={styles.itemImageWrapper}>
                       {firstItem?.orderItem?.imageUrl ? (
-                        <Image
+                        <SafeImage
                           src={firstItem.orderItem.imageUrl}
+                          productName={firstItem.orderItem.productName}
                           alt={firstItem.orderItem.productName || 'Returned Product'}
                           fill
                           style={{ objectFit: 'contain', padding: '0.5rem' }}

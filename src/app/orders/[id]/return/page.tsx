@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import SafeImage from '@/components/ui/SafeImage';
 import Link from 'next/link';
 import { 
   CheckCircle2, 
@@ -254,8 +255,9 @@ export default function ReturnFlowPage({ params }: { params: Promise<{ id: strin
                         />
                         <div className={styles.itemImageWrapper}>
                           {item.imageUrl || item.image ? (
-                            <Image 
-                              src={item.imageUrl || item.image || ''} 
+                            <SafeImage 
+                              src={item.imageUrl || item.image} 
+                              productName={item.productName}
                               alt={item.productName} 
                               fill 
                               style={{ objectFit: 'contain', padding: '0.25rem' }} 

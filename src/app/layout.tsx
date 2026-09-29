@@ -22,18 +22,21 @@ const lora = Lora({
   variable: "--font-lora",
   subsets: ["latin"],
   style: ["normal", "italic"],
+  preload: false,
 });
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
   subsets: ["latin"],
   style: ["normal", "italic"],
+  preload: false,
 });
 
 const ibmPlexMono = IBM_Plex_Mono({
   variable: "--font-ibm-plex-mono",
   subsets: ["latin"],
   weight: ["400", "500", "600"],
+  preload: false,
 });
 
 export const metadata: Metadata = {

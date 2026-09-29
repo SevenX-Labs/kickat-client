@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import SafeImage from '@/components/ui/SafeImage';
 import Link from 'next/link';
 import {
   Package, Search, ChevronDown, MapPin, Check, CheckCircle2,
@@ -393,14 +394,14 @@ export default function OrdersContent({ showBackToAccount = true }: OrdersConten
                     {order.items.map((item: any, idx: number) => (
                       <div key={idx} className={styles.itemRow}>
                         <div className={styles.itemThumbWrap} style={{ background: '#FFFFFF', position: 'relative', overflow: 'hidden' }}>
-                          <Image
+                          <SafeImage
                             src={item.image}
+                            productName={item.name}
                             alt={item.name}
                             width={64}
                             height={64}
                             className={styles.itemThumb}
                             style={{ objectFit: 'contain' }}
-                            unoptimized={item.image?.startsWith('http')}
                           />
                         </div>
                         <div className={styles.itemDetails}>

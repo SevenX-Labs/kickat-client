@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import SafeImage from '@/components/ui/SafeImage';
 import Link from 'next/link';
 import ProductCard from '../common/ProductCard/ProductCard';
 import { useRouter } from 'next/navigation';
@@ -323,8 +324,9 @@ export function CategoryExplorer({
                       <div className={styles.railItemIcon}>
                         {cat.imageUrl ? (
                           <div className={styles.categoryImageWrap}>
-                            <Image
+                            <SafeImage
                               src={cat.imageUrl}
+                              categoryName={cat.name}
                               alt={cat.name}
                               fill
                               sizes="44px"
@@ -419,8 +421,9 @@ export function CategoryExplorer({
                       <div className={styles.subCardImgWrap}>
                         <div className={styles.subCardImgInner}>
                           {sub.imageUrl ? (
-                            <Image
+                            <SafeImage
                               src={sub.imageUrl}
+                              categoryName={sub.name}
                               alt={sub.name}
                               fill
                               sizes="(max-width: 768px) 140px, 160px"

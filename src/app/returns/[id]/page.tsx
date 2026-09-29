@@ -3,6 +3,7 @@
 import { use, useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import SafeImage from '@/components/ui/SafeImage';
 import { 
   ArrowLeft, 
   Package, 
@@ -173,8 +174,9 @@ export default function ReturnDetailsPage({ params }: { params: Promise<{ id: st
                   <div key={item.id} style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', borderBottom: '1px solid #f0f0f0', paddingBottom: '1.25rem' }}>
                     <div className={styles.itemImageWrapper}>
                       {item.orderItem?.imageUrl ? (
-                        <Image 
+                        <SafeImage 
                           src={item.orderItem.imageUrl} 
+                          productName={item.orderItem.productName}
                           alt={item.orderItem.productName || 'Item'} 
                           fill 
                           style={{ objectFit: 'contain', padding: '0.5rem' }} 

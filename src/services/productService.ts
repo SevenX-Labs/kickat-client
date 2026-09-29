@@ -15,7 +15,7 @@ import {
 
 const variantsCache: Record<string, BackendProductVariant[]> = {};
 
-function deduplicateVariants(variants: BackendProductVariant[]): BackendProductVariant[] {
+export function deduplicateVariants(variants: BackendProductVariant[]): BackendProductVariant[] {
   if (!Array.isArray(variants)) return [];
   const seenIds = new Set<string>();
   const seenLabels = new Set<string>();
@@ -37,7 +37,7 @@ function deduplicateVariants(variants: BackendProductVariant[]): BackendProductV
   });
 }
 
-async function enrichProductsWithVariants(products: BackendProduct[]): Promise<BackendProduct[]> {
+export async function enrichProductsWithVariants(products: BackendProduct[]): Promise<BackendProduct[]> {
   if (!Array.isArray(products) || products.length === 0) return products;
 
   const variableProducts = products.filter((p) => p && p.type === 'VARIABLE' && (!p.variants || p.variants.length === 0));

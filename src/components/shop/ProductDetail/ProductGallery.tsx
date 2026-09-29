@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import SafeImage from '@/components/ui/SafeImage';
 import { useRouter } from 'next/navigation';
 import { Play, Maximize, Heart, Share2, X, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
@@ -106,13 +107,12 @@ export function ProductGallery({ images, productId, variantId, brand = 'KickAt' 
               onMouseEnter={() => setActiveIndex(idx)}
               aria-label={`View image thumbnail ${idx + 1}`}
             >
-              <Image
+              <SafeImage
                 src={thumb.src}
                 alt={`Thumbnail ${idx + 1}`}
                 fill
                 sizes="64px"
                 className={styles.thumbnailImage}
-                unoptimized={thumb.src.startsWith('data:')}
               />
               {thumb.type === 'video' && (
                 <div className={styles.videoPlayOverlay}>
@@ -174,7 +174,7 @@ export function ProductGallery({ images, productId, variantId, brand = 'KickAt' 
                 zIndex: idx === activeIndex ? 2 : 1,
               }}
             >
-              <Image
+              <SafeImage
                 src={thumb.src}
                 alt="Product Image"
                 fill
@@ -182,7 +182,6 @@ export function ProductGallery({ images, productId, variantId, brand = 'KickAt' 
                 priority={idx === 0}
                 loading={idx === 0 ? 'eager' : 'eager'}
                 sizes="(max-width: 768px) 100vw, 550px"
-                unoptimized={thumb.src.startsWith('data:')}
               />
             </div>
           ))}
@@ -218,12 +217,11 @@ export function ProductGallery({ images, productId, variantId, brand = 'KickAt' 
               <X size={20} />
             </button>
             <div className={styles.lightboxImageWrap}>
-              <Image
+              <SafeImage
                 src={activeSrc}
                 alt="Enlarged Product View"
                 fill
                 className={styles.lightboxImage}
-                unoptimized={activeSrc.startsWith('data:')}
               />
             </div>
           </div>

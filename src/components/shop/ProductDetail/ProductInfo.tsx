@@ -70,6 +70,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
     const flyingImg = document.createElement('img');
     flyingImg.src = imageSrc;
     flyingImg.alt = 'Flying Product Preview';
+    flyingImg.onerror = () => { flyingImg.src = '/hero-products/dog_food.png'; };
 
     const width = 64;
     const height = 64;

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { wishlistService } from '@/services/wishlistService';
 import { useAuth } from '@/context/AuthContext';
 import Image from 'next/image';
+import SafeImage from '@/components/ui/SafeImage';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
@@ -257,14 +258,15 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
         )}
 
         <Link href={`/product/${product.id}`} prefetch={true} target="_blank" rel="noopener noreferrer" className={styles.cardImageLink}>
-          <Image
+          <SafeImage
             src={product.image}
+            productName={product.name}
+            categoryName={product.mainCategory}
             alt={product.name}
             fill
             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             className={styles.cardImage}
             style={{ objectFit: 'contain' }}
-            unoptimized={product.image?.startsWith('data:')}
           />
         </Link>
       </div>

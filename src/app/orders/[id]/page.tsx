@@ -2,6 +2,7 @@
 
 import { use, useEffect, useState } from 'react';
 import Image from 'next/image';
+import SafeImage from '@/components/ui/SafeImage';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
@@ -397,13 +398,13 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
 
             <div className={styles.productMainRow}>
               <div className={styles.productImageWrapper} style={{ background: '#FFFFFF', position: 'relative', overflow: 'hidden' }}>
-                <Image 
-                  src={item.imageUrl || item.image || '/hero-products/dog_food.png'} 
+                <SafeImage 
+                  src={item.imageUrl || item.image} 
+                  productName={item.productName}
                   alt={item.productName || 'Ordered Item'} 
                   fill 
                   className={styles.productImg}
                   style={{ objectFit: 'contain' }}
-                  unoptimized={item.imageUrl?.startsWith('http') || item.image?.startsWith('http')}
                 />
               </div>
               

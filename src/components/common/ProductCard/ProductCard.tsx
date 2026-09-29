@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { wishlistService } from '@/services/wishlistService';
 import { useAuth } from '@/context/AuthContext';
 import Image from 'next/image';
+import SafeImage from '@/components/ui/SafeImage';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
@@ -176,13 +177,7 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
     }
 
     // Determine target variant ID
-    const effectiveVariantId = activeVariantId || product.variantId || product.selectedVariantId;
-
-    // If variable product has no variant selected or known, open variant modal
-    if (isVariable && !activeVariantId) {
-      setIsVariantModalOpen(true);
-      return;
-    }
+    const effectiveVariantId = activeVariantId || product.variantId || product.selectedVariantId || (product.variants && product.variants[0]?.id);
 
     if (isAdding) return;
 
@@ -309,14 +304,15 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
         )}
 
         <Link href={`/product/${product.id}`} prefetch={true} target="_blank" rel="noopener noreferrer" className={styles.cardImageLink}>
-          <Image
+          <SafeImage
             src={activeImage}
+            productName={product.name}
+            categoryName={product.mainCategory}
             alt={product.name}
             fill
             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             className={styles.cardImage}
             style={{ objectFit: 'contain' }}
-            unoptimized={activeImage?.startsWith('data:')}
           />
         </Link>
       </div>
@@ -428,11 +424,6 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
               <>
                 <Check size={15} color="#ffffff" strokeWidth={2.5} />
                 <span className={styles.btnText}>Go to Cart</span>
-              </>
-            ) : isVariable && !activeVariantId ? (
-              <>
-                <SlidersHorizontal size={15} color="#ffffff" strokeWidth={2.2} />
-                <span className={styles.btnText}>Select Options</span>
               </>
             ) : (
               <>

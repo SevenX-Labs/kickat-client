@@ -1,3 +1,4 @@
+import { enrichProductsWithVariants } from './productService';
 import { api } from './api';
 import {
   CategoriesResponse,
@@ -53,6 +54,10 @@ export const categoryService = {
 
     const qs = params.toString();
     const endpoint = `/categories/${encodeURIComponent(idOrSlug)}/products${qs ? `?${qs}` : ''}`;
-    return api<CategoryProductsResponse>(endpoint, { method: 'GET' });
+    const res = await api<CategoryProductsResponse>(endpoint, { method: 'GET' });
+    if (res && Array.isArray(res.products)) {
+      await enrichProductsWithVariants(res.products);
+    }
+    return res;
   },
 };

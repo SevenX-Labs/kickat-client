@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Image from 'next/image';
+import SafeImage from '@/components/ui/SafeImage';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -165,11 +166,15 @@ export default function CartPage() {
               return (
                 <div key={item.id} className={styles.cartItem}>
                   <div className={styles.itemImageWrapper}>
-                    <Image
-                      src={imageSrc}
+                    <SafeImage
+                      src={item.product?.imageUrl}
+                      productName={item.product?.name}
+                      categoryName={item.product?.category?.name || item.product?.category?.slug}
                       alt={item.product?.name || 'Product Image'}
                       fill
+                      sizes="100px"
                       className={styles.itemImage}
+                      style={{ objectFit: 'contain' }}
                     />
                   </div>
 

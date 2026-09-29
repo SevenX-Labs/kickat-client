@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import SafeImage from '@/components/ui/SafeImage';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
@@ -221,11 +222,14 @@ export function VariantSelectorModal({
         {/* Product Header */}
         <div className={styles.productHeader}>
           <div className={styles.imageWrap}>
-            <Image
+            <SafeImage
               src={activeImage}
+              productName={product.name}
+              categoryName={product.mainCategory}
               alt={product.name}
               fill
               className={styles.productThumb}
+              style={{ objectFit: 'contain' }}
             />
           </div>
 
