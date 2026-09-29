@@ -1028,46 +1028,6 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          {/* Trust Features Strip */}
-          <div className={styles.featuresRow}>
-            <div className={styles.featureBox}>
-              <div className={styles.featureIconCircle}>
-                <Truck size={20} />
-              </div>
-              <div>
-                <div className={styles.featureBoxTitle}>Fast Delivery</div>
-                <div className={styles.featureBoxDesc}>On-time delivery guaranteed</div>
-              </div>
-            </div>
-            <div className={styles.featureBox}>
-              <div className={styles.featureIconCircle}>
-                <Shield size={20} />
-              </div>
-              <div>
-                <div className={styles.featureBoxTitle}>Secure Checkout</div>
-                <div className={styles.featureBoxDesc}>100% safe & encrypted</div>
-              </div>
-            </div>
-            <div className={styles.featureBox}>
-              <div className={styles.featureIconCircle}>
-                <RotateCcw size={20} />
-              </div>
-              <div>
-                <div className={styles.featureBoxTitle}>Easy Returns</div>
-                <div className={styles.featureBoxDesc}>Hassle-free 30 day returns</div>
-              </div>
-            </div>
-            <div className={styles.featureBox}>
-              <div className={styles.featureIconCircle}>
-                <Headphones size={20} />
-              </div>
-              <div>
-                <div className={styles.featureBoxTitle}>24/7 Support</div>
-                <div className={styles.featureBoxDesc}>Dedicated customer care</div>
-              </div>
-            </div>
-          </div>
-
           {/* Action CTAs */}
           <div className={styles.successCtaGroup}>
             <Link href={`/orders/${placedOrder.orderId || placedOrder.orderNumber}`} className={styles.primarySuccessBtn}>
