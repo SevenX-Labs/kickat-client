@@ -36,6 +36,12 @@ import {
   Building2,
   AlertTriangle,
   QrCode,
+  Copy,
+  CheckCheck,
+  Printer,
+  Receipt,
+  FileText,
+  Download,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
@@ -117,6 +123,9 @@ export default function CheckoutPage() {
   const [isSubmittingOrder, setIsSubmittingOrder] = useState<boolean>(false);
   const [orderError, setOrderError] = useState<string | null>(null);
   const [placedOrder, setPlacedOrder] = useState<PlaceOrderResponse | null>(null);
+  const [finalOrderedItems, setFinalOrderedItems] = useState<any[]>([]);
+  const [finalSummary, setFinalSummary] = useState<any>(null);
+  const [copiedOrderNumber, setCopiedOrderNumber] = useState<boolean>(false);
   const idempotencyKeyRef = useRef<string>(generateUUID());
 
   // Payment Lifecycle State
@@ -421,8 +430,9 @@ export default function CheckoutPage() {
 
     try {
       const currentMethod = paymentMethods.find((m) => m.type === selectedPaymentMethod);
-      const codConfigFee = (publicPayment?.cod?.extraFeeEnabled ? (publicPayment.cod.extraFee ?? 0) : 0);
-      const currentCodFee = selectedPaymentMethod === 'COD' ? (checkoutData?.summary?.codFee ?? currentMethod?.extraFee ?? codConfigFee) : 0;
+      const isCodFeeActive = Boolean(publicPayment?.cod?.extraFeeEnabled);
+      const configuredCodFee = isCodFeeActive ? Number(currentMethod?.extraFee ?? publicPayment?.cod?.extraFee ?? 0) : 0;
+      const currentCodFee = selectedPaymentMethod === 'COD' ? (checkoutData?.summary?.codFee ?? configuredCodFee) : 0;
       const effectiveExpectedTotal = (checkoutData?.summary?.grandTotal ?? 0) + currentCodFee;
       const cleanUpiId = selectedPaymentMethod === 'UPI' ? (upiId.trim() || 'qr@razorpay') : undefined;
 
@@ -442,6 +452,8 @@ export default function CheckoutPage() {
         } catch (codErr) {
           console.warn('[Checkout] COD confirmation note:', codErr);
         }
+        setFinalOrderedItems([...(cartItems || [])]);
+        setFinalSummary(checkoutData?.summary);
         setPlacedOrder(res);
         await refreshCart();
         return true;
@@ -692,7 +704,7 @@ export default function CheckoutPage() {
   }
 
   // ----------------------------------------------------
-  // RENDER: Order Placed Success View (COD or Order Confirmation)
+  // RENDER: Order Placed Success View (Master Branded Receipt UI)
   // ----------------------------------------------------
   if (placedOrder) {
     const isCod = selectedPaymentMethod === 'COD';
@@ -704,6 +716,34 @@ export default function CheckoutPage() {
       hour: '2-digit',
       minute: '2-digit',
     }).format(new Date());
+
+    const summarySource = finalSummary || checkoutData?.summary;
+    const itemsSource = finalOrderedItems.length > 0 ? finalOrderedItems : (cartItems || []);
+    const receiptSubtotal = summarySource?.subtotal ?? (itemsSource.reduce((acc: number, item: any) => {
+      const p = item.variant?.discountPrice ?? item.variant?.price ?? item.product?.discountPrice ?? item.product?.price ?? 0;
+      return acc + (p * item.quantity);
+    }, 0));
+    const receiptDeliveryFee = summarySource?.deliveryFee ?? 0;
+    const receiptGstAmount = summarySource?.gstAmount ?? 0;
+    const receiptGstPercentage = summarySource?.gstPercentage ?? publicSettings?.tax?.gstPercentage;
+    const receiptCodFee = isCod ? (summarySource?.codFee ?? 0) : 0;
+    const receiptExtraFeeName = summarySource?.extraFeeName;
+    const receiptExtraFeeAmount = summarySource?.extraFeeAmount ?? 0;
+    const receiptGrandTotal = summarySource?.grandTotal ?? (placedOrder.grandTotal || (receiptSubtotal + receiptDeliveryFee + receiptGstAmount + receiptCodFee + receiptExtraFeeAmount));
+
+    const handleCopyOrderNumber = (text: string) => {
+      if (typeof navigator !== 'undefined' && navigator.clipboard) {
+        navigator.clipboard.writeText(text);
+        setCopiedOrderNumber(true);
+        setTimeout(() => setCopiedOrderNumber(false), 2000);
+      }
+    };
+
+    const handlePrintReceipt = () => {
+      if (typeof window !== 'undefined') {
+        window.print();
+      }
+    };
 
     return (
       <main className={styles.container}>
@@ -740,50 +780,99 @@ export default function CheckoutPage() {
           </div>
 
           <h1 className={styles.successTitle}>
-            {isCod ? 'Order Placed' : 'Order Created'}{' '}
+            {isCod ? 'Order Placed' : 'Order Confirmed'}{' '}
             <span className={styles.successTitleOrange}>Successfully!</span>
           </h1>
           <p className={styles.successSubtitle}>
             {isCod
-              ? 'Thank you for your purchase! We are preparing your order for quick dispatch.'
-              : 'Your order has been recorded. Proceed with online payment to finalize delivery.'}
+              ? 'Thank you for shopping with KickAt! We are preparing your pet goodies for quick dispatch.'
+              : 'Your payment was received and your order is confirmed for express fulfillment.'}
           </p>
 
           <div className={styles.confirmationPill}>
             <Mail size={16} color="#10B981" style={{ flexShrink: 0 }} />
             <span>
-              Confirmation sent to{' '}
+              Official receipt sent to{' '}
               <strong className={styles.pillEmail}>{email || user?.email || 'your registered email'}</strong>
             </span>
           </div>
 
-          {/* Premium Order Details Card */}
-          <div className={styles.successCard}>
-            <div className={styles.successCardHeader}>
-              <div className={styles.cardHeaderItem}>
-                <span className={styles.cardHeaderLabel}>ORDER NUMBER</span>
-                <span className={styles.cardHeaderValueMono}>#{placedOrder.orderNumber}</span>
+          {/* MASTER BRANDED RECEIPT CARD */}
+          <div className={styles.receiptContainer} id="printable-order-receipt">
+            <div className={styles.receiptNotchLeft} />
+            <div className={styles.receiptNotchRight} />
+
+            {/* Receipt Brand Header */}
+            <div className={styles.receiptHeader}>
+              <div className={styles.receiptBrand}>
+                <div className={styles.receiptLogoBadge}>
+                  <PawPrint size={20} fill="#F99205" color="#F99205" />
+                  <span className={styles.receiptBrandName}>KickAt</span>
+                </div>
+                <div className={styles.receiptTagline}>
+                  <span>OFFICIAL ORDER RECEIPT & TAX INVOICE</span>
+                  <span className={styles.receiptVerifiedBadge}>
+                    <Check size={11} strokeWidth={3} /> VERIFIED ORDER
+                  </span>
+                </div>
               </div>
-              <div className={`${styles.cardHeaderItem} ${styles.cardHeaderItemBorder}`}>
-                <span className={styles.cardHeaderLabel}>ORDER DATE</span>
-                <span className={styles.cardHeaderValue}>
-                  <Calendar size={14} /> {orderDateStr}
+              <div className={isCod ? styles.receiptPaymentPillCod : styles.receiptPaymentPillPaid}>
+                {isCod ? (
+                  <>
+                    <Truck size={14} /> Cash on Delivery
+                  </>
+                ) : (
+                  <>
+                    <Shield size={14} /> Online Prepaid (Verified)
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Receipt Order Meta Strip */}
+            <div className={styles.receiptMetaStrip}>
+              <div className={styles.receiptMetaItem}>
+                <span className={styles.receiptMetaLabel}>ORDER NUMBER</span>
+                <div className={styles.receiptOrderNumberRow}>
+                  <span className={styles.receiptOrderNumberText}>#{placedOrder.orderNumber}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleCopyOrderNumber(placedOrder.orderNumber)}
+                    className={styles.receiptCopyBtn}
+                    title="Copy Order ID"
+                  >
+                    {copiedOrderNumber ? (
+                      <>
+                        <CheckCheck size={13} color="#10B981" />
+                        <span className={styles.copiedText}>Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={13} />
+                        <span>Copy</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+              <div className={styles.receiptMetaItem}>
+                <span className={styles.receiptMetaLabel}>ORDER DATE & TIME</span>
+                <span className={styles.receiptMetaValue}>
+                  <Calendar size={13} /> {orderDateStr}
                 </span>
               </div>
-              <div className={`${styles.cardHeaderItem} ${styles.cardHeaderItemBorder} ${styles.cardHeaderItemRight}`}>
-                <span className={styles.cardHeaderLabel}>TOTAL PAYABLE</span>
-                <span className={styles.cardHeaderValueOrange}>
-                  ₹{(placedOrder.grandTotal || checkoutData?.summary?.grandTotal || 0).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                  })}
+              <div className={`${styles.receiptMetaItem} ${styles.receiptMetaItemRight}`}>
+                <span className={styles.receiptMetaLabel}>PAYMENT STATUS</span>
+                <span className={isCod ? styles.statusPillCod : styles.statusPillPaid}>
+                  {isCod ? 'Pay on Delivery' : 'Paid / Confirmed'}
                 </span>
               </div>
             </div>
 
-            {/* Live Order Tracker */}
+            {/* Live Progress Tracker */}
             <div className={styles.trackerContainer}>
               <div className={styles.trackerHeader}>
-                <span className={styles.trackerLabel}>LIVE ORDER STATUS</span>
+                <span className={styles.trackerLabel}>LIVE FULFILLMENT STATUS</span>
                 <span className={styles.trackerStatusBadge}>
                   {placedOrder.status || 'Order Confirmed'}
                 </span>
@@ -813,17 +902,134 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* Delivery Estimate Box */}
-            <div className={styles.deliveryEstimateCard}>
-              <div className={styles.deliveryIconWrapper}>
-                <Truck size={20} color="#ea580c" />
-              </div>
-              <div className={styles.deliveryText}>
-                <div className={styles.deliveryTitle}>Delivery Address</div>
-                <div className={styles.deliveryDate}>
-                  <strong>{selectedAddr?.houseFlat || selectedAddr?.houseNumber ? `${selectedAddr?.houseFlat || selectedAddr?.houseNumber}, ` : ''}{selectedAddr?.buildingStreet || selectedAddr?.street || ''}</strong>, {selectedAddr?.city || ''} ({selectedAddr?.pincode || ''})
+            {/* Perforation Line */}
+            <div className={styles.receiptPerforationLine} />
+
+            {/* Purchased Items Table */}
+            {itemsSource && itemsSource.length > 0 && (
+              <div className={styles.receiptItemsSection}>
+                <div className={styles.receiptItemsSectionHeader}>
+                  <span>ITEM DESCRIPTION</span>
+                  <span>QTY</span>
+                  <span>AMOUNT</span>
+                </div>
+                <div className={styles.receiptItemsList}>
+                  {itemsSource.map((item: any, idx: number) => {
+                    const price = item.variant?.discountPrice ?? item.variant?.price ?? item.product?.discountPrice ?? item.product?.price ?? 0;
+                    const totalPrice = price * item.quantity;
+                    const itemImg = item.variant?.image || item.product?.images?.[0] || item.product?.image;
+                    return (
+                      <div key={item.id || idx} className={styles.receiptItemRow}>
+                        <div className={styles.receiptItemInfo}>
+                          <div className={styles.receiptItemThumb}>
+                            <SafeImage
+                              src={itemImg}
+                              alt={item.product?.name || 'Product'}
+                              fill
+                              sizes="48px"
+                              style={{ objectFit: 'cover' }}
+                              productName={item.product?.name}
+                            />
+                          </div>
+                          <div className={styles.receiptItemText}>
+                            <div className={styles.receiptItemName}>{item.product?.name || 'Product Item'}</div>
+                            {item.variant?.name && (
+                              <div className={styles.receiptItemVariant}>{item.variant.name}</div>
+                            )}
+                          </div>
+                        </div>
+                        <div className={styles.receiptItemQty}>x{item.quantity}</div>
+                        <div className={styles.receiptItemTotal}>
+                          ₹{totalPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
+            )}
+
+            {/* Price Financials Breakdown Grid */}
+            <div className={styles.receiptFinancialsGrid}>
+              <div className={styles.receiptFinancialRow}>
+                <span className={styles.receiptFinancialLabel}>Items Subtotal</span>
+                <span className={styles.receiptFinancialValue}>
+                  ₹{(receiptSubtotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+              <div className={styles.receiptFinancialRow}>
+                <span className={styles.receiptFinancialLabel}>Shipping & Delivery</span>
+                <span className={receiptDeliveryFee === 0 ? styles.receiptFreeText : styles.receiptFinancialValue}>
+                  {receiptDeliveryFee === 0 ? 'FREE' : `+₹${receiptDeliveryFee.toFixed(2)}`}
+                </span>
+              </div>
+              {receiptGstAmount > 0 && (
+                <div className={styles.receiptFinancialRow}>
+                  <span className={styles.receiptFinancialLabel}>
+                    Tax / GST {receiptGstPercentage ? `(${receiptGstPercentage}%)` : ''}
+                  </span>
+                  <span className={styles.receiptFinancialValue}>
+                    +₹{receiptGstAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+              )}
+              {isCod && receiptCodFee > 0 && (
+                <div className={styles.receiptFinancialRow}>
+                  <span className={styles.receiptFinancialLabel}>Cash on Delivery Surcharge</span>
+                  <span className={styles.receiptFinancialValue}>+₹{receiptCodFee.toFixed(2)}</span>
+                </div>
+              )}
+              {receiptExtraFeeAmount > 0 && (
+                <div className={styles.receiptFinancialRow}>
+                  <span className={styles.receiptFinancialLabel}>{receiptExtraFeeName || 'Special Handling Fee'}</span>
+                  <span className={styles.receiptFinancialValue}>+₹{receiptExtraFeeAmount.toFixed(2)}</span>
+                </div>
+              )}
+
+              {/* Grand Total Bar */}
+              <div className={styles.receiptGrandTotalBar}>
+                <div>
+                  <div className={styles.receiptGrandTotalLabel}>TOTAL AMOUNT {isCod ? 'PAYABLE' : 'PAID'}</div>
+                  <div className={styles.receiptTaxInclusiveNote}>All taxes & delivery charges included</div>
+                </div>
+                <div className={styles.receiptGrandTotalAmount}>
+                  ₹{(placedOrder.grandTotal || receiptGrandTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                </div>
+              </div>
+            </div>
+
+            {/* Delivery Address Section */}
+            <div className={styles.receiptAddressTile}>
+              <div className={styles.receiptAddressIconCircle}>
+                <MapPin size={18} color="#F99205" />
+              </div>
+              <div className={styles.receiptAddressDetails}>
+                <div className={styles.receiptAddressHeading}>
+                  DELIVERING TO: <strong>{selectedAddr?.fullName || user?.name || 'Customer'}</strong> ({selectedAddr?.phone || phone || user?.phone || 'Verified Phone'})
+                </div>
+                <div className={styles.receiptAddressText}>
+                  {selectedAddr?.houseFlat || selectedAddr?.houseNumber ? `${selectedAddr?.houseFlat || selectedAddr?.houseNumber}, ` : ''}
+                  {selectedAddr?.buildingStreet || selectedAddr?.street ? `${selectedAddr?.buildingStreet || selectedAddr?.street}, ` : ''}
+                  {selectedAddr?.landmark ? `Near ${selectedAddr.landmark}, ` : ''}
+                  {selectedAddr?.city || ''}, {selectedAddr?.state || ''} - <strong>{selectedAddr?.pincode || ''}</strong>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Barcode / Security Stamp & Print CTA */}
+            <div className={styles.receiptSecurityFooter}>
+              <div className={styles.receiptBarcodeSimulation}>
+                <div className={styles.barcodeBars} />
+                <span className={styles.barcodeText}>KCKT-{placedOrder.orderNumber}-AUTH-OK</span>
+              </div>
+              <button
+                type="button"
+                onClick={handlePrintReceipt}
+                className={styles.printReceiptBtn}
+                title="Print or Save Receipt as PDF"
+              >
+                <Printer size={15} /> Print / Download Receipt
+              </button>
             </div>
           </div>
 
@@ -867,12 +1073,15 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          {/* CTAs */}
+          {/* Action CTAs */}
           <div className={styles.successCtaGroup}>
             <Link href={`/orders/${placedOrder.orderId || placedOrder.orderNumber}`} className={styles.primarySuccessBtn}>
-              <Package size={20} /> View Order Details <ArrowRight size={20} />
+              <Package size={20} /> View Order Details & Tracking <ArrowRight size={20} />
             </Link>
             <div className={styles.secondaryActionsRow}>
+              <button type="button" onClick={handlePrintReceipt} className={styles.outlineBtnAlt}>
+                <Printer size={16} /> Print Receipt
+              </button>
               <Link href="/shop" className={styles.outlineBtnAlt}>
                 <ShoppingBag size={16} /> Continue Shopping
               </Link>
@@ -880,11 +1089,11 @@ export default function CheckoutPage() {
           </div>
 
           <div className={styles.successFooter}>
-            <Heart
-              size={14}
-              fill="#ea580c"
-              color="#ea580c"
-              style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}
+            <PawPrint
+              size={15}
+              fill="#F99205"
+              color="#F99205"
+              style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }}
             />
             Thanks for shopping with KickAt!<br />
             <span style={{ color: '#888', fontSize: '0.85rem' }}>Your pet&apos;s happiness is our priority.</span>
@@ -906,12 +1115,12 @@ export default function CheckoutPage() {
   const extraFeeAmount = summary?.extraFeeAmount ?? (publicDelivery?.extraFeeEnabled ? (publicDelivery.extraFeeAmount ?? 0) : 0);
   const extraFeeName = summary?.extraFeeName ?? publicDelivery?.extraFeeName;
   const currentMethodItem = paymentMethods.find((m) => m.type === selectedPaymentMethod);
-  const serverCodFee = publicPayment?.cod?.extraFeeEnabled ? (publicPayment.cod.extraFee ?? 0) : 0;
+  const isCodFeeActive = Boolean(publicPayment?.cod?.extraFeeEnabled);
   const rawCodFee = (summary?.codFee !== undefined && summary.codFee > 0)
     ? summary.codFee
-    : (currentMethodItem?.extraFee !== undefined && currentMethodItem.extraFee > 0)
-    ? currentMethodItem.extraFee
-    : (serverCodFee > 0 ? serverCodFee : 0);
+    : isCodFeeActive
+    ? (currentMethodItem?.extraFee ?? publicPayment?.cod?.extraFee ?? 0)
+    : 0;
   const activeCodFee = (selectedPaymentMethod === 'COD' && rawCodFee > 0) ? rawCodFee : 0;
   const isTaxInclusive = publicSettings?.tax?.taxInclusive ?? false;
   const taxForTotal = isTaxInclusive ? 0 : gstAmount;
