@@ -326,7 +326,7 @@ export function Navbar() {
 
                 {/* Right Image */}
                 <div className={styles.megaImageCol}>
-                  <SafeImage src={data.image} alt={category} fill className={styles.megaImage} style={{ objectFit: 'cover' }} categoryName={category} />
+                  <SafeImage src={data.image} alt={category} fill sizes="(max-width: 1024px) 100vw, 240px" className={styles.megaImage} style={{ objectFit: 'cover' }} categoryName={category} />
                 </div>
               </div>
             </div>

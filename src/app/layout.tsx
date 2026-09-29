@@ -57,6 +57,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} ${fraunces.variable} ${ibmPlexMono.variable} antialiased`}
     >
       <body className="flex flex-col min-h-screen">
