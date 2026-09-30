@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import Image from 'next/image';
+import SafeImage from '@/components/ui/SafeImage';
 import {
   ShieldCheck,
   Sparkles,
@@ -127,8 +127,11 @@ export function ProductTabs({ product, selectedVariant }: ProductTabsProps) {
             {/* Right Column: Clean Lifestyle Product Showcase */}
             <div className={styles.tabDetailsRightCol}>
               <div className={styles.lifestyleBannerWrap}>
-                <Image
-                  src={product.image || product.images?.[0] || "/hero-products/dog_food.png"}
+                <SafeImage
+                  src={(selectedVariant && selectedVariant.images && selectedVariant.images[0]) || product.image || product.images?.[0] || "/hero-products/dog_food.png"}
+                  productName={product.name}
+                  categoryName={product.mainCategory || undefined}
+                  petSpecies={product.petSpecies || undefined}
                   alt={product.name || "Product lifestyle preview"}
                   fill
                   sizes="(max-width: 768px) 100vw, 500px"
