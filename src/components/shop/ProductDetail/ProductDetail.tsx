@@ -21,6 +21,10 @@ export interface ProductVariant {
   discountPrice?: number | null;
   originalPrice?: number | null;
   stock: number;
+  shippingWeightKg?: number | null;
+  shippingLengthCm?: number | null;
+  shippingBreadthCm?: number | null;
+  shippingHeightCm?: number | null;
   attributes?: Record<string, any> | null;
   imageUrl?: string | null;
   images?: string[];
@@ -49,6 +53,10 @@ export interface Product {
   materials?: string;
   descriptionTitle?: string;
   description?: string;
+  shippingWeightKg?: number | null;
+  shippingLengthCm?: number | null;
+  shippingBreadthCm?: number | null;
+  shippingHeightCm?: number | null;
   attributes?: Record<string, any>;
   highlights?: any;
   ingredients?: any;
@@ -145,14 +153,14 @@ export function ProductDetail({ product, isLoading }: ProductDetailProps) {
       {/* 3. Tabbed Content Section (Details & Highlights, Ingredients, Feeding, Safety, Shipping) */}
       <section className={styles.sectionPadding}>
         <div className={styles.container}>
-          <ProductTabs product={product} />
+          <ProductTabs product={product} selectedVariant={selectedVariant} />
         </div>
       </section>
 
       {/* 4. Product Details + Size Guide (2-Column Row) */}
       <section className={styles.sectionPadding}>
         <div className={styles.container}>
-          <ProductSpecsAndSizeGuide product={product} />
+          <ProductSpecsAndSizeGuide product={product} selectedVariant={selectedVariant} />
         </div>
       </section>
 

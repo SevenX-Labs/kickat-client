@@ -16,13 +16,14 @@ import {
   FileText,
 } from 'lucide-react';
 import styles from './ProductDetail.module.css';
-import { Product } from './ProductDetail';
+import { Product, ProductVariant } from './ProductDetail';
 
 interface ProductTabsProps {
   product: Product;
+  selectedVariant?: ProductVariant | null;
 }
 
-export function ProductTabs({ product }: ProductTabsProps) {
+export function ProductTabs({ product, selectedVariant }: ProductTabsProps) {
   // Parse highlights safely without [object Object]
   let parsedHighlights: string[] = [];
   if (Array.isArray(product.highlights)) {
@@ -259,7 +260,9 @@ export function ProductTabs({ product }: ProductTabsProps) {
                 <div>
                   <h4 className={styles.shippingCardTitle}>Tamper-Proof Packaging</h4>
                   <p className={styles.shippingCardDesc}>
-                    Secure, sealed packaging ensures your products arrive fresh, clean, and undamaged.
+                    {((selectedVariant?.shippingWeightKg ?? product.shippingWeightKg) && (selectedVariant?.shippingLengthCm ?? product.shippingLengthCm))
+                      ? `Package Specs: ${selectedVariant?.shippingWeightKg ?? product.shippingWeightKg} kg (${selectedVariant?.shippingLengthCm ?? product.shippingLengthCm} cm L × ${selectedVariant?.shippingBreadthCm ?? product.shippingBreadthCm} cm B × ${selectedVariant?.shippingHeightCm ?? product.shippingHeightCm} cm H). Securely boxed for courier transit.`
+                      : "Secure, sealed packaging ensures your products arrive fresh, clean, and undamaged."}
                   </p>
                 </div>
               </div>

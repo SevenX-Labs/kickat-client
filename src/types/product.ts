@@ -15,6 +15,10 @@ export interface BackendProductVariant {
   discountPrice?: number | null;
   originalPrice?: number | null;
   stock: number;
+  shippingWeightKg?: number | null;
+  shippingLengthCm?: number | null;
+  shippingBreadthCm?: number | null;
+  shippingHeightCm?: number | null;
   attributes?: Record<string, any> | null;
   imageUrl?: string | null;
   images?: string[];
@@ -55,6 +59,10 @@ export interface BackendProduct {
   isTrending: boolean;
   type: 'SIMPLE' | 'VARIABLE';
   sku?: string | null;
+  shippingWeightKg?: number | null;
+  shippingLengthCm?: number | null;
+  shippingBreadthCm?: number | null;
+  shippingHeightCm?: number | null;
   highlights?: string[] | Record<string, any> | null;
   ingredients?: any;
   feedingGuide?: any;
@@ -352,6 +360,10 @@ export function transformBackendProduct(bp: BackendProduct) {
     description: bp.description || bp.descriptionTitle || '',
     attributes: bp.attributes || undefined,
     highlights: bp.highlights || undefined,
+    shippingWeightKg: bp.shippingWeightKg,
+    shippingLengthCm: bp.shippingLengthCm,
+    shippingBreadthCm: bp.shippingBreadthCm,
+    shippingHeightCm: bp.shippingHeightCm,
     ingredients: bp.ingredients || undefined,
     feedingGuide: bp.feedingGuide || undefined,
     careInstructions: bp.careInstructions || undefined,
@@ -366,6 +378,10 @@ export function transformBackendProduct(bp: BackendProduct) {
       originalPrice: v.discountPrice && v.discountPrice > 0 ? v.price : undefined,
       stock: v.stock,
       attributes: v.attributes,
+      shippingWeightKg: v.shippingWeightKg,
+      shippingLengthCm: v.shippingLengthCm,
+      shippingBreadthCm: v.shippingBreadthCm,
+      shippingHeightCm: v.shippingHeightCm,
       imageUrl: v.imageUrl,
       images: v.images && v.images.length > 0 ? v.images : v.imageUrl ? [v.imageUrl] : [],
       isDefault: v.isDefault,

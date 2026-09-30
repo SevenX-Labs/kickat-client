@@ -3,14 +3,15 @@
 import { useState } from 'react';
 import { ArrowRight, Droplets, Waves, Sun, Dog, ShieldCheck, Check, X, Ruler, Sparkles, AlertCircle } from 'lucide-react';
 import styles from './ProductDetail.module.css';
-import { Product } from './ProductDetail';
+import { Product, ProductVariant } from './ProductDetail';
 
 interface SpecsAndSizeGuideProps {
   product?: Product;
+  selectedVariant?: ProductVariant | null;
   productDetails?: Record<string, string>;
 }
 
-export function ProductSpecsAndSizeGuide({ product, productDetails }: SpecsAndSizeGuideProps) {
+export function ProductSpecsAndSizeGuide({ product, selectedVariant, productDetails }: SpecsAndSizeGuideProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   let specsList: { label: string; value: string }[] = [];
@@ -18,6 +19,30 @@ export function ProductSpecsAndSizeGuide({ product, productDetails }: SpecsAndSi
   if (productDetails) {
     specsList = Object.entries(productDetails).map(([label, value]) => ({ label, value }));
   } else if (product) {
+    const activeWeightKg = (typeof selectedVariant?.shippingWeightKg === "number" && selectedVariant.shippingWeightKg > 0)
+      ? selectedVariant.shippingWeightKg
+      : (typeof product.shippingWeightKg === "number" && product.shippingWeightKg > 0)
+        ? product.shippingWeightKg
+        : null;
+
+    const activeLengthCm = (typeof selectedVariant?.shippingLengthCm === "number" && selectedVariant.shippingLengthCm > 0)
+      ? selectedVariant.shippingLengthCm
+      : (typeof product.shippingLengthCm === "number" && product.shippingLengthCm > 0)
+        ? product.shippingLengthCm
+        : null;
+
+    const activeBreadthCm = (typeof selectedVariant?.shippingBreadthCm === "number" && selectedVariant.shippingBreadthCm > 0)
+      ? selectedVariant.shippingBreadthCm
+      : (typeof product.shippingBreadthCm === "number" && product.shippingBreadthCm > 0)
+        ? product.shippingBreadthCm
+        : null;
+
+    const activeHeightCm = (typeof selectedVariant?.shippingHeightCm === "number" && selectedVariant.shippingHeightCm > 0)
+      ? selectedVariant.shippingHeightCm
+      : (typeof product.shippingHeightCm === "number" && product.shippingHeightCm > 0)
+        ? product.shippingHeightCm
+        : null;
+
     specsList = [
       { label: 'Brand', value: product.brand || 'KickAt' },
       { label: 'Category', value: product.mainCategory || 'Pet Essentials' },
@@ -27,11 +52,29 @@ export function ProductSpecsAndSizeGuide({ product, productDetails }: SpecsAndSi
       ...(product.dietaryPreference
         ? [{ label: 'Dietary Type', value: product.dietaryPreference === 'VEG' ? 'Vegetarian' : 'Non-Vegetarian' }]
         : []),
+      ...(selectedVariant?.name
+        ? [{ label: 'Selected Variant', value: selectedVariant.name }]
+        : []),
+      ...(activeWeightKg
+        ? [{ label: 'Shipping Weight', value: `${activeWeightKg} kg` }]
+        : []),
+      ...(activeLengthCm
+        ? [{ label: 'Package Length', value: `${activeLengthCm} cm` }]
+        : []),
+      ...(activeBreadthCm
+        ? [{ label: 'Package Breadth (Width)', value: `${activeBreadthCm} cm` }]
+        : []),
+      ...(activeHeightCm
+        ? [{ label: 'Package Height', value: `${activeHeightCm} cm` }]
+        : []),
+      ...(activeLengthCm && activeBreadthCm && activeHeightCm
+        ? [{ label: 'Package Dimensions (L × B × H)', value: `${activeLengthCm} × ${activeBreadthCm} × ${activeHeightCm} cm` }]
+        : []),
       ...(product.materials && product.materials.length < 50 && !product.materials.toLowerCase().includes('ingredients') && !product.materials.toLowerCase().includes('storage')
         ? [{ label: 'Material', value: product.materials }]
         : []),
       { label: 'Product Type', value: product.type === 'VARIABLE' ? 'Multi-Variant Pack' : 'Standard Pack' },
-      { label: 'Availability', value: (product.stock ?? 100) > 0 ? 'In Stock' : 'Out of Stock' },
+      { label: 'Availability', value: ((selectedVariant ? selectedVariant.stock : product.stock) ?? 100) > 0 ? 'In Stock' : 'Out of Stock' },
       { label: 'Country of Origin', value: 'India' },
     ];
 
