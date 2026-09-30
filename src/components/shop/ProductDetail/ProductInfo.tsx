@@ -8,6 +8,7 @@ import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
 import { Star, ShoppingBag, Zap, Ruler, Minus, Plus, Check, X, Dog, Droplets, Waves, Sun, Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { AddressSelectionDrawer } from "./AddressSelectionDrawer";
 import styles from "./ProductDetail.module.css";
 import { Product, ProductVariant } from "./ProductDetail";
 
@@ -40,6 +41,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
   const [isUsingDefaultAddress, setIsUsingDefaultAddress] = useState(false);
   const [pincodeInput, setPincodeInput] = useState("");
   const [isChangingPincode, setIsChangingPincode] = useState(false);
+  const [isAddressDrawerOpen, setIsAddressDrawerOpen] = useState(false);
   const [isInitializingAddress, setIsInitializingAddress] = useState(true);
   const [isCheckingDelivery, setIsCheckingDelivery] = useState(false);
   const [deliveryEstimate, setDeliveryEstimate] = useState<DeliveryEstimateResponse | null>(null);
@@ -531,11 +533,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
               <button
                 type="button"
                 className={styles.deliveryChangeBtn}
-                onClick={() => {
-                  setIsChangingPincode(true);
-                  setPincodeInput(activePincode);
-                  setDeliveryError(null);
-                }}
+                onClick={() => setIsAddressDrawerOpen(true)}
               >
                 Change
               </button>
@@ -730,6 +728,28 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
           </div>
         </div>
       )}
+      {/* Right-Side Address Selection & Addition Drawer */}
+      <AddressSelectionDrawer
+        isOpen={isAddressDrawerOpen}
+        onClose={() => setIsAddressDrawerOpen(false)}
+        selectedPincode={activePincode}
+        isCheckingDelivery={isCheckingDelivery}
+        onSelectAddress={(addr) => {
+          setActivePincode(addr.pincode);
+          const cityState = [addr.city, addr.state].filter(Boolean).join(", ");
+          setActiveCityState(cityState || null);
+          setIsUsingDefaultAddress(Boolean(addr.isDefault));
+          setIsChangingPincode(false);
+          fetchDeliveryEstimate(addr.pincode, selectedVariant?.id);
+        }}
+        onCheckPincode={(pincode) => {
+          setActivePincode(pincode);
+          setActiveCityState(null);
+          setIsUsingDefaultAddress(false);
+          setIsChangingPincode(false);
+          fetchDeliveryEstimate(pincode, selectedVariant?.id);
+        }}
+      />
     </div>
   );
 }
