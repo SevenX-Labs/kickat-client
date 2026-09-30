@@ -9,7 +9,7 @@ export default function AccountOrderTrackingRedirect({ params }: { params: Promi
 
   useEffect(() => {
     if (resolvedParams?.id) {
-      router.replace(`/orders/${resolvedParams.id}/tracking`);
+      router.replace(`/orders/${resolvedParams.id}`);
     }
   }, [resolvedParams, router]);
 

@@ -437,18 +437,14 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
             </div>
 
             {/* Action CTAs */}
-            <div className={styles.productActionsRow}>
-              <Link href={`/orders/${order.id}/tracking`} className={styles.primaryTrackBtn}>
-                <Truck size={16} />
-                <span>Track Shipment</span>
-              </Link>
-              {orderStatusUpper === 'DELIVERED' && (
+            {orderStatusUpper === 'DELIVERED' && (
+              <div className={styles.productActionsRow}>
                 <Link href={`/orders/${order.id}/return`} className={styles.secondaryReturnBtn}>
                   <RotateCcw size={15} />
                   <span>Return Item</span>
                 </Link>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         ))}
 
@@ -472,10 +468,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
                 )}
               </span>
             </div>
-            <Link href={`/orders/${order.id}/tracking`} className={styles.viewFullTrackingLink}>
-              <span>Live Tracking</span>
-              <ChevronRight size={14} />
-            </Link>
+
           </div>
 
           <div className={styles.verticalTimeline}>

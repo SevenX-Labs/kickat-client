@@ -448,7 +448,7 @@ export default function OrdersContent({ showBackToAccount = true }: OrdersConten
 
                       {/* Track Button (for ongoing / active orders) */}
                       {isOngoing && (
-                        <Link href={`/orders/${order.rawId || order.id}/tracking`}>
+                        <Link href={`/orders/${order.rawId || order.id}`}>
                           <Button variant="primary" size="sm" icon={<MapPin size={15} />}>
                             Track
                           </Button>
