@@ -47,6 +47,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { usePublicSettings } from '@/hooks/usePublicSettings';
 import { checkoutService } from '@/services/checkoutService';
+import { orderService } from '@/services/orderService';
 import { profileService, CreateAddressDto } from '@/services/profileService';
 import { authService } from '@/services/authService';
 import { UseLocationButton } from '@/components/ui/UseLocationButton';
@@ -127,6 +128,7 @@ export default function CheckoutPage() {
   const [finalOrderedItems, setFinalOrderedItems] = useState<any[]>([]);
   const [finalSummary, setFinalSummary] = useState<any>(null);
   const [copiedOrderNumber, setCopiedOrderNumber] = useState<boolean>(false);
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState<boolean>(false);
   const idempotencyKeyRef = useRef<string>(generateUUID());
 
   // Payment Lifecycle State
@@ -734,6 +736,24 @@ export default function CheckoutPage() {
       }
     };
 
+    const handleDownloadInvoicePdf = async () => {
+      if (!placedOrder) return;
+      setIsDownloadingPdf(true);
+      try {
+        const orderIdentifier = placedOrder.orderId || placedOrder.orderNumber;
+        if (orderIdentifier) {
+          await orderService.downloadInvoicePdf(orderIdentifier, placedOrder.orderNumber);
+        } else {
+          window.print();
+        }
+      } catch (err) {
+        console.warn('PDF download fallback to print:', err);
+        window.print();
+      } finally {
+        setIsDownloadingPdf(false);
+      }
+    };
+
     const handlePrintReceipt = () => {
       if (typeof window !== 'undefined') {
         window.print();
@@ -1019,12 +1039,27 @@ export default function CheckoutPage() {
               </div>
               <button
                 type="button"
-                onClick={handlePrintReceipt}
+                onClick={handleDownloadInvoicePdf}
+                disabled={isDownloadingPdf}
                 className={styles.printReceiptBtn}
-                title="Print or Save Receipt as PDF"
+                title="Download Official Invoice PDF Bill"
               >
-                <Printer size={15} /> Print / Download Receipt
+                {isDownloadingPdf ? (
+                  <>
+                    <Loader2 size={15} className="animate-spin" /> Generating PDF Bill...
+                  </>
+                ) : (
+                  <>
+                    <Download size={15} /> Download PDF Bill
+                  </>
+                )}
               </button>
+            </div>
+
+            {/* Print-Only Official Invoice Bill Footer */}
+            <div className={styles.printOnlyFooter}>
+              <p>This is an authentic computer-generated Tax Invoice / Cash Bill &bull; No signature required.</p>
+              <p>KickAt Pet Care Essentials &bull; www.kickat.co.in</p>
             </div>
           </div>
 
@@ -1034,6 +1069,22 @@ export default function CheckoutPage() {
               <Package size={20} /> View Order Details & Tracking <ArrowRight size={20} />
             </Link>
             <div className={styles.secondaryActionsRow}>
+              <button
+                type="button"
+                onClick={handleDownloadInvoicePdf}
+                disabled={isDownloadingPdf}
+                className={styles.outlineBtnAlt}
+              >
+                {isDownloadingPdf ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" /> Generating PDF...
+                  </>
+                ) : (
+                  <>
+                    <Download size={16} /> Download Invoice PDF
+                  </>
+                )}
+              </button>
               <button type="button" onClick={handlePrintReceipt} className={styles.outlineBtnAlt}>
                 <Printer size={16} /> Print Receipt
               </button>

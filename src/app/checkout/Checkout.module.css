@@ -3256,29 +3256,245 @@
   }
 }
 
-/* Print Optimization */
+/* Print-Only Footer */
+.printOnlyFooter {
+  display: none;
+}
+
+/* Print Optimization: Clean A4 Simple Invoice Bill */
 @media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm 12mm;
+  }
+
+  html, body {
+    background: #ffffff !important;
+    color: #111827 !important;
+    font-size: 11pt !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
   body * {
     visibility: hidden;
   }
+
   #printable-order-receipt,
   #printable-order-receipt * {
     visibility: visible;
   }
+
   #printable-order-receipt {
     position: absolute;
     left: 0;
     top: 0;
-    width: 100%;
-    max-width: 100%;
-    box-shadow: none;
-    border: 1px solid #000;
-    margin: 0;
-    padding: 20px;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 1px solid #111827 !important;
+    border-radius: 8px !important;
+    padding: 24px !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+    box-sizing: border-box !important;
   }
-  .printReceiptBtn,
+
+  /* Hide interactive & decoration elements */
   .receiptNotchLeft,
-  .receiptNotchRight {
+  .receiptNotchRight,
+  .printReceiptBtn,
+  .receiptCopyBtn,
+  .trackerContainer,
+  .confettiContainer,
+  .successHero,
+  .successCtaGroup,
+  .secondaryActionsRow,
+  .successFooter {
     display: none !important;
+  }
+
+  .receiptHeader {
+    border-bottom: 2px solid #111827 !important;
+    padding-bottom: 12px !important;
+    margin-bottom: 14px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+  }
+
+  .receiptBrandName {
+    font-size: 1.5rem !important;
+    color: #000000 !important;
+    font-weight: 800 !important;
+  }
+
+  .receiptTagline {
+    color: #374151 !important;
+    font-size: 0.72rem !important;
+  }
+
+  .receiptVerifiedBadge {
+    border: 1px solid #10b981 !important;
+    color: #047857 !important;
+    background: #f0fdf4 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .receiptPaymentPillCod,
+  .receiptPaymentPillPaid {
+    border: 1px solid #111827 !important;
+    color: #111827 !important;
+    background: #f9fafb !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    font-weight: 700 !important;
+  }
+
+  .receiptMetaStrip {
+    background: #f9fafb !important;
+    border: 1px solid #e5e7eb !important;
+    padding: 10px 14px !important;
+    margin-bottom: 14px !important;
+    border-radius: 6px !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .receiptMetaLabel {
+    color: #4b5563 !important;
+    font-size: 0.65rem !important;
+  }
+
+  .receiptOrderNumberText,
+  .receiptMetaValue {
+    color: #000000 !important;
+    font-weight: 700 !important;
+  }
+
+  .receiptItemsSection {
+    margin-bottom: 14px !important;
+  }
+
+  .receiptItemsSectionHeader {
+    border-bottom: 1px solid #9ca3af !important;
+    padding-bottom: 6px !important;
+    font-weight: 700 !important;
+    color: #111827 !important;
+  }
+
+  .receiptItemRow {
+    border-bottom: 1px solid #e5e7eb !important;
+    padding: 8px 0 !important;
+    page-break-inside: avoid !important;
+  }
+
+  .receiptItemThumb {
+    display: none !important;
+  }
+
+  .receiptItemName {
+    font-size: 0.92rem !important;
+    color: #000000 !important;
+    font-weight: 600 !important;
+  }
+
+  .receiptItemVariant,
+  .receiptItemQty {
+    font-size: 0.78rem !important;
+    color: #4b5563 !important;
+  }
+
+  .receiptItemTotal {
+    font-size: 0.92rem !important;
+    color: #000000 !important;
+    font-weight: 700 !important;
+  }
+
+  .receiptFinancialsGrid {
+    background: #f9fafb !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    padding: 10px 14px !important;
+    margin-bottom: 14px !important;
+    page-break-inside: avoid !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .receiptFinancialRow {
+    padding: 2px 0 !important;
+  }
+
+  .receiptFinancialLabel {
+    color: #374151 !important;
+  }
+
+  .receiptFinancialValue {
+    color: #000000 !important;
+    font-weight: 600 !important;
+  }
+
+  .receiptGrandTotalBar {
+    border-top: 2px solid #111827 !important;
+    padding-top: 6px !important;
+    margin-top: 6px !important;
+  }
+
+  .receiptGrandTotalLabel {
+    color: #000000 !important;
+    font-size: 0.85rem !important;
+    font-weight: 800 !important;
+  }
+
+  .receiptGrandTotalAmount {
+    color: #000000 !important;
+    font-size: 1.25rem !important;
+    font-weight: 800 !important;
+  }
+
+  .receiptAddressTile {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 6px !important;
+    padding: 10px 14px !important;
+    margin-bottom: 14px !important;
+    page-break-inside: avoid !important;
+  }
+
+  .receiptAddressHeading {
+    color: #111827 !important;
+  }
+
+  .receiptAddressText {
+    color: #374151 !important;
+  }
+
+  .receiptSecurityFooter {
+    border-top: 1px dashed #9ca3af !important;
+    padding-top: 10px !important;
+    page-break-inside: avoid !important;
+  }
+
+  .barcodeBars {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .printOnlyFooter {
+    display: block !important;
+    margin-top: 12px !important;
+    padding-top: 8px !important;
+    border-top: 1px solid #e5e7eb !important;
+    text-align: center !important;
+    font-size: 0.72rem !important;
+    color: #6b7280 !important;
+    line-height: 1.4 !important;
+    page-break-inside: avoid !important;
   }
 }
