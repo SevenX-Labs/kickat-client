@@ -44,6 +44,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/checkout/place-orderr',
+        destination: '/checkout/place-order',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

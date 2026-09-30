@@ -187,7 +187,7 @@ export function VariantSelectorModal({
 
     if (!isAuthenticated) {
       onClose();
-      router.push(`/login?redirect=${encodeURIComponent('/checkout')}`);
+      router.push(`/login?redirect=${encodeURIComponent('/checkout/place-order')}`);
       return;
     }
 
@@ -197,7 +197,7 @@ export function VariantSelectorModal({
     try {
       await buyNow(product.id, selectedVariant.id, quantity);
       onClose();
-      router.push('/checkout');
+      router.push('/checkout/place-order');
     } catch (err: any) {
       console.error("Buy now error:", err);
       setErrorMsg(err?.message || "Failed to proceed to checkout. Please try again.");

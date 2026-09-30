@@ -159,13 +159,13 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
     }
     if (isBuyingNow || isAdding || isOutOfStock) return;
     if (!isAuthenticated) {
-      router.push(`/login?redirect=${encodeURIComponent("/checkout")}`);
+      router.push(`/login?redirect=${encodeURIComponent("/checkout/place-order")}`);
       return;
     }
     setIsBuyingNow(true);
     try {
       await addToCart(product.id, selectedVariant?.id, quantity);
-      router.push("/checkout");
+      router.push("/checkout/place-order");
     } catch (err: any) {
       console.error("Error with Buy Now:", err);
       alert(err?.message || "Could not proceed to checkout. Please try again.");
