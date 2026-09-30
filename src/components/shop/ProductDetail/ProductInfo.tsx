@@ -380,9 +380,6 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
         <span className={styles.taxNote}>Inclusive of all taxes</span>
       </div>
 
-      {/* Short Description */}
-      <p className={styles.shortDescription}>{description}</p>
-
       {/* Amazon-style Variety / Option Selector for VARIABLE Products */}
       {hasVariants && (
         <div className={styles.selectorBlock}>
