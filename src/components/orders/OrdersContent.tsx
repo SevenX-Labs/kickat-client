@@ -98,11 +98,13 @@ export default function OrdersContent({ showBackToAccount = true }: OrdersConten
               id: item.id,
               productId: item.productId,
               productSlug: item.productSlug,
+              variantId: item.variantId,
               name: item.productName || item.name || 'Pet Product',
               variant: item.variantName || item.variant || 'Standard',
               qty: item.quantity || item.qty || 1,
               price: item.price || 0,
               image: item.imageUrl || item.image || '/hero-products/dog_food.png',
+              brand: item.brand,
             })),
             timeline: [
               { step: 'Placed', date: formatDate(o.createdAt), done: true },

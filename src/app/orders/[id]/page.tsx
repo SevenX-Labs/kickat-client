@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import styles from './OrderDetails.module.css';
 import { orderService } from '@/services/orderService';
+import { productService } from '@/services/productService';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Button } from '@/components/ui/Button';
 
@@ -56,7 +57,48 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
     try {
       const res = await orderService.getOrderById(orderId);
       if (res.success && res.order) {
-        setOrder(res.order);
+        let orderData = { ...res.order };
+        if (Array.isArray(orderData.items)) {
+          const enrichedItems = await Promise.all(
+            orderData.items.map(async (item: any) => {
+              if (item.imageUrl || item.image) {
+                return item;
+              }
+              if (item.productId) {
+                try {
+                  const prodRes = await productService.getProductById(item.productId);
+                  if (prodRes && prodRes.success && prodRes.product) {
+                    const prod = prodRes.product;
+                    let img = prod.imageUrl;
+                    if (!img && Array.isArray(prod.images) && prod.images.length > 0) {
+                      img = typeof prod.images[0] === 'string' ? prod.images[0] : (prod.images[0] as any)?.url;
+                    }
+                    if (item.variantId && Array.isArray(prod.variants)) {
+                      const v = prod.variants.find((vr: any) => vr.id === item.variantId);
+                      if (v?.imageUrl) {
+                        img = v.imageUrl;
+                      } else if (Array.isArray(v?.images) && v.images.length > 0) {
+                        img = typeof v.images[0] === 'string' ? v.images[0] : (v.images[0] as any)?.url;
+                      }
+                    }
+                    return {
+                      ...item,
+                      imageUrl: img || item.imageUrl,
+                      image: img || item.image,
+                      productSlug: item.productSlug || prod.slug,
+                      brand: item.brand || prod.brand,
+                    };
+                  }
+                } catch (e) {
+                  console.warn("Could not enrich item image on client:", e);
+                }
+              }
+              return item;
+            })
+          );
+          orderData.items = enrichedItems;
+        }
+        setOrder(orderData);
       } else {
         setError('Order details could not be retrieved.');
       }
@@ -392,7 +434,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
         {items.map((item, idx) => (
           <div key={item.id || idx} className={styles.productCard} style={{ marginBottom: '1.25rem' }}>
             <div className={styles.productCardHeader}>
-              <span className={styles.sellerTag}>Seller: KickAt Official</span>
+              <span className={styles.sellerTag}>Seller: {item.brand || 'KickAt Official'}</span>
               <span className={styles.itemCountTag}>Qty: {item.quantity}</span>
             </div>
 
