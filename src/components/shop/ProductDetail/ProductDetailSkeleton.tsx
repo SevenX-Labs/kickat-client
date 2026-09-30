@@ -53,12 +53,12 @@ export function ProductDetailSkeleton() {
               </div>
             </div>
 
+            <div className={`${styles.shimmer} ${styles.deliveryBox}`} />
+
             <div className={styles.buttonRow}>
               <div className={`${styles.shimmer} ${styles.primaryButton}`} />
               <div className={`${styles.shimmer} ${styles.secondaryButton}`} />
             </div>
-
-            <div className={`${styles.shimmer} ${styles.deliveryBox}`} />
           </div>
         </div>
 

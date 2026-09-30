@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
 import { Star, ShoppingBag, Zap, Ruler, Minus, Plus, Check, X, Dog, Droplets, Waves, Sun, Loader2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "./ProductDetail.module.css";
 import { Product, ProductVariant } from "./ProductDetail";
 
@@ -39,6 +40,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
   const [isUsingDefaultAddress, setIsUsingDefaultAddress] = useState(false);
   const [pincodeInput, setPincodeInput] = useState("");
   const [isChangingPincode, setIsChangingPincode] = useState(false);
+  const [isInitializingAddress, setIsInitializingAddress] = useState(true);
   const [isCheckingDelivery, setIsCheckingDelivery] = useState(false);
   const [deliveryEstimate, setDeliveryEstimate] = useState<DeliveryEstimateResponse | null>(null);
   const [deliveryError, setDeliveryError] = useState<string | null>(null);
@@ -89,48 +91,54 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
     let isMounted = true;
 
     const initializeAddressAndDelivery = async () => {
-      if (isAuthenticated) {
-        try {
-          const res: any = await profileService.getProfile();
-          if (!isMounted) return;
-          const addrs = res?.user?.addresses || res?.addresses || [];
-          if (Array.isArray(addrs) && addrs.length > 0) {
-            const def = addrs.find((a: any) => a.isDefault) || addrs[0];
-            if (def && def.pincode && /^[1-9][0-9]{5}$/.test(def.pincode.trim())) {
-              const cleanPin = def.pincode.trim();
-              const cityState = [def.city, def.state].filter(Boolean).join(", ");
-              setDefaultAddress({
-                city: def.city,
-                state: def.state,
-                pincode: cleanPin,
-              });
-              setActivePincode(cleanPin);
-              setActiveCityState(cityState || null);
-              setIsUsingDefaultAddress(true);
-              setPincodeInput(cleanPin);
-              fetchDeliveryEstimate(cleanPin, selectedVariant?.id);
-              return;
-            }
-          }
-        } catch (err) {
-          console.warn("Failed to fetch user default address:", err);
-        }
-      }
-
-      // If not authenticated or no default address found, check remembered pincode in localStorage
       try {
-        const saved = localStorage.getItem("kickat_delivery_pincode");
-        if (saved && /^[1-9][0-9]{5}$/.test(saved.trim())) {
-          const cleanPin = saved.trim();
-          setActivePincode(cleanPin);
-          setActiveCityState(null);
-          setIsUsingDefaultAddress(false);
-          setPincodeInput(cleanPin);
-          fetchDeliveryEstimate(cleanPin, selectedVariant?.id);
-          return;
+        if (isAuthenticated) {
+          try {
+            const res: any = await profileService.getProfile();
+            if (!isMounted) return;
+            const addrs = res?.user?.addresses || res?.addresses || [];
+            if (Array.isArray(addrs) && addrs.length > 0) {
+              const def = addrs.find((a: any) => a.isDefault) || addrs[0];
+              if (def && def.pincode && /^[1-9][0-9]{5}$/.test(def.pincode.trim())) {
+                const cleanPin = def.pincode.trim();
+                const cityState = [def.city, def.state].filter(Boolean).join(", ");
+                setDefaultAddress({
+                  city: def.city,
+                  state: def.state,
+                  pincode: cleanPin,
+                });
+                setActivePincode(cleanPin);
+                setActiveCityState(cityState || null);
+                setIsUsingDefaultAddress(true);
+                setPincodeInput(cleanPin);
+                fetchDeliveryEstimate(cleanPin, selectedVariant?.id);
+                return;
+              }
+            }
+          } catch (err) {
+            console.warn("Failed to fetch user default address:", err);
+          }
         }
-      } catch {
-        // storage fallback
+
+        // If not authenticated or no default address found, check remembered pincode in localStorage
+        try {
+          const saved = localStorage.getItem("kickat_delivery_pincode");
+          if (saved && /^[1-9][0-9]{5}$/.test(saved.trim())) {
+            const cleanPin = saved.trim();
+            setActivePincode(cleanPin);
+            setActiveCityState(null);
+            setIsUsingDefaultAddress(false);
+            setPincodeInput(cleanPin);
+            fetchDeliveryEstimate(cleanPin, selectedVariant?.id);
+            return;
+          }
+        } catch {
+          // storage fallback
+        }
+      } finally {
+        if (isMounted) {
+          setIsInitializingAddress(false);
+        }
       }
     };
 
@@ -492,7 +500,18 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
 
       {/* Compact Customer Delivery Estimate Section */}
       <div className={styles.deliveryEstimateSection}>
-        {activePincode && !isChangingPincode ? (
+        {isInitializingAddress ? (
+          <>
+            <div className={styles.deliveryHeaderRow}>
+              <span className={styles.deliveryIcon}>🚚</span>
+              <span className={styles.deliveryHeading}>Delivery</span>
+            </div>
+            <div className={styles.deliverySkeletonWrap}>
+              <Skeleton style={{ height: "14px", width: "55%", borderRadius: "4px" }} />
+              <Skeleton style={{ height: "20px", width: "42%", borderRadius: "6px", marginTop: "4px" }} />
+            </div>
+          </>
+        ) : activePincode && !isChangingPincode ? (
           <>
             <div className={styles.deliveryHeaderRow}>
               <span className={styles.deliveryIcon}>🚚</span>
@@ -526,9 +545,9 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
               </button>
             </div>
             {isCheckingDelivery ? (
-              <div className={styles.deliveryLoadingText}>
-                <Loader2 size={13} className="animate-spin" />
-                <span>Checking delivery...</span>
+              <div className={styles.deliveryLoadingBadge}>
+                <Loader2 size={13} className="animate-spin" style={{ color: "#F15722" }} />
+                <span>Checking delivery date...</span>
               </div>
             ) : deliveryError ? (
               <div className={styles.deliveryErrorText}>{deliveryError}</div>
@@ -587,9 +606,9 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
               )}
             </form>
             {isCheckingDelivery ? (
-              <div className={styles.deliveryLoadingText}>
-                <Loader2 size={13} className="animate-spin" />
-                <span>Checking delivery...</span>
+              <div className={styles.deliveryLoadingBadge}>
+                <Loader2 size={13} className="animate-spin" style={{ color: "#F15722" }} />
+                <span>Checking delivery availability...</span>
               </div>
             ) : deliveryError ? (
               <div className={styles.deliveryErrorText}>{deliveryError}</div>

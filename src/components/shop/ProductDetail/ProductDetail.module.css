@@ -57,7 +57,7 @@
 
 .mainProductGrid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.15fr);
   gap: 2.25rem;
   align-items: start;
 }
@@ -74,7 +74,15 @@
   display: flex;
   gap: 0.85rem;
   position: sticky;
-  top: 1.5rem;
+  top: 7rem;
+  align-self: flex-start;
+}
+
+@media (max-width: 960px) {
+  .galleryWrapper {
+    position: relative;
+    top: 0;
+  }
 }
 
 @media (max-width: 640px) {
@@ -86,7 +94,7 @@
 .thumbnailList {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.65rem;
   flex-shrink: 0;
 }
 
@@ -99,8 +107,8 @@
 }
 
 .thumbnailBtn {
-  width: 56px;
-  height: 56px;
+  width: 58px;
+  height: 58px;
   border-radius: 12px;
   border: 2px solid #EBE5DB;
   background: #ffffff;
@@ -140,13 +148,21 @@
   border: 1px solid #EAE2D5;
   border-radius: 20px;
   overflow: hidden;
-  aspect-ratio: 1 / 0.96;
-  max-height: 460px;
+  aspect-ratio: 1 / 1;
+  min-height: 480px;
+  max-height: 560px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 0.75rem 0.85rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+@media (max-width: 960px) {
+  .mainImageContainer {
+    min-height: auto;
+    max-height: 480px;
+  }
 }
 
 .mainImageTopOverlay {
@@ -171,7 +187,7 @@
 
 .mainImageCenterWrap {
   position: absolute;
-  inset: 0.75rem 0.5rem;
+  inset: 0.5rem;
   z-index: 1;
   display: flex;
   align-items: center;
@@ -2487,3 +2503,31 @@
   margin: 0;
 }
 
+
+.deliverySkeletonWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+}
+
+.deliveryLoadingBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.65rem;
+  background: #FFF8F3;
+  border: 1px solid #FFE4D6;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: #C2410C;
+  font-weight: 600;
+  margin-top: 0.4rem;
+  width: fit-content;
+  animation: deliveryPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes deliveryPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
