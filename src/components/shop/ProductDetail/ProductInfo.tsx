@@ -383,21 +383,11 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
       {/* Amazon-style Variety / Option Selector for VARIABLE Products */}
       {hasVariants && (
         <div className={styles.selectorBlock}>
-          <div className={styles.selectorHeaderWithLink}>
-            <div className={styles.selectorHeader}>
-              <span className={styles.selectorTitle}>Select Variety / Size:</span>
-              <span className={styles.selectorValue}>
-                {selectedVariant ? (selectedVariant.attributes && Object.values(selectedVariant.attributes)[0] ? String(Object.values(selectedVariant.attributes)[0]) : selectedVariant.name) : "Select an option"}
-              </span>
-            </div>
-            <button
-              type="button"
-              className={styles.sizeGuideRowLink}
-              onClick={() => setIsSizeGuideModalOpen(true)}
-            >
-              <Ruler size={14} />
-              <span>Guide</span>
-            </button>
+          <div className={styles.selectorHeader}>
+            <span className={styles.selectorTitle}>Select Variety / Size:</span>
+            <span className={styles.selectorValue}>
+              {selectedVariant ? (selectedVariant.attributes && Object.values(selectedVariant.attributes)[0] ? String(Object.values(selectedVariant.attributes)[0]) : selectedVariant.name) : "Select an option"}
+            </span>
           </div>
 
           <div className={styles.varietyCardsGrid}>
