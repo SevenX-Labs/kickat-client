@@ -27,7 +27,7 @@ interface DefaultAddressInfo {
 export function ProductInfo({ product, selectedVariant, onSelectVariant }: ProductInfoProps) {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
-  const { addToCart } = useCart();
+  const { addToCart, updateQuantity, items } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const [hasAdded, setHasAdded] = useState(false);
@@ -316,7 +316,16 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
     }
     setIsBuyingNow(true);
     try {
-      await addToCart(product.id, selectedVariant?.id, quantity);
+      const existingItem = items.find(
+        (it) => it.productId === product.id && (selectedVariant?.id ? it.variantId === selectedVariant.id : !it.variantId)
+      );
+      if (existingItem) {
+        if (existingItem.quantity !== quantity) {
+          await updateQuantity(existingItem.id, quantity);
+        }
+      } else {
+        await addToCart(product.id, selectedVariant?.id, quantity);
+      }
       router.push("/checkout/place-order");
     } catch (err: any) {
       console.error("Error with Buy Now:", err);
