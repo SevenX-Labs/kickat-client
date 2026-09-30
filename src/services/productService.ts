@@ -1,3 +1,14 @@
+
+export interface DeliveryEstimateResponse {
+  available: boolean;
+  pincode: string;
+  courierName?: string;
+  estimatedDeliveryDate?: string;
+  estimatedDeliveryDays?: number;
+  formattedDate?: string;
+  message?: string;
+}
+
 import { api } from './api';
 import {
   BackendProduct,
@@ -214,5 +225,24 @@ export const productService = {
       await enrichProductsWithVariants(res.products);
     }
     return res;
+  },
+  /**
+   * GET /api/v1/shipping/delivery-estimate
+   * Fetch customer delivery estimate by pincode and optional variant/weight
+   */
+  async getDeliveryEstimate(params: {
+    pincode: string;
+    productId?: string;
+    variantId?: string;
+    weight?: number;
+  }): Promise<DeliveryEstimateResponse> {
+    const query = new URLSearchParams();
+    query.set("pincode", params.pincode);
+    if (params.productId) query.set("productId", params.productId);
+    if (params.variantId) query.set("variantId", params.variantId);
+    if (params.weight) query.set("weight", String(params.weight));
+    return api<DeliveryEstimateResponse>(`/shipping/delivery-estimate?${query.toString()}`, {
+      method: "GET",
+    });
   },
 };

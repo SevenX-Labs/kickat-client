@@ -2294,3 +2294,158 @@
   color: #DC2626;
   margin-top: 0.25rem;
 }
+
+/* Customer Delivery Estimate Section */
+.deliveryEstimateSection {
+  background: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  margin-top: 0.65rem;
+  margin-bottom: 0.35rem;
+  transition: all 0.2s ease;
+}
+
+.deliveryHeaderRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.deliveryIcon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.deliveryHeading {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.01em;
+}
+
+.deliverToRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+
+.deliverToText {
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.deliverToText strong {
+  color: #111827;
+  font-weight: 700;
+}
+
+.deliveryChangeBtn {
+  background: none;
+  border: none;
+  color: #F99205;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.deliveryChangeBtn:hover {
+  background: #FFF7ED;
+  color: #EA580C;
+}
+
+.deliverySuccessText {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.875rem;
+  color: #16A34A;
+  font-weight: 600;
+  margin-top: 0.25rem;
+}
+
+.deliveryCheckIcon {
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+
+.deliveryInputRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.deliveryPincodeInput {
+  flex: 1;
+  max-width: 170px;
+  height: 38px;
+  padding: 0 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #D1D5DB;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #111827;
+  outline: none;
+  background: #FFFFFF;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.deliveryPincodeInput:focus {
+  border-color: #F99205;
+  box-shadow: 0 0 0 2px rgba(249, 146, 5, 0.15);
+}
+
+.deliveryCheckBtn {
+  height: 38px;
+  padding: 0 1.15rem;
+  border-radius: 8px;
+  background: #111827;
+  color: #FFFFFF;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.deliveryCheckBtn:hover:not(:disabled) {
+  background: #F99205;
+}
+
+.deliveryCheckBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.deliveryLoadingText {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.825rem;
+  color: #6B7280;
+  font-weight: 600;
+  margin-top: 0.25rem;
+}
+
+.deliveryErrorText {
+  font-size: 0.825rem;
+  color: #DC2626;
+  font-weight: 600;
+  margin-top: 0.25rem;
+}
+
+.deliveryHelperText {
+  font-size: 0.8rem;
+  color: #6B7280;
+  margin: 0;
+}

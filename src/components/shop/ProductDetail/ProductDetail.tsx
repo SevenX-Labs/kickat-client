@@ -5,7 +5,6 @@ import { useSearchParams } from 'next/navigation';
 import { userService } from '@/services/userService';
 import { ProductGallery } from './ProductGallery';
 import { ProductInfo } from './ProductInfo';
-import { ProductTrustStrip } from './ProductTrustStrip';
 import { ProductTabs } from './ProductTabs';
 import { ProductSpecsAndSizeGuide } from './ProductSpecsAndSizeGuide';
 import { ProductReviews } from './ProductReviews';
@@ -175,13 +174,6 @@ export function ProductDetail({ product, isLoading, initialVariantId }: ProductD
               onSelectVariant={handleSelectVariant}
             />
           </div>
-        </div>
-      </section>
-
-      {/* 2. Trust Strip Band */}
-      <section className={styles.sectionPadding}>
-        <div className={styles.container}>
-          <ProductTrustStrip />
         </div>
       </section>
 
