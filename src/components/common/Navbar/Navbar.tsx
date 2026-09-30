@@ -5,7 +5,7 @@ import Image from "next/image";
 import SafeImage from "@/components/ui/SafeImage";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { ChevronDown, Search, Heart, User, ShoppingBag, Package, Tag, MapPin, Bell, LogOut, Star, Truck, Percent, Crown, Menu, X, Dog, Cat, Fish, Bird, MessageCircle, BookOpen, Phone, ShieldQuestion, Headset, ArrowRight, Sun, Sparkles, ChevronRight } from "lucide-react";
+import { ChevronDown, Search, Heart, User, ShoppingBag, Package, Tag, MapPin, Bell, LogOut, Sparkles, Truck, Percent, Crown, Menu, X, Dog, Cat, Fish, Bird, MessageCircle, BookOpen, Phone, ShieldQuestion, Headset, ArrowRight, Sun, ChevronRight } from "lucide-react";
 import styles from "./Navbar.module.css";
 import { megaMenuData } from "@/data/megaMenuData";
 import { useAuth } from "@/context/AuthContext";
@@ -197,7 +197,7 @@ export function Navbar() {
                   <item.Icon className={styles.itemIcon} size={15} strokeWidth={2} />
                   {item.text}
                 </span>
-                <Star className={styles.separatorIcon} size={14} strokeWidth={1.5} />
+                <Sparkles className={styles.separatorIcon} size={12} strokeWidth={2} />
               </span>
             ))}
           </div>
@@ -208,7 +208,7 @@ export function Navbar() {
                   <item.Icon className={styles.itemIcon} size={15} strokeWidth={2} />
                   {item.text}
                 </span>
-                <Star className={styles.separatorIcon} size={14} strokeWidth={1.5} />
+                <Sparkles className={styles.separatorIcon} size={12} strokeWidth={2} />
               </span>
             ))}
           </div>

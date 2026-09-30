@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import SafeImage from '@/components/ui/SafeImage';
 import { useRouter } from 'next/navigation';
@@ -78,19 +78,43 @@ export function ProductGallery({ images, productId, variantId, brand = 'KickAt' 
     }
   }, [productId, variantId, isWishlisted, isWishlistLoading, isAuthenticated, router]);
 
+  // Prioritize clean packaging / product shots as hero image (index 0), moving infographics/marketing banners secondary
+  const sortedImages = useMemo(() => {
+    const list = Array.isArray(images) && images.length > 0 ? [...images] : ['/hero-products/dog_food.png'];
+    const isInfographic = (url: string) => {
+      const lower = url.toLowerCase();
+      return (
+        lower.includes('infographic') ||
+        lower.includes('guide') ||
+        lower.includes('how_to') ||
+        lower.includes('how-to') ||
+        lower.includes('feeding') ||
+        lower.includes('instruction') ||
+        lower.includes('banner') ||
+        lower.includes('chart')
+      );
+    };
+
+    return list.sort((a, b) => {
+      const aIsPromo = isInfographic(a);
+      const bIsPromo = isInfographic(b);
+      if (aIsPromo && !bIsPromo) return 1;
+      if (!aIsPromo && bIsPromo) return -1;
+      return 0;
+    });
+  }, [images]);
+
   // Reset activeIndex to 0 whenever images array changes (e.g. when variant selection changes)
   useEffect(() => {
     setActiveIndex(0);
-  }, [images, variantId]);
+  }, [sortedImages, variantId]);
 
-  const currentImages = Array.isArray(images) && images.length > 0 ? images : ['/hero-products/dog_food.png'];
-  
-  const thumbnails = currentImages.map((src) => ({
+  const thumbnails = sortedImages.map((src) => ({
     type: 'image',
     src,
   }));
 
-  const activeSrc = thumbnails[activeIndex]?.src || currentImages[0];
+  const activeSrc = thumbnails[activeIndex]?.src || sortedImages[0];
 
   return (
     <div className={styles.galleryWrapper}>

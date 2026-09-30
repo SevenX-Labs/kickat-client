@@ -329,10 +329,18 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
       {/* Product Title */}
       <h1 className={styles.productTitle}>{title}</h1>
 
-      {/* Brand / Category Tagline */}
-      <p className={styles.productSubtitle}>
-        {product.brand ? `${product.brand} · ` : ""}{product.mainCategory || "KickAt Essential"}
-      </p>
+      {/* Brand / Category & Merchandising Badge Row (Visually Separated from Rating) */}
+      <div className={styles.productHeaderMetaRow}>
+        <p className={styles.productSubtitle}>
+          {product.brand ? `${product.brand} · ` : ""}{product.mainCategory || "KickAt Essential"}
+        </p>
+        {product.badge && (
+          <span className={styles.verifiedBadge}>
+            <Check size={11} strokeWidth={3} />
+            <span>{product.badge}</span>
+          </span>
+        )}
+      </div>
 
       {/* Rating & Social Proof Row */}
       <div className={styles.ratingRow}>
@@ -342,7 +350,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
               {[...Array(5)].map((_, i) => (
                 <Star 
                   key={i} 
-                  size={15} 
+                  size={14} 
                   fill={i < Math.floor(rating) ? "#F99205" : "#E5E7EB"} 
                   color={i < Math.floor(rating) ? "#F99205" : "#E5E7EB"} 
                   strokeWidth={0} 
@@ -356,13 +364,14 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
             </span>
           </>
         ) : (
-          <span className={styles.reviewsCountText}>No reviews yet</span>
-        )}
-        {product.badge && (
-          <span className={styles.verifiedBadge}>
-            <Check size={12} strokeWidth={2.5} />
-            <span>{product.badge}</span>
-          </span>
+          <div className={styles.noReviewsGroup}>
+            <div className={styles.starsGroupEmpty}>
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} size={13} fill="#E5E7EB" color="#E5E7EB" strokeWidth={0} />
+              ))}
+            </div>
+            <span className={styles.reviewsCountText}>No reviews yet</span>
+          </div>
         )}
       </div>
 
