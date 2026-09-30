@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { productService, DeliveryEstimateResponse } from '@/services/productService';
-import { useAuth } from '@/context/AuthContext';
-import { useCart } from '@/context/CartContext';
-import { useRouter } from 'next/navigation';
-import { Star, ShoppingBag, Zap, Ruler, Minus, Plus, Check, X, Dog, Droplets, Waves, Sun, Loader2 } from 'lucide-react';
-import styles from './ProductDetail.module.css';
-import { Product, ProductVariant } from './ProductDetail';
+import { useState, useEffect, useRef, useCallback } from "react";
+import { profileService } from "@/services/profileService";
+import { productService, DeliveryEstimateResponse } from "@/services/productService";
+import { useAuth } from "@/context/AuthContext";
+import { useCart } from "@/context/CartContext";
+import { useRouter } from "next/navigation";
+import { Star, ShoppingBag, Zap, Ruler, Minus, Plus, Check, X, Dog, Droplets, Waves, Sun, Loader2 } from "lucide-react";
+import styles from "./ProductDetail.module.css";
+import { Product, ProductVariant } from "./ProductDetail";
 
 interface ProductInfoProps {
   selectedVariant?: ProductVariant | null;
@@ -15,10 +16,16 @@ interface ProductInfoProps {
   product: Product;
 }
 
+interface DefaultAddressInfo {
+  city: string;
+  state: string;
+  pincode: string;
+}
+
 export function ProductInfo({ product, selectedVariant, onSelectVariant }: ProductInfoProps) {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
-  const { addToCart, buyNow } = useCart();
+  const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const [hasAdded, setHasAdded] = useState(false);
@@ -26,44 +33,48 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
   const [isSizeGuideModalOpen, setIsSizeGuideModalOpen] = useState(false);
 
   // Customer Delivery Estimate State
-  const [pincodeInput, setPincodeInput] = useState('');
-  const [verifiedPincode, setVerifiedPincode] = useState<string | null>(null);
+  const [defaultAddress, setDefaultAddress] = useState<DefaultAddressInfo | null>(null);
+  const [activePincode, setActivePincode] = useState<string | null>(null);
+  const [activeCityState, setActiveCityState] = useState<string | null>(null);
+  const [isUsingDefaultAddress, setIsUsingDefaultAddress] = useState(false);
+  const [pincodeInput, setPincodeInput] = useState("");
   const [isChangingPincode, setIsChangingPincode] = useState(false);
   const [isCheckingDelivery, setIsCheckingDelivery] = useState(false);
   const [deliveryEstimate, setDeliveryEstimate] = useState<DeliveryEstimateResponse | null>(null);
   const [deliveryError, setDeliveryError] = useState<string | null>(null);
 
-  const fetchDeliveryEstimate = async (pincodeToCheck: string, variantId?: string) => {
-    const cleanPin = (pincodeToCheck || '').trim();
+  const fetchDeliveryEstimate = useCallback(async (pincodeToCheck: string, variantId?: string) => {
+    const cleanPin = (pincodeToCheck || "").trim();
     if (!/^[1-9][0-9]{5}$/.test(cleanPin)) {
-      setDeliveryError('Enter a valid 6-digit pincode.');
+      setDeliveryError("Enter a valid 6-digit pincode.");
       setDeliveryEstimate(null);
       return;
     }
 
     setDeliveryError(null);
+    setDeliveryEstimate(null);
     setIsCheckingDelivery(true);
 
     try {
       const res = await productService.getDeliveryEstimate({
         pincode: cleanPin,
         productId: product.id,
-        variantId: variantId || selectedVariant?.id,
+        variantId: variantId !== undefined ? variantId : selectedVariant?.id,
         weight: selectedVariant?.shippingWeightKg || undefined,
       });
 
       if (res && res.available && res.formattedDate) {
         setDeliveryEstimate(res);
-        setVerifiedPincode(cleanPin);
+        setActivePincode(cleanPin);
         setIsChangingPincode(false);
         try {
-          localStorage.setItem('kickat_delivery_pincode', cleanPin);
+          localStorage.setItem("kickat_delivery_pincode", cleanPin);
         } catch {
           // storage fallback
         }
       } else {
         setDeliveryEstimate(null);
-        setDeliveryError(res?.message || 'Delivery is currently unavailable for this pincode.');
+        setDeliveryError(res?.message || "Delivery is currently unavailable for this pincode.");
       }
     } catch {
       setDeliveryEstimate(null);
@@ -71,37 +82,88 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
     } finally {
       setIsCheckingDelivery(false);
     }
-  };
+  }, [product.id, selectedVariant?.id, selectedVariant?.shippingWeightKg]);
 
-  // Load remembered pincode client-side on mount
+  // 1. Initialize address & delivery estimate (Default Address > Remembered Pincode > Input Form)
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('kickat_delivery_pincode');
-      if (saved && /^[1-9][0-9]{5}$/.test(saved)) {
-        setVerifiedPincode(saved);
-        setPincodeInput(saved);
-        fetchDeliveryEstimate(saved, selectedVariant?.id);
-      }
-    } catch {
-      // storage safety
-    }
-  }, []);
+    let isMounted = true;
 
-  // Re-check estimate whenever variant changes (never reuse estimate across variants)
+    const initializeAddressAndDelivery = async () => {
+      if (isAuthenticated) {
+        try {
+          const res: any = await profileService.getProfile();
+          if (!isMounted) return;
+          const addrs = res?.user?.addresses || res?.addresses || [];
+          if (Array.isArray(addrs) && addrs.length > 0) {
+            const def = addrs.find((a: any) => a.isDefault) || addrs[0];
+            if (def && def.pincode && /^[1-9][0-9]{5}$/.test(def.pincode.trim())) {
+              const cleanPin = def.pincode.trim();
+              const cityState = [def.city, def.state].filter(Boolean).join(", ");
+              setDefaultAddress({
+                city: def.city,
+                state: def.state,
+                pincode: cleanPin,
+              });
+              setActivePincode(cleanPin);
+              setActiveCityState(cityState || null);
+              setIsUsingDefaultAddress(true);
+              setPincodeInput(cleanPin);
+              fetchDeliveryEstimate(cleanPin, selectedVariant?.id);
+              return;
+            }
+          }
+        } catch (err) {
+          console.warn("Failed to fetch user default address:", err);
+        }
+      }
+
+      // If not authenticated or no default address found, check remembered pincode in localStorage
+      try {
+        const saved = localStorage.getItem("kickat_delivery_pincode");
+        if (saved && /^[1-9][0-9]{5}$/.test(saved.trim())) {
+          const cleanPin = saved.trim();
+          setActivePincode(cleanPin);
+          setActiveCityState(null);
+          setIsUsingDefaultAddress(false);
+          setPincodeInput(cleanPin);
+          fetchDeliveryEstimate(cleanPin, selectedVariant?.id);
+          return;
+        }
+      } catch {
+        // storage fallback
+      }
+    };
+
+    initializeAddressAndDelivery();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isAuthenticated, fetchDeliveryEstimate, selectedVariant?.id]);
+
+  // 2. Re-check estimate whenever variant changes (never reuse estimate across variants)
   const prevVariantIdRef = useRef<string | undefined>(selectedVariant?.id);
   useEffect(() => {
     if (prevVariantIdRef.current !== selectedVariant?.id) {
       prevVariantIdRef.current = selectedVariant?.id;
-      if (verifiedPincode) {
+      if (activePincode) {
         setDeliveryEstimate(null);
-        fetchDeliveryEstimate(verifiedPincode, selectedVariant?.id);
+        fetchDeliveryEstimate(activePincode, selectedVariant?.id);
       }
     }
-  }, [selectedVariant?.id, verifiedPincode]);
+  }, [selectedVariant?.id, activePincode, fetchDeliveryEstimate]);
 
   const handleCheckPincodeSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchDeliveryEstimate(pincodeInput, selectedVariant?.id);
+    const cleanPin = pincodeInput.trim();
+    if (defaultAddress && cleanPin === defaultAddress.pincode) {
+      setIsUsingDefaultAddress(true);
+      setActiveCityState([defaultAddress.city, defaultAddress.state].filter(Boolean).join(", "));
+    } else {
+      setIsUsingDefaultAddress(false);
+      setActiveCityState(null);
+    }
+    fetchDeliveryEstimate(cleanPin, selectedVariant?.id);
   };
 
   // Dynamic pricing & stock based on selected variant or base product
@@ -129,28 +191,28 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
   const description = product.description || product.descriptionTitle || "Premium quality pet essential curated for health, safety, and everyday comfort.";
 
   const variants = product.variants || [];
-  const hasVariants = (product.type === 'VARIABLE' || variants.length > 0) && variants.length > 0;
+  const hasVariants = (product.type === "VARIABLE" || variants.length > 0) && variants.length > 0;
 
   const animateFlyToCart = (startElem: HTMLElement) => {
-    const bottomNavCart = document.getElementById('bottom-nav-cart-btn');
-    const topNavbarCart = document.getElementById('navbar-cart-btn');
-    const cartBtn = (bottomNavCart && window.getComputedStyle(bottomNavCart).display !== 'none' && bottomNavCart.offsetWidth > 0)
+    const bottomNavCart = document.getElementById("bottom-nav-cart-btn");
+    const topNavbarCart = document.getElementById("navbar-cart-btn");
+    const cartBtn = (bottomNavCart && window.getComputedStyle(bottomNavCart).display !== "none" && bottomNavCart.offsetWidth > 0)
       ? bottomNavCart
       : topNavbarCart;
-    const imageSrc = (selectedVariant?.imageUrl || selectedVariant?.images?.[0]) || product.image || '/hero-products/dog_food.png';
+    const imageSrc = (selectedVariant?.imageUrl || selectedVariant?.images?.[0]) || product.image || "/hero-products/dog_food.png";
 
     if (!cartBtn) {
-      window.dispatchEvent(new CustomEvent('cart-item-added'));
+      window.dispatchEvent(new CustomEvent("cart-item-added"));
       return;
     }
 
     const startRect = startElem.getBoundingClientRect();
     const endRect = cartBtn.getBoundingClientRect();
 
-    const flyingImg = document.createElement('img');
+    const flyingImg = document.createElement("img");
     flyingImg.src = imageSrc;
-    flyingImg.alt = 'Flying Product Preview';
-    flyingImg.onerror = () => { flyingImg.src = '/hero-products/dog_food.png'; };
+    flyingImg.alt = "Flying Product Preview";
+    flyingImg.onerror = () => { flyingImg.src = "/hero-products/dog_food.png"; };
 
     const width = 64;
     const height = 64;
@@ -160,18 +222,18 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
     const endY = endRect.top + endRect.height / 2 - 20;
 
     Object.assign(flyingImg.style, {
-      position: 'fixed',
+      position: "fixed",
       top: `${startY}px`,
       left: `${startX}px`,
       width: `${width}px`,
       height: `${height}px`,
-      objectFit: 'cover',
-      borderRadius: '16px',
-      boxShadow: '0 12px 30px rgba(249, 146, 5, 0.45), 0 4px 12px rgba(0, 0, 0, 0.2)',
-      border: '2.5px solid #ffffff',
-      zIndex: '99999',
-      pointerEvents: 'none',
-      backgroundColor: '#ffffff',
+      objectFit: "cover",
+      borderRadius: "16px",
+      boxShadow: "0 12px 30px rgba(249, 146, 5, 0.45), 0 4px 12px rgba(0, 0, 0, 0.2)",
+      border: "2.5px solid #ffffff",
+      zIndex: "99999",
+      pointerEvents: "none",
+      backgroundColor: "#ffffff",
     });
 
     document.body.appendChild(flyingImg);
@@ -182,7 +244,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
     const animation = flyingImg.animate(
       [
         {
-          transform: 'translate3d(0, 0, 0) scale(1) rotate(0deg)',
+          transform: "translate3d(0, 0, 0) scale(1) rotate(0deg)",
           opacity: 1,
         },
         {
@@ -197,14 +259,14 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
       ],
       {
         duration: 1800,
-        easing: 'cubic-bezier(0.2, 0.9, 0.3, 1)',
-        fill: 'forwards',
+        easing: "cubic-bezier(0.2, 0.9, 0.3, 1)",
+        fill: "forwards",
       }
     );
 
     animation.onfinish = () => {
       flyingImg.remove();
-      window.dispatchEvent(new CustomEvent('cart-item-added'));
+      window.dispatchEvent(new CustomEvent("cart-item-added"));
     };
   };
 
@@ -261,7 +323,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
 
       {/* Brand / Category Tagline */}
       <p className={styles.productSubtitle}>
-        {product.brand ? `${product.brand} · ` : ''}{product.mainCategory || 'KickAt Essential'}
+        {product.brand ? `${product.brand} · ` : ""}{product.mainCategory || "KickAt Essential"}
       </p>
 
       {/* Rating & Social Proof Row */}
@@ -282,7 +344,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
             </div>
             <span className={styles.ratingDivider}>|</span>
             <span className={styles.reviewsCountText}>
-              {reviewsCount} {reviewsCount === 1 ? 'Review' : 'Reviews'}
+              {reviewsCount} {reviewsCount === 1 ? "Review" : "Reviews"}
             </span>
           </>
         ) : (
@@ -320,7 +382,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
             <div className={styles.selectorHeader}>
               <span className={styles.selectorTitle}>Select Variety / Size:</span>
               <span className={styles.selectorValue}>
-                {selectedVariant ? (selectedVariant.attributes && Object.values(selectedVariant.attributes)[0] ? String(Object.values(selectedVariant.attributes)[0]) : selectedVariant.name) : 'Select an option'}
+                {selectedVariant ? (selectedVariant.attributes && Object.values(selectedVariant.attributes)[0] ? String(Object.values(selectedVariant.attributes)[0]) : selectedVariant.name) : "Select an option"}
               </span>
             </div>
             <button
@@ -343,9 +405,8 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
                 ? Math.round(((varOrigPrice - varPrice) / varOrigPrice) * 100)
                 : null;
               
-              // Get clean variant label from attributes (e.g. 500g, 1.2 Kg, 3 Kg) or variant name
               let displayLabel = variant.name;
-              if (variant.attributes && typeof variant.attributes === 'object') {
+              if (variant.attributes && typeof variant.attributes === "object") {
                 const vals = Object.values(variant.attributes).filter(Boolean);
                 if (vals.length > 0) {
                   displayLabel = String(vals[0]);
@@ -357,7 +418,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
                   key={variant.id}
                   type="button"
                   disabled={isVarOutOfStock}
-                  className={`${styles.varietyOptionCard} ${isSelected ? styles.varietyOptionCardActive : ''} ${isVarOutOfStock ? styles.varietyOptionCardDisabled : ''}`}
+                  className={`${styles.varietyOptionCard} ${isSelected ? styles.varietyOptionCardActive : ""} ${isVarOutOfStock ? styles.varietyOptionCardDisabled : ""}`}
                   onClick={() => onSelectVariant?.(variant)}
                   aria-pressed={isSelected}
                   title={isVarOutOfStock ? `${displayLabel} (Out of stock)` : `${displayLabel} - ₹${varPrice}`}
@@ -411,8 +472,8 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
         <div className={styles.stockStatusBox}>
           {isOutOfStock ? (
             <>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#DC2626', display: 'inline-block' }} />
-              <span style={{ fontWeight: 700, color: '#DC2626' }}>Out of Stock</span>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#DC2626", display: "inline-block" }} />
+              <span style={{ fontWeight: 700, color: "#DC2626" }}>Out of Stock</span>
             </>
           ) : currentStock <= 5 ? (
             <>
@@ -429,24 +490,36 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
         </div>
       </div>
 
-      {/* Customer Delivery Estimate Section */}
+      {/* Compact Customer Delivery Estimate Section */}
       <div className={styles.deliveryEstimateSection}>
-        {verifiedPincode && !isChangingPincode ? (
+        {activePincode && !isChangingPincode ? (
           <>
             <div className={styles.deliveryHeaderRow}>
               <span className={styles.deliveryIcon}>🚚</span>
               <span className={styles.deliveryHeading}>Delivery</span>
             </div>
             <div className={styles.deliverToRow}>
-              <span className={styles.deliverToText}>
-                Deliver to <strong>{verifiedPincode}</strong>
-              </span>
+              <div className={styles.deliverToLocationWrap}>
+                {isUsingDefaultAddress && activeCityState ? (
+                  <>
+                    <span className={styles.deliverToLabel}>
+                      Deliver to <strong>{activeCityState}</strong>
+                    </span>
+                    <span className={styles.deliverToPincode}>{activePincode}</span>
+                  </>
+                ) : (
+                  <span className={styles.deliverToLabel}>
+                    Deliver to pincode <strong>{activePincode}</strong>
+                  </span>
+                )}
+              </div>
               <button
                 type="button"
                 className={styles.deliveryChangeBtn}
                 onClick={() => {
                   setIsChangingPincode(true);
-                  setPincodeInput(verifiedPincode);
+                  setPincodeInput(activePincode);
+                  setDeliveryError(null);
                 }}
               >
                 Change
@@ -480,13 +553,14 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
                 maxLength={6}
                 value={pincodeInput}
                 onChange={(e) => {
-                  setPincodeInput(e.target.value.replace(/\D/g, ''));
+                  setPincodeInput(e.target.value.replace(/\D/g, ""));
                   setDeliveryError(null);
                 }}
                 placeholder="Enter pincode"
                 className={styles.deliveryPincodeInput}
                 disabled={isCheckingDelivery}
                 aria-label="Enter pincode"
+                autoFocus={isChangingPincode}
               />
               <button
                 type="submit"
@@ -496,9 +570,21 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
                 {isCheckingDelivery ? (
                   <Loader2 size={14} className="animate-spin" />
                 ) : (
-                  'Check'
+                  "Check"
                 )}
               </button>
+              {isChangingPincode && activePincode && (
+                <button
+                  type="button"
+                  className={styles.deliveryCancelChangeBtn}
+                  onClick={() => {
+                    setIsChangingPincode(false);
+                    setDeliveryError(null);
+                  }}
+                >
+                  Cancel
+                </button>
+              )}
             </form>
             {isCheckingDelivery ? (
               <div className={styles.deliveryLoadingText}>
@@ -520,12 +606,12 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
       <div className={styles.primaryCtasRow}>
         <button
           type="button"
-          className={`${styles.addToCartMainBtn} ${hasAdded ? styles.addedState : ''}`}
+          className={`${styles.addToCartMainBtn} ${hasAdded ? styles.addedState : ""}`}
           onClick={handleAddToCart}
           disabled={isAdding || isBuyingNow || isOutOfStock || (hasVariants && !selectedVariant)}
         >
           {isAdding ? (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
               <Loader2 size={18} className="animate-spin" />
               <span>Adding...</span>
             </span>
@@ -554,7 +640,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
           style={{ opacity: (isOutOfStock || (hasVariants && !selectedVariant)) ? 0.5 : 1 }}
         >
           {isBuyingNow ? (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
               <Loader2 size={18} className="animate-spin" />
               <span>Processing...</span>
             </span>
