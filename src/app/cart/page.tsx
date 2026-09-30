@@ -158,7 +158,7 @@ export default function CartPage() {
           {/* Left Column: Cart Items List */}
           <div className={styles.itemsColumn}>
             {items.map((item) => {
-              const imageSrc = item.product?.imageUrl || '/hero-products/pet_bowl.png';
+              const imageSrc = (item.variant as any)?.imageUrl || (item.variant as any)?.image || (item.variant as any)?.images?.[0] || item.product?.imageUrl || (item.product as any)?.image || (item.product as any)?.images?.[0] || (item as any)?.imageUrl || (item as any)?.image;
               const variantName = item.variant?.name || item.variantId;
               const unitPrice = item.unitPrice || item.product?.price || 0;
               const itemTotal = item.totalPrice || (unitPrice * item.quantity);
@@ -167,7 +167,7 @@ export default function CartPage() {
                 <div key={item.id} className={styles.cartItem}>
                   <div className={styles.itemImageWrapper}>
                     <SafeImage
-                      src={item.product?.imageUrl}
+                      src={imageSrc}
                       productName={item.product?.name}
                       categoryName={item.product?.category?.name || item.product?.category?.slug}
                       alt={item.product?.name || 'Product Image'}

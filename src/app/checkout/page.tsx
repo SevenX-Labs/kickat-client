@@ -1833,7 +1833,7 @@ export default function CheckoutPage() {
               <div className={styles.checkoutStaticList}>
                 {displayedItems.map((item) => {
                   const itemPrice = item.variant ? (item.variant.discountPrice ?? item.variant.price) : (item.product?.discountPrice ?? item.product?.price ?? 0);
-                  const itemImage = item.product?.imageUrl || '/hero-products/pet_bowl.png';
+                  const itemImage = (item.variant as any)?.imageUrl || (item.variant as any)?.image || (item.variant as any)?.images?.[0] || item.product?.imageUrl || (item.product as any)?.image || (item.product as any)?.images?.[0] || (item as any)?.imageUrl || (item as any)?.image;
                   const itemName = item.product?.name || 'Pet Product';
                   const variantName = item.variant?.name;
 
@@ -1841,7 +1841,7 @@ export default function CheckoutPage() {
                     <div key={item.id} className={styles.staticProductCard}>
                       <div className={styles.staticProductImage}>
                         <SafeImage
-                          src={item.product?.imageUrl}
+                          src={itemImage}
                           productName={itemName}
                           alt={itemName}
                           fill

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import HomeProductCard from '@/components/common/HomeProductCard/HomeProductCard';
@@ -16,9 +16,15 @@ interface RelatedProductsProps {
 export function RelatedProducts({ currentProduct }: RelatedProductsProps) {
   const [related, setRelated] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const fetchedTargetRef = useRef<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
+    const targetKey = currentProduct?.id || 'trending';
+
+    if (fetchedTargetRef.current === targetKey && related.length > 0) {
+      return;
+    }
 
     const fetchRelated = async () => {
       setLoading(true);
@@ -59,6 +65,7 @@ export function RelatedProducts({ currentProduct }: RelatedProductsProps) {
       }
     };
 
+    fetchedTargetRef.current = targetKey;
     fetchRelated();
 
     return () => {

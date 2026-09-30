@@ -157,14 +157,30 @@ export const productService = {
 
   /**
    * GET /api/v1/products/:id/related
-   * Fetch related products based on category and species
+   * Fetch related products based on category and species with in-memory caching
    */
   async getRelatedProducts(id: string, limit: number = 8): Promise<RelatedProductsResponse> {
-    const res = await api<RelatedProductsResponse>(`/products/${encodeURIComponent(id)}/related?limit=${limit}`, { method: 'GET' });
-    if (res && Array.isArray(res.relatedProducts)) {
-      await enrichProductsWithVariants(res.relatedProducts);
+    const cacheKey = `${id}-${limit}`;
+    if ((globalThis as any).__kickat_related_cache?.has(cacheKey)) {
+      return (globalThis as any).__kickat_related_cache.get(cacheKey);
     }
-    return res;
+
+    try {
+      const res = await api<RelatedProductsResponse>(`/products/${encodeURIComponent(id)}/related?limit=${limit}`, { method: 'GET' });
+      if (res && Array.isArray(res.relatedProducts)) {
+        await enrichProductsWithVariants(res.relatedProducts);
+        if (!(globalThis as any).__kickat_related_cache) {
+          (globalThis as any).__kickat_related_cache = new Map<string, RelatedProductsResponse>();
+        }
+        (globalThis as any).__kickat_related_cache.set(cacheKey, res);
+      }
+      return res;
+    } catch (err: any) {
+      if (err?.message?.includes('Too Many Requests') || err?.status === 429) {
+        return { success: false, productId: id, relatedProducts: [] };
+      }
+      throw err;
+    }
   },
 
   /**
