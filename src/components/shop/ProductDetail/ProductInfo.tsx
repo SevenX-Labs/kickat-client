@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { productService, DeliveryEstimateResponse } from '@/services/productService';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { useRouter } from 'next/navigation';
@@ -23,6 +24,85 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
   const [hasAdded, setHasAdded] = useState(false);
   const [isBuyingNow, setIsBuyingNow] = useState(false);
   const [isSizeGuideModalOpen, setIsSizeGuideModalOpen] = useState(false);
+
+  // Customer Delivery Estimate State
+  const [pincodeInput, setPincodeInput] = useState('');
+  const [verifiedPincode, setVerifiedPincode] = useState<string | null>(null);
+  const [isChangingPincode, setIsChangingPincode] = useState(false);
+  const [isCheckingDelivery, setIsCheckingDelivery] = useState(false);
+  const [deliveryEstimate, setDeliveryEstimate] = useState<DeliveryEstimateResponse | null>(null);
+  const [deliveryError, setDeliveryError] = useState<string | null>(null);
+
+  const fetchDeliveryEstimate = async (pincodeToCheck: string, variantId?: string) => {
+    const cleanPin = (pincodeToCheck || '').trim();
+    if (!/^[1-9][0-9]{5}$/.test(cleanPin)) {
+      setDeliveryError('Enter a valid 6-digit pincode.');
+      setDeliveryEstimate(null);
+      return;
+    }
+
+    setDeliveryError(null);
+    setIsCheckingDelivery(true);
+
+    try {
+      const res = await productService.getDeliveryEstimate({
+        pincode: cleanPin,
+        productId: product.id,
+        variantId: variantId || selectedVariant?.id,
+        weight: selectedVariant?.shippingWeightKg || undefined,
+      });
+
+      if (res && res.available && res.formattedDate) {
+        setDeliveryEstimate(res);
+        setVerifiedPincode(cleanPin);
+        setIsChangingPincode(false);
+        try {
+          localStorage.setItem('kickat_delivery_pincode', cleanPin);
+        } catch {
+          // storage fallback
+        }
+      } else {
+        setDeliveryEstimate(null);
+        setDeliveryError(res?.message || 'Delivery is currently unavailable for this pincode.');
+      }
+    } catch {
+      setDeliveryEstimate(null);
+      setDeliveryError("Couldn't check delivery right now. Please try again.");
+    } finally {
+      setIsCheckingDelivery(false);
+    }
+  };
+
+  // Load remembered pincode client-side on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('kickat_delivery_pincode');
+      if (saved && /^[1-9][0-9]{5}$/.test(saved)) {
+        setVerifiedPincode(saved);
+        setPincodeInput(saved);
+        fetchDeliveryEstimate(saved, selectedVariant?.id);
+      }
+    } catch {
+      // storage safety
+    }
+  }, []);
+
+  // Re-check estimate whenever variant changes (never reuse estimate across variants)
+  const prevVariantIdRef = useRef<string | undefined>(selectedVariant?.id);
+  useEffect(() => {
+    if (prevVariantIdRef.current !== selectedVariant?.id) {
+      prevVariantIdRef.current = selectedVariant?.id;
+      if (verifiedPincode) {
+        setDeliveryEstimate(null);
+        fetchDeliveryEstimate(verifiedPincode, selectedVariant?.id);
+      }
+    }
+  }, [selectedVariant?.id, verifiedPincode]);
+
+  const handleCheckPincodeSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchDeliveryEstimate(pincodeInput, selectedVariant?.id);
+  };
 
   // Dynamic pricing & stock based on selected variant or base product
   const effectivePrice = selectedVariant
@@ -347,6 +427,93 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
             </>
           )}
         </div>
+      </div>
+
+      {/* Customer Delivery Estimate Section */}
+      <div className={styles.deliveryEstimateSection}>
+        {verifiedPincode && !isChangingPincode ? (
+          <>
+            <div className={styles.deliveryHeaderRow}>
+              <span className={styles.deliveryIcon}>🚚</span>
+              <span className={styles.deliveryHeading}>Delivery</span>
+            </div>
+            <div className={styles.deliverToRow}>
+              <span className={styles.deliverToText}>
+                Deliver to <strong>{verifiedPincode}</strong>
+              </span>
+              <button
+                type="button"
+                className={styles.deliveryChangeBtn}
+                onClick={() => {
+                  setIsChangingPincode(true);
+                  setPincodeInput(verifiedPincode);
+                }}
+              >
+                Change
+              </button>
+            </div>
+            {isCheckingDelivery ? (
+              <div className={styles.deliveryLoadingText}>
+                <Loader2 size={13} className="animate-spin" />
+                <span>Checking delivery...</span>
+              </div>
+            ) : deliveryError ? (
+              <div className={styles.deliveryErrorText}>{deliveryError}</div>
+            ) : deliveryEstimate && deliveryEstimate.formattedDate ? (
+              <div className={styles.deliverySuccessText}>
+                <span className={styles.deliveryCheckIcon}>✓</span>
+                <span>Delivery by <strong>{deliveryEstimate.formattedDate}</strong></span>
+              </div>
+            ) : null}
+          </>
+        ) : (
+          <>
+            <div className={styles.deliveryHeaderRow}>
+              <span className={styles.deliveryIcon}>🚚</span>
+              <span className={styles.deliveryHeading}>Check delivery availability</span>
+            </div>
+            <form onSubmit={handleCheckPincodeSubmit} className={styles.deliveryInputRow}>
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={6}
+                value={pincodeInput}
+                onChange={(e) => {
+                  setPincodeInput(e.target.value.replace(/\D/g, ''));
+                  setDeliveryError(null);
+                }}
+                placeholder="Enter pincode"
+                className={styles.deliveryPincodeInput}
+                disabled={isCheckingDelivery}
+                aria-label="Enter pincode"
+              />
+              <button
+                type="submit"
+                className={styles.deliveryCheckBtn}
+                disabled={isCheckingDelivery || pincodeInput.trim().length !== 6}
+              >
+                {isCheckingDelivery ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : (
+                  'Check'
+                )}
+              </button>
+            </form>
+            {isCheckingDelivery ? (
+              <div className={styles.deliveryLoadingText}>
+                <Loader2 size={13} className="animate-spin" />
+                <span>Checking delivery...</span>
+              </div>
+            ) : deliveryError ? (
+              <div className={styles.deliveryErrorText}>{deliveryError}</div>
+            ) : (
+              <p className={styles.deliveryHelperText}>
+                Enter your pincode to see estimated delivery.
+              </p>
+            )}
+          </>
+        )}
       </div>
 
       {/* Primary CTAs Row (Add to Cart + Buy Now) */}
