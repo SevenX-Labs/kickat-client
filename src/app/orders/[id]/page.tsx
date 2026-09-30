@@ -410,7 +410,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
               
               <div className={styles.productInfo}>
                 <Link 
-                  href={item.productSlug ? `/product/${item.productSlug}` : item.productId ? `/product/${item.productId}` : '#'} 
+                  href={item.productSlug ? `/product/${item.productSlug}${item.variantId ? `?variant=${item.variantId}` : ''}` : item.productId ? `/product/${item.productId}${item.variantId ? `?variant=${item.variantId}` : ''}` : '#'} 
                   style={{ textDecoration: 'none', color: 'inherit' }}
                 >
                   <h2 className={styles.productTitle}>{item.productName || 'Pet Care Product'}</h2>

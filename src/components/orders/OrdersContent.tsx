@@ -406,7 +406,7 @@ export default function OrdersContent({ showBackToAccount = true }: OrdersConten
                         </div>
                         <div className={styles.itemDetails}>
                           <Link
-                            href={item.productSlug ? `/product/${item.productSlug}` : item.productId ? `/product/${item.productId}` : `/orders/${order.rawId || order.id}`}
+                            href={item.productSlug ? `/product/${item.productSlug}${item.variantId ? `?variant=${item.variantId}` : ''}` : item.productId ? `/product/${item.productId}${item.variantId ? `?variant=${item.variantId}` : ''}` : `/orders/${order.rawId || order.id}`}
                             style={{ textDecoration: 'none', color: 'inherit' }}
                           >
                             <span className={styles.itemName} style={{ cursor: 'pointer' }}>{item.name}</span>

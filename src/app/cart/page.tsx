@@ -181,7 +181,7 @@ export default function CartPage() {
                   <div className={styles.itemDetails}>
                     <div className={styles.itemHeader}>
                       <button
-                        onClick={() => router.push(`/product/${item.productId}`)}
+                        onClick={() => router.push(item.variantId ? `/product/${item.productId}?variant=${item.variantId}` : `/product/${item.productId}`)}
                         className={styles.itemName}
                       >
                         {item.product?.name || 'Pet Product'}

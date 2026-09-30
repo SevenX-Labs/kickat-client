@@ -255,6 +255,11 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
     }
   }, [isAdded, isAdding, isOutOfStock, isVariable, activeVariantId, product.id, product.variantId, product.selectedVariantId, activeImage, router, addToCart]);
 
+  const targetVariantId = activeVariantId || product.variantId || product.selectedVariantId;
+  const productHref = targetVariantId
+    ? `/product/${product.id}?variant=${targetVariantId}`
+    : `/product/${product.id}`;
+
   return (
     <div className={styles.productCard}>
       {/* Variant Selector Modal for Variable Products */}
@@ -303,7 +308,7 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
           </button>
         )}
 
-        <Link href={`/product/${product.id}`} prefetch={true} target="_blank" rel="noopener noreferrer" className={styles.cardImageLink}>
+        <Link href={productHref} prefetch={true} target="_blank" rel="noopener noreferrer" className={styles.cardImageLink}>
           <SafeImage
             src={activeImage}
             productName={product.name}
@@ -319,7 +324,7 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
 
       {/* Middle Details Column */}
       <div className={styles.cardInfo}>
-        <Link href={`/product/${product.id}`} prefetch={true} target="_blank" rel="noopener noreferrer" className={styles.cardTitleLink}>
+        <Link href={productHref} prefetch={true} target="_blank" rel="noopener noreferrer" className={styles.cardTitleLink}>
           <h3 className={styles.cardTitle}>{product.name}</h3>
         </Link>
         

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { userService } from '@/services/userService';
 import { ProductGallery } from './ProductGallery';
 import { ProductInfo } from './ProductInfo';
@@ -71,19 +72,44 @@ export interface Product {
 interface ProductDetailProps {
   product: Product;
   isLoading?: boolean;
+  initialVariantId?: string;
 }
 
-export function ProductDetail({ product, isLoading }: ProductDetailProps) {
-  // Determine default variant if product is variable
-  const defaultVar = product.variants && product.variants.length > 0
-    ? (product.variants.find((v) => v.isDefault) || product.variants[0])
-    : null;
+export function ProductDetail({ product, isLoading, initialVariantId }: ProductDetailProps) {
+  const searchParams = useSearchParams();
+  const urlVariant = searchParams ? searchParams.get('variant') : null;
+  const targetVariantId = urlVariant || initialVariantId;
 
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(defaultVar);
+  const findTargetVariant = (vars: ProductVariant[], targetId?: string | null) => {
+    if (!vars || vars.length === 0) return null;
+    if (targetId) {
+      const match = vars.find(
+        (v) => v.id === targetId || v.sku === targetId || v.name?.toLowerCase() === targetId.toLowerCase()
+      );
+      if (match) return match;
+    }
+    return vars.find((v) => v.isDefault) || vars[0];
+  };
+
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(() =>
+    product.variants && product.variants.length > 0
+      ? findTargetVariant(product.variants, targetVariantId)
+      : null
+  );
 
   useEffect(() => {
     if (product.variants && product.variants.length > 0) {
       const vars = product.variants;
+      const targetId = urlVariant || initialVariantId;
+      if (targetId) {
+        const match = vars.find(
+          (v) => v.id === targetId || v.sku === targetId || v.name?.toLowerCase() === targetId.toLowerCase()
+        );
+        if (match) {
+          setSelectedVariant(match);
+          return;
+        }
+      }
       setSelectedVariant((prev) => {
         if (prev && vars.some((v) => v.id === prev.id)) {
           return prev;
@@ -93,7 +119,16 @@ export function ProductDetail({ product, isLoading }: ProductDetailProps) {
     } else {
       setSelectedVariant(null);
     }
-  }, [product.id, product.variants]);
+  }, [product.id, product.variants, urlVariant, initialVariantId]);
+
+  const handleSelectVariant = useCallback((variant: ProductVariant) => {
+    setSelectedVariant(variant);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.set('variant', variant.id);
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, []);
 
   // Track product view in background
   useEffect(() => {
@@ -137,7 +172,7 @@ export function ProductDetail({ product, isLoading }: ProductDetailProps) {
             <ProductInfo
               product={product}
               selectedVariant={selectedVariant}
-              onSelectVariant={setSelectedVariant}
+              onSelectVariant={handleSelectVariant}
             />
           </div>
         </div>

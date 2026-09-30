@@ -24,9 +24,19 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   };
 }
 
-async function ProductContent({ params }: { params: Promise<{ id: string }> }) {
+async function ProductContent({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   const resolvedParams = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const idOrSlug = resolvedParams.id;
+  const initialVariantId = typeof resolvedSearchParams?.variant === 'string'
+    ? resolvedSearchParams.variant
+    : undefined;
 
   let product = null;
 
@@ -70,13 +80,19 @@ async function ProductContent({ params }: { params: Promise<{ id: string }> }) {
     );
   }
 
-  return <ProductDetail product={product as any} />;
+  return <ProductDetail product={product as any} initialVariantId={initialVariantId} />;
 }
 
-export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function ProductPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   return (
     <Suspense fallback={<ProductDetailSkeleton />}>
-      <ProductContent params={params} />
+      <ProductContent params={params} searchParams={searchParams} />
     </Suspense>
   );
 }

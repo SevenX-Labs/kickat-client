@@ -424,7 +424,7 @@ export function VariantSelectorModal({
           </button>
 
           <Link
-            href={`/product/${product.slug || product.id}`}
+            href={`/product/${product.slug || product.id}${selectedVariant ? `?variant=${selectedVariant.id}` : ''}`}
             className={styles.viewDetailsLink}
             onClick={onClose}
           >

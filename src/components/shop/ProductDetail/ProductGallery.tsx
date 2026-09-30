@@ -81,7 +81,7 @@ export function ProductGallery({ images, productId, variantId, brand = 'KickAt' 
   // Reset activeIndex to 0 whenever images array changes (e.g. when variant selection changes)
   useEffect(() => {
     setActiveIndex(0);
-  }, [images]);
+  }, [images, variantId]);
 
   const currentImages = Array.isArray(images) && images.length > 0 ? images : ['/hero-products/dog_food.png'];
   
