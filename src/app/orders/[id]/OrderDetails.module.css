@@ -788,3 +788,153 @@
   }
 }
 
+
+/* ── TRACKING SHIPMENT BANNER & SUMMARY ── */
+.trackingMetaBanner {
+  background: #FAF7F2;
+  border: 1px solid #EBE5DB;
+  border-radius: 14px;
+  padding: 1rem 1.15rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.trackingMetaTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.courierAwbGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.courierName {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1A1612;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.awbText {
+  font-size: 0.8rem;
+  color: #78746D;
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+}
+
+.awbVal {
+  color: #1A1612;
+  font-weight: 700;
+}
+
+.carrierPortalBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 10px;
+  background: #F99205;
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(249, 146, 5, 0.25);
+  white-space: nowrap;
+}
+
+.carrierPortalBtn:hover {
+  background: #E08304;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(249, 146, 5, 0.35);
+}
+
+.trackingSummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.65rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid #ECE7DE;
+}
+
+.trackingSummaryItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.trackingSummaryIcon {
+  color: #F99205;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.trackingSummaryContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.trackingSummaryLabel {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  color: #A8A29E;
+}
+
+.trackingSummaryVal {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #1A1612;
+  line-height: 1.35;
+}
+
+/* ── UPCOMING TIMELINE STEP STYLES ── */
+.upcomingNode {
+  background: #FFFFFF !important;
+  border: 2px solid #D6D1C7 !important;
+  color: #A8A29E !important;
+  box-shadow: none !important;
+}
+
+.upcomingLine {
+  background: #EBE5DB !important;
+}
+
+.upcomingLine::after {
+  display: none !important;
+}
+
+.upcomingCard {
+  background: #FCFAF7 !important;
+  border-color: #EFECE6 !important;
+  opacity: 0.75;
+}
+
+.upcomingCard:hover {
+  opacity: 1;
+}
+
+.upcomingTitle {
+  color: #78746D !important;
+  font-weight: 600 !important;
+}
+
+.stepLocationText {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  color: #78746D;
+  margin-top: 0.2rem;
+  font-weight: 500;
+}

@@ -9,7 +9,7 @@ import {
   ChevronRight, MapPin, User, Download, Phone, Truck, CheckCircle, 
   Package, RotateCcw, Clock, Navigation, PackageCheck, CheckCircle2, 
   FileCheck, AlertCircle, ArrowLeft, XCircle, ShoppingBag, Loader2,
-  RefreshCw, FileText, X
+  RefreshCw, FileText, X, ExternalLink, Calendar
 } from 'lucide-react';
 import styles from './OrderDetails.module.css';
 import { orderService } from '@/services/orderService';
@@ -20,6 +20,126 @@ import { Button } from '@/components/ui/Button';
 function isCancellable(statusStr: string): boolean {
   const upper = (statusStr || '').toUpperCase();
   return ['PLACED', 'PENDING', 'CONFIRMED', 'PROCESSING'].includes(upper);
+}
+
+function getTimelineIcon(stage: string) {
+  switch (stage) {
+    case "ORDER_PLACED":
+    case "ORDER_CONFIRMED":
+      return <FileCheck size={13} strokeWidth={2.5} />;
+    case "PACKED":
+      return <Package size={13} strokeWidth={2.5} />;
+    case "SHIPPED":
+      return <Truck size={13} strokeWidth={2.5} />;
+    case "IN_TRANSIT":
+      return <Navigation size={13} strokeWidth={2.5} />;
+    case "OUT_FOR_DELIVERY":
+      return <Navigation size={13} strokeWidth={2.5} />;
+    case "DELIVERED":
+      return <PackageCheck size={14} strokeWidth={2.5} />;
+    case "CANCELLED":
+      return <XCircle size={14} strokeWidth={2.5} />;
+    case "RTO_INITIATED":
+      return <RotateCcw size={13} strokeWidth={2.5} />;
+    default:
+      return <Package size={13} strokeWidth={2.5} />;
+  }
+}
+
+function getCustomerTimeline(order: any, tracking: any) {
+  if (Array.isArray(tracking?.timeline) && tracking.timeline.length > 0) {
+    return tracking.timeline;
+  }
+
+  const orderStatus = (order?.orderStatus || order?.status || "PLACED").toUpperCase();
+  const isCancelled = orderStatus === "CANCELLED";
+  const isRTO = orderStatus === "RETURN_INITIATED" || orderStatus === "RETURNED";
+
+  const statusOrder = ["PLACED", "PROCESSING", "PACKED", "SHIPPED", "OUT_FOR_DELIVERY", "DELIVERED"];
+  const currentStatusIndex = statusOrder.indexOf(orderStatus);
+
+  const courier = tracking?.courierPartner || order?.courierPartner || null;
+  const awb = tracking?.awbNumber || tracking?.trackingNumber || order?.trackingNumber || null;
+
+  if (isCancelled) {
+    return [
+      {
+        stage: "ORDER_PLACED",
+        title: "Order Placed & Confirmed",
+        location: "Online Platform",
+        timestamp: order?.createdAt,
+        isCompleted: true,
+        isCurrent: false,
+        description: "Customer order placed and payment verified.",
+      },
+      {
+        stage: "CANCELLED",
+        title: "Order Cancelled",
+        location: "Online Platform",
+        timestamp: order?.cancelledAt || order?.updatedAt || order?.createdAt,
+        isCompleted: true,
+        isCurrent: true,
+        description: order?.cancelReason ? `Reason: ${order.cancelReason}` : "Order was cancelled.",
+      },
+    ];
+  }
+
+  return [
+    {
+      stage: "ORDER_PLACED",
+      title: "Order Placed & Confirmed",
+      location: "Online Platform",
+      timestamp: order?.createdAt,
+      isCompleted: true,
+      isCurrent: currentStatusIndex <= 0,
+      description: "Customer order placed and payment verified.",
+    },
+    {
+      stage: "PACKED",
+      title: "Packed at Warehouse",
+      location: "Kickat Central Hub, Mumbai",
+      timestamp: currentStatusIndex >= 2 ? (order?.updatedAt || order?.createdAt) : null,
+      isCompleted: currentStatusIndex >= 2 || isRTO,
+      isCurrent: currentStatusIndex === 1 || currentStatusIndex === 2,
+      description: "Items picked, verified, and safely packed.",
+    },
+    {
+      stage: "SHIPPED",
+      title: "Handed Over to Courier",
+      location: "Mumbai Logistics Hub",
+      timestamp: currentStatusIndex >= 3 ? (order?.updatedAt || order?.createdAt) : null,
+      isCompleted: currentStatusIndex >= 3 || isRTO,
+      isCurrent: currentStatusIndex === 3,
+      description: courier && awb ? `Package picked up by ${courier} under AWB ${awb}.` : "Package handed over to logistics carrier.",
+    },
+    {
+      stage: "IN_TRANSIT",
+      title: "In Transit to Destination Hub",
+      location: `${order?.address?.city || "Destination"} Regional Sorting Facility`,
+      timestamp: currentStatusIndex >= 3 ? (order?.updatedAt || order?.createdAt) : null,
+      isCompleted: currentStatusIndex >= 3 || isRTO,
+      isCurrent: currentStatusIndex === 3,
+      description: "Package in transit between logistics hubs.",
+    },
+    {
+      stage: "OUT_FOR_DELIVERY",
+      title: "Out for Delivery",
+      location: `${order?.address?.city || "Local"} Delivery Center`,
+      timestamp: currentStatusIndex >= 4 ? (order?.updatedAt || order?.createdAt) : null,
+      isCompleted: currentStatusIndex >= 4,
+      isCurrent: currentStatusIndex === 4,
+      description: "Delivery executive assigned and out for delivery.",
+    },
+    {
+      stage: isRTO ? "RTO_INITIATED" : "DELIVERED",
+      title: isRTO ? "Return to Origin (RTO)" : "Delivered to Recipient",
+      location: `${order?.address?.city || ""}, ${order?.address?.state || ""}`.trim() || "Customer Address",
+      timestamp: (orderStatus === "DELIVERED" || orderStatus === "RETURNED") ? (order?.deliveryDate || order?.updatedAt) : null,
+      isCompleted: orderStatus === "DELIVERED" || orderStatus === "RETURNED",
+      isCurrent: orderStatus === "DELIVERED" || orderStatus === "RETURNED",
+      description: isRTO ? "Shipment marked for Return to Origin." : "Package safely delivered to recipient address.",
+    },
+  ];
 }
 
 export default function OrderDetailsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -331,6 +451,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
 
   const statusConfig = getStatusConfig(orderStatusUpper);
   const items: any[] = Array.isArray(order.items) ? order.items : [];
+  const timelineItems = getCustomerTimeline(order, tracking);
 
   return (
     <div className={styles.pageWrapper}>
@@ -497,7 +618,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
               <Clock size={18} className={styles.sectionTitleIcon} />
               <h3 className={styles.sectionTitle}>Tracking History</h3>
               <span className={styles.trackingProgressBadge}>
-                {orderStatusUpper === 'DELIVERED' ? (
+                {orderStatusUpper === "DELIVERED" ? (
                   <>
                     <CheckCircle2 size={12} color="#15803D" />
                     <span>Delivered</span>
@@ -510,104 +631,142 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
                 )}
               </span>
             </div>
-
           </div>
 
-          <div className={styles.verticalTimeline}>
-            {/* Step 1: Placed & Confirmed */}
-            <div className={`${styles.timelineStep} ${styles.timelineCompleted}`}>
-              <div className={styles.timelineLeftColumn}>
-                <div className={styles.timelineNode}>
-                  <FileCheck size={13} strokeWidth={2.5} />
+          {/* Shipment Details & Courier / AWB Banner */}
+          <div className={styles.trackingMetaBanner}>
+            <div className={styles.trackingMetaTopRow}>
+              <div className={styles.courierAwbGroup}>
+                <div className={styles.courierName}>
+                  <Truck size={16} color="#F99205" />
+                  <span>{tracking?.courierPartner || order.courierPartner || "KickAt Express Logistics"}</span>
                 </div>
-                <div className={styles.timelineLine} />
-              </div>
-              <div className={styles.timelineContentCard}>
-                <div className={styles.timelineStepHeader}>
-                  <span className={styles.timelineStepTitle}>Order Confirmed</span>
-                  <span className={styles.timelineStepDate}>{formattedDate}</span>
+                <div className={styles.awbText}>
+                  AWB:{" "}
+                  <span className={styles.awbVal}>
+                    {tracking?.awbNumber || tracking?.trackingNumber || order.trackingNumber || "Pending Assignment"}
+                  </span>
                 </div>
-                <p className={styles.timelineStepDesc}>Order verified and confirmed by KickAt systems.</p>
               </div>
+
+              {(tracking?.trackingUrl || (order.trackingNumber && (order.courierPartner || "").toLowerCase().includes("delhivery"))) && (
+                <a
+                  href={tracking?.trackingUrl || `https://www.delhivery.com/track/package/${order.trackingNumber}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.carrierPortalBtn}
+                >
+                  <span>Carrier Portal</span>
+                  <ExternalLink size={13} />
+                </a>
+              )}
             </div>
 
-            {/* Step 2: Processing / Shipped */}
-            {(orderStatusUpper === 'SHIPPED' || orderStatusUpper === 'OUT_FOR_DELIVERY' || orderStatusUpper === 'DELIVERED') && (
-              <div className={`${styles.timelineStep} ${styles.timelineCompleted}`}>
-                <div className={styles.timelineLeftColumn}>
-                  <div className={styles.timelineNode}>
-                    <Truck size={13} strokeWidth={2.5} />
-                  </div>
-                  <div className={styles.timelineLine} />
-                </div>
-                <div className={styles.timelineContentCard}>
-                  <div className={styles.timelineStepHeader}>
-                    <span className={styles.timelineStepTitle}>Shipped</span>
-                    <span className={styles.timelineStepDate}>
-                      {tracking?.history?.[0]?.timestamp 
-                        ? new Date(tracking.history[0].timestamp).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
-                        : 'In Transit'}
-                    </span>
-                  </div>
-                  <p className={styles.timelineStepDesc}>
-                    {tracking?.courierPartner ? `Dispatched via ${tracking.courierPartner}` : 'Dispatched via express logistics facility.'}
-                  </p>
+            <div className={styles.trackingSummaryGrid}>
+              <div className={styles.trackingSummaryItem}>
+                <MapPin size={15} className={styles.trackingSummaryIcon} />
+                <div className={styles.trackingSummaryContent}>
+                  <span className={styles.trackingSummaryLabel}>Location</span>
+                  <span className={styles.trackingSummaryVal}>
+                    {tracking?.location || (orderStatusUpper === "DELIVERED" ? `${order.address?.city || ""}, ${order.address?.state || ""}`.trim() : "Kickat Logistics Facility, Mumbai")}
+                  </span>
                 </div>
               </div>
-            )}
 
-            {/* Step 3: Out for Delivery */}
-            {(orderStatusUpper === 'OUT_FOR_DELIVERY' || orderStatusUpper === 'DELIVERED') && (
-              <div className={`${styles.timelineStep} ${styles.timelineCompleted}`}>
-                <div className={styles.timelineLeftColumn}>
-                  <div className={styles.timelineNode}>
-                    <Navigation size={13} strokeWidth={2.5} />
-                  </div>
-                  <div className={styles.timelineLine} />
-                </div>
-                <div className={styles.timelineContentCard}>
-                  <div className={styles.timelineStepHeader}>
-                    <span className={styles.timelineStepTitle}>Out for Delivery</span>
-                    <span className={styles.timelineStepDate}>Courier Assigned</span>
-                  </div>
-                  <p className={styles.timelineStepDesc}>Delivery agent is dispatched with your shipment.</p>
-                </div>
-              </div>
-            )}
-
-            {/* Step 4: Final Status (Delivered / Cancelled / Current Status) */}
-            <div className={`${styles.timelineStep} ${styles.timelineCompleted} ${styles.timelineActive}`}>
-              <div className={styles.timelineLeftColumn}>
-                <div className={`${styles.timelineNode} ${styles.activeNodePulse}`}>
-                  {orderStatusUpper === 'DELIVERED' ? (
-                    <PackageCheck size={14} strokeWidth={2.5} />
-                  ) : orderStatusUpper === 'CANCELLED' ? (
-                    <XCircle size={14} strokeWidth={2.5} />
-                  ) : (
-                    <Package size={14} strokeWidth={2.5} />
-                  )}
-                  <span className={styles.pulseBeacon} />
-                </div>
-              </div>
-              <div className={`${styles.timelineContentCard} ${styles.activeContentCard}`}>
-                <div className={styles.timelineStepHeader}>
-                  <div className={styles.titleWithBadge}>
-                    <span className={styles.timelineStepTitle}>{statusConfig.label}</span>
-                    <span className={styles.latestUpdatePill}>Current Status</span>
-                  </div>
-                  <span className={styles.timelineStepDate}>
-                    {order.updatedAt 
-                      ? new Date(order.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+              <div className={styles.trackingSummaryItem}>
+                <Clock size={15} className={styles.trackingSummaryIcon} />
+                <div className={styles.trackingSummaryContent}>
+                  <span className={styles.trackingSummaryLabel}>Last Updated</span>
+                  <span className={styles.trackingSummaryVal}>
+                    {tracking?.lastUpdated || order.updatedAt
+                      ? new Date(tracking?.lastUpdated || order.updatedAt).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
                       : formattedDate}
                   </span>
                 </div>
-                <p className={styles.timelineStepDesc}>{statusConfig.subtitle}</p>
               </div>
+
+              {(tracking?.estimatedDelivery || order.estimatedDelivery || order.deliveryDate) && (
+                <div className={styles.trackingSummaryItem}>
+                  <Calendar size={15} className={styles.trackingSummaryIcon} />
+                  <div className={styles.trackingSummaryContent}>
+                    <span className={styles.trackingSummaryLabel}>Estimated Delivery</span>
+                    <span className={styles.trackingSummaryVal}>
+                      {new Date(tracking?.estimatedDelivery || order.estimatedDelivery || order.deliveryDate).toLocaleDateString("en-IN", {
+                        weekday: "short",
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-        </section>
 
-        {/* DETAILS GRID: Delivery Details & Financial Summary */}
+          {/* Dynamic Milestones Timeline */}
+          <div className={styles.verticalTimeline}>
+            {timelineItems.map((step: any, idx: number) => {
+              const isDone = Boolean(step.isCompleted);
+              const isCurrent = Boolean(step.isCurrent);
+              const isLast = idx === timelineItems.length - 1;
+
+              return (
+                <div key={idx} className={`${styles.timelineStep} ${isDone ? styles.timelineCompleted : styles.timelineUpcoming}`}>
+                  <div className={styles.timelineLeftColumn}>
+                    <div className={`${styles.timelineNode} ${isCurrent ? styles.activeNodePulse : !isDone ? styles.upcomingNode : ""}`}>
+                      {getTimelineIcon(step.stage)}
+                      {isCurrent && <span className={styles.pulseBeacon} />}
+                    </div>
+                    {!isLast && (
+                      <div className={`${styles.timelineLine} ${!isDone ? styles.upcomingLine : ""}`} />
+                    )}
+                  </div>
+
+                  <div className={`${styles.timelineContentCard} ${isCurrent ? styles.activeContentCard : !isDone ? styles.upcomingCard : ""}`}>
+                    <div className={styles.timelineStepHeader}>
+                      <div className={styles.titleWithBadge}>
+                        <span className={`${styles.timelineStepTitle} ${!isDone ? styles.upcomingTitle : ""}`}>
+                          {step.title}
+                        </span>
+                        {isCurrent && (
+                          <span className={styles.latestUpdatePill}>Current Status</span>
+                        )}
+                      </div>
+
+                      {step.timestamp && (
+                        <span className={styles.timelineStepDate}>
+                          {new Date(step.timestamp).toLocaleDateString("en-IN", {
+                            day: "numeric",
+                            month: "short",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      )}
+                    </div>
+
+                    {step.location && (
+                      <div className={styles.stepLocationText}>
+                        <MapPin size={12} color="#78746D" />
+                        <span>{step.location}</span>
+                      </div>
+                    )}
+
+                    {step.description && (
+                      <p className={styles.timelineStepDesc}>{step.description}</p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>{/* DETAILS GRID: Delivery Details & Financial Summary */}
         <div className={styles.detailsGrid}>
           
           {/* Delivery Details Card */}
