@@ -1,63 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Sparkles, BookOpen, Clock, Tag, Search, AlertCircle, Loader2 } from "lucide-react";
+import { ArrowRight, Sparkles, BookOpen, Clock, Search, Loader2 } from "lucide-react";
 import { Footer } from "@/components/common/Footer";
 import { blogService } from "@/services/blogService";
 import { BlogPost } from "@/types/blog";
-
-const FALLBACK_BLOGS: BlogPost[] = [
-  {
-    id: "dog-grooming-guide",
-    slug: "10-essential-grooming-tips-for-dogs",
-    title: "10 Essential Grooming & Hygiene Tips for Dogs",
-    category: "DOG CARE",
-    summary: "Discover the best techniques to maintain your dog's coat, trim nails safely, and keep their ears clean without unnecessary stress.",
-    content: "Providing your dog with regular grooming is essential for maintaining optimal coat health and general comfort.",
-    coverImage: "/hero-products/pet_grooming.png",
-    readTimeMinutes: 5,
-    authorName: "KickAt Veterinary Editorial",
-    isPublished: true,
-    publishedAt: "2026-09-01T00:00:00Z",
-    createdAt: "2026-09-01T00:00:00Z",
-    updatedAt: "2026-09-01T00:00:00Z",
-    tags: ["Dogs", "Grooming", "Wellness"]
-  },
-  {
-    id: "cat-nutrition-essentials",
-    slug: "understanding-cat-nutrition-how-to-choose-the-right-food",
-    title: "Understanding Cat Nutrition: How to Choose the Right Food",
-    category: "NUTRITION",
-    summary: "From obligate carnivore needs to moisture-rich diets, learn how to select high-protein, taurine-rich food for feline longevity.",
-    content: "Cats are obligate carnivores with specific amino acid and moisture requirements.",
-    coverImage: "/hero-products/cat_food.png",
-    readTimeMinutes: 6,
-    authorName: "Dr. Ananya Roy, BVSc",
-    isPublished: true,
-    publishedAt: "2026-09-05T00:00:00Z",
-    createdAt: "2026-09-05T00:00:00Z",
-    updatedAt: "2026-09-05T00:00:00Z",
-    tags: ["Cats", "Nutrition", "Diet"]
-  },
-  {
-    id: "pet-first-aid-kit",
-    slug: "creating-an-emergency-first-aid-kit-for-your-pets",
-    title: "Creating an Emergency First-Aid Kit for Your Pets",
-    category: "WELLNESS & SAFETY",
-    summary: "A practical guide to assembling a veterinary-approved home first aid kit for everyday scrapes, tick bites, and sudden allergies.",
-    content: "Accidents happen, and having a dedicated pet first aid kit can make all the difference.",
-    coverImage: "/hero-products/pet_bowl.png",
-    readTimeMinutes: 4,
-    authorName: "KickAt Care Team",
-    isPublished: true,
-    publishedAt: "2026-09-10T00:00:00Z",
-    createdAt: "2026-09-10T00:00:00Z",
-    updatedAt: "2026-09-10T00:00:00Z",
-    tags: ["First Aid", "Safety", "Dogs", "Cats"]
-  }
-];
+import SafeImage from "@/components/ui/SafeImage";
 
 export default function BlogsPage() {
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
@@ -68,22 +17,22 @@ export default function BlogsPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  // Load Categories
+  // Load Categories from Server
   useEffect(() => {
     async function loadCategories() {
       try {
         const res = await blogService.getBlogCategories();
-        if (res && res.success && res.categories && res.categories.length > 0) {
+        if (res && res.success && Array.isArray(res.categories)) {
           setCategories(res.categories);
         }
       } catch (err) {
-        console.warn("Could not load dynamic blog categories:", err);
+        console.warn("Could not load blog categories:", err);
       }
     }
     loadCategories();
   }, []);
 
-  // Load Blogs
+  // Load Blogs from Server
   const fetchBlogs = useCallback(async () => {
     setLoading(true);
     try {
@@ -95,31 +44,13 @@ export default function BlogsPage() {
       });
 
       const fetchedList = res?.data || res?.blogs || [];
-      if (fetchedList.length > 0) {
-        setBlogs(fetchedList);
-        if (res?.meta) {
-          setTotalPages(res.meta.totalPages || 1);
-        }
-      } else {
-        // Use curated default previews if backend has no active seeded posts yet
-        setBlogs(
-          activeCategory === "All"
-            ? FALLBACK_BLOGS
-            : FALLBACK_BLOGS.filter(
-                (b) => b.category?.toUpperCase() === activeCategory.toUpperCase()
-              )
-        );
+      setBlogs(fetchedList);
+      if (res?.meta) {
+        setTotalPages(res.meta.totalPages || 1);
       }
     } catch (err) {
       console.error("Failed to fetch blogs from API:", err);
-      // Graceful fallback to rich static guides
-      setBlogs(
-        activeCategory === "All"
-          ? FALLBACK_BLOGS
-          : FALLBACK_BLOGS.filter(
-              (b) => b.category?.toUpperCase() === activeCategory.toUpperCase()
-            )
-      );
+      setBlogs([]);
     } finally {
       setLoading(false);
     }
@@ -128,6 +59,8 @@ export default function BlogsPage() {
   useEffect(() => {
     fetchBlogs();
   }, [fetchBlogs]);
+
+  const categoryPills = ["All", ...categories];
 
   return (
     <div className="min-h-screen flex flex-col font-sans bg-[#FAF6F0] text-[#1A1612]">
@@ -172,10 +105,9 @@ export default function BlogsPage() {
         </div>
 
         {/* Category Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 scrollbar-none">
-          {["All", ...categories, ...(categories.length === 0 ? ["Dog Care", "Nutrition", "Wellness & Safety"] : [])]
-            .filter((v, i, a) => a.indexOf(v) === i)
-            .map((cat) => (
+        {categoryPills.length > 1 && (
+          <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 scrollbar-none">
+            {categoryPills.map((cat) => (
               <button
                 key={cat}
                 onClick={() => {
@@ -191,7 +123,8 @@ export default function BlogsPage() {
                 {cat}
               </button>
             ))}
-        </div>
+          </div>
+        )}
 
         {/* Blog Posts Grid */}
         <section>
@@ -221,17 +154,21 @@ export default function BlogsPage() {
               <BookOpen size={48} className="mx-auto mb-4 text-[#F99205]" />
               <h3 className="text-lg font-bold text-[#1A1612] mb-2">No Articles Found</h3>
               <p className="text-sm text-[#78746D] mb-4">
-                We couldn't find any articles matching your search criteria.
+                {searchQuery
+                  ? "We could not find any articles matching your search query."
+                  : "There are currently no published articles available in this category."}
               </p>
-              <button
-                onClick={() => {
-                  setActiveCategory("All");
-                  setSearchQuery("");
-                }}
-                className="px-5 py-2.5 bg-[#1A1612] text-white rounded-xl text-xs font-bold"
-              >
-                Clear Filters
-              </button>
+              {(searchQuery || activeCategory !== "All") && (
+                <button
+                  onClick={() => {
+                    setActiveCategory("All");
+                    setSearchQuery("");
+                  }}
+                  className="px-5 py-2.5 bg-[#1A1612] text-white rounded-xl text-xs font-bold hover:bg-[#F99205] transition-colors cursor-pointer"
+                >
+                  Clear Filters
+                </button>
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -250,21 +187,17 @@ export default function BlogsPage() {
                   >
                     {/* Thumbnail Image */}
                     <div className="relative h-48 w-full bg-[#FAF6F0] overflow-hidden">
-                      {blog.coverImage ? (
-                        <Image
-                          src={blog.coverImage}
-                          alt={blog.title}
-                          fill
-                          sizes="400px"
-                          className="object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-[#FAF6F0] text-[#bbb]">
-                          <BookOpen size={36} />
-                        </div>
-                      )}
+                      <SafeImage
+                        src={blog.coverImage}
+                        alt={blog.title}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 400px"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        productName={blog.title}
+                        categoryName={blog.category || undefined}
+                      />
                       {blog.category && (
-                        <span className="absolute top-3 left-3 bg-[#1A1612]/80 backdrop-blur-sm text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                        <span className="absolute top-3 left-3 bg-[#1A1612]/80 backdrop-blur-sm text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider z-10">
                           {blog.category}
                         </span>
                       )}
@@ -286,7 +219,7 @@ export default function BlogsPage() {
                         </h3>
 
                         <p className="text-xs md:text-sm text-[#555046] line-clamp-3 leading-relaxed">
-                          {blog.summary || blog.content.replace(/<[^>]+>/g, '').slice(0, 140) + "..."}
+                          {blog.summary || (blog.content ? blog.content.replace(/<[^>]+>/g, '').slice(0, 140) + "..." : "")}
                         </p>
                       </div>
 
@@ -307,7 +240,7 @@ export default function BlogsPage() {
               <button
                 disabled={page <= 1}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="px-4 py-2 rounded-xl border border-[#EBE5DB] bg-white text-xs font-bold disabled:opacity-50"
+                className="px-4 py-2 rounded-xl border border-[#EBE5DB] bg-white text-xs font-bold disabled:opacity-50 cursor-pointer"
               >
                 Previous
               </button>
@@ -317,7 +250,7 @@ export default function BlogsPage() {
               <button
                 disabled={page >= totalPages}
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                className="px-4 py-2 rounded-xl border border-[#EBE5DB] bg-white text-xs font-bold disabled:opacity-50"
+                className="px-4 py-2 rounded-xl border border-[#EBE5DB] bg-white text-xs font-bold disabled:opacity-50 cursor-pointer"
               >
                 Next
               </button>

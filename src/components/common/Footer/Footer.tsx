@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePublicSettings } from '@/hooks/usePublicSettings';
 import styles from './Footer.module.css';
 
 const InstagramIcon = () => (
@@ -18,20 +19,40 @@ const FacebookIcon = () => (
   </svg>
 );
 
-const TwitterIcon = () => (
+const LinkedInIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+    <rect x="2" y="9" width="4" height="12"></rect>
+    <circle cx="4" cy="4" r="2"></circle>
+  </svg>
+);
+
+const YouTubeIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path>
+    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" fill="currentColor"></polygon>
   </svg>
 );
 
 export function Footer() {
+  // Live dynamic settings fetched from backend GET /api/v1/settings/public
+  const { general } = usePublicSettings();
+
+  const storeName = general?.storeName || 'KickAt';
+  const socialLinks = general?.socialLinks;
+
+  const instagramUrl = socialLinks?.instagram?.trim();
+  const facebookUrl = socialLinks?.facebook?.trim();
+  const linkedinUrl = socialLinks?.linkedin?.trim();
+  const youtubeUrl = socialLinks?.youtube?.trim();
+
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
         <div className={styles.topSection}>
           
           <div className={styles.brandCol}>
-            <Link href="/" className={styles.logoLink}>
+            <Link href="/" className={styles.logoLink} aria-label="KickAt Home">
               <Image 
                 src="/logo.png" 
                 alt="KickAt Logo" 
@@ -44,9 +65,50 @@ export function Footer() {
             </Link>
             <p className={styles.tagline}>A bond that never ends.</p>
             <div className={styles.socials}>
-              <a href="#" className={styles.socialLink} aria-label="Instagram"><InstagramIcon /></a>
-              <a href="#" className={styles.socialLink} aria-label="Facebook"><FacebookIcon /></a>
-              <a href="#" className={styles.socialLink} aria-label="Twitter"><TwitterIcon /></a>
+              {instagramUrl && (
+                <a 
+                  href={instagramUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className={styles.socialLink} 
+                  aria-label="Instagram"
+                >
+                  <InstagramIcon />
+                </a>
+              )}
+              {facebookUrl && (
+                <a 
+                  href={facebookUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className={styles.socialLink} 
+                  aria-label="Facebook"
+                >
+                  <FacebookIcon />
+                </a>
+              )}
+              {linkedinUrl && (
+                <a 
+                  href={linkedinUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className={styles.socialLink} 
+                  aria-label="LinkedIn"
+                >
+                  <LinkedInIcon />
+                </a>
+              )}
+              {youtubeUrl && (
+                <a 
+                  href={youtubeUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className={styles.socialLink} 
+                  aria-label="YouTube"
+                >
+                  <YouTubeIcon />
+                </a>
+              )}
             </div>
           </div>
 
@@ -102,7 +164,7 @@ export function Footer() {
         </div>
 
         <div className={styles.bottomSection}>
-          <p className={styles.copyright}>&copy; {new Date().getFullYear()} KickAt. All rights reserved.</p>
+          <p className={styles.copyright}>&copy; {new Date().getFullYear()} {storeName}. All rights reserved.</p>
           <div className={styles.legalLinks}>
             <Link href="/privacy" className={styles.legalLink}>Privacy Policy</Link>
             <Link href="/terms" className={styles.legalLink}>Terms of Service</Link>

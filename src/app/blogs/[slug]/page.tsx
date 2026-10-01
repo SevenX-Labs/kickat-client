@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Clock, Sparkles, BookOpen, User, Calendar, Tag, AlertCircle, Loader2 } from "lucide-react";
+import { ArrowLeft, Clock, Calendar, User, Tag, AlertCircle, Loader2 } from "lucide-react";
 import { Footer } from "@/components/common/Footer";
 import { blogService } from "@/services/blogService";
 import { BlogPost } from "@/types/blog";
+import SafeImage from "@/components/ui/SafeImage";
 
 interface SingleBlogPageProps {
   params: Promise<{ slug: string }>;
@@ -33,34 +33,8 @@ export default function SingleBlogPage({ params }: SingleBlogPageProps) {
           setError("Article not found.");
         }
       } catch (err: any) {
-        console.error("Failed to load article:", err);
-        // Provide friendly fallback if dynamic article is not in database yet
-        const humanTitle = slug.replace(/-/g, " ");
-        setBlog({
-          id: slug,
-          slug,
-          title: humanTitle.charAt(0).toUpperCase() + humanTitle.slice(1),
-          category: "PET CARE",
-          summary: "Expert advice and practical insights for keeping your pet healthy, active, and joyful.",
-          content: `Providing your pet with balanced nutrition, an engaging environment, and proactive veterinary care is essential for a long, vibrant life.
-
-### 1. Consistent Daily Routines
-Pets thrive on predictability. Establishing structured feeding times, grooming sessions, and play hours helps eliminate anxiety and promotes balanced behavior.
-
-### 2. Species-Appropriate Diet
-Every companion animal has distinct nutritional needs based on breed, weight, and life stage. Always opt for formulas rich in bioavailable proteins, healthy fatty acids, and essential vitamins.
-
-### 3. Preventative Wellness
-Regular dental checkups, parasite prevention, and routine wellness visits help identify health changes before they become serious issues.`,
-          coverImage: "/hero-products/pet_grooming.png",
-          readTimeMinutes: 5,
-          authorName: "KickAt Veterinary Editorial",
-          isPublished: true,
-          publishedAt: new Date().toISOString(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          tags: ["Pet Care", "Health", "Guides"]
-        });
+        console.error("Failed to load article from server:", err);
+        setError("The requested article could not be found or has not been published yet.");
       } finally {
         setLoading(false);
       }
@@ -80,7 +54,7 @@ Regular dental checkups, parasite prevention, and routine wellness visits help i
     );
   }
 
-  if (error && !blog) {
+  if (error || !blog) {
     return (
       <div className="min-h-screen flex flex-col font-sans bg-[#FAF6F0] text-[#1A1612]">
         <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-16 text-center">
@@ -89,7 +63,7 @@ Regular dental checkups, parasite prevention, and routine wellness visits help i
           <p className="text-sm text-[#78746D] mb-6">{error || "The requested journal article does not exist."}</p>
           <Link
             href="/blogs"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-[#1A1612] text-white rounded-xl text-xs font-bold"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[#1A1612] text-white rounded-xl text-xs font-bold hover:bg-[#F99205] transition-colors"
           >
             <ArrowLeft size={16} /> Back to KickAt Journal
           </Link>
@@ -155,11 +129,14 @@ Regular dental checkups, parasite prevention, and routine wellness visits help i
             {/* Cover Image */}
             {blog.coverImage && (
               <div className="relative h-64 md:h-96 w-full rounded-2xl overflow-hidden mb-8 bg-[#FAF6F0]">
-                <Image
+                <SafeImage
                   src={blog.coverImage}
                   alt={blog.title}
                   fill
+                  priority
                   className="object-cover"
+                  productName={blog.title}
+                  categoryName={blog.category || undefined}
                 />
               </div>
             )}
@@ -172,22 +149,24 @@ Regular dental checkups, parasite prevention, and routine wellness visits help i
             )}
 
             {/* Article Content */}
-            <div className="prose prose-stone max-w-none text-sm md:text-base text-[#555046] leading-relaxed space-y-6">
-              {blog.content.split("\n\n").map((paragraph, idx) => {
-                if (paragraph.startsWith("### ")) {
+            {blog.content && (
+              <div className="prose prose-stone max-w-none text-sm md:text-base text-[#555046] leading-relaxed space-y-6">
+                {blog.content.split("\n\n").map((paragraph, idx) => {
+                  if (paragraph.startsWith("### ")) {
+                    return (
+                      <h2 key={idx} className="text-xl md:text-2xl font-bold text-[#1A1612] font-serif pt-4">
+                        {paragraph.replace("### ", "")}
+                      </h2>
+                    );
+                  }
                   return (
-                    <h2 key={idx} className="text-xl md:text-2xl font-bold text-[#1A1612] font-serif pt-4">
-                      {paragraph.replace("### ", "")}
-                    </h2>
+                    <p key={idx}>
+                      {paragraph}
+                    </p>
                   );
-                }
-                return (
-                  <p key={idx}>
-                    {paragraph}
-                  </p>
-                );
-              })}
-            </div>
+                })}
+              </div>
+            )}
 
             {/* Tags */}
             {blog.tags && blog.tags.length > 0 && (

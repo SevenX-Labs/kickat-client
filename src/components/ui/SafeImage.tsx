@@ -8,7 +8,7 @@ const SECONDARY_FALLBACK = '/hero-products/pet_bowl.png';
 // Ultimate SVG fallback if static assets ever fail to resolve
 const SVG_FALLBACK = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100%" height="100%" fill="%23F3F4F6"/><path d="M35 40a5 5 0 100-10 5 5 0 000 10zm30 0a5 5 0 100-10 5 5 0 000 10zM50 65c8 0 14-6 14-12H36c0 6 6 12 14 12z" fill="%23D1D5DB"/></svg>';
 
-export function getProductFallbackImage(name?: string, category?: string, petSpecies?: string): string {
+export function getProductFallbackImage(name?: string | null, category?: string | null, petSpecies?: string | null): string {
   const combined = `${name || ''} ${category || ''} ${petSpecies || ''}`.toLowerCase();
   
   if (combined.includes('cat') || combined.includes('kitten')) {
@@ -32,9 +32,9 @@ export function getProductFallbackImage(name?: string, category?: string, petSpe
 export interface SafeImageProps extends Omit<ImageProps, 'src'> {
   src?: string | null;
   fallbackSrc?: string;
-  productName?: string;
-  categoryName?: string;
-  petSpecies?: string;
+  productName?: string | null;
+  categoryName?: string | null;
+  petSpecies?: string | null;
 }
 
 export function SafeImage({
