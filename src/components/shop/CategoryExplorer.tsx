@@ -476,7 +476,8 @@ export function CategoryExplorer({
                 )}
 
                 {/* Toolbar Row */}
-                <div className={styles.toolbar}>
+                {(loading || products.length > 0) && (
+                  <div className={styles.toolbar}>
                   <div className={styles.toolbarLeft}>
                     <div className={styles.toolbarViews}>
                       <button
@@ -518,6 +519,7 @@ export function CategoryExplorer({
                     </select>
                   </div>
                 </div>
+                )}
 
                 {/* Product Grid / List */}
                 {loading ? (
