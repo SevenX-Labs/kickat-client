@@ -158,7 +158,7 @@ export default function CartPage() {
           {/* Left Column: Cart Items List */}
           <div className={styles.itemsColumn}>
             {items.map((item) => {
-              const imageSrc = (item.variant as any)?.imageUrl || (item.variant as any)?.image || (item.variant as any)?.images?.[0] || item.product?.imageUrl || (item.product as any)?.image || (item.product as any)?.images?.[0] || (item as any)?.imageUrl || (item as any)?.image;
+              const imageSrc = item.variant?.imageUrl || item.variant?.images?.[0] || item.product?.imageUrl || item.product?.images?.[0];
               const variantName = item.variant?.name || item.variantId;
               const unitPrice = item.unitPrice || item.product?.price || 0;
               const itemTotal = item.totalPrice || (unitPrice * item.quantity);

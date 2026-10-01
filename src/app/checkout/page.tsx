@@ -932,7 +932,7 @@ export default function CheckoutPage() {
                   {itemsSource.map((item: any, idx: number) => {
                     const price = item.variant?.discountPrice ?? item.variant?.price ?? item.product?.discountPrice ?? item.product?.price ?? 0;
                     const totalPrice = price * item.quantity;
-                    const itemImg = item.variant?.image || item.product?.images?.[0] || item.product?.image;
+                    const itemImg = item.variant?.imageUrl || item.variant?.images?.[0] || item.product?.imageUrl || item.product?.images?.[0];
                     return (
                       <div key={item.id || idx} className={styles.receiptItemRow}>
                         <div className={styles.receiptItemInfo}>
@@ -1833,7 +1833,7 @@ export default function CheckoutPage() {
               <div className={styles.checkoutStaticList}>
                 {displayedItems.map((item) => {
                   const itemPrice = item.variant ? (item.variant.discountPrice ?? item.variant.price) : (item.product?.discountPrice ?? item.product?.price ?? 0);
-                  const itemImage = (item.variant as any)?.imageUrl || (item.variant as any)?.image || (item.variant as any)?.images?.[0] || item.product?.imageUrl || (item.product as any)?.image || (item.product as any)?.images?.[0] || (item as any)?.imageUrl || (item as any)?.image;
+                  const itemImage = item.variant?.imageUrl || item.variant?.images?.[0] || item.product?.imageUrl || item.product?.images?.[0];
                   const itemName = item.product?.name || 'Pet Product';
                   const variantName = item.variant?.name;
 

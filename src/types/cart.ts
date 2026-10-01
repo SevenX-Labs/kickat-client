@@ -5,6 +5,7 @@ export interface CartItemProduct {
   price: number;
   discountPrice?: number | null;
   imageUrl?: string | null;
+  images?: string[];
   stock?: number;
   category?: {
     id: string;
@@ -19,6 +20,8 @@ export interface CartItemVariant {
   price: number;
   discountPrice?: number | null;
   stock?: number;
+  imageUrl?: string | null;
+  images?: string[];
 }
 
 export interface CartItem {
