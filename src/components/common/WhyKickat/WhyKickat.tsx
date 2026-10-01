@@ -113,7 +113,8 @@ export function WhyKickat() {
   }, []);
 
   return (
-    <section id="why-kickat" ref={sectionRef} className={styles.section}>
+    <section id="why-us" ref={sectionRef} className={styles.section}>
+      <span id="why-kickat" style={{ position: 'relative', top: '-100px', display: 'block' }} />
       <div className={styles.container}>
         <div className={styles.mainContent}>
           {/* Left-aligned header */}
