@@ -14,6 +14,8 @@ import {
   Leaf,
   PawPrint,
   FileText,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import styles from './ProductDetail.module.css';
 import { Product, ProductVariant } from './ProductDetail';
@@ -27,35 +29,8 @@ export function ProductTabs({ product, selectedVariant }: ProductTabsProps) {
   const tabsNavRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>('details');
 
-  const checkScroll = useCallback(() => {
-    const el = tabsNavRef.current;
-    if (!el) return;
-    const { scrollLeft, scrollWidth, clientWidth } = el;
-    setCanScrollLeft(scrollLeft > 4);
-    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 4);
-  }, []);
-
-  useEffect(() => {
-    const el = tabsNavRef.current;
-    if (!el) return;
-    checkScroll();
-    el.addEventListener('scroll', checkScroll, { passive: true });
-    window.addEventListener('resize', checkScroll);
-    return () => {
-      el.removeEventListener('scroll', checkScroll);
-      window.removeEventListener('resize', checkScroll);
-    };
-  }, [checkScroll]);
-
-  const handleTabClick = (tabId: string, e: React.MouseEvent<HTMLButtonElement>) => {
-    setActiveTab(tabId);
-    e.currentTarget.scrollIntoView({
-      behavior: 'smooth',
-      block: 'nearest',
-      inline: 'center',
-    });
-  };
   // Parse highlights safely without [object Object]
   let parsedHighlights: string[] = [];
   if (Array.isArray(product.highlights)) {
@@ -102,7 +77,7 @@ export function ProductTabs({ product, selectedVariant }: ProductTabsProps) {
       .join(' | ');
   }
 
-  // Build dynamic tabs
+  // Build dynamic tabs list
   const tabs: { id: string; label: string; icon: React.ReactNode }[] = [
     { id: 'details', label: 'Details & Highlights', icon: <FileText size={15} /> },
   ];
@@ -121,57 +96,166 @@ export function ProductTabs({ product, selectedVariant }: ProductTabsProps) {
 
   tabs.push({ id: 'shipping', label: 'Shipping & Returns', icon: <Truck size={15} /> });
 
-  const [activeTab, setActiveTab] = useState<string>('details');
+  // Scroll detection
+  const checkScroll = useCallback(() => {
+    const el = tabsNavRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setCanScrollLeft(scrollLeft > 4);
+    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 4);
+  }, []);
+
+  useEffect(() => {
+    const el = tabsNavRef.current;
+    if (!el) return;
+    checkScroll();
+    el.addEventListener('scroll', checkScroll, { passive: true });
+    window.addEventListener('resize', checkScroll);
+    return () => {
+      el.removeEventListener('scroll', checkScroll);
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, [checkScroll]);
+
+  // Re-check edge scroll indicators whenever activeTab changes
+  useEffect(() => {
+    const timer = setTimeout(checkScroll, 350);
+    return () => clearTimeout(timer);
+  }, [activeTab, checkScroll]);
+
+  // One-time gentle auto-scroll nudge on first mobile load to visually demonstrate horizontal interactivity
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (window.innerWidth > 768) return;
+
+    try {
+      const alreadyNudged = sessionStorage.getItem('kickat_tabs_nudged');
+      if (alreadyNudged) return;
+
+      const timer = setTimeout(() => {
+        const el = tabsNavRef.current;
+        if (!el || el.scrollLeft > 10) return; // User already interacted
+
+        // Gentle nudge forward
+        el.scrollTo({ left: 45, behavior: 'smooth' });
+
+        // Gentle nudge back
+        const backTimer = setTimeout(() => {
+          if (el && el.scrollLeft < 70) {
+            el.scrollTo({ left: 0, behavior: 'smooth' });
+          }
+          try {
+            sessionStorage.setItem('kickat_tabs_nudged', 'true');
+          } catch {}
+        }, 450);
+
+        return () => clearTimeout(backTimer);
+      }, 900);
+
+      return () => clearTimeout(timer);
+    } catch {
+      // storage fallback
+    }
+  }, []);
+
+  const goToTabByIndex = (index: number) => {
+    if (index < 0 || index >= tabs.length) return;
+    const targetTab = tabs[index];
+    setActiveTab(targetTab.id);
+    const btnEl = tabsNavRef.current?.children[index] as HTMLElement;
+    btnEl?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'center',
+    });
+  };
+
+  const handleTabClick = (tabId: string, e: React.MouseEvent<HTMLButtonElement>) => {
+    setActiveTab(tabId);
+    e.currentTarget.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'center',
+    });
+  };
+
+  const currentTabIndex = tabs.findIndex((t) => t.id === activeTab);
+  const hasPrevTab = currentTabIndex > 0;
+  const hasNextTab = currentTabIndex >= 0 && currentTabIndex < tabs.length - 1;
+  const showLeftArrow = hasPrevTab || canScrollLeft;
+  const showRightArrow = hasNextTab || canScrollRight;
+
+  const handlePrevTab = () => {
+    const prevIdx = currentTabIndex > 0 ? currentTabIndex - 1 : 0;
+    if (prevIdx !== currentTabIndex && prevIdx >= 0) {
+      goToTabByIndex(prevIdx);
+    } else {
+      tabsNavRef.current?.scrollBy({ left: -140, behavior: 'smooth' });
+    }
+  };
+
+  const handleNextTab = () => {
+    const nextIdx = currentTabIndex >= 0 ? currentTabIndex + 1 : 1;
+    if (nextIdx < tabs.length) {
+      goToTabByIndex(nextIdx);
+    } else {
+      tabsNavRef.current?.scrollBy({ left: 140, behavior: 'smooth' });
+    }
+  };
 
   const renderTabContent = (tabId: string) => {
     switch (tabId) {
       case 'details':
         return (
           <div className={styles.tabDetailsGrid}>
-            {/* Left Column: Description & Highlights (only if genuine highlights exist) */}
+            {/* Left Column: Description & Highlights */}
             <div className={styles.tabDetailsLeftCol}>
               <h3 className={styles.tabSectionHeading}>
                 {product.descriptionTitle || `Why Choose ${product.name}?`}
               </h3>
               <p className={styles.tabMainParagraph}>
                 {product.description ||
-                  'Crafted with high quality standards to bring wholesome wellness, energy, and joy to your companion. Engineered for pet safety, gentle care, and daily happiness.'}
+                  
+                  'Specially crafted to deliver balanced daily nourishment, vital energy, and premium taste for your pet companion.'}
               </p>
 
-              {/* Only render highlights if real highlights exist */}
               {parsedHighlights.length > 0 && (
-                <div className={styles.calloutGrid}>
-                  {parsedHighlights.map((hl, idx) => (
-                    <div key={idx} className={styles.calloutItem}>
-                      <div className={styles.calloutIconWrap}>
-                        <CheckCircle2 size={18} className={styles.calloutIcon} />
-                      </div>
-                      <div>
-                        <h4 className={styles.calloutTitle}>{hl}</h4>
-                        <p className={styles.calloutSub}>KickAt Quality Guarantee</p>
-                      </div>
-                    </div>
-                  ))}
+                <div className={styles.highlightsContainer}>
+                  <h4 className={styles.highlightsSubHeading}>
+                    <Sparkles size={16} color="#F99205" />
+                    <span>Product Highlights</span>
+                  </h4>
+                  <ul className={styles.highlightsList}>
+                    {parsedHighlights.map((hl, idx) => (
+                      <li key={idx} className={styles.highlightItem}>
+                        <CheckCircle2 size={16} className={styles.highlightIcon} />
+                        <span>{hl}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
             </div>
 
-            {/* Right Column: Clean Lifestyle Product Showcase */}
-            <div className={styles.tabDetailsRightCol}>
-              <div className={styles.lifestyleBannerWrap}>
-                <SafeImage
-                  src={(selectedVariant && selectedVariant.images && selectedVariant.images[0]) || product.image || product.images?.[0] || "/hero-products/dog_food.png"}
-                  productName={product.name}
-                  categoryName={product.mainCategory || undefined}
-                  petSpecies={product.petSpecies || undefined}
-                  alt={product.name || "Product lifestyle preview"}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 500px"
-                  className={styles.lifestyleImage}
-                />
-                <div className={styles.lifestyleBadgeBottom}>
-                  <PawPrint size={15} fill="#F99205" color="#F99205" />
-                  <span>KickAt Certified Quality</span>
+            {/* Right Column: Dynamic Feature Infographic Card */}
+            <div className={styles.tabFeatureCardCol}>
+              <div className={styles.featureInfographicCard}>
+                <div className={styles.featureInfographicContent}>
+                  <span className={styles.featureTag}>Premium Quality Guarantee</span>
+                  <h4 className={styles.featureTitle}>100% Authentic &amp; Vet-Approved</h4>
+                  <p className={styles.featureDesc}>
+                    Formulated with human-grade ingredients and precision nutrition balances to support digestion, immunity, and radiant coat health.
+                  </p>
+                  <div className={styles.featureTrustPills}>
+                    <div className={styles.featureTrustPill}>
+                      <ShieldCheck size={14} color="#F99205" />
+                      <span>FSSAI / Safety Standards Certified</span>
+                    </div>
+                    <div className={styles.featureTrustPill}>
+                      <Sparkles size={14} color="#F99205" />
+                      <span>Zero Artificial Preservatives</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -312,17 +396,27 @@ export function ProductTabs({ product, selectedVariant }: ProductTabsProps) {
 
   return (
     <div className={styles.tabsSectionContainer}>
-      {/* Horizontal Tabs Header Bar with Mobile Scroll Wrapper & Edge Fade Indicators */}
+      {/* Horizontal Tabs Header Bar with Mobile Scroll Wrapper, Edge Fade & Tap Arrows */}
       <div className={styles.tabsHeaderNavWrap}>
-        {/* Left Fade Indicator (visible on mobile when scrolled right) */}
+        {/* Left Fade Indicator & Tap Arrow */}
         <div
           className={styles.tabsFadeLeft}
-          style={{ opacity: canScrollLeft ? 1 : 0 }}
+          style={{ opacity: showLeftArrow ? 1 : 0, pointerEvents: showLeftArrow ? 'auto' : 'none' }}
           aria-hidden="true"
-        />
+        >
+          <button
+            type="button"
+            className={styles.tabScrollArrow}
+            onClick={handlePrevTab}
+            aria-label="Previous tab"
+            tabIndex={showLeftArrow ? 0 : -1}
+          >
+            <ChevronLeft size={14} />
+          </button>
+        </div>
 
         <div className={styles.tabsHeaderNav} ref={tabsNavRef}>
-          {tabs.map((tab) => {
+          {tabs.map((tab, idx) => {
             const isActive = activeTab === tab.id;
             return (
               <button
@@ -340,12 +434,38 @@ export function ProductTabs({ product, selectedVariant }: ProductTabsProps) {
           })}
         </div>
 
-        {/* Right Fade Indicator (visible on mobile when more content is off-screen) */}
+        {/* Right Fade Indicator & Tap Arrow */}
         <div
           className={styles.tabsFadeRight}
-          style={{ opacity: canScrollRight ? 1 : 0 }}
+          style={{ opacity: showRightArrow ? 1 : 0, pointerEvents: showRightArrow ? 'auto' : 'none' }}
           aria-hidden="true"
-        />
+        >
+          <button
+            type="button"
+            className={styles.tabScrollArrow}
+            onClick={handleNextTab}
+            aria-label="Next tab"
+            tabIndex={showRightArrow ? 0 : -1}
+          >
+            <ChevronRight size={14} />
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Tab Sequence Progress Dots Indicator */}
+      <div className={styles.tabProgressDots} aria-hidden="true">
+        {tabs.map((tab, idx) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              className={`${styles.tabProgressDot} ${isActive ? styles.tabProgressDotActive : ''}`}
+              onClick={() => goToTabByIndex(idx)}
+              aria-label={`Switch to ${tab.label} tab`}
+            />
+          );
+        })}
       </div>
 
       {/* Tab Panel Body */}
