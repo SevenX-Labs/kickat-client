@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Mail, Phone, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { usePublicSettings } from '@/hooks/usePublicSettings';
 import styles from './Footer.module.css';
 
@@ -35,10 +37,13 @@ const YouTubeIcon = () => (
 );
 
 export function Footer() {
-  // Live dynamic settings fetched from backend GET /api/v1/settings/public
   const { general } = usePublicSettings();
+  const [subscribed, setSubscribed] = useState(false);
+  const [email, setEmail] = useState('');
 
   const storeName = general?.storeName || 'KickAt';
+  const supportEmail = general?.supportEmail || 'kickat2021@gmail.com';
+  const supportPhone = general?.supportPhone || '+91 96742 48592';
   const socialLinks = general?.socialLinks;
 
   const instagramUrl = socialLinks?.instagram?.trim();
@@ -46,11 +51,20 @@ export function Footer() {
   const linkedinUrl = socialLinks?.linkedin?.trim();
   const youtubeUrl = socialLinks?.youtube?.trim();
 
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email.trim()) {
+      setSubscribed(true);
+      setEmail('');
+    }
+  };
+
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
         <div className={styles.topSection}>
           
+          {/* Brand & Support Touchpoints */}
           <div className={styles.brandCol}>
             <Link href="/" className={styles.logoLink} aria-label="KickAt Home">
               <Image 
@@ -64,6 +78,22 @@ export function Footer() {
               />
             </Link>
             <p className={styles.tagline}>A bond that never ends.</p>
+            
+            <div className={styles.brandContacts}>
+              {supportEmail && (
+                <a href={`mailto:${supportEmail}`} className={styles.contactItem} title="Email Support">
+                  <Mail size={14} className={styles.contactIcon} />
+                  <span>{supportEmail}</span>
+                </a>
+              )}
+              {supportPhone && (
+                <a href={`tel:${supportPhone.replace(/\s+/g, '')}`} className={styles.contactItem} title="Call Customer Care">
+                  <Phone size={14} className={styles.contactIcon} />
+                  <span>{supportPhone}</span>
+                </a>
+              )}
+            </div>
+
             <div className={styles.socials}>
               {instagramUrl && (
                 <a 
@@ -112,53 +142,64 @@ export function Footer() {
             </div>
           </div>
 
+          {/* Column 1: Shop */}
           <div className={styles.linksCol}>
-            <h3 className={styles.colTitle}>Dogs & Cats</h3>
-            <Link href="/category/dogs/dog-accessories" className={styles.link}>Dog Accessories</Link>
-            <Link href="/category/dogs/dog-food-treats" className={styles.link}>Dog Food & Treats</Link>
-            <Link href="/category/dogs/dog-grooming-hygiene" className={styles.link}>Dog Grooming</Link>
-            <Link href="/category/dogs/dog-feeding" className={styles.link}>Dog Feeding</Link>
-            
-            <Link href="/category/cats/cat-accessories" className={styles.link} style={{marginTop: '0.75rem'}}>Cat Accessories</Link>
-            <Link href="/category/cats/cat-food" className={styles.link}>Cat Food</Link>
-            <Link href="/category/cats/cat-grooming-hygiene" className={styles.link}>Cat Grooming</Link>
-            <Link href="/category/cats/cat-feeding" className={styles.link}>Cat Feeding</Link>
+            <h3 className={styles.colTitle}>Shop</h3>
+            <Link href="/shop" className={styles.link}>All Products</Link>
+            <Link href="/category/dogs" className={styles.link}>Dog Essentials</Link>
+            <Link href="/category/cats" className={styles.link}>Cat Essentials</Link>
+            <Link href="/category/fish" className={styles.link}>Aquarium & Fish</Link>
+            <Link href="/category/birds" className={styles.link}>Birds</Link>
           </div>
 
+          {/* Column 2: Explore */}
           <div className={styles.linksCol}>
-            <h3 className={styles.colTitle}>Fish & Birds</h3>
-            <Link href="/category/fish/aquarium-filtration" className={styles.link}>Aquarium Filtration</Link>
-            <Link href="/category/fish/aquarium-pumps" className={styles.link}>Aquarium Pumps</Link>
-            <Link href="/category/fish/aquarium-heating" className={styles.link}>Aquarium Heating</Link>
-            <Link href="/category/fish/aquarium-lighting" className={styles.link}>Aquarium Lighting</Link>
-            <Link href="/category/fish/aquarium-food" className={styles.link}>Aquarium Food</Link>
-            <Link href="/category/fish/aquarium-care-medicine" className={styles.link}>Care & Medicine</Link>
-            <Link href="/category/fish/aquarium-tools" className={styles.link}>Aquarium Tools</Link>
-            
-            <Link href="/category/birds/bird-feeding" className={styles.link} style={{marginTop: '0.75rem'}}>Bird Feeding</Link>
-            <Link href="/category/birds/bird-food" className={styles.link}>Bird Food</Link>
-          </div>
-
-          <div className={styles.linksCol}>
-            <h3 className={styles.colTitle}>Support</h3>
+            <h3 className={styles.colTitle}>Explore</h3>
+            <Link href="/#why-us" className={styles.link}>Why KickAt</Link>
+            <Link href="/blogs" className={styles.link}>KickAt Journal</Link>
+            <Link href="/testimonials" className={styles.link}>Testimonials</Link>
             <Link href="/faq" className={styles.link}>FAQ</Link>
-            <Link href="/shipping" className={styles.link}>Shipping & Returns</Link>
-            <Link href="/orders" className={styles.link}>Track Order</Link>
             <Link href="/contact" className={styles.link}>Contact Us</Link>
           </div>
 
+          {/* Column 3: Customer Care */}
+          <div className={styles.linksCol}>
+            <h3 className={styles.colTitle}>Customer Care</h3>
+            <Link href="/orders" className={styles.link}>Track Order</Link>
+            <Link href="/shipping" className={styles.link}>Shipping & Delivery</Link>
+            <Link href="/returns" className={styles.link}>Returns & Refunds</Link>
+            <Link href="/privacy-policy" className={styles.link}>Privacy Policy</Link>
+            <Link href="/terms" className={styles.link}>Terms of Service</Link>
+          </div>
+
+          {/* Column 4: Newsletter */}
           <div className={styles.newsletterCol}>
             <h3 className={styles.colTitle}>Stay in the loop</h3>
-            <p className={styles.newsletterText}>Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.</p>
-            <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
-              <input 
-                type="email" 
-                placeholder="Enter your email" 
-                className={styles.input}
-                required
-              />
-              <button type="submit" className={styles.submitBtn}>Subscribe</button>
-            </form>
+            <p className={styles.newsletterText}>
+              Subscribe for exclusive pet parent deals, new product launches, and expert care guides.
+            </p>
+            {subscribed ? (
+              <div className={styles.subscribedMsg}>
+                <CheckCircle2 size={18} />
+                <span>Thank you for subscribing!</span>
+              </div>
+            ) : (
+              <form className={styles.form} onSubmit={handleSubscribe}>
+                <input 
+                  type="email" 
+                  placeholder="Enter your email" 
+                  className={styles.input}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required 
+                />
+                <button type="submit" className={styles.submitBtn}>Subscribe</button>
+              </form>
+            )}
+            <div className={styles.trustTag}>
+              <ShieldCheck size={16} />
+              <span>100% Safe & Secure Checkout</span>
+            </div>
           </div>
 
         </div>
@@ -166,8 +207,9 @@ export function Footer() {
         <div className={styles.bottomSection}>
           <p className={styles.copyright}>&copy; {new Date().getFullYear()} {storeName}. All rights reserved.</p>
           <div className={styles.legalLinks}>
-            <Link href="/privacy" className={styles.legalLink}>Privacy Policy</Link>
+            <Link href="/privacy-policy" className={styles.legalLink}>Privacy Policy</Link>
             <Link href="/terms" className={styles.legalLink}>Terms of Service</Link>
+            <Link href="/shipping" className={styles.legalLink}>Shipping Policy</Link>
           </div>
         </div>
       </div>

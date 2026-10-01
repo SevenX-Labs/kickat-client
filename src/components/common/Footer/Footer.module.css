@@ -1,26 +1,35 @@
+/* Footer Styling */
 .footer {
   width: 100%;
   background-color: #111C24;
   color: #FCFAF6;
-  padding: 5rem 2rem 2rem 2rem;
+  padding: 4.5rem 2rem 2rem 2rem;
+  font-family: var(--font-inter), sans-serif;
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1240px;
   margin: 0 auto;
 }
 
 .topSection {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 3rem;
-  margin-bottom: 4rem;
+  gap: 2.5rem;
+  margin-bottom: 3.5rem;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 980px) {
   .topSection {
-    grid-template-columns: 2fr 1fr 1fr 1fr 2fr;
-    gap: 2rem;
+    grid-template-columns: 2.2fr 1fr 1fr 1.2fr 2.4fr;
+    gap: 2.5rem;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 979px) {
+  .topSection {
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
   }
 }
 
@@ -32,7 +41,7 @@
 .logoLink {
   display: inline-flex;
   align-items: center;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1rem;
   width: fit-content;
   background: transparent;
   transition: opacity 0.2s ease;
@@ -45,7 +54,7 @@
 .logo {
   object-fit: contain;
   display: block;
-  width: 170px;
+  width: 160px;
   height: auto;
   filter: invert(1) hue-rotate(180deg) contrast(200%) brightness(1.2);
   mix-blend-mode: screen;
@@ -53,24 +62,61 @@
 
 .tagline {
   font-family: var(--font-lora), serif;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-style: italic;
-  color: rgba(252, 250, 246, 0.8);
-  margin-bottom: 2rem;
+  color: rgba(252, 250, 246, 0.75);
+  margin: 0 0 1.25rem;
+}
+
+.brandContacts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.contactItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: rgba(252, 250, 246, 0.7);
+  font-size: 0.88rem;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.contactItem:hover {
+  color: #F99205;
+}
+
+.contactIcon {
+  color: #F99205;
+  flex-shrink: 0;
 }
 
 .socials {
   display: flex;
-  gap: 1rem;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .socialLink {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: #FCFAF6;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
+  text-decoration: none;
 }
 
 .socialLink:hover {
-  color: #F99205;
+  background: #F99205;
+  color: #ffffff;
+  transform: translateY(-2px);
 }
 
 .linksCol {
@@ -79,9 +125,11 @@
 }
 
 .colTitle {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 1.25rem;
   color: #ffffff;
 }
 
@@ -89,12 +137,14 @@
   color: rgba(252, 250, 246, 0.7);
   text-decoration: none;
   margin-bottom: 0.75rem;
-  font-size: 0.95rem;
-  transition: color 0.2s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 .link:hover {
   color: #F99205;
+  transform: translateX(2px);
 }
 
 .newsletterCol {
@@ -104,15 +154,16 @@
 
 .newsletterText {
   color: rgba(252, 250, 246, 0.7);
-  font-size: 0.95rem;
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  margin: 0 0 1.25rem;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
 }
 
 @media (min-width: 480px) {
@@ -123,32 +174,67 @@
 
 .input {
   flex: 1;
-  padding: 0.875rem 1rem;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.05);
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
   color: white;
+  font-size: 0.88rem;
   outline: none;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .input:focus {
   border-color: #F99205;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.input::placeholder {
+  color: rgba(252, 250, 246, 0.4);
 }
 
 .submitBtn {
-  background-color: #F99205;
+  background: linear-gradient(135deg, #F99205 0%, #E08304 100%);
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 0.875rem 1.5rem;
-  font-weight: 600;
+  border-radius: 10px;
+  padding: 0.75rem 1.35rem;
+  font-size: 0.88rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .submitBtn:hover {
-  background-color: #E08304;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(249, 146, 5, 0.35);
+}
+
+.subscribedMsg {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #34D399;
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  padding: 0.65rem 0.85rem;
+  background: rgba(52, 211, 153, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(52, 211, 153, 0.2);
+}
+
+.trustTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  color: rgba(252, 250, 246, 0.5);
+}
+
+.trustTag svg {
+  color: #34D399;
 }
 
 .bottomSection {
@@ -157,7 +243,7 @@
   align-items: center;
   justify-content: space-between;
   padding-top: 2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   gap: 1rem;
 }
 
@@ -168,22 +254,24 @@
 }
 
 .copyright {
-  color: rgba(252, 250, 246, 0.6);
-  font-size: 0.85rem;
+  color: rgba(252, 250, 246, 0.55);
+  font-size: 0.82rem;
+  margin: 0;
 }
 
 .legalLinks {
   display: flex;
+  flex-wrap: wrap;
   gap: 1.5rem;
 }
 
 .legalLink {
-  color: rgba(252, 250, 246, 0.6);
-  font-size: 0.85rem;
+  color: rgba(252, 250, 246, 0.55);
+  font-size: 0.82rem;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .legalLink:hover {
-  color: #FCFAF6;
+  color: #F99205;
 }
