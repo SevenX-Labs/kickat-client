@@ -47,7 +47,10 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
   const [deliveryEstimate, setDeliveryEstimate] = useState<DeliveryEstimateResponse | null>(null);
   const [deliveryError, setDeliveryError] = useState<string | null>(null);
 
-  const fetchDeliveryEstimate = useCallback(async (pincodeToCheck: string, variantId?: string) => {
+  // Ref to hold the latest fetch function so effects don't re-run when variant changes
+  const fetchDeliveryEstimateRef = useRef<((pin: string, vid?: string, weight?: number) => Promise<void>) | null>(null);
+
+  const fetchDeliveryEstimate = useCallback(async (pincodeToCheck: string, variantId?: string, weight?: number) => {
     const cleanPin = (pincodeToCheck || "").trim();
     if (!/^[1-9][0-9]{5}$/.test(cleanPin)) {
       setDeliveryError("Enter a valid 6-digit pincode.");
@@ -63,8 +66,8 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
       const res = await productService.getDeliveryEstimate({
         pincode: cleanPin,
         productId: product.id,
-        variantId: variantId !== undefined ? variantId : selectedVariant?.id,
-        weight: selectedVariant?.shippingWeightKg || undefined,
+        variantId: variantId,
+        weight: weight || undefined,
       });
 
       if (res && res.available && res.formattedDate) {
@@ -86,10 +89,17 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
     } finally {
       setIsCheckingDelivery(false);
     }
-  }, [product.id, selectedVariant?.id, selectedVariant?.shippingWeightKg]);
+  }, [product.id]);
+
+  // Keep the ref in sync so effects use the latest without re-triggering
+  fetchDeliveryEstimateRef.current = fetchDeliveryEstimate;
 
   // 1. Initialize address & delivery estimate (Default Address > Remembered Pincode > Input Form)
+  // Only runs once on mount (or when auth state changes). Uses ref to avoid re-running on variant change.
+  const hasInitializedRef = useRef(false);
   useEffect(() => {
+    // Prevent duplicate init on strict-mode double-mount or fast re-renders
+    if (hasInitializedRef.current) return;
     let isMounted = true;
 
     const initializeAddressAndDelivery = async () => {
@@ -113,7 +123,8 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
                 setActiveCityState(cityState || null);
                 setIsUsingDefaultAddress(true);
                 setPincodeInput(cleanPin);
-                fetchDeliveryEstimate(cleanPin, selectedVariant?.id);
+                fetchDeliveryEstimateRef.current?.(cleanPin, selectedVariant?.id, selectedVariant?.shippingWeightKg || undefined);
+                hasInitializedRef.current = true;
                 return;
               }
             }
@@ -131,7 +142,8 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
             setActiveCityState(null);
             setIsUsingDefaultAddress(false);
             setPincodeInput(cleanPin);
-            fetchDeliveryEstimate(cleanPin, selectedVariant?.id);
+            fetchDeliveryEstimateRef.current?.(cleanPin, selectedVariant?.id, selectedVariant?.shippingWeightKg || undefined);
+            hasInitializedRef.current = true;
             return;
           }
         } catch {
@@ -149,19 +161,21 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
     return () => {
       isMounted = false;
     };
-  }, [isAuthenticated, fetchDeliveryEstimate, selectedVariant?.id]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
 
-  // 2. Re-check estimate whenever variant changes (never reuse estimate across variants)
+  // 2. Re-check estimate whenever variant changes (uses ref to avoid circular deps)
   const prevVariantIdRef = useRef<string | undefined>(selectedVariant?.id);
   useEffect(() => {
     if (prevVariantIdRef.current !== selectedVariant?.id) {
       prevVariantIdRef.current = selectedVariant?.id;
       if (activePincode) {
         setDeliveryEstimate(null);
-        fetchDeliveryEstimate(activePincode, selectedVariant?.id);
+        fetchDeliveryEstimateRef.current?.(activePincode, selectedVariant?.id, selectedVariant?.shippingWeightKg || undefined);
       }
     }
-  }, [selectedVariant?.id, activePincode, fetchDeliveryEstimate]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedVariant?.id, activePincode]);
 
   const handleCheckPincodeSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -173,7 +187,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
       setIsUsingDefaultAddress(false);
       setActiveCityState(null);
     }
-    fetchDeliveryEstimate(cleanPin, selectedVariant?.id);
+    fetchDeliveryEstimate(cleanPin, selectedVariant?.id, selectedVariant?.shippingWeightKg || undefined);
   };
 
   // Dynamic pricing & stock based on selected variant or base product

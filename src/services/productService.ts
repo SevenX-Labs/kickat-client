@@ -76,6 +76,11 @@ export async function enrichProductsWithVariants(products: BackendProduct[]): Pr
   return products;
 }
 
+// ── Delivery estimate cache (5-min TTL) + request deduplication ──
+const DELIVERY_CACHE_TTL_MS = 5 * 60 * 1000;
+const deliveryEstimateCache = new Map<string, { data: DeliveryEstimateResponse; ts: number }>();
+const deliveryEstimateInflight = new Map<string, Promise<DeliveryEstimateResponse>>();
+
 export const productService = {
   /**
    * GET /api/v1/products
@@ -244,7 +249,8 @@ export const productService = {
   },
   /**
    * GET /api/v1/shipping/delivery-estimate
-   * Fetch customer delivery estimate by pincode and optional variant/weight
+   * Fetch customer delivery estimate by pincode and optional variant/weight.
+   * Includes in-memory cache (5 min TTL), request deduplication, and 429 retry.
    */
   async getDeliveryEstimate(params: {
     pincode: string;
@@ -252,13 +258,58 @@ export const productService = {
     variantId?: string;
     weight?: number;
   }): Promise<DeliveryEstimateResponse> {
+    const cacheKey = `${params.pincode}|${params.productId || ""}|${params.variantId || ""}`;
+
+    // 1. Return from cache if fresh (5-minute TTL)
+    const cached = deliveryEstimateCache.get(cacheKey);
+    if (cached && Date.now() - cached.ts < DELIVERY_CACHE_TTL_MS) {
+      return cached.data;
+    }
+
+    // 2. Deduplicate: if an identical request is already in-flight, piggy-back on it
+    const inflight = deliveryEstimateInflight.get(cacheKey);
+    if (inflight) {
+      return inflight;
+    }
+
     const query = new URLSearchParams();
     query.set("pincode", params.pincode);
     if (params.productId) query.set("productId", params.productId);
     if (params.variantId) query.set("variantId", params.variantId);
     if (params.weight) query.set("weight", String(params.weight));
-    return api<DeliveryEstimateResponse>(`/shipping/delivery-estimate?${query.toString()}`, {
-      method: "GET",
+
+    const doFetch = async (): Promise<DeliveryEstimateResponse> => {
+      try {
+        const res = await api<DeliveryEstimateResponse>(
+          `/shipping/delivery-estimate?${query.toString()}`,
+          { method: "GET" }
+        );
+        // Cache successful responses
+        if (res && res.available) {
+          deliveryEstimateCache.set(cacheKey, { data: res, ts: Date.now() });
+        }
+        return res;
+      } catch (err: any) {
+        // 429 retry: wait 2s and try once more
+        if (err?.message?.includes("429") || err?.message?.toLowerCase().includes("too many")) {
+          await new Promise((r) => setTimeout(r, 2000));
+          const retryRes = await api<DeliveryEstimateResponse>(
+            `/shipping/delivery-estimate?${query.toString()}`,
+            { method: "GET" }
+          );
+          if (retryRes && retryRes.available) {
+            deliveryEstimateCache.set(cacheKey, { data: retryRes, ts: Date.now() });
+          }
+          return retryRes;
+        }
+        throw err;
+      }
+    };
+
+    const promise = doFetch().finally(() => {
+      deliveryEstimateInflight.delete(cacheKey);
     });
+    deliveryEstimateInflight.set(cacheKey, promise);
+    return promise;
   },
 };
