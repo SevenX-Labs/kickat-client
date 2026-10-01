@@ -78,14 +78,30 @@ export default function CartPage() {
   return (
     <main className={styles.container}>
       <div className={styles.pageHeader}>
-        <button onClick={() => router.push('/categories')} className={styles.backBtn}>
-          <ArrowLeft size={17} strokeWidth={1.8} />
-          Continue Shopping
-        </button>
-        <div>
-          <p className={styles.eyebrow}>Shopping bag</p>
-          <h1 className={styles.title}>Your Cart</h1>
-          <p className={styles.subtitle}>{cartCount} {cartCount === 1 ? 'item' : 'items'} ready for checkout</p>
+        <div className={styles.headerTop}>
+          <button onClick={() => router.push('/shop')} className={styles.backBtn} aria-label="Continue Shopping">
+            <ArrowLeft size={15} strokeWidth={2.2} className={styles.backIcon} />
+            <span>Continue Shopping</span>
+          </button>
+        </div>
+
+        <div className={styles.headerTitleRow}>
+          <div className={styles.titleArea}>
+            <p className={styles.eyebrow}>Shopping Bag</p>
+            <div className={styles.titleWithBadge}>
+              <h1 className={styles.title}>Your Cart</h1>
+              {cartCount > 0 && (
+                <span className={styles.itemCountPill}>
+                  {cartCount} {cartCount === 1 ? 'item' : 'items'}
+                </span>
+              )}
+            </div>
+          </div>
+          {cartCount > 0 && (
+            <p className={styles.subtitle}>
+              {cartCount} {cartCount === 1 ? 'item' : 'items'} ready for checkout
+            </p>
+          )}
         </div>
       </div>
 

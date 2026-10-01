@@ -2,13 +2,21 @@
   width: 100%;
   max-width: 1240px;
   margin: 0 auto;
-  padding: 2rem 1.5rem 0;
+  padding: 0.75rem 1.5rem 0;
 }
 
 .pageHeader {
-  display: grid;
-  gap: 1.1rem;
-  margin-bottom: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.1rem;
+}
+
+.headerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 .backBtn {
@@ -16,38 +24,89 @@
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  border: 1px solid rgba(33, 28, 21, 0.1);
-  background: #fffaf3;
-  color: #211C15;
+  border: 1px solid rgba(33, 28, 21, 0.12);
+  background: #ffffff;
+  color: #38342E;
   border-radius: 999px;
-  padding: 0.65rem 0.95rem;
-  font-size: 0.88rem;
-  font-weight: 700;
+  padding: 0.38rem 0.8rem;
+  font-size: 0.82rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.backBtn:hover {
+  background: #FFF9F2;
+  color: #F99205;
+  border-color: rgba(249, 146, 5, 0.4);
+  transform: translateX(-2px);
+}
+
+.backIcon {
+  color: #F99205;
+  transition: transform 0.2s ease;
+}
+
+.backBtn:hover .backIcon {
+  transform: translateX(-2px);
+}
+
+.headerTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.titleArea {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
 }
 
 .eyebrow {
-  margin: 0 0 0.25rem;
+  margin: 0;
   color: #F99205;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
+.titleWithBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
 .title {
   font-family: var(--font-fraunces), serif;
-  font-size: 2.65rem;
-  line-height: 1;
+  font-size: 2rem;
+  line-height: 1.1;
   font-weight: 700;
   color: #17130f;
   margin: 0;
 }
 
+.itemCountPill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: #FFF4E6;
+  color: #D97706;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid rgba(249, 146, 5, 0.2);
+}
+
 .subtitle {
-  margin: 0.55rem 0 0;
-  color: #6b6258;
-  font-size: 1rem;
+  margin: 0;
+  color: #78716C;
+  font-size: 0.86rem;
+  font-weight: 500;
 }
 
 .cartLayout {
