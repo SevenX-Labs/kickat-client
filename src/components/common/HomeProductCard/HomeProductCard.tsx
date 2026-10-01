@@ -211,8 +211,22 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
     }
   }, [isAdded, isAdding, isOutOfStock, isVariable, hasExplicitVariant, product.id, targetVariantId, product.image, router, addToCart]);
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (
+      target.closest('button') ||
+      target.closest('input') ||
+      target.closest('select') ||
+      target.closest(`.${styles.cardWishlistBtn}`) ||
+      target.closest(`.${styles.addToCartBtn}`)
+    ) {
+      return;
+    }
+    router.push(productHref);
+  };
+
   return (
-    <div className={styles.homeCard}>
+    <div className={styles.homeCard} onClick={handleCardClick}>
       {/* Variant Selector Modal (only if variable product has no pre-selected variant) */}
       {isVariable && !hasExplicitVariant && (
         <VariantSelectorModal
@@ -260,7 +274,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
           </button>
         )}
 
-        <Link href={productHref} prefetch={true} target="_blank" rel="noopener noreferrer" className={styles.cardImageLink}>
+        <Link href={productHref} prefetch={true} className={styles.cardImageLink}>
           <SafeImage
             src={product.image}
             productName={product.name}
@@ -280,7 +294,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
           <span className={styles.categoryText}>{product.brand || product.mainCategory || 'KickAt Essential'}</span>
         </div>
 
-        <Link href={productHref} prefetch={true} target="_blank" rel="noopener noreferrer" className={styles.cardTitleLink}>
+        <Link href={productHref} prefetch={true} className={styles.cardTitleLink}>
           <h3 className={styles.cardTitle}>{product.name}</h3>
         </Link>
 

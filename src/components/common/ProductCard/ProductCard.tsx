@@ -260,8 +260,26 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
     ? `/product/${product.id}?variant=${targetVariantId}`
     : `/product/${product.id}`;
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (
+      target.closest('button') ||
+      target.closest('input') ||
+      target.closest('select') ||
+      target.closest(`.${styles.cardWishlistBtn}`) ||
+      target.closest(`.${styles.cardRemoveBtn}`) ||
+      target.closest(`.${styles.addToCartBtn}`) ||
+      target.closest(`.${styles.desktopWishlistBtn}`) ||
+      target.closest(`.${styles.variantChip}`) ||
+      target.closest(`.${styles.swatchDot}`)
+    ) {
+      return;
+    }
+    router.push(productHref);
+  };
+
   return (
-    <div className={styles.productCard}>
+    <div className={styles.productCard} onClick={handleCardClick}>
       {/* Variant Selector Modal for Variable Products */}
       {isVariable && !isSpecificVariantCard && (
         <VariantSelectorModal
@@ -308,7 +326,7 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
           </button>
         )}
 
-        <Link href={productHref} prefetch={true} target="_blank" rel="noopener noreferrer" className={styles.cardImageLink}>
+        <Link href={productHref} prefetch={true} className={styles.cardImageLink}>
           <SafeImage
             src={activeImage}
             productName={product.name}
@@ -324,7 +342,7 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
 
       {/* Middle Details Column */}
       <div className={styles.cardInfo}>
-        <Link href={productHref} prefetch={true} target="_blank" rel="noopener noreferrer" className={styles.cardTitleLink}>
+        <Link href={productHref} prefetch={true} className={styles.cardTitleLink}>
           <h3 className={styles.cardTitle}>{product.name}</h3>
         </Link>
         
