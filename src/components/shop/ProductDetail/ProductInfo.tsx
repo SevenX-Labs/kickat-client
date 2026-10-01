@@ -6,7 +6,7 @@ import { productService, DeliveryEstimateResponse } from "@/services/productServ
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
-import { Star, ShoppingBag, Zap, Ruler, Minus, Plus, Check, X, Dog, Droplets, Waves, Sun, Loader2 } from "lucide-react";
+import { Star, ShoppingBag, Zap, Ruler, Minus, Plus, Check, X, Dog, Droplets, Waves, Sun, Loader2, Truck } from "lucide-react";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { AddressSelectionDrawer } from "./AddressSelectionDrawer";
 import styles from "./ProductDetail.module.css";
@@ -354,11 +354,47 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
       {/* Product Title */}
       <h1 className={styles.productTitle}>{title}</h1>
 
-      {/* Brand / Category & Merchandising Badge Row (Visually Separated from Rating) */}
+      {/* Subtext (Category) + Reviews + Best Seller Badge combined in ONE clean line */}
       <div className={styles.productHeaderMetaRow}>
         <p className={styles.productSubtitle}>
           {product.brand ? `${product.brand} · ` : ""}{product.mainCategory || "KickAt Essential"}
         </p>
+
+        <span className={styles.metaDivider}>|</span>
+
+        {/* Rating & Social Proof */}
+        <div className={styles.ratingRow}>
+          {reviewsCount > 0 && rating > 0 ? (
+            <>
+              <div className={styles.starsGroup}>
+                {[...Array(5)].map((_, i) => (
+                  <Star 
+                    key={i} 
+                    size={13} 
+                    fill={i < Math.floor(rating) ? "#F99205" : "none"} 
+                    color={i < Math.floor(rating) ? "#F99205" : "#C2B8AA"} 
+                    strokeWidth={i < Math.floor(rating) ? 0 : 1.5} 
+                  />
+                ))}
+                <span className={styles.ratingScore}>{rating.toFixed(1)}</span>
+              </div>
+              <span className={styles.ratingDivider}>·</span>
+              <span className={styles.reviewsCountText}>
+                {reviewsCount} {reviewsCount === 1 ? "Review" : "Reviews"}
+              </span>
+            </>
+          ) : (
+            <div className={styles.noReviewsGroup}>
+              <div className={styles.starsGroupEmpty}>
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} size={12} fill="none" color="#C2B8AA" strokeWidth={1.5} />
+                ))}
+              </div>
+              <span className={styles.reviewsCountText}>No reviews yet</span>
+            </div>
+          )}
+        </div>
+
         {product.badge && (
           <span className={styles.verifiedBadge}>
             <Check size={11} strokeWidth={3} />
@@ -367,40 +403,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
         )}
       </div>
 
-      {/* Rating & Social Proof Row */}
-      <div className={styles.ratingRow}>
-        {reviewsCount > 0 && rating > 0 ? (
-          <>
-            <div className={styles.starsGroup}>
-              {[...Array(5)].map((_, i) => (
-                <Star 
-                  key={i} 
-                  size={14} 
-                  fill={i < Math.floor(rating) ? "#F99205" : "#E5E7EB"} 
-                  color={i < Math.floor(rating) ? "#F99205" : "#E5E7EB"} 
-                  strokeWidth={0} 
-                />
-              ))}
-              <span className={styles.ratingScore}>{rating.toFixed(1)}</span>
-            </div>
-            <span className={styles.ratingDivider}>|</span>
-            <span className={styles.reviewsCountText}>
-              {reviewsCount} {reviewsCount === 1 ? "Review" : "Reviews"}
-            </span>
-          </>
-        ) : (
-          <div className={styles.noReviewsGroup}>
-            <div className={styles.starsGroupEmpty}>
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} size={13} fill="#E5E7EB" color="#E5E7EB" strokeWidth={0} />
-              ))}
-            </div>
-            <span className={styles.reviewsCountText}>No reviews yet</span>
-          </div>
-        )}
-      </div>
-
-      {/* Price Row */}
+      {/* Price & Stock Status Row */}
       <div className={styles.priceContainer}>
         <div className={styles.priceRowMain}>
           <span className={styles.currentPrice}>₹{effectivePrice.toLocaleString()}</span>
@@ -410,6 +413,27 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
           {discountPercent && (
             <span className={styles.discountBadge}>{discountPercent}% OFF</span>
           )}
+
+          {/* In Stock / Availability Pill aligned in price row */}
+          <div className={styles.stockStatusInline}>
+            {isOutOfStock ? (
+              <>
+                <span className={styles.redDot} />
+                <span className={styles.stockOutOfStockText}>Out of Stock</span>
+              </>
+            ) : currentStock <= 5 ? (
+              <>
+                <span className={styles.greenDot} />
+                <span className={styles.stockInStockText}>In Stock</span>
+                <span className={styles.lowStockBadge}>Only {currentStock} left</span>
+              </>
+            ) : (
+              <>
+                <span className={styles.greenDot} />
+                <span className={styles.stockInStockText}>In Stock</span>
+              </>
+            )}
+          </div>
         </div>
         <span className={styles.taxNote}>Inclusive of all taxes</span>
       </div>
@@ -418,10 +442,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
       {hasVariants && (
         <div className={styles.selectorBlock}>
           <div className={styles.selectorHeader}>
-            <span className={styles.selectorTitle}>Select Variety / Size:</span>
-            <span className={styles.selectorValue}>
-              {selectedVariant ? (selectedVariant.attributes && Object.values(selectedVariant.attributes)[0] ? String(Object.values(selectedVariant.attributes)[0]) : selectedVariant.name) : "Select an option"}
-            </span>
+            <span className={styles.selectorTitle}>Select Variety / Size</span>
           </div>
 
           <div className={styles.varietyCardsGrid}>
@@ -452,21 +473,25 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
                   aria-pressed={isSelected}
                   title={isVarOutOfStock ? `${displayLabel} (Out of stock)` : `${displayLabel} - ₹${varPrice}`}
                 >
-                  <div className={styles.varietyCardName}>
-                    <span>{displayLabel}</span>
-                    {isSelected && <Check size={13} strokeWidth={3} color="#F99205" />}
+                  <div className={styles.varietyCardHeaderRow}>
+                    <span className={styles.varietyCardName}>{displayLabel}</span>
+                    {isSelected && (
+                      <span className={styles.varietyCardCheckWrap}>
+                        <Check size={11} strokeWidth={3} />
+                      </span>
+                    )}
                   </div>
-                  <div className={styles.varietyCardPriceRow}>
+                  <div className={styles.varietyCardDetailsRow}>
                     <span className={styles.varietyCardPrice}>₹{varPrice.toLocaleString()}</span>
                     {varOrigPrice && varOrigPrice > varPrice && (
                       <span className={styles.varietyCardOrigPrice}>₹{varOrigPrice.toLocaleString()}</span>
                     )}
+                    {varDiscount ? (
+                      <span className={styles.varietyCardDiscount}>{varDiscount}% OFF</span>
+                    ) : isVarOutOfStock ? (
+                      <span className={styles.varietyStockText}>Out of stock</span>
+                    ) : null}
                   </div>
-                  {varDiscount ? (
-                    <span className={styles.varietyCardDiscount}>{varDiscount}% OFF</span>
-                  ) : isVarOutOfStock ? (
-                    <span className={styles.varietyStockText}>Out of stock</span>
-                  ) : null}
                 </button>
               );
             })}
@@ -474,57 +499,14 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
         </div>
       )}
 
-      {/* Quantity & Stock Row */}
-      <div className={styles.quantityStockRow}>
-        <div className={styles.quantityStepper}>
-          <button
-            type="button"
-            className={styles.stepperBtn}
-            onClick={() => setQuantity(Math.max(1, quantity - 1))}
-            disabled={quantity <= 1 || isOutOfStock}
-            aria-label="Decrease quantity"
-          >
-            <Minus size={14} />
-          </button>
-          <span className={styles.stepperValue}>{quantity}</span>
-          <button
-            type="button"
-            className={styles.stepperBtn}
-            onClick={() => setQuantity(Math.min(currentStock, quantity + 1))}
-            disabled={quantity >= currentStock || isOutOfStock}
-            aria-label="Increase quantity"
-          >
-            <Plus size={14} />
-          </button>
-        </div>
 
-        <div className={styles.stockStatusBox}>
-          {isOutOfStock ? (
-            <>
-              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#DC2626", display: "inline-block" }} />
-              <span style={{ fontWeight: 700, color: "#DC2626" }}>Out of Stock</span>
-            </>
-          ) : currentStock <= 5 ? (
-            <>
-              <span className={styles.greenDot} />
-              <span className={styles.stockBold}>In Stock</span>
-              <span className={styles.lowStockBadge}>Only {currentStock} left</span>
-            </>
-          ) : (
-            <>
-              <span className={styles.greenDot} />
-              <span className={styles.stockBold}>In Stock</span>
-            </>
-          )}
-        </div>
-      </div>
 
       {/* Compact Customer Delivery Estimate Section */}
       <div className={styles.deliveryEstimateSection}>
         {isInitializingAddress ? (
           <>
             <div className={styles.deliveryHeaderRow}>
-              <span className={styles.deliveryIcon}>🚚</span>
+              <span className={styles.deliveryIconWrap}><Truck size={16} color="#F99205" /></span>
               <span className={styles.deliveryHeading}>Delivery</span>
             </div>
             <div className={styles.deliverySkeletonWrap}>
@@ -535,7 +517,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
         ) : activePincode && !isChangingPincode ? (
           <>
             <div className={styles.deliveryHeaderRow}>
-              <span className={styles.deliveryIcon}>🚚</span>
+              <span className={styles.deliveryIconWrap}><Truck size={16} color="#F99205" /></span>
               <span className={styles.deliveryHeading}>Delivery</span>
             </div>
             <div className={styles.deliverToRow}>
@@ -578,7 +560,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
         ) : (
           <>
             <div className={styles.deliveryHeaderRow}>
-              <span className={styles.deliveryIcon}>🚚</span>
+              <span className={styles.deliveryIconWrap}><Truck size={16} color="#F99205" /></span>
               <span className={styles.deliveryHeading}>Check delivery availability</span>
             </div>
             <form onSubmit={handleCheckPincodeSubmit} className={styles.deliveryInputRow}>
@@ -638,8 +620,30 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
         )}
       </div>
 
-      {/* Primary CTAs Row (Add to Cart + Buy Now) */}
+      {/* Primary CTAs Row (Quantity Stepper + Add to Cart + Buy Now) */}
       <div className={styles.primaryCtasRow}>
+        <div className={styles.quantityStepper}>
+          <button
+            type="button"
+            className={styles.stepperBtn}
+            onClick={() => setQuantity(Math.max(1, quantity - 1))}
+            disabled={quantity <= 1 || isOutOfStock}
+            aria-label="Decrease quantity"
+          >
+            <Minus size={15} />
+          </button>
+          <span className={styles.stepperValue}>{quantity}</span>
+          <button
+            type="button"
+            className={styles.stepperBtn}
+            onClick={() => setQuantity(Math.min(currentStock, quantity + 1))}
+            disabled={quantity >= currentStock || isOutOfStock}
+            aria-label="Increase quantity"
+          >
+            <Plus size={15} />
+          </button>
+        </div>
+
         <button
           type="button"
           className={`${styles.addToCartMainBtn} ${hasAdded ? styles.addedState : ""}`}
