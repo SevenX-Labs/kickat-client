@@ -77,7 +77,7 @@ export function ProductTabs({ product, selectedVariant }: ProductTabsProps) {
       .join(' | ');
   }
 
-  // Build dynamic tabs list
+  // Build dynamic tabs
   const tabs: { id: string; label: string; icon: React.ReactNode }[] = [
     { id: 'details', label: 'Details & Highlights', icon: <FileText size={15} /> },
   ];
@@ -96,7 +96,7 @@ export function ProductTabs({ product, selectedVariant }: ProductTabsProps) {
 
   tabs.push({ id: 'shipping', label: 'Shipping & Returns', icon: <Truck size={15} /> });
 
-  // Scroll detection
+  // Scroll detection for mobile indicators
   const checkScroll = useCallback(() => {
     const el = tabsNavRef.current;
     if (!el) return;
@@ -117,13 +117,13 @@ export function ProductTabs({ product, selectedVariant }: ProductTabsProps) {
     };
   }, [checkScroll]);
 
-  // Re-check edge scroll indicators whenever activeTab changes
+  // Re-check edge scroll indicators on activeTab change
   useEffect(() => {
     const timer = setTimeout(checkScroll, 350);
     return () => clearTimeout(timer);
   }, [activeTab, checkScroll]);
 
-  // One-time gentle auto-scroll nudge on first mobile load to visually demonstrate horizontal interactivity
+  // One-time gentle auto-scroll nudge on first mobile load
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (window.innerWidth > 768) return;
@@ -134,12 +134,10 @@ export function ProductTabs({ product, selectedVariant }: ProductTabsProps) {
 
       const timer = setTimeout(() => {
         const el = tabsNavRef.current;
-        if (!el || el.scrollLeft > 10) return; // User already interacted
+        if (!el || el.scrollLeft > 10) return;
 
-        // Gentle nudge forward
         el.scrollTo({ left: 45, behavior: 'smooth' });
 
-        // Gentle nudge back
         const backTimer = setTimeout(() => {
           if (el && el.scrollLeft < 70) {
             el.scrollTo({ left: 0, behavior: 'smooth' });
@@ -208,54 +206,50 @@ export function ProductTabs({ product, selectedVariant }: ProductTabsProps) {
       case 'details':
         return (
           <div className={styles.tabDetailsGrid}>
-            {/* Left Column: Description & Highlights */}
+            {/* Left Column: Description & Highlights (only if genuine highlights exist) */}
             <div className={styles.tabDetailsLeftCol}>
               <h3 className={styles.tabSectionHeading}>
                 {product.descriptionTitle || `Why Choose ${product.name}?`}
               </h3>
               <p className={styles.tabMainParagraph}>
                 {product.description ||
-                  
-                  'Specially crafted to deliver balanced daily nourishment, vital energy, and premium taste for your pet companion.'}
+                  'Crafted with high quality standards to bring wholesome wellness, energy, and joy to your companion. Engineered for pet safety, gentle care, and daily happiness.'}
               </p>
 
+              {/* Only render highlights if real highlights exist */}
               {parsedHighlights.length > 0 && (
-                <div className={styles.highlightsContainer}>
-                  <h4 className={styles.highlightsSubHeading}>
-                    <Sparkles size={16} color="#F99205" />
-                    <span>Product Highlights</span>
-                  </h4>
-                  <ul className={styles.highlightsList}>
-                    {parsedHighlights.map((hl, idx) => (
-                      <li key={idx} className={styles.highlightItem}>
-                        <CheckCircle2 size={16} className={styles.highlightIcon} />
-                        <span>{hl}</span>
-                      </li>
-                    ))}
-                  </ul>
+                <div className={styles.calloutGrid}>
+                  {parsedHighlights.map((hl, idx) => (
+                    <div key={idx} className={styles.calloutItem}>
+                      <div className={styles.calloutIconWrap}>
+                        <CheckCircle2 size={18} className={styles.calloutIcon} />
+                      </div>
+                      <div>
+                        <h4 className={styles.calloutTitle}>{hl}</h4>
+                        <p className={styles.calloutSub}>KickAt Quality Guarantee</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
 
-            {/* Right Column: Dynamic Feature Infographic Card */}
-            <div className={styles.tabFeatureCardCol}>
-              <div className={styles.featureInfographicCard}>
-                <div className={styles.featureInfographicContent}>
-                  <span className={styles.featureTag}>Premium Quality Guarantee</span>
-                  <h4 className={styles.featureTitle}>100% Authentic &amp; Vet-Approved</h4>
-                  <p className={styles.featureDesc}>
-                    Formulated with human-grade ingredients and precision nutrition balances to support digestion, immunity, and radiant coat health.
-                  </p>
-                  <div className={styles.featureTrustPills}>
-                    <div className={styles.featureTrustPill}>
-                      <ShieldCheck size={14} color="#F99205" />
-                      <span>FSSAI / Safety Standards Certified</span>
-                    </div>
-                    <div className={styles.featureTrustPill}>
-                      <Sparkles size={14} color="#F99205" />
-                      <span>Zero Artificial Preservatives</span>
-                    </div>
-                  </div>
+            {/* Right Column: Clean Lifestyle Product Showcase */}
+            <div className={styles.tabDetailsRightCol}>
+              <div className={styles.lifestyleBannerWrap}>
+                <SafeImage
+                  src={(selectedVariant && selectedVariant.images && selectedVariant.images[0]) || product.image || product.images?.[0] || "/hero-products/dog_food.png"}
+                  productName={product.name}
+                  categoryName={product.mainCategory || undefined}
+                  petSpecies={product.petSpecies || undefined}
+                  alt={product.name || "Product lifestyle preview"}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 500px"
+                  className={styles.lifestyleImage}
+                />
+                <div className={styles.lifestyleBadgeBottom}>
+                  <PawPrint size={15} fill="#F99205" color="#F99205" />
+                  <span>KickAt Certified Quality</span>
                 </div>
               </div>
             </div>
