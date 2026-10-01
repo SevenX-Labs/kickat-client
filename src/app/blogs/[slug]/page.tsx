@@ -2,11 +2,27 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowLeft, Clock, Calendar, User, Tag, AlertCircle, Loader2 } from "lucide-react";
+import { ArrowLeft, Clock, Calendar, User, Tag, AlertCircle, Loader2, Lightbulb, CheckCircle2 } from "lucide-react";
 import { Footer } from "@/components/common/Footer";
 import { blogService } from "@/services/blogService";
 import { BlogPost } from "@/types/blog";
 import SafeImage from "@/components/ui/SafeImage";
+
+// Inline markdown formatting (bold)
+function renderInlineText(text: string) {
+  if (!text) return null;
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return (
+        <strong key={index} className="font-bold text-[#1A1612]">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    return part;
+  });
+}
 
 interface SingleBlogPageProps {
   params: Promise<{ slug: string }>;
@@ -151,17 +167,77 @@ export default function SingleBlogPage({ params }: SingleBlogPageProps) {
             {/* Article Content */}
             {blog.content && (
               <div className="prose prose-stone max-w-none text-sm md:text-base text-[#555046] leading-relaxed space-y-6">
-                {blog.content.split("\n\n").map((paragraph, idx) => {
-                  if (paragraph.startsWith("### ")) {
+                {blog.content.split(/\n\n+/).map((block, idx) => {
+                  const trimmed = block.trim();
+                  if (!trimmed) return null;
+
+                  // 1. Headings (### or ##)
+                  if (trimmed.startsWith("### ") || trimmed.startsWith("## ")) {
                     return (
-                      <h2 key={idx} className="text-xl md:text-2xl font-bold text-[#1A1612] font-serif pt-4">
-                        {paragraph.replace("### ", "")}
+                      <h2
+                        key={idx}
+                        className="text-xl md:text-2xl font-bold text-[#1A1612] font-serif pt-6 pb-1 border-b border-[#F3ECE1] flex items-center gap-2.5"
+                      >
+                        <span className="h-2 w-2 rounded-full bg-[#FF7A00] shrink-0"></span>
+                        <span>{trimmed.replace(/^###?\s+/, "")}</span>
                       </h2>
                     );
                   }
+
+                  // 2. Callout / Pro Tip (> 💡 or >)
+                  if (trimmed.startsWith(">")) {
+                    const tipText = trimmed.replace(/^>\s*(💡\s*)?/, "");
+                    return (
+                      <div
+                        key={idx}
+                        className="my-5 p-4 md:p-5 bg-amber-50/80 rounded-2xl border border-amber-200/80 text-amber-950 flex items-start gap-3 shadow-xs"
+                      >
+                        <div className="p-1.5 rounded-xl bg-amber-100 text-amber-700 shrink-0 mt-0.5">
+                          <Lightbulb className="h-4 w-4" />
+                        </div>
+                        <div className="text-sm md:text-base font-medium leading-relaxed">
+                          <p className="font-bold text-amber-900 text-xs uppercase tracking-wide mb-0.5">
+                            Pro-Tip / Highlight
+                          </p>
+                          <p>{renderInlineText(tipText)}</p>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  // 3. Bullet Point List
+                  const lines = trimmed.split("\n");
+                  const isBulletList = lines.every((l) => {
+                    const lt = l.trim();
+                    return !lt || lt.startsWith("- ") || lt.startsWith("* ") || lt.startsWith("• ");
+                  });
+
+                  if (isBulletList) {
+                    const bullets = lines
+                      .map((l) => l.trim().replace(/^[-*•]\s*/, ""))
+                      .filter((l) => l.length > 0);
+
+                    return (
+                      <ul key={idx} className="space-y-2.5 my-4 pl-1 sm:pl-2">
+                        {bullets.map((bullet, bIdx) => (
+                          <li
+                            key={bIdx}
+                            className="flex items-start gap-3 text-sm md:text-base text-[#555046] leading-relaxed"
+                          >
+                            <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-orange-100 text-[#FF7A00] mt-0.5">
+                              <CheckCircle2 className="h-3.5 w-3.5 stroke-[2.5]" />
+                            </div>
+                            <span className="flex-1">{renderInlineText(bullet)}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    );
+                  }
+
+                  // 4. Regular Paragraph
                   return (
-                    <p key={idx}>
-                      {paragraph}
+                    <p key={idx} className="leading-relaxed">
+                      {renderInlineText(trimmed)}
                     </p>
                   );
                 })}
