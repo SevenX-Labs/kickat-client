@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import SafeImage from '@/components/ui/SafeImage';
 import {
   ShieldCheck,
@@ -24,6 +24,38 @@ interface ProductTabsProps {
 }
 
 export function ProductTabs({ product, selectedVariant }: ProductTabsProps) {
+  const tabsNavRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    const el = tabsNavRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setCanScrollLeft(scrollLeft > 4);
+    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 4);
+  }, []);
+
+  useEffect(() => {
+    const el = tabsNavRef.current;
+    if (!el) return;
+    checkScroll();
+    el.addEventListener('scroll', checkScroll, { passive: true });
+    window.addEventListener('resize', checkScroll);
+    return () => {
+      el.removeEventListener('scroll', checkScroll);
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, [checkScroll]);
+
+  const handleTabClick = (tabId: string, e: React.MouseEvent<HTMLButtonElement>) => {
+    setActiveTab(tabId);
+    e.currentTarget.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'center',
+    });
+  };
   // Parse highlights safely without [object Object]
   let parsedHighlights: string[] = [];
   if (Array.isArray(product.highlights)) {
@@ -280,26 +312,44 @@ export function ProductTabs({ product, selectedVariant }: ProductTabsProps) {
 
   return (
     <div className={styles.tabsSectionContainer}>
-      {/* Horizontal Tabs Header Bar */}
-      <div className={styles.tabsHeaderNav}>
-        {tabs.map((tab) => {
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              className={`${styles.tabNavBtn} ${isActive ? styles.tabNavBtnActive : ''}`}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              <span className={styles.tabBtnIcon}>{tab.icon}</span>
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
+      {/* Horizontal Tabs Header Bar with Mobile Scroll Wrapper & Edge Fade Indicators */}
+      <div className={styles.tabsHeaderNavWrap}>
+        {/* Left Fade Indicator (visible on mobile when scrolled right) */}
+        <div
+          className={styles.tabsFadeLeft}
+          style={{ opacity: canScrollLeft ? 1 : 0 }}
+          aria-hidden="true"
+        />
+
+        <div className={styles.tabsHeaderNav} ref={tabsNavRef}>
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                className={`${styles.tabNavBtn} ${isActive ? styles.tabNavBtnActive : ''}`}
+                onClick={(e) => handleTabClick(tab.id, e)}
+                aria-selected={isActive}
+                role="tab"
+              >
+                <span className={styles.tabBtnIcon}>{tab.icon}</span>
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Right Fade Indicator (visible on mobile when more content is off-screen) */}
+        <div
+          className={styles.tabsFadeRight}
+          style={{ opacity: canScrollRight ? 1 : 0 }}
+          aria-hidden="true"
+        />
       </div>
 
       {/* Tab Panel Body */}
-      <div className={styles.tabPanelBody}>
+      <div className={styles.tabPanelBody} role="tabpanel">
         {renderTabContent(activeTab)}
       </div>
     </div>
