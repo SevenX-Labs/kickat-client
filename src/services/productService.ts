@@ -235,6 +235,21 @@ export const productService = {
   },
 
   /**
+   * GET /api/v1/products/recommended
+   * Fetch personalized companion recommendations based on registered pet species
+   */
+  async getRecommended(petId?: string): Promise<{ success: boolean; products: BackendProduct[] }> {
+    const qs = petId ? `?petId=${encodeURIComponent(petId)}` : "";
+    const res = await api<{ success: boolean; products: BackendProduct[] }>(`/products/recommended${qs}`, {
+      method: "GET",
+    });
+    if (res && Array.isArray(res.products)) {
+      await enrichProductsWithVariants(res.products);
+    }
+    return res;
+  },
+
+  /**
    * GET /api/v1/products?sort=newest
    * Fetch new arrival products from the database
    */

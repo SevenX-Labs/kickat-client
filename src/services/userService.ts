@@ -101,4 +101,53 @@ export const userService = {
 
     return [];
   },
+  /**
+   * Send Phone Verification OTP for logged in user (POST /api/v1/users/mobile/send-verification)
+   */
+  async sendMobileVerification(phone?: string): Promise<{ success: boolean; message: string }> {
+    const data = phone ? { phone: phone.startsWith("+91") ? phone : `+91${phone.replace(/\D/g, "")}` } : {};
+    return api<{ success: boolean; message: string }>("/users/mobile/send-verification", {
+      method: "POST",
+      data,
+    });
+  },
+
+  /**
+   * Verify Phone OTP for logged in user (POST /api/v1/users/mobile/verify)
+   */
+  async verifyMobile(otp: string, phone?: string): Promise<{ success: boolean; message: string; user?: any }> {
+    const data: Record<string, string> = { otp };
+    if (phone) {
+      data.phone = phone.startsWith("+91") ? phone : `+91${phone.replace(/\D/g, "")}`;
+    }
+    return api<{ success: boolean; message: string; user?: any }>("/users/mobile/verify", {
+      method: "POST",
+      data,
+    });
+  },
+
+  /**
+   * Send Email Verification OTP for logged in user (POST /api/v1/users/email/send-verification)
+   */
+  async sendEmailVerification(email?: string): Promise<{ success: boolean; message: string }> {
+    const data = email ? { email } : {};
+    return api<{ success: boolean; message: string }>("/users/email/send-verification", {
+      method: "POST",
+      data,
+    });
+  },
+
+  /**
+   * Verify Email OTP for logged in user (POST /api/v1/users/email/verify)
+   */
+  async verifyEmail(otp: string, email?: string): Promise<{ success: boolean; message: string; user?: any }> {
+    const data: Record<string, string> = { otp };
+    if (email) {
+      data.email = email;
+    }
+    return api<{ success: boolean; message: string; user?: any }>("/users/email/verify", {
+      method: "POST",
+      data,
+    });
+  },
 };
