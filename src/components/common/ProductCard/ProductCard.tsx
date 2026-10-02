@@ -8,6 +8,7 @@ import SafeImage from '@/components/ui/SafeImage';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
+import { useWishlist } from '@/context/WishlistContext';
 import { Heart, Star, ShoppingCart, Trash2, Check, Truck, SlidersHorizontal } from 'lucide-react';
 import { VariantSelectorModal } from '@/components/shop/VariantSelectorModal/VariantSelectorModal';
 import { BackendProductVariant } from '@/types/product';
@@ -47,8 +48,7 @@ interface ProductCardProps {
 function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProps) {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
-  const [isWishlisted, setIsWishlisted] = useState(Boolean(product.isWishlisted));
-  const wishlistLoadingRef = useRef(false);
+  const { isWishlisted: checkIsWishlisted, toggleWishlist } = useWishlist();
   const [selectedSwatch, setSelectedSwatch] = useState(0);
   const [isAdded, setIsAdded] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
@@ -56,12 +56,6 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
 
   const initialVariantId = product.variantId || product.selectedVariantId || (product.variants && product.variants.length > 0 ? product.variants[0].id : undefined);
   const [activeVariantId, setActiveVariantId] = useState<string | undefined>(initialVariantId);
-
-  useEffect(() => {
-    if (typeof product.isWishlisted === 'boolean') {
-      setIsWishlisted(product.isWishlisted);
-    }
-  }, [product.isWishlisted]);
 
   useEffect(() => {
     if (product.variantId || product.selectedVariantId) {
@@ -75,6 +69,8 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
     if (isSpecificVariantCard || !product.variants || product.variants.length === 0) return null;
     return product.variants.find((v) => v.id === activeVariantId) || null;
   }, [isSpecificVariantCard, product.variants, activeVariantId]);
+
+  const isWishlisted = checkIsWishlisted(product.id, activeVariantId || product.variantId || product.selectedVariantId) || Boolean(product.isWishlisted);
 
   const rating = product.rating ?? 0;
   const reviewsCount = product.reviewsCount ?? 0;
@@ -133,37 +129,10 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
       return;
     }
 
-    if (wishlistLoadingRef.current) return;
-    wishlistLoadingRef.current = true;
+    await toggleWishlist(product, activeVariantId);
+  }, [onRemoveFromWishlist, product, activeVariantId, isAuthenticated, router, toggleWishlist]);
 
-    const variantIdToUse = activeVariantId || product.variantId || product.selectedVariantId || undefined;
-    const nextWishlisted = !isWishlisted;
-
-    // Immediate optimistic update so color changes instantly on click
-    setIsWishlisted(nextWishlisted);
-
-    try {
-      if (nextWishlisted) {
-        await wishlistService.addToWishlist(product.id, variantIdToUse);
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('wishlist-updated', { detail: { productId: product.id, action: 'add' } }));
-        }
-      } else {
-        await wishlistService.removeFromWishlist(product.id, variantIdToUse);
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('wishlist-updated', { detail: { productId: product.id, action: 'remove' } }));
-        }
-      }
-    } catch (err: any) {
-      console.error('Failed to update wishlist:', err);
-      // Revert optimistic update on failure
-      setIsWishlisted(!nextWishlisted);
-    } finally {
-      wishlistLoadingRef.current = false;
-    }
-  }, [onRemoveFromWishlist, product.id, activeVariantId, product.variantId, product.selectedVariantId, isWishlisted, isAuthenticated, router]);
-
-  const { addToCart } = useCart();
+    const { addToCart } = useCart();
 
   const handleAddToCart = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();

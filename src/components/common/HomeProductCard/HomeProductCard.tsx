@@ -8,6 +8,7 @@ import SafeImage from '@/components/ui/SafeImage';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
+import { useWishlist } from '@/context/WishlistContext';
 import { Heart, Star, ShoppingCart, Trash2, Check, SlidersHorizontal } from 'lucide-react';
 import { VariantSelectorModal } from '@/components/shop/VariantSelectorModal/VariantSelectorModal';
 import { BackendProductVariant } from '@/types/product';
@@ -44,19 +45,12 @@ interface HomeProductCardProps {
 function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProductCardProps) {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
-  const [isWishlisted, setIsWishlisted] = useState(Boolean(product.isWishlisted));
-  const wishlistLoadingRef = useRef(false);
+  const { isWishlisted: checkIsWishlisted, toggleWishlist } = useWishlist();
   const [isAdded, setIsAdded] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [isVariantModalOpen, setIsVariantModalOpen] = useState(false);
 
   const { addToCart } = useCart();
-
-  useEffect(() => {
-    if (typeof product.isWishlisted === 'boolean') {
-      setIsWishlisted(product.isWishlisted);
-    }
-  }, [product.isWishlisted]);
 
   const targetVariantId = product.variantId || product.selectedVariantId;
   const productHref = targetVariantId
@@ -67,6 +61,8 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
   const isOutOfStock = typeof product.stock === 'number' && product.stock <= 0;
   const isVariable = product.type === 'VARIABLE';
   const hasExplicitVariant = Boolean(targetVariantId);
+
+  const isWishlisted = checkIsWishlisted(product.id, targetVariantId) || Boolean(product.isWishlisted);
 
   const discountPercent = useMemo(() => {
     if (product.originalPrice && product.originalPrice > product.price) {
@@ -89,36 +85,10 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
       return;
     }
 
-    if (wishlistLoadingRef.current) return;
-    wishlistLoadingRef.current = true;
+    await toggleWishlist(product, targetVariantId);
+  }, [onRemoveFromWishlist, product, targetVariantId, isAuthenticated, router, toggleWishlist]);
 
-    const nextWishlisted = !isWishlisted;
-
-    // Instant optimistic update for immediate visual feedback
-    setIsWishlisted(nextWishlisted);
-
-    try {
-      if (nextWishlisted) {
-        await wishlistService.addToWishlist(product.id, targetVariantId);
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('wishlist-updated', { detail: { productId: product.id, action: 'add' } }));
-        }
-      } else {
-        await wishlistService.removeFromWishlist(product.id, targetVariantId);
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('wishlist-updated', { detail: { productId: product.id, action: 'remove' } }));
-        }
-      }
-    } catch (err: any) {
-      console.error('Failed to update wishlist:', err);
-      // Revert optimistic update on failure
-      setIsWishlisted(!nextWishlisted);
-    } finally {
-      wishlistLoadingRef.current = false;
-    }
-  }, [onRemoveFromWishlist, product.id, targetVariantId, isWishlisted, isAuthenticated, router]);
-
-  const handleAddToCart = useCallback(async (e: React.MouseEvent) => {
+    const handleAddToCart = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (isOutOfStock) return;

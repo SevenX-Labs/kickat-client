@@ -6,6 +6,7 @@ import SafeImage from '@/components/ui/SafeImage';
 import { useRouter } from 'next/navigation';
 import { Play, Maximize, Heart, Share2, X, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useWishlist } from '@/context/WishlistContext';
 import { wishlistService } from '@/services/wishlistService';
 import styles from './ProductDetail.module.css';
 
@@ -20,27 +21,13 @@ export function ProductGallery({ images, productId, variantId, brand = 'KickAt' 
   const router = useRouter();
   const { isAuthenticated } = useAuth();
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isWishlisted, setIsWishlisted] = useState(false);
-  const wishlistLoadingRef = useRef(false);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const { isWishlisted: checkIsWishlisted, toggleWishlist } = useWishlist();
 
-  // Sync wishlist status
-  useEffect(() => {
-    if (!productId) return;
-    const handleWishlistUpdated = (e: any) => {
-      if (e.detail?.productId === productId) {
-        setIsWishlisted(e.detail.action === 'add');
-      }
-    };
-    window.addEventListener('wishlist-updated', handleWishlistUpdated);
-    return () => window.removeEventListener('wishlist-updated', handleWishlistUpdated);
-  }, [productId]);
+  const isWishlisted = productId ? checkIsWishlisted(productId, variantId) : false;
 
   const handleWishlistToggle = useCallback(async () => {
-    if (!productId) {
-      setIsWishlisted((prev) => !prev);
-      return;
-    }
+    if (!productId) return;
 
     if (!isAuthenticated) {
       const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/shop';
@@ -48,36 +35,10 @@ export function ProductGallery({ images, productId, variantId, brand = 'KickAt' 
       return;
     }
 
-    if (wishlistLoadingRef.current) return;
-    wishlistLoadingRef.current = true;
+    await toggleWishlist({ id: productId, variantId }, variantId);
+  }, [productId, variantId, isAuthenticated, router, toggleWishlist]);
 
-    const nextWishlisted = !isWishlisted;
-
-    // Instant optimistic update for immediate visual feedback
-    setIsWishlisted(nextWishlisted);
-
-    try {
-      if (nextWishlisted) {
-        await wishlistService.addToWishlist(productId, variantId);
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('wishlist-updated', { detail: { productId, action: 'add' } }));
-        }
-      } else {
-        await wishlistService.removeFromWishlist(productId, variantId);
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('wishlist-updated', { detail: { productId, action: 'remove' } }));
-        }
-      }
-    } catch (err: any) {
-      console.error('Failed to update wishlist:', err);
-      // Revert state if request fails
-      setIsWishlisted(!nextWishlisted);
-    } finally {
-      wishlistLoadingRef.current = false;
-    }
-  }, [productId, variantId, isWishlisted, isAuthenticated, router]);
-
-  // Prioritize clean packaging / product shots as hero image (index 0), moving infographics/marketing banners secondary
+    // Prioritize clean packaging / product shots as hero image (index 0), moving infographics/marketing banners secondary
   const sortedImages = useMemo(() => {
     const list = Array.isArray(images) && images.length > 0 ? [...images] : ['/hero-products/dog_food.png'];
     const isInfographic = (url: string) => {

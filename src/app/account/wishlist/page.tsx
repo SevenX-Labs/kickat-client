@@ -1,60 +1,24 @@
 "use client";
 
 import Link from 'next/link';
-import { useState, Suspense } from 'react';
-import { Heart, Filter, ChevronDown } from 'lucide-react';
+import { Suspense, useState } from 'react';
+import { Heart, Filter } from 'lucide-react';
 import styles from './wishlist.module.css';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Skeleton } from '@/components/ui/Skeleton';
 import ProductCard from '@/components/common/ProductCard/ProductCard';
-import { wishlistService, WishlistItem } from '@/services/wishlistService';
-import { useEffect } from 'react';
+import { useWishlist } from '@/context/WishlistContext';
 
 function AccountWishlistContent() {
-  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchWishlist = async () => {
-      try {
-        setLoading(true);
-        const res = await wishlistService.getWishlist();
-        if (res.success && res.items) {
-          setWishlistItems(res.items);
-        }
-      } catch (err) {
-        console.error('Failed to load wishlist', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchWishlist();
-  }, []);
-
-  const handleRemove = async (id: string) => {
-    try {
-      await wishlistService.removeFromWishlist(id);
-      setWishlistItems(prev => prev.filter(item => item.productId !== id));
-    } catch (err) {
-      console.error('Failed to remove item', err);
-    }
-  };
-
+  const { wishlistItems, loading, removeFromWishlist, moveAllToCart } = useWishlist();
   const [movingToCart, setMovingToCart] = useState(false);
+
   const handleMoveAllToCart = async () => {
     if (wishlistItems.length === 0) return;
     setMovingToCart(true);
     try {
-      // Execute all move-to-cart operations in parallel
-      await Promise.all(
-        wishlistItems.map(item => wishlistService.moveToCart(item.productId, item.variantId || undefined, 1))
-      );
-      // Remove all items from local state since they are moved to cart
-      setWishlistItems([]);
-      window.dispatchEvent(new CustomEvent('cart-items-added'));
-    } catch (err) {
-      console.error('Failed to move items to cart', err);
+      await moveAllToCart();
     } finally {
       setMovingToCart(false);
     }
@@ -71,28 +35,47 @@ function AccountWishlistContent() {
         </div>
         <div className={styles.wishlistActions}>
           <Button variant="secondary" icon={<Filter size={16} />}>Sort</Button>
-          <Button variant="primary" onClick={handleMoveAllToCart} disabled={movingToCart || wishlistItems.length === 0}>{movingToCart ? "Moving..." : "Add All to Cart"}</Button>
+          <Button variant="primary" onClick={handleMoveAllToCart} disabled={movingToCart || wishlistItems.length === 0}>
+            {movingToCart ? "Moving..." : "Add All to Cart"}
+          </Button>
         </div>
       </div>
 
-      {loading ? (
+      {loading && wishlistItems.length === 0 ? (
         <div className={styles.grid}>
-          <Skeleton style={{ height: 320 }} />
-          <Skeleton style={{ height: 320 }} />
-          <Skeleton style={{ height: 320 }} />
+          <Skeleton style={{ height: 120, borderRadius: 16 }} />
+          <Skeleton style={{ height: 120, borderRadius: 16 }} />
         </div>
       ) : wishlistItems.length > 0 ? (
         <div className={styles.grid}>
           {wishlistItems.map(item => {
+            const product = item.product || {};
+            const variant = item.variant;
+            
+            const activeImg = variant?.imageUrl || (variant?.images && variant.images[0]) || product.image || (product.images && product.images[0]) || '/hero-products/dog_food.png';
+            
             const productData = {
-              ...item.product,
-              id: item.productId // Ensure ProductCard uses productId for removal
+              id: item.productId,
+              name: product.name || 'Product',
+              price: variant ? (variant.discountPrice || variant.price) : (product.price || 0),
+              originalPrice: variant ? (variant.originalPrice || variant.price) : product.originalPrice,
+              rating: product.rating ?? 5,
+              reviewsCount: product.reviewsCount ?? 0,
+              image: activeImg,
+              mainCategory: product.category?.name || product.mainCategory || 'Pet Foods',
+              brand: product.brand || 'KickAt',
+              badge: product.badge,
+              stock: variant ? variant.stock : (product.stock ?? 1),
+              type: product.type || 'SIMPLE',
+              variantId: item.variantId || undefined,
+              isWishlisted: true,
             };
+
             return (
               <ProductCard 
                 key={item.id} 
                 product={productData as any} 
-                onRemoveFromWishlist={() => handleRemove(item.productId)} 
+                onRemoveFromWishlist={() => removeFromWishlist(item.productId, item.variantId || undefined)} 
               />
             );
           })}
