@@ -5,52 +5,18 @@ import { Star } from 'lucide-react';
 import styles from './CustomerReviews.module.css';
 import { testimonialService, TestimonialItem } from '@/services/testimonialService';
 
-const FALLBACK_REVIEWS = [
-  {
-    author: "Sarah Mitchell",
-    pet: "Max · Golden Retriever",
-    initial: "S",
-    avatarColor: "#333F2B",
-    content: "KickAt completely transformed Max's digestion. The quality of the food is unmatched and the delivery is always perfectly on time.",
-    rating: 4.9,
-  },
-  {
-    author: "Priya Sharma",
-    pet: "Luna · Bengal Cat",
-    initial: "P",
-    avatarColor: "#E7A03B",
-    content: "I've never seen Luna so excited for meal time. The treats are her absolute favorite, and I love that they are made with clean, honest ingredients.",
-    rating: 5.0,
-  },
-  {
-    author: "James Cooper",
-    pet: "Charlie · French Bulldog",
-    initial: "J",
-    avatarColor: "#8B6F4E",
-    content: "The toys are incredibly durable and beautifully designed. Finally, pet accessories that actually look good in my apartment!",
-    rating: 4.8,
-  },
-  {
-    author: "Ananya Desai",
-    pet: "Coco · Labrador",
-    initial: "A",
-    avatarColor: "#5B7553",
-    content: "We switched to KickAt six months ago and Coco's coat has never looked shinier. The subscription saves us so much time and money.",
-    rating: 4.9,
-  },
-  {
-    author: "Rohan Mehta",
-    pet: "Simba · Persian Cat",
-    initial: "R",
-    avatarColor: "#A0522D",
-    content: "Simba is the pickiest eater I've ever met, but he devours everything from KickAt. The grooming products are amazing too.",
-    rating: 5.0,
-  },
-];
-
 const AVATAR_COLORS = ["#333F2B", "#E7A03B", "#8B6F4E", "#5B7553", "#A0522D", "#2E5B88", "#7C3AED"];
 
-function ReviewCard({ review }: { review: any }) {
+interface DisplayReview {
+  author: string;
+  pet: string;
+  initial: string;
+  avatarColor: string;
+  content: string;
+  rating: number;
+}
+
+function ReviewCard({ review }: { review: DisplayReview }) {
   return (
     <div className={styles.card}>
       <span className={styles.quoteDecor}>&ldquo;</span>
@@ -80,7 +46,8 @@ function ReviewCard({ review }: { review: any }) {
 }
 
 export function CustomerReviews() {
-  const [reviewsList, setReviewsList] = useState(FALLBACK_REVIEWS);
+  const [reviewsList, setReviewsList] = useState<DisplayReview[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
@@ -88,7 +55,7 @@ export function CustomerReviews() {
       try {
         const res = await testimonialService.getTestimonials(8);
         if (isMounted && res && res.success && Array.isArray(res.data) && res.data.length > 0) {
-          const mapped = res.data.map((item, idx) => ({
+          const mapped: DisplayReview[] = res.data.map((item: TestimonialItem, idx: number) => ({
             author: item.name,
             pet: item.petName ? `${item.petName} · ${item.petSpecies || 'Pet'}` : (item.petSpecies || item.location || 'Verified Buyer'),
             initial: (item.name || 'P').charAt(0).toUpperCase(),
@@ -97,9 +64,18 @@ export function CustomerReviews() {
             rating: item.rating || 5.0,
           }));
           setReviewsList(mapped);
+        } else if (isMounted) {
+          setReviewsList([]);
         }
       } catch (err) {
-        console.warn('Testimonial API fallback to static reviews:', err);
+        console.warn('Failed to load testimonials:', err);
+        if (isMounted) {
+          setReviewsList([]);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     }
     loadTestimonials();
@@ -107,6 +83,14 @@ export function CustomerReviews() {
       isMounted = false;
     };
   }, []);
+
+  if (isLoading || reviewsList.length === 0) {
+    return null;
+  }
+
+  const averageRating = (
+    reviewsList.reduce((acc, r) => acc + (r.rating || 5.0), 0) / reviewsList.length
+  ).toFixed(1);
 
   return (
     <section id="reviews" className={styles.section}>
@@ -124,10 +108,10 @@ export function CustomerReviews() {
       <div className={styles.marqueeWrapper}>
         <div className={styles.marqueeTrack}>
           {reviewsList.map((review, idx) => (
-            <ReviewCard key={`a-${idx}`} review={review} />
+            <ReviewCard key={`rev-a-${idx}`} review={review} />
           ))}
           {reviewsList.map((review, idx) => (
-            <ReviewCard key={`b-${idx}`} review={review} />
+            <ReviewCard key={`rev-b-${idx}`} review={review} />
           ))}
         </div>
       </div>
@@ -137,8 +121,10 @@ export function CustomerReviews() {
         <div className={styles.trustStrip}>
           <div className={styles.trustRating}>
             <Star className={styles.trustStar} strokeWidth={1.5} fill="#E7A03B" color="#E7A03B" />
-            <span className={styles.trustScore}>4.9</span>
-            <span className={styles.trustLabel}>average from 12,300+ verified pet parents</span>
+            <span className={styles.trustScore}>{averageRating}</span>
+            <span className={styles.trustLabel}>
+              average from {reviewsList.length} verified {reviewsList.length === 1 ? 'review' : 'reviews'}
+            </span>
           </div>
         </div>
       </div>

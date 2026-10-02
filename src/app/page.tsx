@@ -15,7 +15,6 @@ const WhyKickat = dynamic(() => import("@/components/common/WhyKickat").then(mod
 const RecentlyViewed = dynamic(() => import("@/components/common/RecentlyViewed").then(mod => mod.RecentlyViewed));
 const CustomerReviews = dynamic(() => import("@/components/common/CustomerReviews").then(mod => mod.CustomerReviews));
 const FAQ = dynamic(() => import("@/components/common/FAQ").then(mod => mod.FAQ));
-const InstagramFeed = dynamic(() => import("@/components/common/InstagramFeed").then(mod => mod.InstagramFeed));
 const Footer = dynamic(() => import("@/components/common/Footer").then(mod => mod.Footer));
 
 export default function Home() {
@@ -129,8 +128,6 @@ export default function Home() {
         {/* 10. FAQ */}
         <FAQ />
 
-        {/* 11. Instagram / Community Feed */}
-        <InstagramFeed />
       </main>
 
       {/* 12. Footer */}

@@ -1,23 +1,13 @@
 "use client";
 
 import Link from 'next/link';
-import { useState, useEffect, Suspense } from 'react';
-import { 
-  Bell, Shield, Trash2, Sparkles, AlertTriangle, X, ArrowLeft 
-} from 'lucide-react';
+import { useState, Suspense } from 'react';
+import { Shield, Sparkles, ArrowLeft } from 'lucide-react';
 import accountStyles from '../Account.module.css';
 import styles from './Settings.module.css';
 
 function SettingsContent() {
   const [toastMsg, setToastMsg] = useState<string | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-  const [notifications, setNotifications] = useState({
-    orderUpdates: true,
-    smsWhatsapp: true,
-    promotions: false,
-    blogDigest: true
-  });
 
   const [privacy, setPrivacy] = useState({
     twoFactor: false,
@@ -29,25 +19,12 @@ function SettingsContent() {
     setTimeout(() => setToastMsg(null), 3500);
   };
 
-  const handleToggle = (category: 'notifications' | 'privacy', key: string) => {
-    if (category === 'notifications') {
-      setNotifications(prev => {
-        const updated = { ...prev, [key]: !prev[key as keyof typeof prev] };
-        triggerToast('Notification preferences updated!');
-        return updated;
-      });
-    } else {
-      setPrivacy(prev => {
-        const updated = { ...prev, [key]: !prev[key as keyof typeof prev] };
-        triggerToast('Privacy setting updated!');
-        return updated;
-      });
-    }
-  };
-
-  const handleDeleteAccount = () => {
-    setIsDeleteModalOpen(false);
-    triggerToast('Account deletion request submitted.');
+  const handleToggle = (key: 'twoFactor' | 'analytics') => {
+    setPrivacy(prev => {
+      const updated = { ...prev, [key]: !prev[key] };
+      triggerToast('Privacy preference updated!');
+      return updated;
+    });
   };
 
   return (
@@ -71,82 +48,7 @@ function SettingsContent() {
         <div className={accountStyles.sectionBlockHeader}>
           <div>
             <h1 className={accountStyles.blockTitle}>Preferences &amp; Settings</h1>
-            <p className={accountStyles.blockSubtitle}>Customize notification alerts, shopping defaults, and account privacy options.</p>
-          </div>
-        </div>
-
-        {/* ── NOTIFICATION PREFERENCES ── */}
-        <div className={styles.settingBlock} style={{ marginBottom: '24px' }}>
-          <div className={styles.blockTitleRow}>
-            <div className={styles.iconCircle}>
-              <Bell size={18} color="#F99205" />
-            </div>
-            <div>
-              <h2 className={styles.blockTitle}>Notifications &amp; Alerts</h2>
-              <p className={styles.blockSub}>Choose how KickAt communicates order progress and offers with you.</p>
-            </div>
-          </div>
-
-          <div className={styles.toggleList}>
-            <div className={styles.toggleRow}>
-              <div className={styles.toggleTextGroup}>
-                <span className={styles.toggleTitle}>Order Tracking &amp; Delivery Updates</span>
-                <span className={styles.toggleDesc}>Receive real-time email &amp; WhatsApp alerts when items ship or arrive.</span>
-              </div>
-              <label className={styles.switch}>
-                <input 
-                  type="checkbox" 
-                  checked={notifications.orderUpdates}
-                  onChange={() => handleToggle('notifications', 'orderUpdates')}
-                />
-                <span className={styles.slider}></span>
-              </label>
-            </div>
-
-            <div className={styles.toggleRow}>
-              <div className={styles.toggleTextGroup}>
-                <span className={styles.toggleTitle}>SMS &amp; WhatsApp Alerts</span>
-                <span className={styles.toggleDesc}>Get instant mobile text alerts for dispatch and delivery partner updates.</span>
-              </div>
-              <label className={styles.switch}>
-                <input 
-                  type="checkbox" 
-                  checked={notifications.smsWhatsapp}
-                  onChange={() => handleToggle('notifications', 'smsWhatsapp')}
-                />
-                <span className={styles.slider}></span>
-              </label>
-            </div>
-
-            <div className={styles.toggleRow}>
-              <div className={styles.toggleTextGroup}>
-                <span className={styles.toggleTitle}>VIP Offers &amp; Price Drop Alerts</span>
-                <span className={styles.toggleDesc}>Exclusive discounts, cash-back rewards, and seasonal sale early access.</span>
-              </div>
-              <label className={styles.switch}>
-                <input 
-                  type="checkbox" 
-                  checked={notifications.promotions}
-                  onChange={() => handleToggle('notifications', 'promotions')}
-                />
-                <span className={styles.slider}></span>
-              </label>
-            </div>
-
-            <div className={styles.toggleRow}>
-              <div className={styles.toggleTextGroup}>
-                <span className={styles.toggleTitle}>Pet Care Tips &amp; Blog Newsletter</span>
-                <span className={styles.toggleDesc}>Weekly curated articles on pet nutrition, training, and wellness guide.</span>
-              </div>
-              <label className={styles.switch}>
-                <input 
-                  type="checkbox" 
-                  checked={notifications.blogDigest}
-                  onChange={() => handleToggle('notifications', 'blogDigest')}
-                />
-                <span className={styles.slider}></span>
-              </label>
-            </div>
+            <p className={accountStyles.blockSubtitle}>Manage account privacy and shopping security options.</p>
           </div>
         </div>
 
@@ -172,7 +74,7 @@ function SettingsContent() {
                 <input 
                   type="checkbox" 
                   checked={privacy.twoFactor}
-                  onChange={() => handleToggle('privacy', 'twoFactor')}
+                  onChange={() => handleToggle('twoFactor')}
                 />
                 <span className={styles.slider}></span>
               </label>
@@ -187,67 +89,14 @@ function SettingsContent() {
                 <input 
                   type="checkbox" 
                   checked={privacy.analytics}
-                  onChange={() => handleToggle('privacy', 'analytics')}
+                  onChange={() => handleToggle('analytics')}
                 />
                 <span className={styles.slider}></span>
               </label>
             </div>
           </div>
         </div>
-
-        {/* ── DANGER ZONE ── */}
-        <div className={styles.dangerBlock}>
-          <div className={styles.dangerHeader}>
-            <AlertTriangle size={20} color="#B91C1C" />
-            <div>
-              <h3 className={styles.dangerTitle}>Danger Zone</h3>
-              <p className={styles.dangerDesc}>Permanently close your KickAt member profile and remove saved data.</p>
-            </div>
-          </div>
-
-          <button 
-            type="button" 
-            className={styles.deleteAccountBtn}
-            onClick={() => setIsDeleteModalOpen(true)}
-          >
-            <Trash2 size={15} /> Deactivate / Delete Account
-          </button>
-        </div>
       </div>
-
-      {/* ── DELETE ACCOUNT CONFIRMATION MODAL ── */}
-      {isDeleteModalOpen && (
-        <div className={accountStyles.modalBackdrop} onClick={() => setIsDeleteModalOpen(false)}>
-          <div className={accountStyles.modalCard} onClick={(e) => e.stopPropagation()}>
-            <div className={accountStyles.modalHeader}>
-              <div className={accountStyles.modalTitleGroup}>
-                <AlertTriangle size={20} color="#B91C1C" />
-                <h2>Deactivate Account</h2>
-              </div>
-              <button type="button" className={accountStyles.modalCloseBtn} onClick={() => setIsDeleteModalOpen(false)}>
-                <X size={20} />
-              </button>
-            </div>
-
-            <div style={{ fontSize: '0.9rem', color: '#555047', lineHeight: 1.5, marginBottom: '20px' }}>
-              Are you sure you want to deactivate your KickAt account? You will lose access to order history tracking and saved delivery addresses.
-            </div>
-
-            <div className={accountStyles.modalFooterActions}>
-              <button type="button" className={accountStyles.actionBtn} onClick={() => setIsDeleteModalOpen(false)}>
-                Keep Account
-              </button>
-              <button 
-                type="button" 
-                className={styles.confirmDeleteBtn}
-                onClick={handleDeleteAccount}
-              >
-                Yes, Delete Account
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }
