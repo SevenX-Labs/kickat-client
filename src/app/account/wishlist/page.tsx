@@ -54,11 +54,32 @@ function AccountWishlistContent() {
             
             const activeImg = variant?.imageUrl || (variant?.images && variant.images[0]) || product.image || (product.images && product.images[0]) || '/hero-products/dog_food.png';
             
+            // Build accurate product title with variant specification
+            let displayName = product.name || 'Product';
+            if (variant) {
+              if (variant.name && !displayName.toLowerCase().includes(variant.name.toLowerCase())) {
+                displayName = `${displayName} – ${variant.name}`;
+              } else if (variant.attributes && typeof variant.attributes === 'object') {
+                const vals = Object.values(variant.attributes).filter(Boolean);
+                if (vals.length > 0 && !displayName.toLowerCase().includes(String(vals[0]).toLowerCase())) {
+                  displayName = `${displayName} – ${vals[0]}`;
+                }
+              }
+            }
+
+            const effectivePrice = variant
+              ? (variant.discountPrice && variant.discountPrice > 0 ? variant.discountPrice : variant.price)
+              : (product.price || 0);
+
+            const originalPrice = variant
+              ? (variant.originalPrice || (variant.discountPrice && variant.discountPrice > 0 ? variant.price : undefined))
+              : product.originalPrice;
+
             const productData = {
               id: item.productId,
-              name: product.name || 'Product',
-              price: variant ? (variant.discountPrice || variant.price) : (product.price || 0),
-              originalPrice: variant ? (variant.originalPrice || variant.price) : product.originalPrice,
+              name: displayName,
+              price: effectivePrice,
+              originalPrice: originalPrice,
               rating: product.rating ?? 5,
               reviewsCount: product.reviewsCount ?? 0,
               image: activeImg,
@@ -66,8 +87,10 @@ function AccountWishlistContent() {
               brand: product.brand || 'KickAt',
               badge: product.badge,
               stock: variant ? variant.stock : (product.stock ?? 1),
-              type: product.type || 'SIMPLE',
+              type: product.type || (item.variantId ? 'VARIABLE' : 'SIMPLE'),
               variantId: item.variantId || undefined,
+              selectedVariantId: item.variantId || undefined,
+              variantName: variant?.name,
               isWishlisted: true,
             };
 

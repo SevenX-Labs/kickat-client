@@ -42,7 +42,7 @@ export interface Product {
 
 interface ProductCardProps {
   product: Product;
-  onRemoveFromWishlist?: (id: string) => void;
+  onRemoveFromWishlist?: (id: string, variantId?: string) => void;
 }
 
 function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProps) {
@@ -64,13 +64,14 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
   }, [product.variantId, product.selectedVariantId]);
 
   const isSpecificVariantCard = Boolean(product.variantId || product.selectedVariantId);
+  const targetVariantId = product.variantId || product.selectedVariantId || activeVariantId;
 
   const activeVariant = useMemo(() => {
     if (isSpecificVariantCard || !product.variants || product.variants.length === 0) return null;
     return product.variants.find((v) => v.id === activeVariantId) || null;
   }, [isSpecificVariantCard, product.variants, activeVariantId]);
 
-  const isWishlisted = checkIsWishlisted(product.id, activeVariantId || product.variantId || product.selectedVariantId) || Boolean(product.isWishlisted);
+  const isWishlisted = checkIsWishlisted(product.id, targetVariantId);
 
   const rating = product.rating ?? 0;
   const reviewsCount = product.reviewsCount ?? 0;
@@ -119,7 +120,7 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
     e.preventDefault();
     e.stopPropagation();
     if (onRemoveFromWishlist) {
-      onRemoveFromWishlist(product.id);
+      onRemoveFromWishlist(product.id, targetVariantId);
       return;
     }
 
@@ -129,8 +130,8 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
       return;
     }
 
-    await toggleWishlist(product, activeVariantId);
-  }, [onRemoveFromWishlist, product, activeVariantId, isAuthenticated, router, toggleWishlist]);
+    await toggleWishlist(product, targetVariantId);
+  }, [onRemoveFromWishlist, product, targetVariantId, isAuthenticated, router, toggleWishlist]);
 
     const { addToCart } = useCart();
 
@@ -222,7 +223,6 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
     }
   }, [isAdded, isAdding, isOutOfStock, isVariable, activeVariantId, product.id, product.variantId, product.selectedVariantId, activeImage, router, addToCart]);
 
-  const targetVariantId = activeVariantId || product.variantId || product.selectedVariantId;
   const productHref = targetVariantId
     ? `/product/${product.id}?variant=${targetVariantId}`
     : `/product/${product.id}`;

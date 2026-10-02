@@ -33,14 +33,17 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const isFetchingRef = useRef(false);
   const lastFetchTimeRef = useRef(0);
 
-  // Helper to build Set of IDs from Wishlist items
+  // Helper to build Set of IDs from Wishlist items strictly per variant or product
   const buildIdsSet = (items: WishlistItem[]): Set<string> => {
     const ids = new Set<string>();
     items.forEach((item) => {
       if (item.productId) {
-        ids.add(item.productId);
         if (item.variantId) {
+          // Specific variant
           ids.add(`${item.productId}_${item.variantId}`);
+        } else {
+          // Base product
+          ids.add(item.productId);
         }
       }
     });
@@ -97,14 +100,13 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       const customEvent = e as CustomEvent<{ productId: string; action: 'add' | 'remove'; variantId?: string }>;
       if (customEvent.detail && customEvent.detail.productId) {
         const { productId, action, variantId } = customEvent.detail;
+        const key = variantId ? `${productId}_${variantId}` : productId;
         setWishlistIds((prev) => {
           const next = new Set(prev);
           if (action === 'add') {
-            next.add(productId);
-            if (variantId) next.add(`${productId}_${variantId}`);
+            next.add(key);
           } else {
-            next.delete(productId);
-            if (variantId) next.delete(`${productId}_${variantId}`);
+            next.delete(key);
           }
           return next;
         });
@@ -121,7 +123,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
     (productId: string, variantId?: string): boolean => {
       if (!productId) return false;
       if (variantId) {
-        return wishlistIds.has(`${productId}_${variantId}`) || wishlistIds.has(productId);
+        return wishlistIds.has(`${productId}_${variantId}`);
       }
       return wishlistIds.has(productId);
     },
@@ -132,28 +134,27 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
     async (product: ToggleProductParam, activeVariantId?: string): Promise<boolean> => {
       if (!product || !product.id) return false;
 
-      // Determine product type
+      // Determine product type and exact variant
       const isVariable =
         product.type === 'VARIABLE' || (Array.isArray(product.variants) && product.variants.length > 0);
       const variantIdToUse = isVariable
-        ? activeVariantId ||
-          product.variantId ||
+        ? product.variantId ||
           product.selectedVariantId ||
+          activeVariantId ||
           (product.variants && product.variants[0]?.id)
         : undefined;
 
       const currentStatus = isWishlisted(product.id, variantIdToUse);
       const nextStatus = !currentStatus;
+      const key = variantIdToUse ? `${product.id}_${variantIdToUse}` : product.id;
 
       // Instant optimistic update
       setWishlistIds((prev) => {
         const next = new Set(prev);
         if (nextStatus) {
-          next.add(product.id);
-          if (variantIdToUse) next.add(`${product.id}_${variantIdToUse}`);
+          next.add(key);
         } else {
-          next.delete(product.id);
-          if (variantIdToUse) next.delete(`${product.id}_${variantIdToUse}`);
+          next.delete(key);
         }
         return next;
       });
@@ -199,12 +200,12 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
 
         // Handle conflict or already removed gracefully without reverting valid UI state
         if (nextStatus && (msg.includes('already in wishlist') || msg.includes('conflict') || msg.includes('409'))) {
-          setWishlistIds((prev) => new Set(prev).add(product.id));
+          setWishlistIds((prev) => new Set(prev).add(key));
           return true;
         } else if (!nextStatus && (msg.includes('not in wishlist') || msg.includes('not found') || msg.includes('404'))) {
           setWishlistIds((prev) => {
             const next = new Set(prev);
-            next.delete(product.id);
+            next.delete(key);
             return next;
           });
           return false;
@@ -215,11 +216,9 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         setWishlistIds((prev) => {
           const next = new Set(prev);
           if (currentStatus) {
-            next.add(product.id);
-            if (variantIdToUse) next.add(`${product.id}_${variantIdToUse}`);
+            next.add(key);
           } else {
-            next.delete(product.id);
-            if (variantIdToUse) next.delete(`${product.id}_${variantIdToUse}`);
+            next.delete(key);
           }
           return next;
         });
@@ -231,10 +230,10 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
 
   const removeFromWishlist = useCallback(
     async (productId: string, variantId?: string) => {
+      const key = variantId ? `${productId}_${variantId}` : productId;
       setWishlistIds((prev) => {
         const next = new Set(prev);
-        next.delete(productId);
-        if (variantId) next.delete(`${productId}_${variantId}`);
+        next.delete(key);
         return next;
       });
 
