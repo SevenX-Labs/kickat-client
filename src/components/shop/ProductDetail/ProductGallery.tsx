@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import SafeImage from '@/components/ui/SafeImage';
 import { useRouter } from 'next/navigation';
@@ -21,7 +21,7 @@ export function ProductGallery({ images, productId, variantId, brand = 'KickAt' 
   const { isAuthenticated } = useAuth();
   const [activeIndex, setActiveIndex] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const [isWishlistLoading, setIsWishlistLoading] = useState(false);
+  const wishlistLoadingRef = useRef(false);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   // Sync wishlist status
@@ -42,41 +42,40 @@ export function ProductGallery({ images, productId, variantId, brand = 'KickAt' 
       return;
     }
 
-    if (isWishlistLoading) return;
-
     if (!isAuthenticated) {
       const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/shop';
       router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
       return;
     }
 
-    setIsWishlistLoading(true);
-    if (!isWishlisted) {
-      try {
+    if (wishlistLoadingRef.current) return;
+    wishlistLoadingRef.current = true;
+
+    const nextWishlisted = !isWishlisted;
+
+    // Instant optimistic update for immediate visual feedback
+    setIsWishlisted(nextWishlisted);
+
+    try {
+      if (nextWishlisted) {
         await wishlistService.addToWishlist(productId, variantId);
-        setIsWishlisted(true);
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('wishlist-updated', { detail: { productId, action: 'add' } }));
         }
-      } catch (err: any) {
-        console.error('Failed to add to wishlist:', err);
-      } finally {
-        setIsWishlistLoading(false);
-      }
-    } else {
-      try {
+      } else {
         await wishlistService.removeFromWishlist(productId, variantId);
-        setIsWishlisted(false);
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('wishlist-updated', { detail: { productId, action: 'remove' } }));
         }
-      } catch (err: any) {
-        console.error('Failed to remove from wishlist:', err);
-      } finally {
-        setIsWishlistLoading(false);
       }
+    } catch (err: any) {
+      console.error('Failed to update wishlist:', err);
+      // Revert state if request fails
+      setIsWishlisted(!nextWishlisted);
+    } finally {
+      wishlistLoadingRef.current = false;
     }
-  }, [productId, variantId, isWishlisted, isWishlistLoading, isAuthenticated, router]);
+  }, [productId, variantId, isWishlisted, isAuthenticated, router]);
 
   // Prioritize clean packaging / product shots as hero image (index 0), moving infographics/marketing banners secondary
   const sortedImages = useMemo(() => {
@@ -157,13 +156,9 @@ export function ProductGallery({ images, productId, variantId, brand = 'KickAt' 
             className={`${styles.imageFloatingBtn} ${isWishlisted ? styles.wishlistActive : ''}`}
             aria-label={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
             onClick={handleWishlistToggle}
-            disabled={isWishlistLoading}
+            
           >
-            {isWishlistLoading ? (
-              <Loader2 size={16} className="animate-spin" color="#F99205" />
-            ) : (
-              <Heart size={16} fill={isWishlisted ? "#F99205" : "none"} color={isWishlisted ? "#F99205" : "#211C15"} />
-            )}
+            <Heart size={16} fill={isWishlisted ? "#F99205" : "none"} color={isWishlisted ? "#F99205" : "#211C15"} />
           </button>
           <button
             type="button"

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef, memo } from 'react';
 import { wishlistService } from '@/services/wishlistService';
 import { useAuth } from '@/context/AuthContext';
 import Image from 'next/image';
@@ -45,7 +45,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
   const router = useRouter();
   const { isAuthenticated } = useAuth();
   const [isWishlisted, setIsWishlisted] = useState(Boolean(product.isWishlisted));
-  const [isWishlistLoading, setIsWishlistLoading] = useState(false);
+  const wishlistLoadingRef = useRef(false);
   const [isAdded, setIsAdded] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [isVariantModalOpen, setIsVariantModalOpen] = useState(false);
@@ -83,41 +83,40 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
       return;
     }
 
-    if (isWishlistLoading) return;
-
     if (!isAuthenticated) {
       const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/';
       router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
       return;
     }
 
-    setIsWishlistLoading(true);
-    if (!isWishlisted) {
-      try {
+    if (wishlistLoadingRef.current) return;
+    wishlistLoadingRef.current = true;
+
+    const nextWishlisted = !isWishlisted;
+
+    // Instant optimistic update for immediate visual feedback
+    setIsWishlisted(nextWishlisted);
+
+    try {
+      if (nextWishlisted) {
         await wishlistService.addToWishlist(product.id, targetVariantId);
-        setIsWishlisted(true);
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('wishlist-updated', { detail: { productId: product.id, action: 'add' } }));
         }
-      } catch (err: any) {
-        console.error('Failed to add to wishlist:', err);
-      } finally {
-        setIsWishlistLoading(false);
-      }
-    } else {
-      try {
+      } else {
         await wishlistService.removeFromWishlist(product.id, targetVariantId);
-        setIsWishlisted(false);
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('wishlist-updated', { detail: { productId: product.id, action: 'remove' } }));
         }
-      } catch (err: any) {
-        console.error('Failed to remove from wishlist:', err);
-      } finally {
-        setIsWishlistLoading(false);
       }
+    } catch (err: any) {
+      console.error('Failed to update wishlist:', err);
+      // Revert optimistic update on failure
+      setIsWishlisted(!nextWishlisted);
+    } finally {
+      wishlistLoadingRef.current = false;
     }
-  }, [onRemoveFromWishlist, product.id, targetVariantId, isWishlisted, isWishlistLoading, isAuthenticated, router]);
+  }, [onRemoveFromWishlist, product.id, targetVariantId, isWishlisted, isAuthenticated, router]);
 
   const handleAddToCart = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -263,7 +262,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
             className={`${styles.cardWishlistBtn} ${isWishlisted ? styles.wishlistedActive : ''}`} 
             aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
             onClick={handleWishlistClick}
-            disabled={isWishlistLoading}
+            
           >
             <Heart
               size={16}

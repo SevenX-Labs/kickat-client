@@ -309,6 +309,11 @@
   border-color: #F99205;
 }
 
+.desktopWishlistBtn:active {
+  transform: scale(0.92);
+  transition: transform 0.08s ease;
+}
+
 .wishlistedActive {
   background-color: #FFF5EE !important;
   border-color: #F99205 !important;
@@ -329,7 +334,19 @@
   color: #F99205 !important;
   stroke: #F99205 !important;
   transform: scale(1.1);
-  transition: transform 0.2s ease;
+  animation: heartPop 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes heartPop {
+  0% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1.1);
+  }
 }
 
 /* In Stock & Delivery Group (Directly under button with tight 6px spacing) */

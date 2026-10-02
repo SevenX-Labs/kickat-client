@@ -476,7 +476,7 @@ export function CategoryExplorer({
                 )}
 
                 {/* Toolbar Row */}
-                {(loading || products.length > 0) && (
+                {!loading && products.length > 0 && (
                   <div className={styles.toolbar}>
                   <div className={styles.toolbarLeft}>
                     <div className={styles.toolbarViews}>

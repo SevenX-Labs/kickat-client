@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef, memo } from 'react';
 import { wishlistService } from '@/services/wishlistService';
 import { useAuth } from '@/context/AuthContext';
 import Image from 'next/image';
@@ -48,7 +48,7 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
   const router = useRouter();
   const { isAuthenticated } = useAuth();
   const [isWishlisted, setIsWishlisted] = useState(Boolean(product.isWishlisted));
-  const [isWishlistLoading, setIsWishlistLoading] = useState(false);
+  const wishlistLoadingRef = useRef(false);
   const [selectedSwatch, setSelectedSwatch] = useState(0);
   const [isAdded, setIsAdded] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
@@ -127,43 +127,41 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
       return;
     }
 
-    if (isWishlistLoading) return;
-
     if (!isAuthenticated) {
       const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/shop';
       router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
       return;
     }
 
-    const variantIdToUse = activeVariantId || product.variantId || product.selectedVariantId || undefined;
+    if (wishlistLoadingRef.current) return;
+    wishlistLoadingRef.current = true;
 
-    setIsWishlistLoading(true);
-    if (!isWishlisted) {
-      try {
+    const variantIdToUse = activeVariantId || product.variantId || product.selectedVariantId || undefined;
+    const nextWishlisted = !isWishlisted;
+
+    // Immediate optimistic update so color changes instantly on click
+    setIsWishlisted(nextWishlisted);
+
+    try {
+      if (nextWishlisted) {
         await wishlistService.addToWishlist(product.id, variantIdToUse);
-        setIsWishlisted(true);
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('wishlist-updated', { detail: { productId: product.id, action: 'add' } }));
         }
-      } catch (err: any) {
-        console.error('Failed to add to wishlist:', err);
-      } finally {
-        setIsWishlistLoading(false);
-      }
-    } else {
-      try {
+      } else {
         await wishlistService.removeFromWishlist(product.id, variantIdToUse);
-        setIsWishlisted(false);
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('wishlist-updated', { detail: { productId: product.id, action: 'remove' } }));
         }
-      } catch (err: any) {
-        console.error('Failed to remove from wishlist:', err);
-      } finally {
-        setIsWishlistLoading(false);
       }
+    } catch (err: any) {
+      console.error('Failed to update wishlist:', err);
+      // Revert optimistic update on failure
+      setIsWishlisted(!nextWishlisted);
+    } finally {
+      wishlistLoadingRef.current = false;
     }
-  }, [onRemoveFromWishlist, product.id, activeVariantId, product.variantId, product.selectedVariantId, isWishlisted, isWishlistLoading, isAuthenticated, router]);
+  }, [onRemoveFromWishlist, product.id, activeVariantId, product.variantId, product.selectedVariantId, isWishlisted, isAuthenticated, router]);
 
   const { addToCart } = useCart();
 
@@ -316,7 +314,7 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
             className={`${styles.cardWishlistBtn} ${isWishlisted ? styles.wishlistedActive : ''}`} 
             aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
             onClick={handleWishlistClick}
-            disabled={isWishlistLoading}
+            
           >
             <Heart
               size={15}
@@ -475,7 +473,7 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
               className={`${styles.desktopWishlistBtn} ${isWishlisted ? styles.wishlistedActive : ''}`} 
               aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
               onClick={handleWishlistClick}
-              disabled={isWishlistLoading}
+              
             >
               <Heart
                 size={18}
