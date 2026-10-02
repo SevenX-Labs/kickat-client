@@ -373,9 +373,15 @@ export function ProductTabs({ product, selectedVariant }: ProductTabsProps) {
                 <div>
                   <h4 className={styles.shippingCardTitle}>Tamper-Proof Packaging</h4>
                   <p className={styles.shippingCardDesc}>
-                    {((selectedVariant?.shippingWeightKg ?? product.shippingWeightKg) && (selectedVariant?.shippingLengthCm ?? product.shippingLengthCm))
-                      ? `Package Specs: ${selectedVariant?.shippingWeightKg ?? product.shippingWeightKg} kg (${selectedVariant?.shippingLengthCm ?? product.shippingLengthCm} cm L × ${selectedVariant?.shippingBreadthCm ?? product.shippingBreadthCm} cm B × ${selectedVariant?.shippingHeightCm ?? product.shippingHeightCm} cm H). Securely boxed for courier transit.`
-                      : "Secure, sealed packaging ensures your products arrive fresh, clean, and undamaged."}
+                    {(() => {
+                      const displayWeight = selectedVariant ? selectedVariant.shippingWeightKg : product.shippingWeightKg;
+                      const displayLength = selectedVariant ? selectedVariant.shippingLengthCm : product.shippingLengthCm;
+                      const displayBreadth = selectedVariant ? selectedVariant.shippingBreadthCm : product.shippingBreadthCm;
+                      const displayHeight = selectedVariant ? selectedVariant.shippingHeightCm : product.shippingHeightCm;
+                      return (displayWeight && displayLength)
+                        ? `Package Specs: ${displayWeight} kg (${displayLength} cm L × ${displayBreadth} cm B × ${displayHeight} cm H). Securely boxed for courier transit.`
+                        : "Secure, sealed packaging ensures your products arrive fresh, clean, and undamaged.";
+                    })()}
                   </p>
                 </div>
               </div>

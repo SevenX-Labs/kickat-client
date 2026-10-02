@@ -19,29 +19,22 @@ export function ProductSpecsAndSizeGuide({ product, selectedVariant, productDeta
   if (productDetails) {
     specsList = Object.entries(productDetails).map(([label, value]) => ({ label, value }));
   } else if (product) {
-    const activeWeightKg = (typeof selectedVariant?.shippingWeightKg === "number" && selectedVariant.shippingWeightKg > 0)
-      ? selectedVariant.shippingWeightKg
-      : (typeof product.shippingWeightKg === "number" && product.shippingWeightKg > 0)
-        ? product.shippingWeightKg
-        : null;
+    const hasSelectedVariant = Boolean(selectedVariant);
+    const activeWeightKg = hasSelectedVariant
+      ? (typeof selectedVariant?.shippingWeightKg === "number" && selectedVariant.shippingWeightKg > 0 ? selectedVariant.shippingWeightKg : null)
+      : (typeof product.shippingWeightKg === "number" && product.shippingWeightKg > 0 ? product.shippingWeightKg : null);
 
-    const activeLengthCm = (typeof selectedVariant?.shippingLengthCm === "number" && selectedVariant.shippingLengthCm > 0)
-      ? selectedVariant.shippingLengthCm
-      : (typeof product.shippingLengthCm === "number" && product.shippingLengthCm > 0)
-        ? product.shippingLengthCm
-        : null;
+    const activeLengthCm = hasSelectedVariant
+      ? (typeof selectedVariant?.shippingLengthCm === "number" && selectedVariant.shippingLengthCm > 0 ? selectedVariant.shippingLengthCm : null)
+      : (typeof product.shippingLengthCm === "number" && product.shippingLengthCm > 0 ? product.shippingLengthCm : null);
 
-    const activeBreadthCm = (typeof selectedVariant?.shippingBreadthCm === "number" && selectedVariant.shippingBreadthCm > 0)
-      ? selectedVariant.shippingBreadthCm
-      : (typeof product.shippingBreadthCm === "number" && product.shippingBreadthCm > 0)
-        ? product.shippingBreadthCm
-        : null;
+    const activeBreadthCm = hasSelectedVariant
+      ? (typeof selectedVariant?.shippingBreadthCm === "number" && selectedVariant.shippingBreadthCm > 0 ? selectedVariant.shippingBreadthCm : null)
+      : (typeof product.shippingBreadthCm === "number" && product.shippingBreadthCm > 0 ? product.shippingBreadthCm : null);
 
-    const activeHeightCm = (typeof selectedVariant?.shippingHeightCm === "number" && selectedVariant.shippingHeightCm > 0)
-      ? selectedVariant.shippingHeightCm
-      : (typeof product.shippingHeightCm === "number" && product.shippingHeightCm > 0)
-        ? product.shippingHeightCm
-        : null;
+    const activeHeightCm = hasSelectedVariant
+      ? (typeof selectedVariant?.shippingHeightCm === "number" && selectedVariant.shippingHeightCm > 0 ? selectedVariant.shippingHeightCm : null)
+      : (typeof product.shippingHeightCm === "number" && product.shippingHeightCm > 0 ? product.shippingHeightCm : null);
 
     specsList = [
       { label: 'Brand', value: product.brand || 'KickAt' },
