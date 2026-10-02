@@ -1,26 +1,29 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { userService } from '@/services/userService';
-import { ProductGallery } from './ProductGallery';
-import { ProductInfo } from './ProductInfo';
-import { ProductTabs } from './ProductTabs';
-import { ProductSpecsAndSizeGuide } from './ProductSpecsAndSizeGuide';
-import { ProductReviews } from './ProductReviews';
-import { ProductFAQ } from './ProductFAQ';
-import { RelatedProducts } from './RelatedProducts';
-import { ProductDetailSkeleton } from './ProductDetailSkeleton';
-import styles from './ProductDetail.module.css';
+import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowLeft, ChevronRight } from "lucide-react";
+import { ProductGallery } from "./ProductGallery";
+import { ProductInfo } from "./ProductInfo";
+import { ProductTabs } from "./ProductTabs";
+import { ProductSpecsAndSizeGuide } from "./ProductSpecsAndSizeGuide";
+import { ProductReviews } from "./ProductReviews";
+import { ProductFAQ } from "./ProductFAQ";
+import { RelatedProducts } from "./RelatedProducts";
+import { ProductDetailSkeleton } from "./ProductDetailSkeleton";
+import { userService } from "@/services/userService";
+import styles from "./ProductDetail.module.css";
 
 export interface ProductVariant {
   id: string;
+  sku: string;
   name: string;
-  sku?: string | null;
   price: number;
-  discountPrice?: number | null;
   originalPrice?: number | null;
+  discountPrice?: number | null;
   stock: number;
+  weightKg?: number | null;
   shippingWeightKg?: number | null;
   shippingLengthCm?: number | null;
   shippingBreadthCm?: number | null;
@@ -45,6 +48,7 @@ export interface Product {
   reviewsCount?: number;
   image: string;
   images: string[];
+  categorySlug?: string;
   mainCategory: string;
   subCategory: string;
   brand?: string;
@@ -75,6 +79,7 @@ interface ProductDetailProps {
 }
 
 export function ProductDetail({ product, isLoading, initialVariantId }: ProductDetailProps) {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const urlVariant = searchParams ? searchParams.get('variant') : null;
   const targetVariantId = urlVariant || initialVariantId;
@@ -143,11 +148,21 @@ export function ProductDetail({ product, isLoading, initialVariantId }: ProductD
     }
   }, [product]);
 
+  const handleBackNavigation = () => {
+    if (typeof window !== 'undefined' && document.referrer && document.referrer.includes(window.location.host)) {
+      window.history.back();
+    } else if (product.categorySlug) {
+      router.push(`/category/${product.categorySlug}`);
+    } else {
+      router.push('/category');
+    }
+  };
+
   if (isLoading) {
     return <ProductDetailSkeleton />;
   }
 
-  // Determine active images gallery: if selected variant has images, use it, else fallback to parent product images
+  // Determine active images gallery
   const activeImages = (selectedVariant && selectedVariant.images && selectedVariant.images.length > 0)
     ? selectedVariant.images
     : (selectedVariant && selectedVariant.imageUrl)
@@ -158,6 +173,23 @@ export function ProductDetail({ product, isLoading, initialVariantId }: ProductD
 
   return (
     <div className={styles.pageContainer}>
+      {/* Top Back Bar (Mobile View Only) */}
+      <div className={styles.topBackBar}>
+        <div className={styles.container}>
+          <div className={styles.topBackNavRow}>
+            <button
+              type="button"
+              onClick={handleBackNavigation}
+              className={styles.backBtn}
+              aria-label="Back to products list"
+            >
+              <ArrowLeft size={16} strokeWidth={2.4} />
+              <span>Back to {product.mainCategory || 'Products'}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* 1. Main Product Section (2-Column Desktop, Stacked Mobile) */}
       <section className={styles.mainProductSection}>
         <div className={styles.container}>
@@ -184,7 +216,7 @@ export function ProductDetail({ product, isLoading, initialVariantId }: ProductD
         </div>
       </section>
 
-      {/* 4. Product Details + Size Guide (2-Column Row) */}
+      {/* 4. Product Details + Size Guide */}
       <section className={styles.sectionPadding}>
         <div className={styles.container}>
           <ProductSpecsAndSizeGuide product={product} selectedVariant={selectedVariant} />
@@ -214,3 +246,5 @@ export function ProductDetail({ product, isLoading, initialVariantId }: ProductD
     </div>
   );
 }
+
+export default ProductDetail;

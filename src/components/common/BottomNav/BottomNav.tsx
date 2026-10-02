@@ -14,7 +14,6 @@ export function BottomNav() {
 
   useEffect(() => {
     const handleCartItemAdded = () => {
-      // cartCount synced via CartContext
       setIsCartBouncing(true);
       setTimeout(() => {
         setIsCartBouncing(false);
@@ -24,6 +23,11 @@ export function BottomNav() {
     window.addEventListener("cart-item-added", handleCartItemAdded);
     return () => window.removeEventListener("cart-item-added", handleCartItemAdded);
   }, []);
+
+  // Hide BottomNav on Product Detail pages and Checkout flow
+  if (pathname.startsWith("/product/") || pathname.startsWith("/checkout")) {
+    return null;
+  }
 
   const navItems = [
     {

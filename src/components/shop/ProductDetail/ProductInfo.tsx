@@ -651,24 +651,24 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
           disabled={isAdding || isBuyingNow || isOutOfStock || (hasVariants && !selectedVariant)}
         >
           {isAdding ? (
-            <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
-              <Loader2 size={18} className="animate-spin" />
+            <span className={styles.btnContentWrap}>
+              <Loader2 size={16} className="animate-spin" style={{ flexShrink: 0 }} />
               <span>Adding...</span>
             </span>
           ) : hasAdded ? (
-            <>
-              <Check size={18} />
+            <span className={styles.btnContentWrap}>
+              <Check size={16} strokeWidth={2.5} style={{ flexShrink: 0 }} />
               <span>Go to Cart</span>
-            </>
+            </span>
           ) : isOutOfStock ? (
-            <span>Out of Stock</span>
+            <span className={styles.btnContentWrap}>Out of Stock</span>
           ) : hasVariants && !selectedVariant ? (
-            <span>Select an Option</span>
+            <span className={styles.btnContentWrap}>Select Option</span>
           ) : (
-            <>
-              <ShoppingBag size={18} />
+            <span className={styles.btnContentWrap}>
+              <ShoppingBag size={16} strokeWidth={2.2} style={{ flexShrink: 0 }} />
               <span>Add to Cart</span>
-            </>
+            </span>
           )}
         </button>
 
@@ -680,15 +680,15 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
           style={{ opacity: (isOutOfStock || (hasVariants && !selectedVariant)) ? 0.5 : 1 }}
         >
           {isBuyingNow ? (
-            <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
-              <Loader2 size={18} className="animate-spin" />
+            <span className={styles.btnContentWrap}>
+              <Loader2 size={16} className="animate-spin" style={{ flexShrink: 0 }} />
               <span>Processing...</span>
             </span>
           ) : (
-            <>
-              <Zap size={18} fill="#ffffff" color="#ffffff" />
+            <span className={styles.btnContentWrap}>
+              <Zap size={16} fill="#ffffff" color="#ffffff" strokeWidth={1} style={{ flexShrink: 0 }} />
               <span>Buy Now</span>
-            </>
+            </span>
           )}
         </button>
       </div>

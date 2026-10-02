@@ -242,7 +242,7 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
     ) {
       return;
     }
-    router.push(productHref);
+    window.open(productHref, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -293,7 +293,7 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
           </button>
         )}
 
-        <Link href={productHref} prefetch={true} className={styles.cardImageLink}>
+        <Link href={productHref} target="_blank" rel="noopener noreferrer" prefetch={true} className={styles.cardImageLink}>
           <SafeImage
             src={activeImage}
             productName={product.name}
@@ -309,7 +309,7 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
 
       {/* Middle Details Column */}
       <div className={styles.cardInfo}>
-        <Link href={productHref} prefetch={true} className={styles.cardTitleLink}>
+        <Link href={productHref} target="_blank" rel="noopener noreferrer" prefetch={true} className={styles.cardTitleLink}>
           <h3 className={styles.cardTitle}>{product.name}</h3>
         </Link>
         

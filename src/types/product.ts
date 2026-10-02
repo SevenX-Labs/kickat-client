@@ -350,6 +350,8 @@ export function transformBackendProduct(bp: BackendProduct) {
     reviewsCount: bp.reviewsCount || 0,
     image: bp.imageUrl || allImages[0],
     images: allImages,
+    categorySlug: bp.category?.slug || undefined,
+    category: bp.category || undefined,
     mainCategory: bp.category?.name || bp.category?.slug || 'Pet Care',
     subCategory: bp.petSpecies ? `${bp.petSpecies.toLowerCase()} essentials` : 'Essentials',
     brand: bp.brand || 'KickAt',

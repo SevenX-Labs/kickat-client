@@ -191,7 +191,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
     ) {
       return;
     }
-    router.push(productHref);
+    window.open(productHref, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -243,7 +243,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
           </button>
         )}
 
-        <Link href={productHref} prefetch={true} className={styles.cardImageLink}>
+        <Link href={productHref} target="_blank" rel="noopener noreferrer" prefetch={true} className={styles.cardImageLink}>
           <SafeImage
             src={product.image}
             productName={product.name}
@@ -263,7 +263,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
           <span className={styles.categoryText}>{product.brand || product.mainCategory || 'KickAt Essential'}</span>
         </div>
 
-        <Link href={productHref} prefetch={true} className={styles.cardTitleLink}>
+        <Link href={productHref} target="_blank" rel="noopener noreferrer" prefetch={true} className={styles.cardTitleLink}>
           <h3 className={styles.cardTitle}>{product.name}</h3>
         </Link>
 
