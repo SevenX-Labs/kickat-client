@@ -20,7 +20,7 @@ interface WishlistContextType {
   toggleWishlist: (product: ToggleProductParam, activeVariantId?: string) => Promise<boolean>;
   removeFromWishlist: (productId: string, variantId?: string) => Promise<void>;
   moveAllToCart: () => Promise<void>;
-  refreshWishlist: () => Promise<void>;
+  refreshWishlist: (force?: boolean) => Promise<void>;
 }
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
@@ -30,7 +30,8 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
   const [wishlistIds, setWishlistIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
-  const isOperatingRef = useRef(false);
+  const isFetchingRef = useRef(false);
+  const lastFetchTimeRef = useRef(0);
 
   // Helper to build Set of IDs from Wishlist items
   const buildIdsSet = (items: WishlistItem[]): Set<string> => {
@@ -46,12 +47,20 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
     return ids;
   };
 
-  const refreshWishlist = useCallback(async () => {
+  const refreshWishlist = useCallback(async (force = false) => {
     if (!isAuthenticated) {
       setWishlistItems([]);
       setWishlistIds(new Set());
       return;
     }
+
+    const now = Date.now();
+    if (!force && (isFetchingRef.current || now - lastFetchTimeRef.current < 5000)) {
+      return;
+    }
+
+    isFetchingRef.current = true;
+    lastFetchTimeRef.current = now;
 
     try {
       setLoading(true);
@@ -60,16 +69,27 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         setWishlistItems(res.items);
         setWishlistIds(buildIdsSet(res.items));
       }
-    } catch (err) {
-      console.error('Failed to load wishlist:', err);
+    } catch (err: any) {
+      const msg = err?.message || '';
+      if (msg.includes('Too Many Requests') || msg.includes('ThrottlerException')) {
+        console.warn('[Wishlist] Rate limited, using in-memory state.');
+      } else {
+        console.error('Failed to load wishlist:', err);
+      }
     } finally {
+      isFetchingRef.current = false;
       setLoading(false);
     }
   }, [isAuthenticated]);
 
   useEffect(() => {
-    refreshWishlist();
-  }, [refreshWishlist]);
+    if (isAuthenticated) {
+      refreshWishlist(true);
+    } else {
+      setWishlistItems([]);
+      setWishlistIds(new Set());
+    }
+  }, [isAuthenticated, refreshWishlist]);
 
   // Listen to global wishlist-updated events across windows / tabs
   useEffect(() => {
@@ -152,7 +172,10 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
 
       try {
         if (nextStatus) {
-          await wishlistService.addToWishlist(product.id, variantIdToUse);
+          const res = await wishlistService.addToWishlist(product.id, variantIdToUse);
+          if (res?.item) {
+            setWishlistItems((prev) => [res.item, ...prev.filter((i) => i.id !== res.item.id)]);
+          }
           if (typeof window !== 'undefined') {
             window.dispatchEvent(
               new CustomEvent('wishlist-updated', {
@@ -160,13 +183,6 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
               })
             );
           }
-          // Fetch updated list in background to sync full WishlistItem records
-          wishlistService.getWishlist(1, 100).then((res) => {
-            if (res.success && Array.isArray(res.items)) {
-              setWishlistItems(res.items);
-              setWishlistIds(buildIdsSet(res.items));
-            }
-          }).catch(() => {});
         } else {
           await wishlistService.removeFromWishlist(product.id, variantIdToUse);
           if (typeof window !== 'undefined') {
@@ -179,7 +195,6 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         }
         return nextStatus;
       } catch (err: any) {
-        console.error('Failed to toggle wishlist:', err);
         const msg = (err?.message || '').toLowerCase();
 
         // Handle conflict or already removed gracefully without reverting valid UI state
@@ -195,7 +210,8 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
           return false;
         }
 
-        // Revert optimistic update on unexpected network/auth failure
+        console.error('Failed to toggle wishlist:', err);
+        // Revert optimistic update on unexpected failure
         setWishlistIds((prev) => {
           const next = new Set(prev);
           if (currentStatus) {
@@ -240,10 +256,9 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         }
       } catch (err) {
         console.error('Failed to remove from wishlist:', err);
-        refreshWishlist();
       }
     },
-    [refreshWishlist]
+    []
   );
 
   const moveAllToCart = useCallback(async () => {
@@ -261,9 +276,8 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (err) {
       console.error('Failed to move items to cart:', err);
-      refreshWishlist();
     }
-  }, [wishlistItems, refreshWishlist]);
+  }, [wishlistItems]);
 
   const value = useMemo(
     () => ({
