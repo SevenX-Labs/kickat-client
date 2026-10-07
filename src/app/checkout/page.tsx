@@ -1059,7 +1059,7 @@ export default function CheckoutPage() {
             {/* Print-Only Official Invoice Bill Footer */}
             <div className={styles.printOnlyFooter}>
               <p>This is an authentic computer-generated Tax Invoice / Cash Bill &bull; No signature required.</p>
-              <p>KickAt Pet Care Essentials &bull; www.kickat.co.in</p>
+              <p>KickAt Pet Care Essentials &bull; www.kickat.in</p>
             </div>
           </div>
 

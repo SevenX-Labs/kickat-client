@@ -20,7 +20,7 @@ function AccountMainHubContent() {
   const [userData, setUserData] = useState({
     firstName: "KickAt",
     lastName: "Member",
-    email: "member@kickat.co.in",
+    email: "member@kickat.in",
     phone: "Not provided",
     tier: "Gold Paw VIP",
     points: 1240,

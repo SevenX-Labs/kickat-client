@@ -205,7 +205,7 @@ export async function POST(req: NextRequest) {
         from: smtpFrom,
         to: customerEmail,
         subject: `We've received your request [${ticketId}] - KickAt Support`,
-        text: `Hi ${customerName},\n\nThank you for reaching out to KickAt! We have received your inquiry regarding "${contactSubject}" (Ticket ID: ${ticketId}).\n\nOur pet care support team is reviewing your message and will get back to you shortly.\n\nYour Message:\n${contactMessage}\n\nBest regards,\nThe KickAt Team\nhttps://kickat.co.in`,
+        text: `Hi ${customerName},\n\nThank you for reaching out to KickAt! We have received your inquiry regarding "${contactSubject}" (Ticket ID: ${ticketId}).\n\nOur pet care support team is reviewing your message and will get back to you shortly.\n\nYour Message:\n${contactMessage}\n\nBest regards,\nThe KickAt Team\nhttps://kickat.in`,
         html: `
           <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto; padding: 24px; color: #211C15;">
             <h2 style="color: #F99205;">🐾 Hello ${customerName},</h2>

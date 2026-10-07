@@ -1,5 +1,5 @@
 export const CONFIG = {
-  API_BASE_URL: process.env.NEXT_PUBLIC_SERVER_API_URL!,
+  API_BASE_URL: process.env.NEXT_PUBLIC_SERVER_API_URL || 'https://ap.kickat.in/api/v1',
   APP_NAME: 'Kickat',
   CURRENCY: '₹',
 };

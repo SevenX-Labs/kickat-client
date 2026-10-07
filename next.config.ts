@@ -20,11 +20,15 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'cdn.kickat.co.in',
+        hostname: 'ap.kickat.in',
       },
       {
         protocol: 'https',
-        hostname: 'api.kickat.co.in',
+        hostname: 'cdn.kickat.in',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.kickat.in',
       },
       {
         protocol: 'https',

@@ -27,7 +27,7 @@ interface UserProps {
 const defaultUser: UserProps = {
   firstName: "KickAt",
   lastName: "Member",
-  email: "member@kickat.co.in",
+  email: "member@kickat.in",
   totalOrders: 0,
   points: 1240,
   tier: "KickAt VIP"
