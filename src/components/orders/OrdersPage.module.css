@@ -942,6 +942,262 @@
   .expandWrap { transition: none; }
 }
 
+
+/* ---------- Search & Mobile Filter Row ---------- */
+.searchFilterRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mobileFilterBtn {
+  display: none;
+}
+
+.filterBadgeDot {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--o-orange);
+  border: 2px solid #FFFFFF;
+}
+
+/* Mobile active filters row */
+.mobileActiveFilters {
+  display: none;
+}
+
+/* ---------- Filter Bottom Sheet (Mobile) ---------- */
+.filterSheetBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(26, 20, 16, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+.filterSheet {
+  width: 100%;
+  max-width: 520px;
+  background: var(--o-surface);
+  border-radius: 24px 24px 0 0;
+  padding: 12px 20px 24px 20px;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--o-border);
+  border-bottom: none;
+  animation: slideUpSheet 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+  box-sizing: border-box;
+}
+
+@keyframes slideUpSheet {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.sheetHandle {
+  width: 38px;
+  height: 4px;
+  border-radius: 2px;
+  background: #E0D6C8;
+  margin: 4px auto 12px auto;
+  flex-shrink: 0;
+}
+
+.sheetHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--o-border);
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+
+.sheetHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sheetTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--o-text);
+  margin: 0;
+}
+
+.sheetActiveBadge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: var(--o-orange-tint);
+  color: var(--o-orange);
+  padding: 2px 8px;
+  border-radius: 20px;
+  border: 1px solid rgba(242, 140, 15, 0.3);
+}
+
+.sheetHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sheetResetBtn {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--o-orange);
+  cursor: pointer;
+  padding: 4px 6px;
+}
+
+.sheetCloseBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: #F4EEE4;
+  color: var(--o-muted);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.sheetCloseBtn:hover {
+  background: #EAE2D5;
+}
+
+.sheetBody {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-bottom: 8px;
+}
+
+.sheetSectionTitle {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--o-faint);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.sheetOptionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sheetOptionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--o-border);
+  background: #FAF7F2;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  text-align: left;
+}
+
+.sheetOptionRowSelected {
+  background: var(--o-orange-tint);
+  border-color: var(--o-orange);
+}
+
+.sheetOptionInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sheetCalendarIcon {
+  color: var(--o-faint);
+}
+
+.sheetOptionName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--o-text);
+}
+
+.sheetOptionCount {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: #EAE3D5;
+  color: var(--o-muted);
+}
+
+.sheetOptionCountActive {
+  background: var(--o-orange);
+  color: #FFFFFF;
+}
+
+.sheetCheckDot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--o-orange);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sheetUncheckDot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #D5CCBE;
+  flex-shrink: 0;
+}
+
+.sheetFooter {
+  padding-top: 14px;
+  border-top: 1px solid var(--o-border);
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+.sheetApplyBtn {
+  width: 100%;
+  height: 46px;
+  border-radius: 12px;
+  background: var(--o-orange);
+  color: #FFFFFF;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.sheetApplyBtn:hover {
+  background: var(--o-orange-hover);
+}
+
 /* ============================================================
    Responsive
    ============================================================ */
@@ -959,16 +1215,100 @@
     flex-direction: column;
     align-items: stretch;
     gap: 14px;
+    margin-bottom: 14px;
   }
   .title { font-size: 26px; }
-  .searchBox { width: 100%; }
 
-  .toolbar {
-    flex-direction: column;
-    align-items: stretch;
+  .searchFilterRow {
+    width: 100%;
+    display: flex;
+    align-items: center;
     gap: 10px;
   }
-  .dateWrap { align-self: flex-end; }
+  .searchBox {
+    flex: 1;
+    width: auto;
+  }
+
+  .mobileFilterBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--o-surface);
+    border: 1px solid var(--o-border);
+    color: var(--o-text);
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+    transition: all 0.18s ease;
+  }
+  .mobileFilterBtn:active {
+    transform: scale(0.96);
+  }
+  .mobileFilterBtnActive {
+    background: var(--o-orange-tint);
+    border-color: var(--o-orange);
+    color: var(--o-orange);
+  }
+
+  /* Hide the desktop toolbar tabs on mobile */
+  .toolbar {
+    display: none;
+  }
+
+  /* Show mobile active filters row */
+  .mobileActiveFilters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 8px 12px;
+    background: #F8F3EA;
+    border: 1px solid var(--o-border);
+    border-radius: 12px;
+  }
+  .mobileActiveLabel {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--o-faint);
+  }
+  .mobileFilterChip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: var(--o-orange-tint);
+    color: var(--o-orange);
+    border: 1px solid rgba(242, 140, 15, 0.35);
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .mobileFilterChip button {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  .mobileClearBtn {
+    background: none;
+    border: none;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--o-muted);
+    cursor: pointer;
+    text-decoration: underline;
+    margin-left: auto;
+    padding: 0;
+  }
 
   .cardHead { flex-wrap: wrap; }
   .headRight { width: 100%; justify-content: space-between; margin-left: 0; margin-top: 4px; }

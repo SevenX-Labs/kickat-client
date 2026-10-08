@@ -5,7 +5,7 @@ import Link from 'next/link';
 import SafeImage from '@/components/ui/SafeImage';
 import {
   Package, Search, ChevronDown, Check, Copy, Clock, Truck,
-  CheckCircle2, XCircle, RotateCcw, MapPin, FileText, Eye,
+  CheckCircle2, XCircle, RotateCcw, MapPin, FileText, Eye, Filter,
   RefreshCw, Star, AlertCircle, Loader2, X, Calendar, SearchX,
 } from 'lucide-react';
 import { orderService } from '@/services/orderService';
@@ -107,6 +107,7 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
   const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
   const [stuck, setStuck] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
 
   const [reorderingId, setReorderingId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -351,28 +352,66 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
                   : `${orders.length} ${orders.length === 1 ? 'order' : 'orders'} placed with KickAt`}
             </p>
           </div>
-          <div className={styles.searchBox}>
-            <Search size={18} className={styles.searchIcon} />
-            <input
-              type="text"
-              className={styles.searchInput}
-              placeholder="Search by order ID or product…"
-              value={searchQuery}
-              onChange={(e) => changeSearch(e.target.value)}
-              aria-label="Search orders by order ID or product name"
-            />
-            {searchQuery && (
-              <button type="button" className={styles.searchClear} onClick={() => changeSearch('')} aria-label="Clear search">
-                <X size={13} />
-              </button>
-            )}
+          <div className={styles.searchFilterRow}>
+            <div className={styles.searchBox}>
+              <Search size={18} className={styles.searchIcon} />
+              <input
+                type="text"
+                className={styles.searchInput}
+                placeholder="Search by order ID or product…"
+                value={searchQuery}
+                onChange={(e) => changeSearch(e.target.value)}
+                aria-label="Search orders by order ID or product name"
+              />
+              {searchQuery && (
+                <button type="button" className={styles.searchClear} onClick={() => changeSearch('')} aria-label="Clear search">
+                  <X size={13} />
+                </button>
+              )}
+            </div>
+            <button
+              type="button"
+              className={`${styles.mobileFilterBtn} ${(statusFilter !== 'All' || dateRange !== 'all') ? styles.mobileFilterBtnActive : ''}`}
+              onClick={() => setFilterSheetOpen(true)}
+              aria-label="Filter orders"
+              title="Filter Orders"
+            >
+              <Filter size={18} />
+              {(statusFilter !== 'All' || dateRange !== 'all') && <span className={styles.filterBadgeDot} />}
+            </button>
           </div>
         </header>
 
         {/* sentinel for sticky detection */}
         <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
 
-        {/* Sticky toolbar: filter tabs + date range */}
+        {/* Mobile active filter pills */}
+        {(statusFilter !== 'All' || dateRange !== 'all') && (
+          <div className={styles.mobileActiveFilters}>
+            <span className={styles.mobileActiveLabel}>Filters:</span>
+            {statusFilter !== 'All' && (
+              <span className={styles.mobileFilterChip}>
+                {statusFilter}
+                <button type="button" onClick={() => changeStatus('All')} aria-label="Clear status filter">
+                  <X size={12} />
+                </button>
+              </span>
+            )}
+            {dateRange !== 'all' && (
+              <span className={styles.mobileFilterChip}>
+                {DATE_RANGES.find((d) => d.key === dateRange)?.label}
+                <button type="button" onClick={() => changeDateRange('all')} aria-label="Clear date filter">
+                  <X size={12} />
+                </button>
+              </span>
+            )}
+            <button type="button" className={styles.mobileClearBtn} onClick={clearFilters}>
+              Reset all
+            </button>
+          </div>
+        )}
+
+        {/* Sticky toolbar: filter tabs + date range (Desktop/Tablet) */}
         <div className={`${styles.toolbar} ${stuck ? styles.toolbarStuck : ''}`}>
           <div className={styles.tabs} role="tablist" aria-label="Filter orders by status">
             {tabs.map((t) => (
@@ -784,6 +823,125 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
           </>
         )}
       </div>
+
+      {/* Mobile Filter Bottom Sheet Modal */}
+      {filterSheetOpen && (
+        <div
+          className={styles.filterSheetBackdrop}
+          onClick={() => setFilterSheetOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Filter orders"
+        >
+          <div className={styles.filterSheet} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.sheetHandle} />
+
+            <div className={styles.sheetHeader}>
+              <div className={styles.sheetHeaderLeft}>
+                <h2 className={styles.sheetTitle}>Filter Orders</h2>
+                {(statusFilter !== 'All' || dateRange !== 'all') && (
+                  <span className={styles.sheetActiveBadge}>
+                    {(statusFilter !== 'All' ? 1 : 0) + (dateRange !== 'all' ? 1 : 0)} active
+                  </span>
+                )}
+              </div>
+              <div className={styles.sheetHeaderRight}>
+                {(statusFilter !== 'All' || dateRange !== 'all') && (
+                  <button
+                    type="button"
+                    className={styles.sheetResetBtn}
+                    onClick={clearFilters}
+                  >
+                    Reset
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className={styles.sheetCloseBtn}
+                  onClick={() => setFilterSheetOpen(false)}
+                  aria-label="Close filters"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            <div className={styles.sheetBody}>
+              {/* Order Status */}
+              <div className={styles.sheetSection}>
+                <label className={styles.sheetSectionTitle}>Order Status</label>
+                <div className={styles.sheetOptionsList}>
+                  {tabs.map((t) => {
+                    const isSelected = statusFilter === t;
+                    return (
+                      <button
+                        key={t}
+                        type="button"
+                        className={`${styles.sheetOptionRow} ${isSelected ? styles.sheetOptionRowSelected : ''}`}
+                        onClick={() => changeStatus(t)}
+                      >
+                        <div className={styles.sheetOptionInfo}>
+                          <span className={styles.sheetOptionName}>{t === 'All' ? 'All Orders' : t}</span>
+                          <span className={`${styles.sheetOptionCount} ${isSelected ? styles.sheetOptionCountActive : ''}`}>
+                            {counts[t]}
+                          </span>
+                        </div>
+                        {isSelected ? (
+                          <div className={styles.sheetCheckDot}>
+                            <Check size={14} strokeWidth={3} />
+                          </div>
+                        ) : (
+                          <div className={styles.sheetUncheckDot} />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Time Period */}
+              <div className={styles.sheetSection}>
+                <label className={styles.sheetSectionTitle}>Time Period</label>
+                <div className={styles.sheetOptionsList}>
+                  {DATE_RANGES.map((d) => {
+                    const isSelected = dateRange === d.key;
+                    return (
+                      <button
+                        key={d.key}
+                        type="button"
+                        className={`${styles.sheetOptionRow} ${isSelected ? styles.sheetOptionRowSelected : ''}`}
+                        onClick={() => changeDateRange(d.key)}
+                      >
+                        <div className={styles.sheetOptionInfo}>
+                          <Calendar size={15} className={styles.sheetCalendarIcon} />
+                          <span className={styles.sheetOptionName}>{d.label}</span>
+                        </div>
+                        {isSelected ? (
+                          <div className={styles.sheetCheckDot}>
+                            <Check size={14} strokeWidth={3} />
+                          </div>
+                        ) : (
+                          <div className={styles.sheetUncheckDot} />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.sheetFooter}>
+              <button
+                type="button"
+                className={styles.sheetApplyBtn}
+                onClick={() => setFilterSheetOpen(false)}
+              >
+                Show {filteredOrders.length} {filteredOrders.length === 1 ? 'Order' : 'Orders'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Toast */}
       {toastMessage && (
