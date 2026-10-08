@@ -349,12 +349,11 @@
 .cardMetaRow {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  justify-content: flex-start;
+  gap: 8px;
   width: 100%;
-  padding-bottom: 8px;
+  padding-bottom: 10px;
   border-bottom: 1px solid #F4EFE6;
-  flex-wrap: wrap;
 }
 
 .orderId {
@@ -531,20 +530,91 @@
 .summaryRed   { color: var(--o-red); }
 .summaryGrey  { color: var(--o-grey); }
 
-/* Row 5: Actions Grid */
-.cardFoot {
+/* Row 5: Total Pricing Footer & View Details CTA */
+.cardFooter {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   width: 100%;
-  padding-top: 4px;
+  padding-top: 12px;
+  margin-top: 2px;
+  border-top: 1px dashed var(--o-border);
 }
 
-.actions {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+.totalBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.totalLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--o-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.itemCount {
+  font-weight: 500;
+  text-transform: none;
+  color: var(--o-muted);
+  font-size: 0.72rem;
+}
+
+.totalValue {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--o-text);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.viewDetailsCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--o-orange);
+  background: var(--o-orange-tint);
+  padding: 7px 13px;
+  border-radius: 9999px;
+  border: 1px solid rgba(242, 140, 15, 0.25);
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.card:hover .viewDetailsCta {
+  background: var(--o-orange);
+  color: #FFFFFF;
+  border-color: var(--o-orange);
+  box-shadow: 0 4px 12px rgba(242, 140, 15, 0.28);
+}
+
+.ctaChevron {
+  transition: transform 0.2s ease;
+}
+
+.card:hover .ctaChevron {
+  transform: translateX(3px);
+}
+
+/* Skeleton footer row */
+.skelFooterRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
+  padding-top: 10px;
+  border-top: 1px dashed var(--o-border);
 }
 
 /* Touch friendly min 42-44px buttons */

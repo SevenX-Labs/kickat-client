@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import SafeImage from '@/components/ui/SafeImage';
 import {
-  Package, Search, ChevronDown, Check, Copy, Clock, Truck,
+  Package, Search, ChevronDown, ChevronRight, Check, Copy, Clock, Truck,
   CheckCircle2, XCircle, RotateCcw, MapPin, FileText, Eye,
   RefreshCw, Star, AlertCircle, Loader2, X, Calendar, SearchX,
   Filter, ArrowLeft
@@ -494,9 +494,9 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
                     <div className={styles.skel} style={{ width: '40%', height: 13 }} />
                   </div>
                 </div>
-                <div className={styles.skelActionsRow}>
-                  <div className={styles.skel} style={{ width: '48%', height: 42, borderRadius: 10 }} />
-                  <div className={styles.skel} style={{ width: '48%', height: 42, borderRadius: 10 }} />
+                <div className={styles.skelFooterRow}>
+                  <div className={styles.skel} style={{ width: 120, height: 26, borderRadius: 6 }} />
+                  <div className={styles.skel} style={{ width: 96, height: 28, borderRadius: 9999, marginLeft: 'auto' }} />
                 </div>
               </div>
             ))}
@@ -576,7 +576,7 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
                       <span className={styles.headDate}>{order.date}</span>
                     </div>
 
-                    {/* Row 2: Full Order ID with copy icon on left, Total on right */}
+                    {/* Row 2: Full Order ID with copy icon */}
                     <div className={styles.cardMetaRow}>
                       <div className={styles.orderId}>
                         <span className={styles.orderIdPrefix}>ID:</span>
@@ -591,20 +591,11 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
                           {copiedId === String(order.id) ? <Check size={13} /> : <Copy size={13} />}
                         </button>
                       </div>
-
-                      <div className={styles.cardTotal}>
-                        <span className={styles.cardTotalLabel}>TOTAL</span>
-                        <span className={styles.cardTotalValue}>{formatPrice(order.total)}</span>
-                      </div>
                     </div>
 
-                    {/* Row 3: Product Row (Thumbnail on left, Title + Variant/Qty on right) -> Links to Order Details */}
+                    {/* Row 3: Product Row (Thumbnail on left, Title + Variant/Qty on right) */}
                     <div className={styles.cardBody}>
-                      <Link
-                        href={`/orders/${orderTargetId}`}
-                        className={styles.thumbLink}
-                        title="View order details"
-                      >
+                      <div className={styles.thumbLink}>
                         <div className={styles.thumb}>
                           <SafeImage
                             src={order.items[0]?.image || '/hero-products/dog_food.png'}
@@ -619,16 +610,12 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
                         {extraItems > 0 && (
                           <span className={styles.moreChip}>+{extraItems} more</span>
                         )}
-                      </Link>
+                      </div>
 
                       <div className={styles.bodyInfo}>
-                        <Link
-                          href={`/orders/${orderTargetId}`}
-                          className={styles.itemName}
-                          title="View order details"
-                        >
+                        <span className={styles.itemName}>
                           {order.items[0]?.name || 'Pet Product'}
-                        </Link>
+                        </span>
                         <div className={styles.itemMeta}>
                           {order.items.length === 1
                             ? `${order.items[0]?.variant || 'Standard'} · Qty ${order.items[0]?.qty || 1}`
@@ -638,113 +625,27 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
                     </div>
 
                     {/* Row 4: Status Summary line */}
-                    <div className={styles.statusSummaryRow}>
-                      <span className={`${styles.summary} ${toneSummary[tone]}`}>
-                        <StatusIcon status={order.status} size={15} />
-                        <span>{summaryText}</span>
-                      </span>
-                    </div>
+                    {summaryText && (
+                      <div className={styles.statusSummaryRow}>
+                        <span className={`${styles.summary} ${toneSummary[tone]}`}>
+                          <StatusIcon status={order.status} size={15} />
+                          <span>{summaryText}</span>
+                        </span>
+                      </div>
+                    )}
 
-                    {/* Row 5: Action Buttons (Touch-friendly 42-44px buttons in a balanced grid) */}
-                    <div className={styles.cardFoot}>
-                      <div className={styles.actions}>
-                        {/* Active: Filled Orange Track (Primary) + Outlined Details + Tertiary Invoice */}
-                        {isActive && (
-                          <>
-                            <Link href={`/orders/${orderTargetId}/tracking`} className={`${styles.btn} ${styles.btnPrimary}`}>
-                              <MapPin size={15} /> Track Order
-                            </Link>
-                            <Link href={`/orders/${orderTargetId}`} className={`${styles.btn} ${styles.btnSecondary}`}>
-                              <Eye size={15} /> Details
-                            </Link>
-                            <Link href={`/orders/${orderTargetId}/invoice`} className={`${styles.btn} ${styles.btnTertiary}`}>
-                              <FileText size={15} /> Invoice
-                            </Link>
-                            {cancellable && (
-                              <button
-                                type="button"
-                                className={`${styles.btn} ${styles.btnDanger}`}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setCancelModalOrder(order);
-                                }}
-                              >
-                                <XCircle size={15} /> Cancel
-                              </button>
-                            )}
-                          </>
-                        )}
+                    {/* Row 5: Total Pricing Footer (Clean prominent pricing & View Details CTA) */}
+                    <div className={styles.cardFooter}>
+                      <div className={styles.totalBlock}>
+                        <span className={styles.totalLabel}>
+                          Total Amount <span className={styles.itemCount}>({order.items.length} {order.items.length === 1 ? 'item' : 'items'})</span>
+                        </span>
+                        <span className={styles.totalValue}>{formatPrice(order.total)}</span>
+                      </div>
 
-                        {/* Delivered: Filled Orange Reorder (Primary) + Outlined Details + Tertiary Invoice */}
-                        {isDelivered && (
-                          <>
-                            <button
-                              type="button"
-                              className={`${styles.btn} ${styles.btnPrimary}`}
-                              disabled={reorderingId === orderTargetId}
-                              onClick={(e) => handleReorderClick(order.id, order.rawId, e)}
-                            >
-                              {reorderingId === orderTargetId
-                                ? <><Loader2 size={15} className="animate-spin" /> Adding…</>
-                                : <><RefreshCw size={15} /> Reorder</>}
-                            </button>
-                            <Link href={`/orders/${orderTargetId}`} className={`${styles.btn} ${styles.btnSecondary}`}>
-                              <Eye size={15} /> Details
-                            </Link>
-                            <Link href={`/orders/${orderTargetId}/invoice`} className={`${styles.btn} ${styles.btnTertiary}`}>
-                              <FileText size={15} /> Invoice
-                            </Link>
-                            {order.items[0]?.productSlug && (
-                              <Link href={`/product/${order.items[0].productSlug}#reviews`} className={`${styles.btn} ${styles.btnTertiary}`}>
-                                <Star size={14} /> Review
-                              </Link>
-                            )}
-                          </>
-                        )}
-
-                        {/* Cancelled: Outlined Reorder (Secondary) + Outlined Details + Tertiary Invoice */}
-                        {isCancelled && (
-                          <>
-                            <button
-                              type="button"
-                              className={`${styles.btn} ${styles.btnSecondary}`}
-                              disabled={reorderingId === orderTargetId}
-                              onClick={(e) => handleReorderClick(order.id, order.rawId, e)}
-                            >
-                              {reorderingId === orderTargetId
-                                ? <><Loader2 size={15} className="animate-spin" /> Adding…</>
-                                : <><RefreshCw size={15} /> Reorder</>}
-                            </button>
-                            <Link href={`/orders/${orderTargetId}`} className={`${styles.btn} ${styles.btnSecondary}`}>
-                              <Eye size={15} /> Details
-                            </Link>
-                            <Link href={`/orders/${orderTargetId}/invoice`} className={`${styles.btn} ${styles.btnTertiary}`}>
-                              <FileText size={15} /> Invoice
-                            </Link>
-                          </>
-                        )}
-
-                        {/* Returned */}
-                        {isReturned && (
-                          <>
-                            <button
-                              type="button"
-                              className={`${styles.btn} ${styles.btnSecondary}`}
-                              disabled={reorderingId === orderTargetId}
-                              onClick={(e) => handleReorderClick(order.id, order.rawId, e)}
-                            >
-                              {reorderingId === orderTargetId
-                                ? <><Loader2 size={15} className="animate-spin" /> Adding…</>
-                                : <><RefreshCw size={15} /> Reorder</>}
-                            </button>
-                            <Link href={`/orders/${orderTargetId}`} className={`${styles.btn} ${styles.btnSecondary}`}>
-                              <Eye size={15} /> Details
-                            </Link>
-                            <Link href={`/orders/${orderTargetId}/invoice`} className={`${styles.btn} ${styles.btnTertiary}`}>
-                              <FileText size={15} /> Invoice
-                            </Link>
-                          </>
-                        )}
+                      <div className={styles.viewDetailsCta}>
+                        <span>View Details</span>
+                        <ChevronRight size={15} className={styles.ctaChevron} />
                       </div>
                     </div>
                   </div>
