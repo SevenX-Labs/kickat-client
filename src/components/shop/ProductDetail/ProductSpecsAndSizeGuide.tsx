@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ArrowRight, Droplets, Waves, Sun, Dog, ShieldCheck, Check, X, Ruler, Sparkles, AlertCircle } from 'lucide-react';
 import styles from './ProductDetail.module.css';
+import { usePublicSettings } from '@/hooks/usePublicSettings';
 import { Product, ProductVariant } from './ProductDetail';
 
 interface SpecsAndSizeGuideProps {
@@ -12,6 +13,7 @@ interface SpecsAndSizeGuideProps {
 }
 
 export function ProductSpecsAndSizeGuide({ product, selectedVariant, productDetails }: SpecsAndSizeGuideProps) {
+  const { manufacturing } = usePublicSettings();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   let specsList: { label: string; value: string }[] = [];
@@ -68,7 +70,11 @@ export function ProductSpecsAndSizeGuide({ product, selectedVariant, productDeta
         : []),
       { label: 'Product Type', value: product.type === 'VARIABLE' ? 'Multi-Variant Pack' : 'Standard Pack' },
       { label: 'Availability', value: ((selectedVariant ? selectedVariant.stock : product.stock) ?? 100) > 0 ? 'In Stock' : 'Out of Stock' },
-      { label: 'Country of Origin', value: 'India' },
+      { label: 'Country of Origin', value: manufacturing?.countryOfOrigin || 'India' },
+      ...(manufacturing?.manufacturerName ? [{ label: 'Manufacturer', value: `${manufacturing.manufacturerName}${manufacturing.manufacturerAddress ? `, ${manufacturing.manufacturerAddress}` : ''}` }] : []),
+      ...(manufacturing?.marketedBy ? [{ label: 'Marketed By', value: manufacturing.marketedBy }] : []),
+      ...(manufacturing?.consumerCareEmail || manufacturing?.consumerCarePhone ? [{ label: 'Consumer Care', value: [manufacturing.consumerCareEmail, manufacturing.consumerCarePhone].filter(Boolean).join(' | ') }] : []),
+      ...(manufacturing?.shelfLife ? [{ label: 'Shelf Life', value: manufacturing.shelfLife }] : []),
     ];
 
     if (product.attributes && typeof product.attributes === 'object') {

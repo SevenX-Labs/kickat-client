@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import SafeImage from '@/components/ui/SafeImage';
 import {
   ShieldCheck,
+  Building2,
   Sparkles,
   CheckCircle2,
   Utensils,
@@ -18,6 +19,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import styles from './ProductDetail.module.css';
+import { usePublicSettings } from '@/hooks/usePublicSettings';
 import { Product, ProductVariant } from './ProductDetail';
 
 interface ProductTabsProps {
@@ -26,6 +28,7 @@ interface ProductTabsProps {
 }
 
 export function ProductTabs({ product, selectedVariant }: ProductTabsProps) {
+  const { manufacturing } = usePublicSettings();
   const tabsNavRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -95,6 +98,9 @@ export function ProductTabs({ product, selectedVariant }: ProductTabsProps) {
   }
 
   tabs.push({ id: 'shipping', label: 'Shipping & Returns', icon: <Truck size={15} /> });
+  if (manufacturing && (manufacturing.manufacturerName || manufacturing.marketedBy || manufacturing.manufacturerAddress)) {
+    tabs.push({ id: 'manufacturing', label: 'Manufacturing & Compliance', icon: <Building2 size={15} /> });
+  }
 
   // Scroll detection for mobile indicators
   const checkScroll = useCallback(() => {
@@ -333,6 +339,98 @@ export function ProductTabs({ product, selectedVariant }: ProductTabsProps) {
                 <CheckCircle2 size={15} color="#2E7D32" />
                 <span>Lab Quality Tested</span>
               </div>
+            </div>
+          </div>
+        );
+
+      case 'manufacturing':
+        if (!manufacturing || (!manufacturing.manufacturerName && !manufacturing.marketedBy && !manufacturing.manufacturerAddress)) {
+          return null;
+        }
+        return (
+          <div className={styles.tabContentBlock}>
+            <h3 className={styles.tabSectionHeading}>Manufacturing &amp; Regulatory Compliance</h3>
+            <p className={styles.tabTextContent}>
+              Mandatory legal disclosures under the Legal Metrology (Packaged Commodities) Rules, 2011 for e-commerce products in India.
+            </p>
+
+            <div className={styles.shippingGrid} style={{ marginTop: '1.25rem' }}>
+              {(manufacturing.manufacturerName || manufacturing.marketedBy || manufacturing.manufacturerAddress) && (
+                <div className={styles.shippingCard}>
+                  <div className={styles.shippingIconWrap}>
+                    <Building2 size={22} color="#F99205" />
+                  </div>
+                  <div>
+                    <h4 className={styles.shippingCardTitle}>
+                      {manufacturing.marketedBy ? 'Manufactured & Marketed By' : 'Manufacturer Details'}
+                    </h4>
+                    <p className={styles.shippingCardDesc} style={{ lineHeight: 1.6 }}>
+                      {manufacturing.marketedBy && (
+                        <>
+                          <strong>Marketed By:</strong> {manufacturing.marketedBy}<br />
+                        </>
+                      )}
+                      {manufacturing.manufacturerName && (
+                        <>
+                          <strong>Manufactured By:</strong> {manufacturing.manufacturerName}<br />
+                        </>
+                      )}
+                      {manufacturing.manufacturerAddress && (
+                        <>
+                          {manufacturing.manufacturerAddress}<br />
+                        </>
+                      )}
+                      {manufacturing.cinNumber && (
+                        <>
+                          <strong>CIN:</strong> {manufacturing.cinNumber}
+                        </>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className={styles.shippingCard}>
+                <div className={styles.shippingIconWrap}>
+                  <ShieldCheck size={22} color="#2E7D32" />
+                </div>
+                <div>
+                  <h4 className={styles.shippingCardTitle}>Quality &amp; Safety Standard</h4>
+                  <p className={styles.shippingCardDesc} style={{ lineHeight: 1.6 }}>
+                    {manufacturing.qualityStandard || '100% Quality Inspected & Batch Verified.'}<br />
+                    <strong>Country of Origin:</strong> {manufacturing.countryOfOrigin || 'India'}
+                  </p>
+                </div>
+              </div>
+
+              {(manufacturing.consumerCareEmail || manufacturing.consumerCarePhone || manufacturing.shelfLife) && (
+                <div className={styles.shippingCard}>
+                  <div className={styles.shippingIconWrap}>
+                    <Leaf size={22} color="#F99205" />
+                  </div>
+                  <div>
+                    <h4 className={styles.shippingCardTitle}>Consumer Care &amp; Support</h4>
+                    <p className={styles.shippingCardDesc} style={{ lineHeight: 1.6 }}>
+                      For queries, feedback, or consumer complaints:<br />
+                      {manufacturing.consumerCareEmail && (
+                        <>
+                          <strong>Email:</strong> {manufacturing.consumerCareEmail}<br />
+                        </>
+                      )}
+                      {manufacturing.consumerCarePhone && (
+                        <>
+                          <strong>Helpline:</strong> {manufacturing.consumerCarePhone}<br />
+                        </>
+                      )}
+                      {manufacturing.shelfLife && (
+                        <>
+                          <strong>Shelf Life:</strong> {manufacturing.shelfLife}
+                        </>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         );

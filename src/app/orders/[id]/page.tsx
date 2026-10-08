@@ -727,6 +727,10 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
                   <div className={styles.itemInfo}>
                     <div className={styles.itemBrandSeller}>
                       <span>Seller: {item.brand || 'KickAt Official'}</span>
+                      <span className={styles.mfgDot}>•</span>
+                      <span>Mfg: KickAt Pet Care Pvt Ltd</span>
+                      <span className={styles.mfgDot}>•</span>
+                      <span>Origin: India</span>
                     </div>
 
                     {productUrl ? (

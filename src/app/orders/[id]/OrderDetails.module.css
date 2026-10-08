@@ -413,11 +413,19 @@
 }
 
 .itemBrandSeller {
-  font-size: 0.76rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 0.74rem;
   font-weight: 700;
   color: var(--o-faint);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
+}
+
+.mfgDot {
+  color: var(--o-border-strong);
 }
 
 .itemTitleLink {

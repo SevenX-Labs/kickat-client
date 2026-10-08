@@ -7,6 +7,7 @@ import {
   PublicTaxSettings,
   PublicPaymentSettings,
   PublicGeneralSettings,
+  PublicManufacturingSettings,
   getPublicSettings 
 } from '@/services/settingsService';
 
@@ -38,6 +39,7 @@ export function usePublicSettings() {
   const tax: PublicTaxSettings | null = settings?.tax ?? null;
   const payment: PublicPaymentSettings | null = settings?.payment ?? null;
   const general: PublicGeneralSettings | null = settings?.general ?? null;
+  const manufacturing: PublicManufacturingSettings | null = settings?.manufacturing ?? null;
 
   return {
     settings,
@@ -45,6 +47,7 @@ export function usePublicSettings() {
     tax,
     payment,
     general,
+    manufacturing,
     loading,
     freeDeliveryThreshold: delivery?.freeDeliveryThreshold,
     deliveryFee: delivery?.deliveryFee,

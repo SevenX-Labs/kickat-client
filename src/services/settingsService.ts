@@ -1,3 +1,15 @@
+export interface PublicManufacturingSettings {
+  manufacturerName?: string | null;
+  manufacturerAddress?: string | null;
+  marketedBy?: string | null;
+  countryOfOrigin?: string | null;
+  consumerCareEmail?: string | null;
+  consumerCarePhone?: string | null;
+  qualityStandard?: string | null;
+  cinNumber?: string | null;
+  shelfLife?: string | null;
+}
+
 import { api } from './api';
 
 export interface PublicDeliverySettings {
@@ -54,6 +66,7 @@ export interface PublicSettings {
   delivery: PublicDeliverySettings;
   tax: PublicTaxSettings;
   payment: PublicPaymentSettings;
+  manufacturing?: PublicManufacturingSettings | null;
 }
 
 let cachedSettings: PublicSettings | null = null;
