@@ -185,8 +185,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [isAuthenticated, authLoading, fetchCart]);
 
   // Add Item to Cart (Auth or Guest)
+  const isAddingToCartRef = useRef<boolean>(false);
   const addToCart = async (productId: string, variantId?: string, quantity: number = 1) => {
     if (quantity <= 0) return;
+    if (isAddingToCartRef.current) return;
+    isAddingToCartRef.current = true;
     setIsUpdating(true);
     setError(null);
     try {
@@ -208,6 +211,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       throw err;
     } finally {
       setIsUpdating(false);
+      isAddingToCartRef.current = false;
     }
   };
 

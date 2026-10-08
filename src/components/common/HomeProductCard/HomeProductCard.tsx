@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useMemo, memo } from 'react';
+import React, { useState, useCallback, useMemo, useRef, memo } from 'react';
 import SafeImage from '@/components/ui/SafeImage';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -91,6 +91,8 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
     await toggleWishlist(product, targetVariantId);
   }, [onRemoveFromWishlist, productId, product, targetVariantId, isAuthenticated, router, toggleWishlist]);
 
+  const isAddingRef = useRef(false);
+
   const handleAddToCart = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -106,11 +108,11 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
       return;
     }
 
-    if (isAdding) return;
-
+    if (isAddingRef.current || isAdding) return;
+    isAddingRef.current = true;
     setIsAdding(true);
     try {
-      await addToCart(productId, targetVariantId);
+      await addToCart(productId, targetVariantId, 1);
       setIsAdded(true);
 
       setTimeout(() => {
@@ -184,6 +186,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
       console.warn("Add to cart error:", err);
     } finally {
       setIsAdding(false);
+      isAddingRef.current = false;
     }
   }, [isAdded, isAdding, isOutOfStock, isVariable, hasExplicitVariant, productId, targetVariantId, product.image, router, addToCart]);
 
@@ -223,6 +226,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
       target.closest('select') ||
       target.closest(`.${styles.cardWishlistBtn}`) ||
       target.closest(`.${styles.buyNowBtn}`) ||
+      target.closest(`.${styles.cartIconBtn}`) ||
       target.closest(`.${styles.addToCartBtn}`)
     ) {
       return;

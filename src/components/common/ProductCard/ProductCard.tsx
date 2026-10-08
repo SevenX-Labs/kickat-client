@@ -134,6 +134,7 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
   }, [onRemoveFromWishlist, product, targetVariantId, isAuthenticated, router, toggleWishlist]);
 
     const { addToCart } = useCart();
+  const isAddingRef = useRef(false);
 
   const handleAddToCart = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -144,14 +145,15 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
       return;
     }
 
+    if (isAddingRef.current || isAdding) return;
+    isAddingRef.current = true;
+    setIsAdding(true);
+
     // Determine target variant ID
     const effectiveVariantId = activeVariantId || product.variantId || product.selectedVariantId || (product.variants && product.variants[0]?.id);
 
-    if (isAdding) return;
-
-    setIsAdding(true);
     try {
-      await addToCart(product.id, effectiveVariantId);
+      await addToCart(product.id, effectiveVariantId, 1);
       setIsAdded(true);
 
       const startElem = e.currentTarget as HTMLElement;
@@ -220,6 +222,7 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
       console.warn("Add to cart error:", err);
     } finally {
       setIsAdding(false);
+      isAddingRef.current = false;
     }
   }, [isAdded, isAdding, isOutOfStock, isVariable, activeVariantId, product.id, product.variantId, product.selectedVariantId, activeImage, router, addToCart]);
 
@@ -230,6 +233,7 @@ function ProductCardComponent({ product, onRemoveFromWishlist }: ProductCardProp
   const handleCardClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
     if (
+      target.closest('a') ||
       target.closest('button') ||
       target.closest('input') ||
       target.closest('select') ||

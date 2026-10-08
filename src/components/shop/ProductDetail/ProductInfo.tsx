@@ -294,7 +294,10 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
     };
   };
 
+  const isAddingRef = useRef(false);
   const handleAddToCart = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (hasAdded) {
       router.push("/cart");
       return;
@@ -303,7 +306,8 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
       alert("Please select an option before adding to cart.");
       return;
     }
-    if (isAdding || isBuyingNow || isOutOfStock) return;
+    if (isAddingRef.current || isAdding || isBuyingNow || isOutOfStock) return;
+    isAddingRef.current = true;
     const buttonElem = e.currentTarget;
     setIsAdding(true);
     try {
@@ -315,6 +319,7 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
       alert(err?.message || "Could not add item to cart. Please try again.");
     } finally {
       setIsAdding(false);
+      isAddingRef.current = false;
     }
   };
 

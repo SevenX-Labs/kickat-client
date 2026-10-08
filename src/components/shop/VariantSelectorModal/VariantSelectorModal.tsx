@@ -155,6 +155,7 @@ export function VariantSelectorModal({
       return;
     }
 
+    if (isAdding) return;
     setIsAdding(true);
     setErrorMsg(null);
 
