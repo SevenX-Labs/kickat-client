@@ -55,20 +55,30 @@ export function CustomerReviews() {
       try {
         const res = await testimonialService.getTestimonials(8);
         if (isMounted && res && res.success && Array.isArray(res.data) && res.data.length > 0) {
-          const mapped: DisplayReview[] = res.data.map((item: TestimonialItem, idx: number) => ({
-            author: item.name,
-            pet: item.petName ? `${item.petName} · ${item.petSpecies || 'Pet'}` : (item.petSpecies || item.location || 'Verified Buyer'),
-            initial: (item.name || 'P').charAt(0).toUpperCase(),
-            avatarColor: AVATAR_COLORS[idx % AVATAR_COLORS.length],
-            content: item.comment,
-            rating: item.rating || 5.0,
-          }));
+          const mapped: DisplayReview[] = res.data
+            .map((item: TestimonialItem, idx: number) => {
+              const content = item.content || item.comment || "";
+              const petInfo = item.petName
+                ? `${item.petName} · ${item.petType || item.petSpecies || item.role || "Pet"}`
+                : (item.petType || item.petSpecies || item.role || item.location || "Verified Buyer");
+
+              return {
+                author: item.name || "Pet Parent",
+                pet: petInfo,
+                initial: (item.name || "P").charAt(0).toUpperCase(),
+                avatarColor: AVATAR_COLORS[idx % AVATAR_COLORS.length],
+                content,
+                rating: item.rating || 5.0,
+              };
+            })
+            .filter((review) => Boolean(review.content));
+
           setReviewsList(mapped);
         } else if (isMounted) {
           setReviewsList([]);
         }
       } catch (err) {
-        console.warn('Failed to load testimonials:', err);
+        console.warn("Failed to load testimonials:", err);
         if (isMounted) {
           setReviewsList([]);
         }
@@ -123,7 +133,7 @@ export function CustomerReviews() {
             <Star className={styles.trustStar} strokeWidth={1.5} fill="#E7A03B" color="#E7A03B" />
             <span className={styles.trustScore}>{averageRating}</span>
             <span className={styles.trustLabel}>
-              average from {reviewsList.length} verified {reviewsList.length === 1 ? 'review' : 'reviews'}
+              average from {reviewsList.length} verified {reviewsList.length === 1 ? "review" : "reviews"}
             </span>
           </div>
         </div>
