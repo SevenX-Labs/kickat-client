@@ -1,11 +1,20 @@
 "use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Mail, Phone, ShieldCheck, CheckCircle2 } from 'lucide-react';
-import { usePublicSettings } from '@/hooks/usePublicSettings';
-import styles from './Footer.module.css';
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { 
+  Mail, 
+  Phone, 
+  ShieldCheck, 
+  CheckCircle2, 
+  ChevronDown, 
+  Truck, 
+  Sparkles, 
+  Headphones 
+} from "lucide-react";
+import { usePublicSettings } from "@/hooks/usePublicSettings";
+import styles from "./Footer.module.css";
 
 const InstagramIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -39,11 +48,12 @@ const YouTubeIcon = () => (
 export function Footer() {
   const { general } = usePublicSettings();
   const [subscribed, setSubscribed] = useState(false);
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
+  const [openSection, setOpenSection] = useState<string | null>(null);
 
-  const storeName = general?.storeName || 'KickAt';
-  const supportEmail = general?.supportEmail || 'kickat2021@gmail.com';
-  const supportPhone = general?.supportPhone || '+91 96742 48592';
+  const storeName = general?.storeName || "KickAt";
+  const supportEmail = general?.supportEmail || "kickat2021@gmail.com";
+  const supportPhone = general?.supportPhone || "+91 96742 48592";
   const socialLinks = general?.socialLinks;
 
   const instagramUrl = socialLinks?.instagram?.trim();
@@ -51,17 +61,53 @@ export function Footer() {
   const linkedinUrl = socialLinks?.linkedin?.trim();
   const youtubeUrl = socialLinks?.youtube?.trim();
 
+  const toggleSection = (section: string) => {
+    setOpenSection((prev) => (prev === section ? null : section));
+  };
+
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
     if (email.trim()) {
       setSubscribed(true);
-      setEmail('');
+      setEmail("");
     }
   };
 
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
+        
+        {/* Value Highlights Bar */}
+        <div className={styles.valueProps}>
+          <div className={styles.valueItem}>
+            <div className={styles.valueIconBox}>
+              <Truck size={18} />
+            </div>
+            <div className={styles.valueContent}>
+              <h4>Free & Fast Shipping</h4>
+              <p>On eligible orders across India</p>
+            </div>
+          </div>
+          <div className={styles.valueItem}>
+            <div className={styles.valueIconBox}>
+              <Sparkles size={18} />
+            </div>
+            <div className={styles.valueContent}>
+              <h4>100% Genuine Care</h4>
+              <p>Vet-formulated & premium quality</p>
+            </div>
+          </div>
+          <div className={styles.valueItem}>
+            <div className={styles.valueIconBox}>
+              <Headphones size={18} />
+            </div>
+            <div className={styles.valueContent}>
+              <h4>Dedicated Support</h4>
+              <p>Friendly help for pet parents</p>
+            </div>
+          </div>
+        </div>
+
         <div className={styles.topSection}>
           
           {/* Brand & Support Touchpoints */}
@@ -70,8 +116,8 @@ export function Footer() {
               <Image 
                 src="/logo.png" 
                 alt="KickAt Logo" 
-                width={220} 
-                height={66} 
+                width={200} 
+                height={60} 
                 className={styles.logo}
                 draggable={false}
                 onContextMenu={(e) => e.preventDefault()}
@@ -82,13 +128,13 @@ export function Footer() {
             <div className={styles.brandContacts}>
               {supportEmail && (
                 <a href={`mailto:${supportEmail}`} className={styles.contactItem} title="Email Support">
-                  <Mail size={14} className={styles.contactIcon} />
+                  <Mail size={15} className={styles.contactIcon} />
                   <span>{supportEmail}</span>
                 </a>
               )}
               {supportPhone && (
-                <a href={`tel:${supportPhone.replace(/\s+/g, '')}`} className={styles.contactItem} title="Call Customer Care">
-                  <Phone size={14} className={styles.contactIcon} />
+                <a href={`tel:${supportPhone.replace(/\s+/g, "")}`} className={styles.contactItem} title="Call Customer Care">
+                  <Phone size={15} className={styles.contactIcon} />
                   <span>{supportPhone}</span>
                 </a>
               )}
@@ -144,37 +190,76 @@ export function Footer() {
 
           {/* Column 1: Shop */}
           <div className={styles.linksCol}>
-            <h3 className={styles.colTitle}>Shop</h3>
-            <Link href="/shop" className={styles.link}>All Products</Link>
-            <Link href="/category/dogs" className={styles.link}>Dog Essentials</Link>
-            <Link href="/category/cats" className={styles.link}>Cat Essentials</Link>
-            <Link href="/category/fish" className={styles.link}>Aquarium & Fish</Link>
-            <Link href="/category/birds" className={styles.link}>Birds</Link>
+            <button 
+              type="button"
+              className={styles.accordionHeader}
+              onClick={() => toggleSection("shop")}
+              aria-expanded={openSection === "shop"}
+            >
+              <span className={styles.colTitle}>Shop</span>
+              <ChevronDown 
+                size={18} 
+                className={`${styles.accordionChevron} ${openSection === "shop" ? styles.chevronOpen : ""}`} 
+              />
+            </button>
+            <div className={`${styles.accordionContent} ${openSection === "shop" ? styles.contentOpen : ""}`}>
+              <Link href="/shop" className={styles.link}>All Products</Link>
+              <Link href="/category/dogs" className={styles.link}>Dog Essentials</Link>
+              <Link href="/category/cats" className={styles.link}>Cat Essentials</Link>
+              <Link href="/category/fish" className={styles.link}>Aquarium & Fish</Link>
+              <Link href="/category/birds" className={styles.link}>Birds</Link>
+            </div>
           </div>
 
           {/* Column 2: Explore */}
           <div className={styles.linksCol}>
-            <h3 className={styles.colTitle}>Explore</h3>
-            <Link href="/#why-us" className={styles.link}>Why KickAt</Link>
-            <Link href="/blogs" className={styles.link}>KickAt Journal</Link>
-            <Link href="/testimonials" className={styles.link}>Testimonials</Link>
-            <Link href="/faq" className={styles.link}>FAQ</Link>
-            <Link href="/contact" className={styles.link}>Contact Us</Link>
+            <button 
+              type="button"
+              className={styles.accordionHeader}
+              onClick={() => toggleSection("explore")}
+              aria-expanded={openSection === "explore"}
+            >
+              <span className={styles.colTitle}>Explore</span>
+              <ChevronDown 
+                size={18} 
+                className={`${styles.accordionChevron} ${openSection === "explore" ? styles.chevronOpen : ""}`} 
+              />
+            </button>
+            <div className={`${styles.accordionContent} ${openSection === "explore" ? styles.contentOpen : ""}`}>
+              <Link href="/#why-us" className={styles.link}>Why KickAt</Link>
+              <Link href="/blogs" className={styles.link}>KickAt Journal</Link>
+              <Link href="/testimonials" className={styles.link}>Testimonials</Link>
+              <Link href="/faq" className={styles.link}>FAQ</Link>
+              <Link href="/contact" className={styles.link}>Contact Us</Link>
+            </div>
           </div>
 
           {/* Column 3: Customer Care */}
           <div className={styles.linksCol}>
-            <h3 className={styles.colTitle}>Customer Care</h3>
-            <Link href="/orders" className={styles.link}>Track Order</Link>
-            <Link href="/shipping" className={styles.link}>Shipping & Delivery</Link>
-            <Link href="/returns" className={styles.link}>Returns & Refunds</Link>
-            <Link href="/privacy-policy" className={styles.link}>Privacy Policy</Link>
-            <Link href="/terms" className={styles.link}>Terms of Service</Link>
+            <button 
+              type="button"
+              className={styles.accordionHeader}
+              onClick={() => toggleSection("care")}
+              aria-expanded={openSection === "care"}
+            >
+              <span className={styles.colTitle}>Customer Care</span>
+              <ChevronDown 
+                size={18} 
+                className={`${styles.accordionChevron} ${openSection === "care" ? styles.chevronOpen : ""}`} 
+              />
+            </button>
+            <div className={`${styles.accordionContent} ${openSection === "care" ? styles.contentOpen : ""}`}>
+              <Link href="/orders" className={styles.link}>Track Order</Link>
+              <Link href="/shipping" className={styles.link}>Shipping & Delivery</Link>
+              <Link href="/returns" className={styles.link}>Returns & Refunds</Link>
+              <Link href="/privacy-policy" className={styles.link}>Privacy Policy</Link>
+              <Link href="/terms" className={styles.link}>Terms of Service</Link>
+            </div>
           </div>
 
           {/* Column 4: Newsletter */}
           <div className={styles.newsletterCol}>
-            <h3 className={styles.colTitle}>Stay in the loop</h3>
+            <h3 className={styles.newsletterTitle}>Stay in the loop</h3>
             <p className={styles.newsletterText}>
               Subscribe for exclusive pet parent deals, new product launches, and expert care guides.
             </p>
@@ -185,15 +270,19 @@ export function Footer() {
               </div>
             ) : (
               <form className={styles.form} onSubmit={handleSubscribe}>
-                <input 
-                  type="email" 
-                  placeholder="Enter your email" 
-                  className={styles.input}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required 
-                />
-                <button type="submit" className={styles.submitBtn}>Subscribe</button>
+                <div className={styles.formWrapper}>
+                  <input 
+                    type="email" 
+                    placeholder="Enter your email" 
+                    className={styles.input}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required 
+                  />
+                  <button type="submit" className={styles.submitBtn}>
+                    Subscribe
+                  </button>
+                </div>
               </form>
             )}
             <div className={styles.trustTag}>
@@ -204,15 +293,21 @@ export function Footer() {
 
         </div>
 
+        {/* Bottom Section */}
         <div className={styles.bottomSection}>
           <p className={styles.copyright}>&copy; {new Date().getFullYear()} {storeName}. All rights reserved.</p>
           <div className={styles.legalLinks}>
             <Link href="/privacy-policy" className={styles.legalLink}>Privacy Policy</Link>
+            <span className={styles.legalDivider}>•</span>
             <Link href="/terms" className={styles.legalLink}>Terms of Service</Link>
+            <span className={styles.legalDivider}>•</span>
             <Link href="/shipping" className={styles.legalLink}>Shipping Policy</Link>
           </div>
         </div>
+
       </div>
     </footer>
   );
 }
+
+export default Footer;
