@@ -35,11 +35,16 @@ import {
 import styles from './OrderDetails.module.css';
 import { orderService } from '@/services/orderService';
 import { productService } from '@/services/productService';
-
-function isCancellable(statusStr: string): boolean {
-  const upper = (statusStr || '').toUpperCase();
-  return ['PLACED', 'PENDING', 'CONFIRMED', 'PROCESSING'].includes(upper);
-}
+import {
+  CancellationReasonOption,
+  MAX_REASON_NOTE_LENGTH,
+  getCancellationBlockedReason,
+  getDefaultReasonCode,
+  isOrderCancellable,
+  normalizeCancellationReasons,
+  reasonRequiresNote,
+  validateCancellationSelection,
+} from '@/lib/cancellation';
 
 function getTimelineIcon(stage: string, isCancelled: boolean) {
   if (isCancelled && stage === 'CANCELLED') {
@@ -205,8 +210,11 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
 
   // Cancel modal state
   const [showCancelModal, setShowCancelModal] = useState(false);
-  const [cancelReason, setCancelReason] = useState<string>('changed_mind');
+  // Reason catalog comes from the backend; the client keeps no list of its own.
+  const [cancellationReasons, setCancellationReasons] = useState<CancellationReasonOption[]>([]);
+  const [cancelReason, setCancelReason] = useState<string>('');
   const [cancelReasonOther, setCancelReasonOther] = useState<string>('');
+  const [cancelError, setCancelError] = useState<string | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
 
   const showToast = (text: string, type: 'success' | 'error' = 'success') => {
@@ -276,6 +284,17 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
           orderData.items = enrichedItems;
         }
         setOrder(orderData);
+
+        // Backend-owned reason catalog drives the cancel dropdown.
+        const reasons = normalizeCancellationReasons(
+          res.cancellationReasons ?? orderData.cancellationReasons,
+        );
+        setCancellationReasons(reasons);
+        setCancelReason((current) =>
+          current && reasons.some((option) => option.code === current)
+            ? current
+            : getDefaultReasonCode(reasons),
+        );
       } else {
         setError('Order details could not be retrieved.');
       }
@@ -345,17 +364,29 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
 
   const handleConfirmCancel = async () => {
     if (!orderId) return;
+
+    const validation = validateCancellationSelection({
+      reasons: cancellationReasons,
+      code: cancelReason,
+      note: cancelReasonOther,
+    });
+    if (!validation.valid) {
+      setCancelError(validation.error);
+      return;
+    }
+
+    setCancelError(null);
     setIsCancelling(true);
     try {
       const res = await orderService.cancelOrder(
         orderId,
-        cancelReason,
-        cancelReason === 'other' ? cancelReasonOther : undefined
+        validation.payload.reason,
+        validation.payload.reasonOther
       );
       if (res && res.success) {
         showToast('Order has been successfully cancelled.', 'success');
         setShowCancelModal(false);
-        setCancelReason('changed_mind');
+        setCancelReason(getDefaultReasonCode(cancellationReasons));
         setCancelReasonOther('');
         await fetchOrderDetails();
       } else {
@@ -461,7 +492,11 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
   const isShipped = orderStatusUpper === 'SHIPPED';
   const isOutForDelivery = orderStatusUpper === 'OUT_FOR_DELIVERY';
   const isReturned = orderStatusUpper === 'RETURNED' || orderStatusUpper === 'RETURN_INITIATED';
-  const cancellable = isCancellable(orderStatusUpper);
+  // Backend is the single source of truth: it already accounts for status,
+  // AWB and provider shipment id.
+  const cancellable = isOrderCancellable(order);
+  const cancellationBlockedReason = getCancellationBlockedReason(order);
+  const noteRequired = reasonRequiresNote(cancellationReasons, cancelReason);
 
   const getStatusConfig = (status: string) => {
     switch (status) {
@@ -604,17 +639,27 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
               <span>Invoice</span>
             </Link>
 
-            {/* Cancel Button (if cancellable) */}
+            {/* Cancel Button — shown only when the backend says so */}
             {cancellable && (
               <button
                 type="button"
                 className={styles.topBtnDanger}
-                onClick={() => setShowCancelModal(true)}
+                onClick={() => {
+                  setCancelError(null);
+                  setShowCancelModal(true);
+                }}
                 aria-label="Cancel this order"
               >
                 <XCircle size={15} />
                 <span>Cancel Order</span>
               </button>
+            )}
+
+            {/* Why cancelling is unavailable, in the backend's own words. */}
+            {!cancellable && cancellationBlockedReason && !isCancelled && (
+              <span className={styles.topBtnNote} title={cancellationBlockedReason}>
+                {cancellationBlockedReason}
+              </span>
             )}
 
             {/* Buy Again (Delivered, Cancelled, Returned) */}
@@ -1216,24 +1261,36 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
               <label className={styles.modalLabel}>Please select a cancellation reason:</label>
               <select
                 value={cancelReason}
-                onChange={(e) => setCancelReason(e.target.value)}
+                onChange={(e) => {
+                  setCancelReason(e.target.value);
+                  setCancelError(null);
+                }}
                 className={styles.modalSelect}
               >
-                <option value="changed_mind">Changed my mind</option>
-                <option value="ordered_by_mistake">Ordered by mistake</option>
-                <option value="found_cheaper">Found cheaper elsewhere</option>
-                <option value="delivery_delayed">Expected delivery is too late</option>
-                <option value="other">Other reason</option>
+                {cancellationReasons.map((option) => (
+                  <option key={option.code} value={option.code}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
 
-              {cancelReason === 'other' && (
+              {noteRequired && (
                 <textarea
                   placeholder="Please specify your reason in detail..."
                   value={cancelReasonOther}
-                  onChange={(e) => setCancelReasonOther(e.target.value)}
-                  maxLength={250}
+                  onChange={(e) => {
+                    setCancelReasonOther(e.target.value.slice(0, MAX_REASON_NOTE_LENGTH));
+                    setCancelError(null);
+                  }}
+                  maxLength={MAX_REASON_NOTE_LENGTH}
                   className={styles.modalTextarea}
                 />
+              )}
+
+              {cancelError && (
+                <p className={styles.modalSubtitle} role="alert">
+                  {cancelError}
+                </p>
               )}
             </div>
 
@@ -1250,7 +1307,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
                 type="button"
                 className={styles.modalBtnConfirm}
                 onClick={handleConfirmCancel}
-                disabled={isCancelling}
+                disabled={isCancelling || !cancelReason}
               >
                 {isCancelling ? (
                   <>

@@ -76,6 +76,14 @@ export interface Order {
   trackingNumber?: string;
   courierPartner?: string;
   returnEligibilityDate?: string;
+  /**
+   * Backend-computed: whether this order may still be cancelled. Accounts for
+   * order status, courier AWB and provider shipment id. The client must not
+   * re-derive this.
+   */
+  cancellable?: boolean;
+  /** Backend's customer-facing explanation when `cancellable` is false. */
+  cancellationBlockedReason?: string | null;
   user?: {
     id: string;
     name?: string;
@@ -203,7 +211,17 @@ export const orderService = {
    */
   async getOrderById(id: string) {
     const cleanId = id.trim();
-    const res = await api<{ success: boolean; order: any }>(`/orders/${cleanId}`);
+    const res = await api<{
+      success: boolean;
+      order: any;
+      // Backend-owned cancellation reason catalog; drives the cancel dropdown.
+      cancellationReasons?: Array<{
+        code: string;
+        label: string;
+        requiresNote: boolean;
+      }>;
+      awaitingPayment?: boolean;
+    }>(`/orders/${cleanId}`);
 
     if (res && res.order && res.order.items && Array.isArray(res.order.items)) {
       res.order.items = await enrichOrderItemsWithProductData(res.order.items);
