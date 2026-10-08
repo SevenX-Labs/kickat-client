@@ -342,7 +342,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
           )}
         </div>
 
-        {/* Dual Actions CTA Row */}
+        {/* Dual Actions CTA Row (Single-line on mobile & desktop: Buy Now + Cart Icon) */}
         <div className={styles.cardActionsRow}>
           {isOutOfStock ? (
             <button 
@@ -376,24 +376,19 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
                 <span>{isBuyingNow ? 'Processing…' : 'Buy Now'}</span>
               </button>
 
-              {/* Secondary "Add to Cart" CTA with micro-feedback */}
+              {/* Cart Icon Companion Button */}
               <button
                 type="button"
-                className={`${styles.addToCartBtn} ${isAdded ? styles.addedBtn : ''}`}
+                className={`${styles.cartIconBtn} ${isAdded ? styles.cartIconAdded : ''}`}
                 onClick={handleAddToCart}
                 disabled={isAdding}
-                aria-label={`Add ${product.name} to cart`}
+                aria-label={isAdded ? 'Added to cart' : `Add ${product.name} to cart`}
+                title={isAdded ? 'Item added to cart' : 'Add to cart'}
               >
                 {isAdded ? (
-                  <>
-                    <Check size={14} strokeWidth={2.5} />
-                    <span>Added ✓</span>
-                  </>
+                  <Check size={16} strokeWidth={2.5} />
                 ) : (
-                  <>
-                    <ShoppingCart size={14} strokeWidth={2.2} />
-                    <span>Add to Cart</span>
-                  </>
+                  <ShoppingCart size={16} strokeWidth={2.2} />
                 )}
               </button>
             </>
