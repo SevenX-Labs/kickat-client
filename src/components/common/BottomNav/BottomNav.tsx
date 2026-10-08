@@ -8,7 +8,7 @@ import { Home, LayoutGrid, Package, ShoppingBag, User } from "lucide-react";
 import styles from "./BottomNav.module.css";
 
 export function BottomNav() {
-  const pathname = usePathname();
+  const pathname = usePathname() || "";
   const { cartCount } = useCart();
   const [isCartBouncing, setIsCartBouncing] = useState(false);
 
