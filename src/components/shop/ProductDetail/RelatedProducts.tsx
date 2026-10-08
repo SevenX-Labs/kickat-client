@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Sparkles } from 'lucide-react';
-import HomeProductCard from '@/components/common/HomeProductCard/HomeProductCard';
+import ProductCard from '@/components/common/ProductCard/ProductCard';
 import { productService } from '@/services/productService';
 import { mapBackendProductListToCards } from '@/types/product';
 import styles from './RelatedProducts.module.css';
@@ -100,7 +100,7 @@ export function RelatedProducts({ currentProduct }: RelatedProductsProps) {
 
       <div className={styles.relatedProductsGrid}>
         {related.map((prod) => (
-          <HomeProductCard key={prod.variantId ? `${prod.id}-${prod.variantId}` : prod.id} product={prod} />
+          <ProductCard key={prod.variantId ? `${prod.id}-${prod.variantId}` : prod.id} product={prod} />
         ))}
       </div>
     </div>

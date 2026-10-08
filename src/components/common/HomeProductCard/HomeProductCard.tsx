@@ -1,12 +1,10 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo, useRef, memo } from 'react';
-import { wishlistService } from '@/services/wishlistService';
-import { useAuth } from '@/context/AuthContext';
-import Image from 'next/image';
+import React, { useState, useCallback, useMemo, memo } from 'react';
 import SafeImage from '@/components/ui/SafeImage';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { Heart, Star, ShoppingCart, Trash2, Check, SlidersHorizontal } from 'lucide-react';
@@ -19,7 +17,7 @@ export interface HomeProduct {
   name: string;
   price: number;
   originalPrice?: number;
-  rating: number;
+  rating?: number;
   reviewsCount?: number;
   image: string;
   mainCategory?: string;
@@ -48,6 +46,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
   const { isWishlisted: checkIsWishlisted, toggleWishlist } = useWishlist();
   const [isAdded, setIsAdded] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const [isBuyingNow, setIsBuyingNow] = useState(false);
   const [isVariantModalOpen, setIsVariantModalOpen] = useState(false);
 
   const { addToCart } = useCart();
@@ -68,8 +67,11 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
     if (product.originalPrice && product.originalPrice > product.price) {
       return Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
     }
-    return product.badge === 'Sale' ? 15 : null;
+    if (product.badge === 'Sale') return 15;
+    return null;
   }, [product.originalPrice, product.price, product.badge]);
+
+  const brandLabel = (product.brand || 'KICKAT').toUpperCase();
 
   const handleWishlistClick = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -88,16 +90,17 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
     await toggleWishlist(product, targetVariantId);
   }, [onRemoveFromWishlist, product, targetVariantId, isAuthenticated, router, toggleWishlist]);
 
-    const handleAddToCart = useCallback(async (e: React.MouseEvent) => {
+  const handleAddToCart = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (isOutOfStock) return;
+
     if (isAdded) {
       router.push('/cart');
       return;
     }
 
-    // For variable products without an explicit pre-selected variant, open modal
+    // For variable products without pre-selected variant, open modal
     if (isVariable && !hasExplicitVariant) {
       setIsVariantModalOpen(true);
       return;
@@ -109,6 +112,11 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
     try {
       await addToCart(product.id, targetVariantId);
       setIsAdded(true);
+
+      // Micro-feedback timeout
+      setTimeout(() => {
+        setIsAdded(false);
+      }, 2500);
 
       const startElem = e.currentTarget as HTMLElement;
       const bottomNavCart = document.getElementById('bottom-nav-cart-btn');
@@ -141,7 +149,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
           height: `${height}px`,
           objectFit: 'cover',
           borderRadius: '14px',
-          boxShadow: '0 10px 25px rgba(249, 146, 5, 0.45), 0 4px 12px rgba(0, 0, 0, 0.2)',
+          boxShadow: '0 10px 25px rgba(242, 140, 15, 0.45), 0 4px 12px rgba(0, 0, 0, 0.2)',
           border: '2px solid #ffffff',
           zIndex: '99999',
           pointerEvents: 'none',
@@ -180,6 +188,33 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
     }
   }, [isAdded, isAdding, isOutOfStock, isVariable, hasExplicitVariant, product.id, targetVariantId, product.image, router, addToCart]);
 
+  const handleBuyNow = useCallback(async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isOutOfStock) return;
+
+    if (isVariable && !hasExplicitVariant) {
+      setIsVariantModalOpen(true);
+      return;
+    }
+
+    if (isBuyingNow) return;
+
+    setIsBuyingNow(true);
+    try {
+      await addToCart(product.id, targetVariantId, 1);
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('cart-item-added'));
+      }
+      router.push('/checkout/place-order');
+    } catch (err) {
+      console.warn("Buy now error:", err);
+      router.push('/checkout/place-order');
+    } finally {
+      setIsBuyingNow(false);
+    }
+  }, [isOutOfStock, isVariable, hasExplicitVariant, isBuyingNow, addToCart, product.id, targetVariantId, router]);
+
   const handleCardClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
     if (
@@ -187,6 +222,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
       target.closest('input') ||
       target.closest('select') ||
       target.closest(`.${styles.cardWishlistBtn}`) ||
+      target.closest(`.${styles.buyNowBtn}`) ||
       target.closest(`.${styles.addToCartBtn}`)
     ) {
       return;
@@ -196,7 +232,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
 
   return (
     <div className={styles.homeCard} onClick={handleCardClick}>
-      {/* Variant Selector Modal (only if variable product has no pre-selected variant) */}
+      {/* Variant Selector Modal (if variable product has no pre-selected variant) */}
       {isVariable && !hasExplicitVariant && (
         <VariantSelectorModal
           isOpen={isVariantModalOpen}
@@ -214,6 +250,8 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
               ? 'NEW'
               : product.badge === 'Sale'
               ? 'SALE'
+              : product.badge === 'Best Seller' || product.badge === 'Bestseller'
+              ? 'BEST SELLER'
               : product.badge.toUpperCase()}
           </span>
         )}
@@ -221,6 +259,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
         {/* Wishlist Button */}
         {onRemoveFromWishlist ? (
           <button 
+            type="button"
             className={styles.cardWishlistBtn} 
             aria-label="Remove from wishlist"
             onClick={handleWishlistClick}
@@ -229,16 +268,16 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
           </button>
         ) : (
           <button 
+            type="button"
             className={`${styles.cardWishlistBtn} ${isWishlisted ? styles.wishlistedActive : ''}`} 
-            aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+            aria-label={isWishlisted ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
             onClick={handleWishlistClick}
-            
           >
             <Heart
               size={16}
               className={isWishlisted ? styles.heartFilled : ''}
-              color={isWishlisted ? '#F99205' : '#111827'}
-              strokeWidth={1.8}
+              color={isWishlisted ? '#F28C0F' : '#4A4238'}
+              strokeWidth={2}
             />
           </button>
         )}
@@ -250,24 +289,26 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
             categoryName={product.mainCategory}
             alt={product.name}
             fill
-            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 25vw"
             className={styles.cardImage}
             style={{ objectFit: 'contain' }}
           />
         </Link>
       </div>
 
-      {/* Details Area */}
+      {/* Card Details Area */}
       <div className={styles.cardContent}>
-        <div className={styles.categoryRow}>
-          <span className={styles.categoryText}>{product.brand || product.mainCategory || 'KickAt Essential'}</span>
+        {/* Brand label */}
+        <div className={styles.brandRow}>
+          <span className={styles.brandText}>{brandLabel}</span>
         </div>
 
+        {/* Product Title */}
         <Link href={productHref} target="_blank" rel="noopener noreferrer" prefetch={true} className={styles.cardTitleLink}>
-          <h3 className={styles.cardTitle}>{product.name}</h3>
+          <h3 className={styles.cardTitle} title={product.name}>{product.name}</h3>
         </Link>
 
-        {/* Rating Row (only shown when there are genuine verified reviews) */}
+        {/* Rating Row (rendered when valid ratings exist) */}
         {reviewsCount > 0 && rating > 0 && (
           <div className={styles.cardRatingRow}>
             <div className={styles.starsGroup}>
@@ -275,8 +316,8 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
                 <Star 
                   key={star} 
                   size={12} 
-                  fill={star <= Math.floor(rating) ? "#F99205" : "#E5E7EB"} 
-                  color={star <= Math.floor(rating) ? "#F99205" : "#E5E7EB"} 
+                  fill={star <= Math.floor(rating) ? "#F28C0F" : star - rating < 1 ? "#F28C0F" : "#E5E7EB"} 
+                  color={star <= Math.floor(rating) ? "#F28C0F" : star - rating < 1 ? "#F28C0F" : "#E5E7EB"} 
                   strokeWidth={0} 
                 />
               ))}
@@ -289,9 +330,9 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
         {/* Price Row */}
         <div className={styles.priceContainer}>
           <div className={styles.priceRowUpper}>
-            <span className={styles.cardPrice}>₹{product.price.toLocaleString()}</span>
-            {product.originalPrice && (
-              <span className={styles.originalPrice}>₹{product.originalPrice.toLocaleString()}</span>
+            <span className={styles.cardPrice}>₹{product.price.toLocaleString('en-IN')}</span>
+            {product.originalPrice && product.originalPrice > product.price && (
+              <span className={styles.originalPrice}>₹{product.originalPrice.toLocaleString('en-IN')}</span>
             )}
           </div>
           {discountPercent && (
@@ -299,32 +340,63 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
           )}
         </div>
 
-        {/* Add to Cart / Select Options Button */}
-        <button 
-          disabled={isAdding || isOutOfStock}
-          className={`${styles.addToCartBtn} ${isAdded ? styles.addedBtn : ''}`}
-          onClick={handleAddToCart}
-          aria-label={isOutOfStock ? "Out of stock" : isVariable && !hasExplicitVariant ? "Select options" : "Add to cart"}
-        >
+        {/* Dual Actions CTA Row */}
+        <div className={styles.cardActionsRow}>
           {isOutOfStock ? (
-            <span>Out of Stock</span>
-          ) : isAdded ? (
-            <>
-              <Check size={15} color="#ffffff" strokeWidth={2.5} />
-              <span>Go to Cart</span>
-            </>
+            <button 
+              type="button"
+              disabled 
+              className={styles.outOfStockBtn}
+              aria-label="Out of stock"
+            >
+              <span>Out of Stock</span>
+            </button>
           ) : isVariable && !hasExplicitVariant ? (
-            <>
-              <SlidersHorizontal size={15} color="#ffffff" strokeWidth={2.2} />
+            <button 
+              type="button"
+              className={styles.buyNowBtn}
+              onClick={() => setIsVariantModalOpen(true)}
+              aria-label="Select product options"
+            >
+              <SlidersHorizontal size={14} strokeWidth={2.2} />
               <span>Select Options</span>
-            </>
+            </button>
           ) : (
             <>
-              <ShoppingCart size={15} color="#ffffff" strokeWidth={2.2} />
-              <span>Add to Cart</span>
+              {/* Primary "Buy Now" CTA */}
+              <button
+                type="button"
+                className={styles.buyNowBtn}
+                onClick={handleBuyNow}
+                disabled={isBuyingNow}
+                aria-label={`Buy ${product.name} now`}
+              >
+                <span>{isBuyingNow ? 'Processing…' : 'Buy Now'}</span>
+              </button>
+
+              {/* Secondary "Add to Cart" CTA with micro-feedback */}
+              <button
+                type="button"
+                className={`${styles.addToCartBtn} ${isAdded ? styles.addedBtn : ''}`}
+                onClick={handleAddToCart}
+                disabled={isAdding}
+                aria-label={`Add ${product.name} to cart`}
+              >
+                {isAdded ? (
+                  <>
+                    <Check size={14} strokeWidth={2.5} />
+                    <span>Added ✓</span>
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart size={14} strokeWidth={2.2} />
+                    <span>Add to Cart</span>
+                  </>
+                )}
+              </button>
             </>
           )}
-        </button>
+        </div>
       </div>
     </div>
   );
