@@ -42,6 +42,7 @@ import {
   Receipt,
   FileText,
   Download,
+  Home,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
@@ -136,6 +137,8 @@ export default function CheckoutPage() {
   const [paymentStatusText, setPaymentStatusText] = useState<string>('');
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
   const [pendingOrderNumber, setPendingOrderNumber] = useState<string | null>(null);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState<boolean>(false);
+  const [cancelModalReason, setCancelModalReason] = useState<string | null>(null);
 
   // UI Accordions & Visuals
   const [isPriceDetailsOpen, setIsPriceDetailsOpen] = useState<boolean>(false);
@@ -606,6 +609,8 @@ export default function CheckoutPage() {
                 setOrderError('Payment cancelled — your order was not placed. You can try again.');
                 return 'cancelled';
               });
+              setCancelModalReason('The payment window was closed before completing the transaction.');
+              setIsCancelModalOpen(true);
               resolve(false);
             },
           },
@@ -614,9 +619,11 @@ export default function CheckoutPage() {
         const rzp = new window.Razorpay!(options);
         rzp.on('payment.failed', function (resp: any) {
           console.error('[Razorpay] Payment failed event:', resp.error);
-          const reason = resp.error?.description || resp.error?.reason || 'Payment failed';
+          const reason = resp.error?.description || resp.error?.reason || 'Payment was declined or cancelled';
           setPaymentFlowState('failed');
-          setOrderError(`Payment failed — your order was not placed (${reason}). Please try again.`);
+          setOrderError(`Payment incomplete — your order was not placed (${reason}). Please try again.`);
+          setCancelModalReason(reason);
+          setIsCancelModalOpen(true);
           resolve(false);
         });
         rzp.open();
@@ -638,6 +645,19 @@ export default function CheckoutPage() {
    * gateway for the same hidden pending order (pendingOrderId), so no second
    * order is created.
    */
+  const handleModalRetryPayment = async () => {
+    setIsCancelModalOpen(false);
+    await handleRetryPayment();
+  };
+
+  const handleModalChangeMethod = () => {
+    setIsCancelModalOpen(false);
+    const paymentSection = document.getElementById('payment-methods-section');
+    if (paymentSection) {
+      paymentSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
   const handleRetryPayment = async () => {
     if (isSubmittingOrder) return;
     setOrderError(null);
@@ -1625,7 +1645,7 @@ export default function CheckoutPage() {
 
               {/* STEP 2: PAYMENT METHOD SELECTION */}
               {currentStep === 2 && (
-                <div className={styles.stepBodyAlt}>
+                <div className={styles.stepBodyAlt} id="payment-methods-section">
                   {/* Compact Delivery Summary Chip */}
                   <div className={styles.deliverySummaryBanner}>
                     <div className={styles.deliverySummaryContent}>
@@ -1658,7 +1678,7 @@ export default function CheckoutPage() {
                   )}
 
                   {!isLoadingPaymentMethods && paymentMethods.length === 0 && (
-                    <div className={styles.paymentOptionsGrid}>
+                    <div className={styles.paymentOptionsGrid} id="payment-methods-section">
                       <div
                         className={`${styles.paymentOptionCard} ${selectedPaymentMethod === 'COD' ? styles.selected : ''}`}
                         onClick={() => setSelectedPaymentMethod('COD')}
@@ -2021,6 +2041,108 @@ export default function CheckoutPage() {
           </div>
         </div>
       </main>
+
+      
+      {/* Payment Cancellation / Interrupted Dialog Box */}
+      {isCancelModalOpen && (
+        <div
+          className={styles.cancelModalBackdrop}
+          onClick={() => setIsCancelModalOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="cancel-modal-title"
+        >
+          <div className={styles.cancelModalCard} onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className={styles.cancelModalCloseBtn}
+              onClick={() => setIsCancelModalOpen(false)}
+              aria-label="Close dialog"
+            >
+              <X size={18} />
+            </button>
+
+            <div className={styles.cancelModalIconWrap}>
+              <AlertTriangle size={32} className={styles.cancelModalIcon} />
+            </div>
+
+            <h3 id="cancel-modal-title" className={styles.cancelModalTitle}>
+              Payment Incomplete
+            </h3>
+            <p className={styles.cancelModalSubtitle}>
+              {cancelModalReason || 'Your payment window was closed before completing the transaction. No order was placed.'}
+            </p>
+
+            <div className={styles.cancelReassuranceCard}>
+              <div className={styles.reassuranceRow}>
+                <div className={styles.reassuranceIconBadge}>
+                  <Shield size={15} color="#10B981" />
+                </div>
+                <div className={styles.reassuranceText}>
+                  <strong>No money was deducted</strong>
+                  <span>Your bank account or card has not been charged.</span>
+                </div>
+              </div>
+              <div className={styles.reassuranceRow}>
+                <div className={styles.reassuranceIconBadge}>
+                  <ShoppingBag size={15} color="#F99205" />
+                </div>
+                <div className={styles.reassuranceText}>
+                  <strong>Cart items are safe</strong>
+                  <span>All your selected products are still saved and ready for checkout.</span>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.cancelOrderSummaryPill}>
+              <div className={styles.cancelSummaryItem}>
+                <span className={styles.cancelSummaryLabel}>Total Amount:</span>
+                <span className={styles.cancelSummaryValue}>₹{effectiveGrandTotal.toLocaleString()}</span>
+              </div>
+              <div className={styles.cancelSummaryItem}>
+                <span className={styles.cancelSummaryLabel}>Method:</span>
+                <span className={styles.cancelSummaryValue}>
+                  {selectedPaymentMethod === 'UPI'
+                    ? 'UPI / QR'
+                    : selectedPaymentMethod === 'COD'
+                    ? 'Cash on Delivery'
+                    : selectedPaymentMethod}
+                </span>
+              </div>
+            </div>
+
+            <div className={styles.cancelModalActions}>
+              <button
+                type="button"
+                className={styles.cancelRetryBtn}
+                onClick={handleModalRetryPayment}
+                disabled={isSubmittingOrder}
+              >
+                <RotateCcw size={17} />
+                <span>{isSubmittingOrder ? 'Opening Payment...' : 'Try Payment Again'}</span>
+              </button>
+
+              <button
+                type="button"
+                className={styles.cancelChangeMethodBtn}
+                onClick={handleModalChangeMethod}
+              >
+                <CreditCard size={17} />
+                <span>Choose Another Payment Method</span>
+              </button>
+
+              <Link
+                href="/"
+                className={styles.cancelBackHomeBtn}
+                onClick={() => setIsCancelModalOpen(false)}
+              >
+                <Home size={16} />
+                <span>Back to Home</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Phone OTP Verification Modal */}
       {isPhoneModalOpen && (

@@ -3498,3 +3498,340 @@
     page-break-inside: avoid !important;
   }
 }
+
+
+/* ==========================================================================
+   Payment Cancellation / Interrupted Dialog Box & Modals
+   ========================================================================== */
+
+.cancelModalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 28, 36, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  z-index: 10000;
+  animation: modalFadeIn 0.25s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.cancelModalCard {
+  background: #ffffff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  padding: 2rem 1.75rem;
+  box-shadow: 0 20px 50px -10px rgba(17, 28, 36, 0.35), 0 0 1px 1px rgba(0, 0, 0, 0.05);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: modalPopIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalPopIn {
+  from {
+    transform: scale(0.92) translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.cancelModalCloseBtn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #F3F4F6;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6B7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelModalCloseBtn:hover {
+  background: #E5E7EB;
+  color: #111827;
+  transform: rotate(90deg);
+}
+
+.cancelModalIconWrap {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: #FFF7ED;
+  border: 4px solid #FFEDD5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.1rem;
+  box-shadow: 0 4px 14px rgba(249, 146, 5, 0.15);
+}
+
+.cancelModalIcon {
+  color: #F99205;
+}
+
+.cancelModalTitle {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #111C24;
+  margin: 0 0 0.4rem 0;
+  letter-spacing: -0.01em;
+}
+
+.cancelModalSubtitle {
+  font-size: 0.92rem;
+  color: #6B7280;
+  line-height: 1.45;
+  margin: 0 0 1.25rem 0;
+}
+
+/* Reassurance Info Card */
+.cancelReassuranceCard {
+  width: 100%;
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-align: left;
+  margin-bottom: 1.1rem;
+}
+
+.reassuranceRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.reassuranceIconBadge {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #DCFCE7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.reassuranceText {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.reassuranceText strong {
+  font-size: 0.85rem;
+  color: #166534;
+  font-weight: 600;
+}
+
+.reassuranceText span {
+  font-size: 0.78rem;
+  color: #15803D;
+  line-height: 1.3;
+}
+
+/* Order Snapshot Pill */
+.cancelOrderSummaryPill {
+  width: 100%;
+  background: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  padding: 0.65rem 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.35rem;
+}
+
+.cancelSummaryItem {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.cancelSummaryLabel {
+  font-size: 0.8rem;
+  color: #6B7280;
+}
+
+.cancelSummaryValue {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #111C24;
+}
+
+/* Modal Actions */
+.cancelModalActions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.cancelRetryBtn {
+  width: 100%;
+  min-height: 46px;
+  background: linear-gradient(135deg, #F99205 0%, #E08304 100%);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(249, 146, 5, 0.35);
+}
+
+.cancelRetryBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(249, 146, 5, 0.45);
+}
+
+.cancelRetryBtn:active {
+  transform: scale(0.98);
+}
+
+.cancelChangeMethodBtn {
+  width: 100%;
+  min-height: 44px;
+  background: #FFFFFF;
+  color: #374151;
+  border: 1px solid #D1D5DB;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.cancelChangeMethodBtn:hover {
+  background: #F9FAFB;
+  border-color: #9CA3AF;
+  color: #111827;
+}
+
+.cancelBackHomeBtn {
+  width: 100%;
+  min-height: 40px;
+  background: transparent;
+  color: #6B7280;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  margin-top: 0.2rem;
+}
+
+.cancelBackHomeBtn:hover {
+  color: #F99205;
+  background: rgba(249, 146, 5, 0.06);
+}
+
+/* Generic Modal Support */
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 28, 36, 0.7);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 10000;
+  animation: modalFadeIn 0.2s ease-out;
+}
+
+.modalCard {
+  background: #ffffff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 440px;
+  padding: 1.75rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.modalTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modalTitleGroup h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #111C24;
+  margin: 0;
+}
+
+.modalCloseBtn {
+  background: none;
+  border: none;
+  color: #6B7280;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modalCloseBtn:hover {
+  background: #F3F4F6;
+  color: #111827;
+}
+
+.modalForm {
+  display: flex;
+  flex-direction: column;
+}
