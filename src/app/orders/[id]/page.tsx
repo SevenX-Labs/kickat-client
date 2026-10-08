@@ -1,48 +1,69 @@
 "use client";
 
 import { use, useEffect, useState } from 'react';
-import Image from 'next/image';
 import SafeImage from '@/components/ui/SafeImage';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { 
-  ChevronRight, MapPin, User, Download, Phone, Truck, CheckCircle, 
-  Package, RotateCcw, Clock, Navigation, PackageCheck, CheckCircle2, 
-  FileCheck, AlertCircle, ArrowLeft, XCircle, ShoppingBag, Loader2,
-  RefreshCw, FileText, X, ExternalLink, Calendar
+import {
+  ArrowLeft,
+  Calendar,
+  Check,
+  CheckCircle2,
+  Clock,
+  Copy,
+  Download,
+  ExternalLink,
+  FileCheck,
+  FileText,
+  Loader2,
+  MapPin,
+  Navigation,
+  Package,
+  PackageCheck,
+  Phone,
+  RefreshCw,
+  RotateCcw,
+  Truck,
+  User,
+  X,
+  XCircle,
+  AlertCircle,
+  CreditCard,
+  ChevronRight,
+  Sparkles,
 } from 'lucide-react';
 import styles from './OrderDetails.module.css';
 import { orderService } from '@/services/orderService';
 import { productService } from '@/services/productService';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { Button } from '@/components/ui/Button';
 
 function isCancellable(statusStr: string): boolean {
   const upper = (statusStr || '').toUpperCase();
   return ['PLACED', 'PENDING', 'CONFIRMED', 'PROCESSING'].includes(upper);
 }
 
-function getTimelineIcon(stage: string) {
+function getTimelineIcon(stage: string, isCancelled: boolean) {
+  if (isCancelled && stage === 'CANCELLED') {
+    return <XCircle size={14} strokeWidth={2.5} />;
+  }
   switch (stage) {
-    case "ORDER_PLACED":
-    case "ORDER_CONFIRMED":
-      return <FileCheck size={13} strokeWidth={2.5} />;
-    case "PACKED":
-      return <Package size={13} strokeWidth={2.5} />;
-    case "SHIPPED":
-      return <Truck size={13} strokeWidth={2.5} />;
-    case "IN_TRANSIT":
-      return <Navigation size={13} strokeWidth={2.5} />;
-    case "OUT_FOR_DELIVERY":
-      return <Navigation size={13} strokeWidth={2.5} />;
-    case "DELIVERED":
+    case 'ORDER_PLACED':
+    case 'ORDER_CONFIRMED':
+      return <FileCheck size={14} strokeWidth={2.5} />;
+    case 'PACKED':
+      return <Package size={14} strokeWidth={2.5} />;
+    case 'SHIPPED':
+      return <Truck size={14} strokeWidth={2.5} />;
+    case 'IN_TRANSIT':
+    case 'OUT_FOR_DELIVERY':
+      return <Navigation size={14} strokeWidth={2.5} />;
+    case 'DELIVERED':
       return <PackageCheck size={14} strokeWidth={2.5} />;
-    case "CANCELLED":
+    case 'CANCELLED':
       return <XCircle size={14} strokeWidth={2.5} />;
-    case "RTO_INITIATED":
-      return <RotateCcw size={13} strokeWidth={2.5} />;
+    case 'RTO_INITIATED':
+      return <RotateCcw size={14} strokeWidth={2.5} />;
     default:
-      return <Package size={13} strokeWidth={2.5} />;
+      return <Package size={14} strokeWidth={2.5} />;
   }
 }
 
@@ -51,11 +72,11 @@ function getCustomerTimeline(order: any, tracking: any) {
     return tracking.timeline;
   }
 
-  const orderStatus = (order?.orderStatus || order?.status || "PLACED").toUpperCase();
-  const isCancelled = orderStatus === "CANCELLED";
-  const isRTO = orderStatus === "RETURN_INITIATED" || orderStatus === "RETURNED";
+  const orderStatus = (order?.orderStatus || order?.status || 'PLACED').toUpperCase();
+  const isCancelled = orderStatus === 'CANCELLED';
+  const isRTO = orderStatus === 'RETURN_INITIATED' || orderStatus === 'RETURNED';
 
-  const statusOrder = ["PLACED", "PROCESSING", "PACKED", "SHIPPED", "OUT_FOR_DELIVERY", "DELIVERED"];
+  const statusOrder = ['PLACED', 'PROCESSING', 'PACKED', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED'];
   const currentStatusIndex = statusOrder.indexOf(orderStatus);
 
   const courier = tracking?.courierPartner || order?.courierPartner || null;
@@ -64,82 +85,105 @@ function getCustomerTimeline(order: any, tracking: any) {
   if (isCancelled) {
     return [
       {
-        stage: "ORDER_PLACED",
-        title: "Order Placed & Confirmed",
-        location: "Online Platform",
+        stage: 'ORDER_PLACED',
+        title: 'Order Placed & Confirmed',
+        location: 'Online Platform',
         timestamp: order?.createdAt,
         isCompleted: true,
         isCurrent: false,
-        description: "Customer order placed and payment verified.",
+        description: 'Customer order placed and payment verified.',
       },
       {
-        stage: "CANCELLED",
-        title: "Order Cancelled",
-        location: "Online Platform",
+        stage: 'CANCELLED',
+        title: 'Order Cancelled',
+        location: 'Online Platform',
         timestamp: order?.cancelledAt || order?.updatedAt || order?.createdAt,
         isCompleted: true,
         isCurrent: true,
-        description: order?.cancelReason ? `Reason: ${order.cancelReason}` : "Order was cancelled.",
+        description: order?.cancelReason ? `Reason: ${order.cancelReason}` : 'Order was cancelled.',
       },
     ];
   }
 
   return [
     {
-      stage: "ORDER_PLACED",
-      title: "Order Placed & Confirmed",
-      location: "Online Platform",
+      stage: 'ORDER_PLACED',
+      title: 'Order Placed & Confirmed',
+      location: 'Online Platform',
       timestamp: order?.createdAt,
       isCompleted: true,
       isCurrent: currentStatusIndex <= 0,
-      description: "Customer order placed and payment verified.",
+      description: 'Customer order placed and payment verified.',
     },
     {
-      stage: "PACKED",
-      title: "Packed at Warehouse",
-      location: "Kickat Central Hub, Mumbai",
+      stage: 'PACKED',
+      title: 'Packed at Warehouse',
+      location: 'Kickat Central Hub, Mumbai',
       timestamp: currentStatusIndex >= 2 ? (order?.updatedAt || order?.createdAt) : null,
       isCompleted: currentStatusIndex >= 2 || isRTO,
       isCurrent: currentStatusIndex === 1 || currentStatusIndex === 2,
-      description: "Items picked, verified, and safely packed.",
+      description: 'Items picked, verified, and safely packed.',
     },
     {
-      stage: "SHIPPED",
-      title: "Handed Over to Courier",
-      location: "Mumbai Logistics Hub",
+      stage: 'SHIPPED',
+      title: 'Handed Over to Courier',
+      location: 'Mumbai Logistics Hub',
       timestamp: currentStatusIndex >= 3 ? (order?.updatedAt || order?.createdAt) : null,
       isCompleted: currentStatusIndex >= 3 || isRTO,
       isCurrent: currentStatusIndex === 3,
-      description: courier && awb ? `Package picked up by ${courier} under AWB ${awb}.` : "Package handed over to logistics carrier.",
+      description: courier && awb ? `Package picked up by ${courier} under AWB ${awb}.` : 'Package handed over to logistics carrier.',
     },
     {
-      stage: "IN_TRANSIT",
-      title: "In Transit to Destination Hub",
-      location: `${order?.address?.city || "Destination"} Regional Sorting Facility`,
+      stage: 'IN_TRANSIT',
+      title: 'In Transit to Destination Hub',
+      location: `${order?.address?.city || 'Destination'} Regional Sorting Facility`,
       timestamp: currentStatusIndex >= 3 ? (order?.updatedAt || order?.createdAt) : null,
       isCompleted: currentStatusIndex >= 3 || isRTO,
       isCurrent: currentStatusIndex === 3,
-      description: "Package in transit between logistics hubs.",
+      description: 'Package in transit between logistics hubs.',
     },
     {
-      stage: "OUT_FOR_DELIVERY",
-      title: "Out for Delivery",
-      location: `${order?.address?.city || "Local"} Delivery Center`,
+      stage: 'OUT_FOR_DELIVERY',
+      title: 'Out for Delivery',
+      location: `${order?.address?.city || 'Local'} Delivery Center`,
       timestamp: currentStatusIndex >= 4 ? (order?.updatedAt || order?.createdAt) : null,
       isCompleted: currentStatusIndex >= 4,
       isCurrent: currentStatusIndex === 4,
-      description: "Delivery executive assigned and out for delivery.",
+      description: 'Delivery executive assigned and out for delivery.',
     },
     {
-      stage: isRTO ? "RTO_INITIATED" : "DELIVERED",
-      title: isRTO ? "Return to Origin (RTO)" : "Delivered to Recipient",
-      location: `${order?.address?.city || ""}, ${order?.address?.state || ""}`.trim() || "Customer Address",
-      timestamp: (orderStatus === "DELIVERED" || orderStatus === "RETURNED") ? (order?.deliveryDate || order?.updatedAt) : null,
-      isCompleted: orderStatus === "DELIVERED" || orderStatus === "RETURNED",
-      isCurrent: orderStatus === "DELIVERED" || orderStatus === "RETURNED",
-      description: isRTO ? "Shipment marked for Return to Origin." : "Package safely delivered to recipient address.",
+      stage: isRTO ? 'RTO_INITIATED' : 'DELIVERED',
+      title: isRTO ? 'Return to Origin (RTO)' : 'Delivered to Recipient',
+      location: `${order?.address?.city || ''}, ${order?.address?.state || ''}`.trim() || 'Customer Address',
+      timestamp: (orderStatus === 'DELIVERED' || orderStatus === 'RETURNED') ? (order?.deliveryDate || order?.updatedAt) : null,
+      isCompleted: orderStatus === 'DELIVERED' || orderStatus === 'RETURNED',
+      isCurrent: orderStatus === 'DELIVERED' || orderStatus === 'RETURNED',
+      description: isRTO ? 'Shipment marked for Return to Origin.' : 'Package safely delivered to recipient address.',
     },
   ];
+}
+
+function formatFullAddress(addr: any): string[] {
+  if (!addr) return ['No delivery address recorded.'];
+  if (typeof addr === 'string') return [addr];
+  const lines: string[] = [];
+  if (addr.addressLine1 || addr.street || addr.address) {
+    lines.push(String(addr.addressLine1 || addr.street || addr.address).trim());
+  }
+  if (addr.addressLine2) {
+    lines.push(String(addr.addressLine2).trim());
+  }
+  if (addr.landmark) {
+    lines.push(`Landmark: ${String(addr.landmark).trim()}`);
+  }
+  const cityStatePincode = [addr.city, addr.state, addr.pincode || addr.zipCode || addr.postalCode].filter(Boolean).join(', ');
+  if (cityStatePincode) {
+    lines.push(cityStatePincode);
+  }
+  if (addr.country && String(addr.country).toLowerCase() !== 'india') {
+    lines.push(String(addr.country).trim());
+  }
+  return lines.length > 0 ? lines : ['Address provided at checkout'];
 }
 
 export default function OrderDetailsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -155,6 +199,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
   // Actions state
   const [isReordering, setIsReordering] = useState(false);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Cancel modal state
@@ -167,7 +212,18 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
     setToastMessage({ type, text });
     setTimeout(() => {
       setToastMessage(null);
-    }, 4000);
+    }, 3500);
+  };
+
+  const copyToClipboard = (text: string, fieldName: string) => {
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedField(fieldName);
+      showToast(`Copied ${fieldName} to clipboard!`, 'success');
+      setTimeout(() => setCopiedField(null), 2500);
+    }).catch(() => {
+      showToast('Failed to copy to clipboard', 'error');
+    });
   };
 
   const fetchOrderDetails = async () => {
@@ -210,7 +266,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
                     };
                   }
                 } catch (e) {
-                  console.warn("Could not enrich item image on client:", e);
+                  console.warn('Could not enrich item image on client:', e);
                 }
               }
               return item;
@@ -272,14 +328,15 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
   };
 
   const handleDownloadPdf = async () => {
-    if (!orderId || isDownloadingPdf) return;
+    if (!orderId) return;
     setIsDownloadingPdf(true);
     try {
       await orderService.downloadInvoicePdf(orderId, order?.orderNumber || orderId);
-      showToast('Invoice downloaded successfully!', 'success');
+      showToast('Invoice PDF downloaded successfully.', 'success');
     } catch (err: any) {
       console.error('Download invoice failed:', err);
-      showToast('Could not download PDF invoice.', 'error');
+      showToast(err?.message || 'Failed to download invoice PDF. Opening online invoice...', 'error');
+      router.push(`/orders/${orderId}/invoice`);
     } finally {
       setIsDownloadingPdf(false);
     }
@@ -311,64 +368,76 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
     }
   };
 
+  // Loading Skeleton
   if (loading) {
     return (
       <div className={styles.pageWrapper}>
         <div className={styles.container}>
-          <div style={{ marginBottom: '1.5rem' }}>
-            <Skeleton style={{ height: '36px', width: '160px', borderRadius: '8px', marginBottom: '1rem' }} />
-            <Skeleton style={{ height: '140px', width: '100%', borderRadius: '16px' }} />
+          {/* Top Bar Skeleton */}
+          <div className={styles.topBar}>
+            <div className={`${styles.skel} ${styles.skelBack}`} />
+            <div className={styles.topBarActions}>
+              <div className={`${styles.skel} ${styles.skelTopBtn}`} />
+              <div className={`${styles.skel} ${styles.skelTopBtn}`} />
+            </div>
           </div>
-          <div style={{ marginBottom: '1.5rem' }}>
-            <Skeleton style={{ height: '220px', width: '100%', borderRadius: '16px' }} />
+
+          {/* Header Card Skeleton */}
+          <div className={styles.skelCard} style={{ minHeight: '140px' }}>
+            <div className={`${styles.skel} ${styles.skelPill}`} />
+            <div className={`${styles.skel} ${styles.skelTitle}`} />
+            <div className={`${styles.skel} ${styles.skelSubtitle}`} />
           </div>
+
+          {/* Items Card Skeleton */}
+          <div className={styles.skelCard} style={{ minHeight: '180px' }}>
+            <div className={styles.skelProductRow}>
+              <div className={`${styles.skel} ${styles.skelThumb}`} />
+              <div style={{ flex: 1 }}>
+                <div className={`${styles.skel} ${styles.skelLineLong}`} />
+                <div className={`${styles.skel} ${styles.skelLineShort}`} />
+              </div>
+            </div>
+          </div>
+
+          {/* Tracking Skeleton */}
+          <div className={styles.skelCard} style={{ minHeight: '220px' }}>
+            <div className={`${styles.skel} ${styles.skelLineLong}`} style={{ width: '40%' }} />
+            <div className={`${styles.skel} ${styles.skelLineLong}`} style={{ height: '70px', marginTop: '14px' }} />
+          </div>
+
+          {/* 2 Col Details Skeleton */}
           <div className={styles.detailsGrid}>
-            <Skeleton style={{ height: '200px', borderRadius: '16px' }} />
-            <Skeleton style={{ height: '200px', borderRadius: '16px' }} />
+            <div className={styles.skelCard} style={{ minHeight: '200px' }} />
+            <div className={styles.skelCard} style={{ minHeight: '200px' }} />
           </div>
         </div>
       </div>
     );
   }
 
+  // Error State
   if (error || !order) {
     return (
       <div className={styles.pageWrapper}>
         <div className={styles.container}>
-          <div style={{ 
-            background: '#ffffff', 
-            borderRadius: '16px', 
-            border: '1px solid #EBE5DB', 
-            padding: '3rem 1.5rem', 
-            textAlign: 'center',
-            maxWidth: '560px',
-            margin: '4rem auto'
-          }}>
-            <div style={{ 
-              width: '64px', 
-              height: '64px', 
-              borderRadius: '50%', 
-              background: '#FEE2E2', 
-              color: '#DC2626', 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              margin: '0 auto 1.25rem'
-            }}>
+          <div className={styles.errorCard}>
+            <div className={styles.errorIconWrap}>
               <AlertCircle size={32} />
             </div>
-            <h1 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1A1612', marginBottom: '0.5rem' }}>
-              Order Not Found
-            </h1>
-            <p style={{ fontSize: '0.875rem', color: '#78746D', marginBottom: '1.5rem', lineHeight: 1.5 }}>
+            <h1 className={styles.errorTitle}>Order Not Found</h1>
+            <p className={styles.errorDesc}>
               {error || `We could not find order #${orderId}. It may not exist or you might need to log in to view it.`}
             </p>
-            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
-              <Link href="/orders">
-                <Button variant="primary" icon={<ArrowLeft size={16} />}>
-                  Back to Orders
-                </Button>
+            <div className={styles.errorActions}>
+              <Link href="/orders" className={styles.errorBtnPrimary}>
+                <ArrowLeft size={16} />
+                <span>Back to Orders</span>
               </Link>
+              <button type="button" onClick={fetchOrderDetails} className={styles.errorBtnSecondary}>
+                <RefreshCw size={16} />
+                <span>Retry</span>
+              </button>
             </div>
           </div>
         </div>
@@ -386,53 +455,59 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
     : 'Recently Placed';
 
   const orderStatusUpper = (order.orderStatus || order.status || 'PLACED').toUpperCase();
+  const isCancelled = orderStatusUpper === 'CANCELLED';
+  const isDelivered = orderStatusUpper === 'DELIVERED';
+  const isShipped = orderStatusUpper === 'SHIPPED';
+  const isOutForDelivery = orderStatusUpper === 'OUT_FOR_DELIVERY';
+  const isReturned = orderStatusUpper === 'RETURNED' || orderStatusUpper === 'RETURN_INITIATED';
   const cancellable = isCancellable(orderStatusUpper);
 
   const getStatusConfig = (status: string) => {
     switch (status) {
       case 'DELIVERED':
         return {
-          icon: <CheckCircle size={15} strokeWidth={2.5} />,
-          badgeStyle: { backgroundColor: '#DCFCE7', color: '#15803D', borderColor: 'rgba(21, 128, 61, 0.15)' },
+          icon: <CheckCircle2 size={16} strokeWidth={2.5} />,
+          badgeClass: styles.badgeGreen,
           label: 'Delivered',
           title: 'Your order has been delivered.',
-          subtitle: order.deliveryDate || order.estimatedDelivery 
+          subtitle: order.deliveryDate || order.estimatedDelivery
             ? `Delivered on ${new Date(order.deliveryDate || order.estimatedDelivery).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}`
-            : 'Package successfully received',
+            : 'Package successfully received.',
         };
       case 'SHIPPED':
         return {
-          icon: <Truck size={15} strokeWidth={2.5} />,
-          badgeStyle: { backgroundColor: '#DBEAFE', color: '#1D4ED8', borderColor: 'rgba(29, 78, 216, 0.15)' },
+          icon: <Truck size={16} strokeWidth={2.5} />,
+          badgeClass: styles.badgeBlue,
           label: 'Shipped',
           title: 'Your order is on the way!',
-          subtitle: tracking?.courierPartner 
+          subtitle: tracking?.courierPartner
             ? `Dispatched with ${tracking.courierPartner} • Tracking #${tracking.trackingNumber || order.trackingNumber || order.orderNumber}`
-            : 'Package is in transit to your delivery address',
+            : 'Package is in transit to your delivery address.',
         };
       case 'OUT_FOR_DELIVERY':
         return {
-          icon: <Navigation size={15} strokeWidth={2.5} />,
-          badgeStyle: { backgroundColor: '#FEF3C7', color: '#B45309', borderColor: 'rgba(180, 83, 9, 0.15)' },
+          icon: <Navigation size={16} strokeWidth={2.5} />,
+          badgeClass: styles.badgeAmber,
           label: 'Out for Delivery',
           title: 'Out for delivery today!',
-          subtitle: 'Our delivery partner is in your area and will arrive soon',
+          subtitle: 'Our delivery partner is in your area and will arrive soon.',
         };
       case 'CANCELLED':
         return {
-          icon: <XCircle size={15} strokeWidth={2.5} />,
-          badgeStyle: { backgroundColor: '#FEE2E2', color: '#DC2626', borderColor: 'rgba(220, 38, 38, 0.15)' },
+          icon: <XCircle size={16} strokeWidth={2.5} />,
+          badgeClass: styles.badgeRed,
           label: 'Cancelled',
           title: 'This order was cancelled.',
-          subtitle: order.cancelReason ? `Reason: ${order.cancelReason}` : 'Cancelled by customer or store manager',
+          subtitle: order.cancelReason ? `Reason: ${order.cancelReason}` : 'Cancelled by customer or store manager.',
         };
       case 'RETURNED':
+      case 'RETURN_INITIATED':
         return {
-          icon: <RotateCcw size={15} strokeWidth={2.5} />,
-          badgeStyle: { backgroundColor: '#F3E8FF', color: '#7E22CE', borderColor: 'rgba(126, 34, 206, 0.15)' },
+          icon: <RotateCcw size={16} strokeWidth={2.5} />,
+          badgeClass: styles.badgePurple,
           label: 'Returned',
           title: 'This order was returned.',
-          subtitle: 'Return request processed and refunded',
+          subtitle: 'Return request processed and refunded.',
         };
       case 'CONFIRMED':
       case 'PROCESSING':
@@ -440,11 +515,11 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
       case 'PLACED':
       default:
         return {
-          icon: <Package size={15} strokeWidth={2.5} />,
-          badgeStyle: { backgroundColor: '#FFF7ED', color: '#C2410C', borderColor: 'rgba(194, 65, 12, 0.15)' },
+          icon: <Package size={16} strokeWidth={2.5} />,
+          badgeClass: styles.badgeAmber,
           label: status === 'CONFIRMED' ? 'Confirmed' : status === 'PROCESSING' ? 'Processing' : 'Placed',
           title: 'Your order is confirmed & in progress.',
-          subtitle: `Order placed on ${formattedDate} • We are preparing your items`,
+          subtitle: `Order placed on ${formattedDate} • We are preparing your items.`,
         };
     }
   };
@@ -452,28 +527,54 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
   const statusConfig = getStatusConfig(orderStatusUpper);
   const items: any[] = Array.isArray(order.items) ? order.items : [];
   const timelineItems = getCustomerTimeline(order, tracking);
+  const fullOrderNumber = String(order.orderNumber || order.id || orderId);
+  const fullAwb = String(tracking?.awbNumber || tracking?.trackingNumber || order.trackingNumber || '');
+  const addressLines = formatFullAddress(order.address);
+
+  // Pricing calculations
+  const subtotal = order.subtotal ?? items.reduce((s: number, it: any) => s + (Number(it.price) || 0) * (Number(it.quantity) || 1), 0);
+  const deliveryFee = Number(order.deliveryFee ?? 0);
+  const isFreeDelivery = deliveryFee === 0;
+  const gstAmount = Number(order.gstAmount ?? 0);
+  const extraFee = Number(order.extraFeeAmount ?? 0) + Number(order.codFee ?? 0);
+  const discountAmount = Number(order.discountAmount ?? 0);
+  const grandTotal = Number(order.grandTotal ?? order.totalAmount ?? subtotal);
+
+  // Payment badge details
+  const rawPayStatus = String(order.paymentStatus || '').toUpperCase();
+  const payMethod = order.paymentMethod || 'Online';
+  let payStatusLabel = `Paid via ${payMethod}`;
+  let payBadgeClass = styles.payBadgeGreen;
+
+  if (isCancelled) {
+    if (['REFUNDED', 'REFUND_INITIATED'].includes(rawPayStatus)) {
+      payStatusLabel = 'Refund Processed';
+      payBadgeClass = styles.payBadgePurple;
+    } else if (payMethod.toLowerCase() === 'cod') {
+      payStatusLabel = 'Cash on Delivery (Cancelled)';
+      payBadgeClass = styles.payBadgeGrey;
+    } else {
+      payStatusLabel = 'Refund Pending';
+      payBadgeClass = styles.payBadgeAmber;
+    }
+  } else if (rawPayStatus === 'PENDING') {
+    payStatusLabel = `Pending via ${payMethod}`;
+    payBadgeClass = styles.payBadgeAmber;
+  } else if (rawPayStatus === 'FAILED') {
+    payStatusLabel = 'Payment Failed';
+    payBadgeClass = styles.payBadgeRed;
+  } else if (payMethod.toLowerCase() === 'cod') {
+    payStatusLabel = 'Pay on Delivery (COD)';
+    payBadgeClass = styles.payBadgeGrey;
+  }
 
   return (
     <div className={styles.pageWrapper}>
       {/* Toast Notification */}
       {toastMessage && (
         <div
-          style={{
-            position: 'fixed',
-            bottom: '24px',
-            right: '24px',
-            zIndex: 10000,
-            background: toastMessage.type === 'success' ? '#15803D' : '#DC2626',
-            color: '#FFFFFF',
-            padding: '12px 20px',
-            borderRadius: '12px',
-            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            fontWeight: 600,
-            fontSize: '0.9rem',
-          }}
+          role="alert"
+          className={`${styles.toast} ${toastMessage.type === 'success' ? styles.toastSuccess : styles.toastError}`}
         >
           {toastMessage.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
           <span>{toastMessage.text}</span>
@@ -482,179 +583,262 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
 
       <div className={styles.container}>
         
-        {/* Navigation Breadcrumb / Back Link */}
-        <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Link 
-            href="/orders" 
-            style={{ 
-              display: 'inline-flex', 
-              alignItems: 'center', 
-              gap: '0.4rem', 
-              fontSize: '0.85rem', 
-              fontWeight: 600, 
-              color: '#78746D',
-              textDecoration: 'none'
-            }}
-          >
+        {/* TOP BAR: Back Link & Header Action Buttons */}
+        <div className={styles.topBar}>
+          <Link href="/orders" className={styles.backBtn} aria-label="Back to orders list">
             <ArrowLeft size={16} />
             <span>Back to Orders</span>
           </Link>
 
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <Link href={`/orders/${order.id}/invoice`}>
-              <Button variant="secondary" size="sm" icon={<FileText size={15} />}>
-                Invoice
-              </Button>
+          <div className={styles.topBarActions}>
+            {/* Invoice Link */}
+            <Link href={`/orders/${order.id}/invoice`} className={styles.topBtnSecondary} aria-label="View Invoice">
+              <FileText size={15} />
+              <span>Invoice</span>
             </Link>
+
+            {/* Cancel Button (if cancellable) */}
             {cancellable && (
-              <Button 
-                variant="secondary" 
-                size="sm" 
-                icon={<XCircle size={15} color="#DC2626" />} 
+              <button
+                type="button"
+                className={styles.topBtnDanger}
                 onClick={() => setShowCancelModal(true)}
-                style={{ color: '#DC2626', borderColor: '#FCA5A5' }}
+                aria-label="Cancel this order"
               >
-                Cancel Order
-              </Button>
+                <XCircle size={15} />
+                <span>Cancel Order</span>
+              </button>
             )}
-            {(orderStatusUpper === 'DELIVERED' || orderStatusUpper === 'CANCELLED' || orderStatusUpper === 'RETURNED') && (
-              <Button 
-                variant="primary" 
-                size="sm" 
-                icon={isReordering ? <Loader2 size={15} className="animate-spin" /> : <RefreshCw size={15} />}
+
+            {/* Buy Again (Delivered, Cancelled, Returned) */}
+            {(isDelivered || isCancelled || isReturned) && (
+              <button
+                type="button"
+                className={isCancelled ? styles.topBtnSecondaryHighlight : styles.topBtnPrimary}
                 disabled={isReordering}
                 onClick={handleReorder}
+                aria-label="Buy all items in this order again"
               >
-                {isReordering ? 'Adding...' : 'Buy Again'}
-              </Button>
+                {isReordering ? (
+                  <>
+                    <Loader2 size={15} className="animate-spin" />
+                    <span>Adding…</span>
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw size={15} />
+                    <span>Buy Again</span>
+                  </>
+                )}
+              </button>
             )}
           </div>
         </div>
 
-        {/* HERO / HEADER SECTION */}
-        <div className={styles.orderHeaderCard}>
-          <div className={styles.headerTopRow}>
-            <div className={styles.orderBadgeGroup}>
-              <span className={styles.orderIdBadge}>Order #{order.orderNumber || order.id}</span>
-              <span className={styles.headerDotSep}>•</span>
-              <span className={styles.orderDateTag}>{formattedDate}</span>
+        {/* 1. ORDER SUMMARY & STATUS HERO CARD */}
+        <section className={styles.heroCard}>
+          {/* Header Row: Order Number & Date */}
+          <div className={styles.heroTopRow}>
+            <div className={styles.orderIdGroup}>
+              <span className={styles.orderIdLabel}>Order</span>
+              <span className={styles.orderIdValue}>#{fullOrderNumber}</span>
+              <button
+                type="button"
+                className={`${styles.copyBtn} ${copiedField === 'Order ID' ? styles.copied : ''}`}
+                onClick={() => copyToClipboard(fullOrderNumber, 'Order ID')}
+                aria-label="Copy Order ID"
+                title="Copy full Order ID"
+              >
+                {copiedField === 'Order ID' ? <Check size={13} /> : <Copy size={13} />}
+              </button>
+              <span className={styles.metaDot}>•</span>
+              <span className={styles.orderDateValue}>{formattedDate}</span>
             </div>
           </div>
 
-          <div className={styles.statusBanner}>
-            <div className={styles.statusBadgeGreen} style={statusConfig.badgeStyle}>
+          {/* Status Headline Block */}
+          <div className={styles.statusBlock}>
+            <div className={`${styles.statusBadge} ${statusConfig.badgeClass}`}>
               {statusConfig.icon}
               <span>{statusConfig.label}</span>
             </div>
             <h1 className={styles.heroTitle}>{statusConfig.title}</h1>
             <p className={styles.heroSubtitle}>{statusConfig.subtitle}</p>
           </div>
-        </div>
+        </section>
 
-        {/* PRODUCT ITEMS LIST */}
-        {items.map((item, idx) => (
-          <div key={item.id || idx} className={styles.productCard} style={{ marginBottom: '1.25rem' }}>
-            <div className={styles.productCardHeader}>
-              <span className={styles.sellerTag}>Seller: {item.brand || 'KickAt Official'}</span>
-              <span className={styles.itemCountTag}>Qty: {item.quantity}</span>
+        {/* 2. ORDERED ITEMS CARD */}
+        <section className={styles.sectionCard}>
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionTitleGroup}>
+              <Package size={18} className={styles.sectionTitleIcon} />
+              <h2 className={styles.sectionTitle}>
+                Items in Order ({items.length} {items.length === 1 ? 'item' : 'items'})
+              </h2>
             </div>
-
-            <div className={styles.productMainRow}>
-              <div className={styles.productImageWrapper} style={{ background: '#FFFFFF', position: 'relative', overflow: 'hidden' }}>
-                <SafeImage 
-                  src={item.imageUrl || item.image} 
-                  productName={item.productName}
-                  alt={item.productName || 'Ordered Item'} 
-                  fill 
-                  className={styles.productImg}
-                  style={{ objectFit: 'contain' }}
-                />
-              </div>
-              
-              <div className={styles.productInfo}>
-                <Link 
-                  href={item.productSlug ? `/product/${item.productSlug}${item.variantId ? `?variant=${item.variantId}` : ''}` : item.productId ? `/product/${item.productId}${item.variantId ? `?variant=${item.variantId}` : ''}` : '#'} 
-                  style={{ textDecoration: 'none', color: 'inherit' }}
-                >
-                  <h2 className={styles.productTitle}>{item.productName || 'Pet Care Product'}</h2>
-                </Link>
-
-                {item.variantName && (
-                  <div className={styles.productVariantMeta}>
-                    <span className={styles.metaLabel}>Variant:</span>
-                    <span className={styles.metaValue}>{item.variantName}</span>
-                  </div>
-                )}
-                
-                <div className={styles.priceRow}>
-                  <span className={styles.productPrice}>
-                    ₹{(item.totalPrice || item.price * item.quantity).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </span>
-                  {item.quantity > 1 && (
-                    <span style={{ fontSize: '0.8rem', color: '#78746D' }}>
-                      (₹{item.price.toLocaleString('en-IN')} × {item.quantity})
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Action CTAs */}
-            {orderStatusUpper === 'DELIVERED' && (
-              <div className={styles.productActionsRow}>
-                <Link href={`/orders/${order.id}/return`} className={styles.secondaryReturnBtn}>
-                  <RotateCcw size={15} />
-                  <span>Return Item</span>
-                </Link>
-              </div>
-            )}
           </div>
-        ))}
 
-        {/* TRACKING HISTORY SECTION */}
+          <div className={styles.itemsList}>
+            {items.map((item: any, idx: number) => {
+              const itemTotal = Number(item.totalPrice || (item.price * item.quantity) || 0);
+              const unitPrice = Number(item.price || 0);
+              const qty = Number(item.quantity || item.qty || 1);
+              const itemSlug = item.productSlug || item.productId;
+              const productUrl = itemSlug
+                ? `/product/${itemSlug}${item.variantId ? `?variant=${item.variantId}` : ''}`
+                : null;
+
+              return (
+                <div key={item.id || idx} className={styles.itemRow}>
+                  {/* Product Thumbnail */}
+                  <div className={styles.itemThumbWrap}>
+                    {productUrl ? (
+                      <Link href={productUrl} className={styles.itemThumbLink} aria-label={`View ${item.productName || 'product'}`}>
+                        <SafeImage
+                          src={item.imageUrl || item.image || '/hero-products/dog_food.png'}
+                          productName={item.productName}
+                          alt={item.productName || 'Ordered Item'}
+                          width={72}
+                          height={72}
+                          className={styles.itemThumbImg}
+                          style={{ objectFit: 'contain' }}
+                        />
+                      </Link>
+                    ) : (
+                      <SafeImage
+                        src={item.imageUrl || item.image || '/hero-products/dog_food.png'}
+                        productName={item.productName}
+                        alt={item.productName || 'Ordered Item'}
+                        width={72}
+                        height={72}
+                        className={styles.itemThumbImg}
+                        style={{ objectFit: 'contain' }}
+                      />
+                    )}
+                  </div>
+
+                  {/* Product Details (Full unwrapped title, variant, brand) */}
+                  <div className={styles.itemInfo}>
+                    <div className={styles.itemBrandSeller}>
+                      <span>Seller: {item.brand || 'KickAt Official'}</span>
+                    </div>
+
+                    {productUrl ? (
+                      <Link href={productUrl} className={styles.itemTitleLink}>
+                        <h3 className={styles.itemTitle}>{item.productName || 'Pet Product'}</h3>
+                      </Link>
+                    ) : (
+                      <h3 className={styles.itemTitle}>{item.productName || 'Pet Product'}</h3>
+                    )}
+
+                    {item.variantName && (
+                      <div className={styles.itemVariant}>
+                        <span className={styles.variantLabel}>Variant:</span>
+                        <span className={styles.variantValue}>{item.variantName}</span>
+                      </div>
+                    )}
+
+                    {/* Mobile Price & Qty Row */}
+                    <div className={styles.itemPriceQtyMobile}>
+                      <div className={styles.itemPriceCol}>
+                        <span className={styles.itemPriceMain}>
+                          ₹{itemTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                        {qty > 1 && (
+                          <span className={styles.itemUnitPrice}>
+                            (₹{unitPrice.toLocaleString('en-IN')} × {qty})
+                          </span>
+                        )}
+                      </div>
+                      <span className={styles.itemQtyBadge}>Qty: {qty}</span>
+                    </div>
+
+                    {/* Product Actions (Review / Return) */}
+                    {isDelivered && (
+                      <div className={styles.itemActions}>
+                        <Link href={`/orders/${order.id}/return`} className={styles.itemActionBtn}>
+                          <RotateCcw size={13} />
+                          <span>Return / Replace</span>
+                        </Link>
+                        {item.productSlug && (
+                          <Link href={`/product/${item.productSlug}#reviews`} className={styles.itemActionBtn}>
+                            <Sparkles size={13} />
+                            <span>Write Review</span>
+                          </Link>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Desktop Price & Qty Block */}
+                  <div className={styles.itemPriceQtyDesktop}>
+                    <div className={styles.itemPriceCol}>
+                      <span className={styles.itemPriceMain}>
+                        ₹{itemTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                      {qty > 1 && (
+                        <span className={styles.itemUnitPrice}>
+                          (₹{unitPrice.toLocaleString('en-IN')} × {qty})
+                        </span>
+                      )}
+                    </div>
+                    <span className={styles.itemQtyBadge}>Qty: {qty}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* 3. TRACKING HISTORY CARD */}
         <section className={styles.sectionCard}>
           <div className={styles.sectionHeader}>
             <div className={styles.sectionTitleGroup}>
               <Clock size={18} className={styles.sectionTitleIcon} />
-              <h3 className={styles.sectionTitle}>Tracking History</h3>
-              <span className={styles.trackingProgressBadge}>
-                {orderStatusUpper === "DELIVERED" ? (
-                  <>
-                    <CheckCircle2 size={12} color="#15803D" />
-                    <span>Delivered</span>
-                  </>
-                ) : (
-                  <>
-                    <Truck size={12} color="#2563EB" />
-                    <span>{statusConfig.label}</span>
-                  </>
-                )}
+              <h2 className={styles.sectionTitle}>Tracking History</h2>
+              <span className={`${styles.trackingStatusChip} ${
+                isCancelled ? styles.trackingChipCancelled
+                : isDelivered ? styles.trackingChipDelivered
+                : styles.trackingChipActive
+              }`}>
+                {isCancelled ? <XCircle size={12} /> : isDelivered ? <CheckCircle2 size={12} /> : <Truck size={12} />}
+                <span>{statusConfig.label}</span>
               </span>
             </div>
           </div>
 
-          {/* Shipment Details & Courier / AWB Banner */}
-          <div className={styles.trackingMetaBanner}>
-            <div className={styles.trackingMetaTopRow}>
-              <div className={styles.courierAwbGroup}>
-                <div className={styles.courierName}>
-                  <Truck size={16} color="#F99205" />
-                  <span>{tracking?.courierPartner || order.courierPartner || "KickAt Express Logistics"}</span>
+          {/* Shipment Meta Info Panel */}
+          <div className={styles.carrierPanel}>
+            <div className={styles.carrierTopRow}>
+              <div className={styles.carrierAwbGroup}>
+                <div className={styles.carrierName}>
+                  <Truck size={16} className={styles.carrierIcon} />
+                  <span>{tracking?.courierPartner || order.courierPartner || 'KickAt Express Logistics'}</span>
                 </div>
-                <div className={styles.awbText}>
-                  AWB:{" "}
-                  <span className={styles.awbVal}>
-                    {tracking?.awbNumber || tracking?.trackingNumber || order.trackingNumber || "Pending Assignment"}
-                  </span>
+                <div className={styles.awbWrap}>
+                  <span className={styles.awbLabel}>AWB:</span>
+                  <span className={styles.awbValue}>{fullAwb || 'Pending Assignment'}</span>
+                  {fullAwb && (
+                    <button
+                      type="button"
+                      className={`${styles.copyBtn} ${copiedField === 'AWB' ? styles.copied : ''}`}
+                      onClick={() => copyToClipboard(fullAwb, 'AWB')}
+                      aria-label="Copy AWB number"
+                      title="Copy AWB tracking number"
+                    >
+                      {copiedField === 'AWB' ? <Check size={13} /> : <Copy size={13} />}
+                    </button>
+                  )}
                 </div>
               </div>
 
-              {(tracking?.trackingUrl || (order.trackingNumber && (order.courierPartner || "").toLowerCase().includes("delhivery"))) && (
+              {(tracking?.trackingUrl || (order.trackingNumber && String(order.courierPartner || '').toLowerCase().includes('delhivery'))) && (
                 <a
                   href={tracking?.trackingUrl || `https://www.delhivery.com/track/package/${order.trackingNumber}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={styles.carrierPortalBtn}
+                  aria-label="Open carrier tracking portal"
                 >
                   <span>Carrier Portal</span>
                   <ExternalLink size={13} />
@@ -662,28 +846,30 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
               )}
             </div>
 
-            <div className={styles.trackingSummaryGrid}>
-              <div className={styles.trackingSummaryItem}>
-                <MapPin size={15} className={styles.trackingSummaryIcon} />
-                <div className={styles.trackingSummaryContent}>
-                  <span className={styles.trackingSummaryLabel}>Location</span>
-                  <span className={styles.trackingSummaryVal}>
-                    {tracking?.location || (orderStatusUpper === "DELIVERED" ? `${order.address?.city || ""}, ${order.address?.state || ""}`.trim() : "Kickat Logistics Facility, Mumbai")}
+            {/* Carrier Summary Details */}
+            <div className={styles.carrierGrid}>
+              <div className={styles.carrierGridItem}>
+                <MapPin size={15} className={styles.carrierGridIcon} />
+                <div className={styles.carrierGridText}>
+                  <span className={styles.carrierGridLabel}>Current Location</span>
+                  <span className={styles.carrierGridVal}>
+                    {tracking?.location || (isDelivered ? `${order.address?.city || ''}, ${order.address?.state || ''}`.trim() : 'Kickat Logistics Hub, Mumbai')}
                   </span>
                 </div>
               </div>
 
-              <div className={styles.trackingSummaryItem}>
-                <Clock size={15} className={styles.trackingSummaryIcon} />
-                <div className={styles.trackingSummaryContent}>
-                  <span className={styles.trackingSummaryLabel}>Last Updated</span>
-                  <span className={styles.trackingSummaryVal}>
+              <div className={styles.carrierGridItem}>
+                <Clock size={15} className={styles.carrierGridIcon} />
+                <div className={styles.carrierGridText}>
+                  <span className={styles.carrierGridLabel}>Last Updated</span>
+                  <span className={styles.carrierGridVal}>
                     {tracking?.lastUpdated || order.updatedAt
-                      ? new Date(tracking?.lastUpdated || order.updatedAt).toLocaleDateString("en-IN", {
-                          day: "numeric",
-                          month: "short",
-                          hour: "2-digit",
-                          minute: "2-digit",
+                      ? new Date(tracking?.lastUpdated || order.updatedAt).toLocaleDateString('en-IN', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
                         })
                       : formattedDate}
                   </span>
@@ -691,16 +877,18 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
               </div>
 
               {(tracking?.estimatedDelivery || order.estimatedDelivery || order.deliveryDate) && (
-                <div className={styles.trackingSummaryItem}>
-                  <Calendar size={15} className={styles.trackingSummaryIcon} />
-                  <div className={styles.trackingSummaryContent}>
-                    <span className={styles.trackingSummaryLabel}>Estimated Delivery</span>
-                    <span className={styles.trackingSummaryVal}>
-                      {new Date(tracking?.estimatedDelivery || order.estimatedDelivery || order.deliveryDate).toLocaleDateString("en-IN", {
-                        weekday: "short",
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
+                <div className={styles.carrierGridItem}>
+                  <Calendar size={15} className={styles.carrierGridIcon} />
+                  <div className={styles.carrierGridText}>
+                    <span className={styles.carrierGridLabel}>
+                      {isDelivered ? 'Delivered On' : 'Estimated Delivery'}
+                    </span>
+                    <span className={styles.carrierGridVal}>
+                      {new Date(tracking?.estimatedDelivery || order.estimatedDelivery || order.deliveryDate).toLocaleDateString('en-IN', {
+                        weekday: 'short',
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
                       })}
                     </span>
                   </div>
@@ -709,200 +897,265 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
             </div>
           </div>
 
-          {/* Dynamic Milestones Timeline */}
-          <div className={styles.verticalTimeline}>
+          {/* Vertical Timeline */}
+          <div className={styles.timelineList}>
             {timelineItems.map((step: any, idx: number) => {
               const isDone = Boolean(step.isCompleted);
               const isCurrent = Boolean(step.isCurrent);
+              const isCancelledStep = step.stage === 'CANCELLED';
               const isLast = idx === timelineItems.length - 1;
 
               return (
-                <div key={idx} className={`${styles.timelineStep} ${isDone ? styles.timelineCompleted : styles.timelineUpcoming}`}>
-                  <div className={styles.timelineLeftColumn}>
-                    <div className={`${styles.timelineNode} ${isCurrent ? styles.activeNodePulse : !isDone ? styles.upcomingNode : ""}`}>
-                      {getTimelineIcon(step.stage)}
-                      {isCurrent && <span className={styles.pulseBeacon} />}
+                <div
+                  key={idx}
+                  className={`${styles.timelineRow} ${
+                    isCancelledStep && isCurrent
+                      ? styles.timelineRowCancelled
+                      : isDone
+                      ? styles.timelineRowCompleted
+                      : styles.timelineRowUpcoming
+                  }`}
+                >
+                  <div className={styles.timelineNodeCol}>
+                    <div
+                      className={`${styles.timelineDot} ${
+                        isCancelledStep && isCurrent
+                          ? styles.timelineDotCancelled
+                          : isCurrent
+                          ? styles.timelineDotActive
+                          : !isDone
+                          ? styles.timelineDotUpcoming
+                          : styles.timelineDotDone
+                      }`}
+                    >
+                      {getTimelineIcon(step.stage, isCancelled)}
+                      {isCurrent && (
+                        <span
+                          className={`${styles.pulseBeacon} ${
+                            isCancelledStep ? styles.pulseBeaconRed : ''
+                          }`}
+                        />
+                      )}
                     </div>
                     {!isLast && (
-                      <div className={`${styles.timelineLine} ${!isDone ? styles.upcomingLine : ""}`} />
+                      <div
+                        className={`${styles.timelineBar} ${
+                          isCancelledStep
+                            ? styles.timelineBarCancelled
+                            : !isDone
+                            ? styles.timelineBarUpcoming
+                            : styles.timelineBarDone
+                        }`}
+                      />
                     )}
                   </div>
 
-                  <div className={`${styles.timelineContentCard} ${isCurrent ? styles.activeContentCard : !isDone ? styles.upcomingCard : ""}`}>
-                    <div className={styles.timelineStepHeader}>
-                      <div className={styles.titleWithBadge}>
-                        <span className={`${styles.timelineStepTitle} ${!isDone ? styles.upcomingTitle : ""}`}>
-                          {step.title}
-                        </span>
+                  <div
+                    className={`${styles.timelineBox} ${
+                      isCancelledStep && isCurrent
+                        ? styles.timelineBoxCancelled
+                        : isCurrent
+                        ? styles.timelineBoxActive
+                        : !isDone
+                        ? styles.timelineBoxUpcoming
+                        : ''
+                    }`}
+                  >
+                    <div className={styles.timelineBoxHead}>
+                      <div className={styles.timelineTitleGroup}>
+                        <span className={styles.timelineTitle}>{step.title}</span>
                         {isCurrent && (
-                          <span className={styles.latestUpdatePill}>Current Status</span>
+                          <span
+                            className={`${styles.statusPill} ${
+                              isCancelledStep ? styles.statusPillRed : styles.statusPillOrange
+                            }`}
+                          >
+                            Current Status
+                          </span>
                         )}
                       </div>
 
                       {step.timestamp && (
-                        <span className={styles.timelineStepDate}>
-                          {new Date(step.timestamp).toLocaleDateString("en-IN", {
-                            day: "numeric",
-                            month: "short",
-                            hour: "2-digit",
-                            minute: "2-digit",
+                        <span className={styles.timelineTimestamp}>
+                          {new Date(step.timestamp).toLocaleDateString('en-IN', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
                           })}
                         </span>
                       )}
                     </div>
 
                     {step.location && (
-                      <div className={styles.stepLocationText}>
-                        <MapPin size={12} color="#78746D" />
+                      <div className={styles.timelineLocation}>
+                        <MapPin size={13} />
                         <span>{step.location}</span>
                       </div>
                     )}
 
                     {step.description && (
-                      <p className={styles.timelineStepDesc}>{step.description}</p>
+                      <p className={styles.timelineDescription}>{step.description}</p>
                     )}
                   </div>
                 </div>
               );
             })}
           </div>
-        </section>{/* DETAILS GRID: Delivery Details & Financial Summary */}
+        </section>
+
+        {/* 4. DETAILS GRID: Delivery Details (Left) + Financial Summary (Right) */}
         <div className={styles.detailsGrid}>
           
-          {/* Delivery Details Card */}
+          {/* DELIVERY DETAILS CARD */}
           <section className={styles.sectionCard}>
             <div className={styles.sectionHeader}>
               <div className={styles.sectionTitleGroup}>
                 <MapPin size={18} className={styles.sectionTitleIcon} />
-                <h3 className={styles.sectionTitle}>Delivery Details</h3>
+                <h2 className={styles.sectionTitle}>Delivery Details</h2>
               </div>
             </div>
 
-            <div className={styles.deliveryDetailsBody}>
-              <div className={styles.infoTile}>
-                <div className={styles.tileIconCircle}>
-                  <User size={16} color="#F99205" />
+            <div className={styles.deliveryDetailsList}>
+              {/* Recipient */}
+              <div className={styles.detailTile}>
+                <div className={styles.tileIcon}>
+                  <User size={16} />
                 </div>
                 <div className={styles.tileContent}>
-                  <div className={styles.tileLabel}>Recipient</div>
-                  <div className={styles.tileValue}>
+                  <span className={styles.tileLabel}>Recipient Name</span>
+                  <span className={styles.tileValue}>
                     {order.user?.name || order.address?.name || order.address?.fullName || 'Valued Customer'}
-                  </div>
+                  </span>
                 </div>
               </div>
 
-              <div className={styles.infoTile}>
-                <div className={styles.tileIconCircle}>
-                  <MapPin size={16} color="#F99205" />
+              {/* Full Address - Fully wraps and multi-line, NO truncation */}
+              <div className={styles.detailTile}>
+                <div className={styles.tileIcon}>
+                  <MapPin size={16} />
                 </div>
                 <div className={styles.tileContent}>
-                  <div className={styles.tileLabel}>Delivery Address</div>
-                  <div className={styles.tileValue}>
-                    {order.address?.houseFlat ? `${order.address.houseFlat}, ` : ''}
-                    {order.address?.buildingStreet || order.address?.addressLine || 'Address on record'}
-                    {order.address?.landmark ? `, Near ${order.address.landmark}` : ''}
-                    {order.address?.city ? `, ${order.address.city}` : ''}
-                    {order.address?.state ? `, ${order.address.state}` : ''}
-                    {order.address?.pincode ? ` - ${order.address.pincode}` : ''}
+                  <span className={styles.tileLabel}>Delivery Address</span>
+                  <div className={styles.tileAddressBlock}>
+                    {addressLines.map((line, lIdx) => (
+                      <div key={lIdx} className={styles.addressLine}>
+                        {line}
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
 
-              {(order.user?.phone || order.address?.phone) && (
-                <div className={styles.infoTile}>
-                  <div className={styles.tileIconCircle}>
-                    <Phone size={16} color="#F99205" />
-                  </div>
-                  <div className={styles.tileContent}>
-                    <div className={styles.tileLabel}>Contact Phone</div>
-                    <div className={styles.tileValue}>
-                      {order.user?.phone || order.address?.phone}
-                    </div>
-                  </div>
+              {/* Contact Phone */}
+              <div className={styles.detailTile}>
+                <div className={styles.tileIcon}>
+                  <Phone size={16} />
                 </div>
-              )}
+                <div className={styles.tileContent}>
+                  <span className={styles.tileLabel}>Contact Phone</span>
+                  <span className={styles.tileValue}>
+                    {order.address?.phone || order.address?.phoneNumber || order.user?.phone || '+91 Not Provided'}
+                  </span>
+                </div>
+              </div>
             </div>
           </section>
 
-          {/* Financial Summary Card */}
+          {/* FINANCIAL SUMMARY CARD */}
           <section className={styles.sectionCard}>
             <div className={styles.sectionHeader}>
               <div className={styles.sectionTitleGroup}>
-                <Package size={18} className={styles.sectionTitleIcon} />
-                <h3 className={styles.sectionTitle}>Financial Summary</h3>
+                <CreditCard size={18} className={styles.sectionTitleIcon} />
+                <h2 className={styles.sectionTitle}>Financial Summary</h2>
               </div>
-              <span className={styles.paymentMethodBadge}>
-                {order.paymentStatus === 'PAID' ? 'Paid' : 'Pending'} via {order.paymentMethod || 'Online'}
+              <span className={`${styles.payStatusBadge} ${payBadgeClass}`}>
+                {payStatusLabel}
               </span>
             </div>
 
-            <div className={styles.priceBreakdown}>
-              <div className={styles.priceLine}>
-                <span>Subtotal</span>
-                <span>₹{Number(order.subtotal || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-              </div>
-
-              <div className={styles.priceLine}>
-                <span>Delivery fee</span>
-                <span className={styles.feeValue}>
-                  {(order.deliveryFee ?? 0) === 0 ? 'FREE' : `+₹${Number(order.deliveryFee).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+            <div className={styles.pricingBreakdown}>
+              {/* Subtotal */}
+              <div className={styles.priceRow}>
+                <span className={styles.priceRowLabel}>Items Subtotal</span>
+                <span className={styles.priceRowValue}>
+                  ₹{subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
 
-              {(order.codFee ?? 0) > 0 && (
-                <div className={styles.priceLine}>
-                  <span>COD handling fee</span>
-                  <span className={styles.feeValue}>+₹{Number(order.codFee).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              {/* Delivery Fee */}
+              <div className={styles.priceRow}>
+                <span className={styles.priceRowLabel}>Delivery Fee</span>
+                <span className={styles.priceRowValue}>
+                  {isFreeDelivery ? (
+                    <span className={styles.freeDeliveryText}>FREE</span>
+                  ) : (
+                    `+₹${deliveryFee.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                  )}
+                </span>
+              </div>
+
+              {/* Extra / COD Fee */}
+              {extraFee > 0 && (
+                <div className={styles.priceRow}>
+                  <span className={styles.priceRowLabel}>{order.extraFeeName || 'Handling / COD Fee'}</span>
+                  <span className={styles.priceRowValue}>
+                    +₹{extraFee.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
                 </div>
               )}
 
-              {(order.extraFeeAmount ?? 0) > 0 && (
-                <div className={styles.priceLine}>
-                  <span>{order.extraFeeName || 'Extra fee'}</span>
-                  <span className={styles.feeValue}>+₹{Number(order.extraFeeAmount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              {/* GST */}
+              {gstAmount > 0 && (
+                <div className={styles.priceRow}>
+                  <span className={styles.priceRowLabel}>
+                    GST {order.gstPercentage ? `(${order.gstPercentage}%)` : ''}
+                  </span>
+                  <span className={styles.priceRowValue}>
+                    +₹{gstAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
                 </div>
               )}
 
-              {(order.gstAmount ?? 0) > 0 && (
-                <div className={styles.priceLine}>
-                  <span>GST {order.gstPercentage ? `(${order.gstPercentage}%)` : ''}</span>
-                  <span className={styles.feeValue}>+₹{Number(order.gstAmount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              {/* Discount */}
+              {discountAmount > 0 && (
+                <div className={styles.priceRow}>
+                  <span className={styles.priceRowLabel}>Discount Savings</span>
+                  <span className={styles.discountRowValue}>
+                    -₹{discountAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
                 </div>
               )}
 
-              {(order.discountAmount ?? 0) > 0 && (
-                <div className={styles.priceLine}>
-                  <span>Discount</span>
-                  <span className={styles.discountValue}>-₹{Number(order.discountAmount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                </div>
-              )}
-
-              <div className={styles.priceTotalRow}>
+              {/* Highlighted Total Block */}
+              <div className={styles.grandTotalBlock}>
                 <div>
-                  <div className={styles.totalLabel}>Total Amount</div>
-                  <div className={styles.taxInclusiveText}>Inclusive of all taxes</div>
+                  <div className={styles.grandTotalLabel}>Total Amount</div>
+                  <div className={styles.taxInclusiveNote}>Inclusive of all taxes</div>
                 </div>
-                <div className={styles.totalAmountText}>
-                  ₹{Number(order.grandTotal || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                <div className={styles.grandTotalAmount}>
+                  ₹{grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '8px', marginTop: '0.5rem' }}>
-                <Link href={`/orders/${order.id}/invoice`} className={styles.secondaryInvoiceBtn} style={{ flex: 1 }}>
+              {/* Invoice Action Buttons */}
+              <div className={styles.invoiceActionsRow}>
+                <Link href={`/orders/${order.id}/invoice`} className={styles.invoiceBtnSecondary}>
                   <FileText size={15} />
                   <span>View Invoice</span>
                 </Link>
+
                 <button
                   type="button"
                   onClick={handleDownloadPdf}
                   disabled={isDownloadingPdf}
-                  className={styles.secondaryInvoiceBtn}
-                  style={{ flex: 1, cursor: isDownloadingPdf ? 'not-allowed' : 'pointer' }}
+                  className={styles.invoiceBtnPrimary}
                 >
                   {isDownloadingPdf ? (
                     <>
                       <Loader2 size={15} className="animate-spin" />
-                      <span>Downloading...</span>
+                      <span>Downloading…</span>
                     </>
                   ) : (
                     <>
@@ -919,150 +1172,79 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
 
       </div>
 
-      {/* Cancel Order Modal */}
+      {/* CANCEL ORDER MODAL */}
       {showCancelModal && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(26, 22, 18, 0.65)',
-            backdropFilter: 'blur(4px)',
-            zIndex: 10000,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '16px',
-          }}
-          onClick={() => setShowCancelModal(false)}
-        >
-          <div
-            style={{
-              background: '#FFFFFF',
-              borderRadius: '20px',
-              maxWidth: '480px',
-              width: '100%',
-              padding: '24px',
-              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.25)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '16px',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{
-                  width: '38px',
-                  height: '38px',
-                  borderRadius: '50%',
-                  background: '#FEE2E2',
-                  color: '#DC2626',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
+        <div className={styles.modalOverlay} onClick={() => setShowCancelModal(false)}>
+          <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHead}>
+              <div className={styles.modalTitleGroup}>
+                <div className={styles.modalDangerIcon}>
                   <AlertCircle size={20} />
                 </div>
                 <div>
-                  <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0, color: '#1A1612' }}>
-                    Cancel Order #{order.orderNumber || order.id}
-                  </h3>
-                  <p style={{ fontSize: '0.8rem', color: '#78746D', margin: 0 }}>
-                    Are you sure you want to cancel this order?
-                  </p>
+                  <h3 className={styles.modalTitle}>Cancel Order #{fullOrderNumber}</h3>
+                  <p className={styles.modalSubtitle}>Are you sure you want to cancel this order?</p>
                 </div>
               </div>
               <button
                 type="button"
+                className={styles.modalCloseBtn}
                 onClick={() => setShowCancelModal(false)}
-                style={{
-                  background: '#F5F2EC',
-                  border: 'none',
-                  borderRadius: '50%',
-                  width: '30px',
-                  height: '30px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                }}
+                aria-label="Close modal"
               >
                 <X size={16} />
               </button>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#333' }}>
-                Please select a reason:
-              </label>
+            <div className={styles.modalBody}>
+              <label className={styles.modalLabel}>Please select a cancellation reason:</label>
               <select
                 value={cancelReason}
                 onChange={(e) => setCancelReason(e.target.value)}
-                style={{
-                  padding: '10px 14px',
-                  borderRadius: '10px',
-                  border: '1px solid #D6D1C7',
-                  fontSize: '0.9rem',
-                  outline: 'none',
-                  background: '#FAF7F2',
-                }}
+                className={styles.modalSelect}
               >
                 <option value="changed_mind">Changed my mind</option>
                 <option value="ordered_by_mistake">Ordered by mistake</option>
                 <option value="found_cheaper">Found cheaper elsewhere</option>
+                <option value="delivery_delayed">Expected delivery is too late</option>
                 <option value="other">Other reason</option>
               </select>
 
               {cancelReason === 'other' && (
                 <textarea
-                  placeholder="Please specify your reason..."
+                  placeholder="Please specify your reason in detail..."
                   value={cancelReasonOther}
                   onChange={(e) => setCancelReasonOther(e.target.value)}
-                  maxLength={200}
-                  style={{
-                    marginTop: '6px',
-                    padding: '10px 14px',
-                    borderRadius: '10px',
-                    border: '1px solid #D6D1C7',
-                    fontSize: '0.85rem',
-                    outline: 'none',
-                    minHeight: '70px',
-                    resize: 'none',
-                  }}
+                  maxLength={250}
+                  className={styles.modalTextarea}
                 />
               )}
             </div>
 
-            <div style={{
-              display: 'flex',
-              gap: '12px',
-              justifyContent: 'flex-end',
-              marginTop: '8px',
-            }}>
-              <Button
-                variant="secondary"
+            <div className={styles.modalFoot}>
+              <button
+                type="button"
+                className={styles.modalBtnKeep}
                 onClick={() => setShowCancelModal(false)}
                 disabled={isCancelling}
               >
                 Keep Order
-              </Button>
-              <Button
-                variant="primary"
+              </button>
+              <button
+                type="button"
+                className={styles.modalBtnConfirm}
                 onClick={handleConfirmCancel}
                 disabled={isCancelling}
-                style={{ background: '#DC2626', borderColor: '#DC2626' }}
               >
                 {isCancelling ? (
                   <>
-                    <Loader2 size={16} className="animate-spin" /> Cancelling...
+                    <Loader2 size={16} className="animate-spin" />
+                    <span>Cancelling…</span>
                   </>
                 ) : (
-                  'Confirm Cancel'
+                  <span>Confirm Cancel</span>
                 )}
-              </Button>
+              </button>
             </div>
           </div>
         </div>
