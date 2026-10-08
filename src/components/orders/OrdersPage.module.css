@@ -301,11 +301,13 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   overflow: hidden;
   box-sizing: border-box;
+  cursor: pointer;
 }
 
 .card:hover {
-  border-color: rgba(242, 140, 15, 0.35);
-  box-shadow: 0 4px 16px -2px rgba(26, 20, 16, 0.09);
+  border-color: rgba(242, 140, 15, 0.4);
+  box-shadow: 0 4px 18px -2px rgba(26, 20, 16, 0.1);
+  transform: translateY(-2px);
 }
 
 /* Row 1: Status Badge & Date */
@@ -343,7 +345,7 @@
   white-space: nowrap;
 }
 
-/* Row 2: Order ID & Total */
+/* Row 2: Full Order ID & Total */
 .cardMetaRow {
   display: flex;
   align-items: center;
@@ -352,33 +354,39 @@
   width: 100%;
   padding-bottom: 8px;
   border-bottom: 1px solid #F4EFE6;
+  flex-wrap: wrap;
 }
 
 .orderId {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.82rem;
+  gap: 5px;
+  font-size: 0.84rem;
   font-weight: 600;
   color: var(--o-muted);
+  min-width: 0;
+  flex-wrap: wrap;
 }
 .orderIdPrefix {
   color: var(--o-faint);
   font-weight: 700;
-  font-size: 0.74rem;
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
 }
 .orderIdValue {
   font-family: var(--font-sans);
   color: var(--o-text);
   font-weight: 700;
+  letter-spacing: -0.01em;
+  word-break: break-all;
 }
 
 .copyBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border-radius: 6px;
   border: 1px solid var(--o-border);
   background: #FAF7F2;
@@ -386,6 +394,7 @@
   cursor: pointer;
   transition: all 0.15s ease;
   margin-left: 2px;
+  flex-shrink: 0;
 }
 .copyBtn:hover {
   background: var(--o-orange-tint);
@@ -403,15 +412,16 @@
   align-items: baseline;
   gap: 6px;
   text-align: right;
+  margin-left: auto;
 }
 .cardTotalLabel {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: var(--o-faint);
   letter-spacing: 0.05em;
 }
 .cardTotalValue {
-  font-size: 1.05rem;
+  font-size: 1.08rem;
   font-weight: 800;
   color: var(--o-text);
   font-variant-numeric: tabular-nums;
@@ -426,11 +436,17 @@
   width: 100%;
 }
 
+.thumbLink {
+  text-decoration: none;
+  flex-shrink: 0;
+  display: block;
+}
+
 .thumbStack {
   position: relative;
   flex-shrink: 0;
-  width: 60px;
-  height: 60px;
+  width: 58px;
+  height: 58px;
   border-radius: 12px;
   background: #FAF7F2;
   border: 1px solid var(--o-border);
@@ -457,13 +473,12 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(26, 20, 16, 0.75);
+  background: rgba(26, 20, 16, 0.8);
   color: #FFFFFF;
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   font-weight: 700;
   text-align: center;
   padding: 1px 0;
-  backdrop-filter: blur(2px);
 }
 
 .bodyInfo {
@@ -475,7 +490,7 @@
 }
 
 .itemName {
-  font-size: 0.92rem;
+  font-size: 0.94rem;
   font-weight: 700;
   color: var(--o-text);
   text-decoration: none;
@@ -506,7 +521,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   font-weight: 600;
   line-height: 1.3;
 }
@@ -516,7 +531,7 @@
 .summaryRed   { color: var(--o-red); }
 .summaryGrey  { color: var(--o-grey); }
 
-/* Row 5: Actions */
+/* Row 5: Actions Grid */
 .cardFoot {
   display: flex;
   flex-direction: column;
@@ -526,21 +541,20 @@
 }
 
 .actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 8px;
   width: 100%;
 }
 
-/* Touch friendly min 44px buttons */
+/* Touch friendly min 42-44px buttons */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: 44px;
-  padding: 0 16px;
+  min-height: 42px;
+  padding: 0 14px;
   border-radius: 10px;
   font-family: inherit;
   font-size: 0.84rem;
@@ -549,8 +563,8 @@
   cursor: pointer;
   transition: all 0.18s ease;
   white-space: nowrap;
-  flex: 1 1 auto;
   box-sizing: border-box;
+  width: 100%;
 }
 
 .btn:active {
@@ -597,183 +611,6 @@
   background: var(--o-red-tint);
   border-color: var(--o-red);
 }
-
-.expandBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  min-height: 44px;
-  padding: 0 14px;
-  border-radius: 10px;
-  background: transparent;
-  border: 1px dashed var(--o-border-strong);
-  color: var(--o-muted);
-  font-family: inherit;
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  flex: 1 1 auto;
-  box-sizing: border-box;
-}
-.expandBtn:hover {
-  background: #FAF7F2;
-  color: var(--o-text);
-}
-.expandChevron {
-  transition: transform 0.2s ease;
-}
-.expandChevronOpen {
-  transform: rotate(180deg);
-}
-
-/* ---------- Accordion Expand (Timeline & Breakdown) ---------- */
-.expandWrap {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  width: 100%;
-}
-.expandWrapOpen {
-  grid-template-rows: 1fr;
-}
-.expandInner {
-  overflow: hidden;
-}
-.expandContent {
-  padding-top: 14px;
-  margin-top: 8px;
-  border-top: 1px solid #F4EFE6;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-.expandHeading {
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--o-faint);
-  margin: 0 0 10px 0;
-}
-
-/* Stepper Tracker */
-.stepper {
-  display: flex;
-  justify-content: space-between;
-  position: relative;
-  width: 100%;
-  padding: 4px 0;
-}
-.step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  position: relative;
-  flex: 1;
-  gap: 4px;
-}
-.stepConnector {
-  position: absolute;
-  top: 12px;
-  right: 50%;
-  width: 100%;
-  height: 2px;
-  background: #EAE1D3;
-  z-index: 0;
-}
-.stepConnectorDone { background: var(--o-green); }
-.stepDot {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: #FFFFFF;
-  border: 2px solid #D5CCBE;
-  color: var(--o-muted);
-}
-.stepDoneDot {
-  background: var(--o-green);
-  border-color: var(--o-green);
-  color: #FFFFFF;
-}
-.stepCurrentDot {
-  background: var(--o-orange-tint);
-  border-color: var(--o-orange);
-  color: var(--o-orange);
-}
-.stepLabel { font-size: 0.74rem; font-weight: 700; color: var(--o-text); }
-.stepLabelMuted { color: var(--o-faint); font-weight: 500; }
-.stepDate { font-size: 0.68rem; color: var(--o-faint); font-variant-numeric: tabular-nums; }
-
-/* Cancelled Timeline (2-step placed -> cancelled) */
-.cancelTimeline {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  position: relative;
-  padding-left: 6px;
-}
-.ctRow { display: flex; align-items: flex-start; gap: 12px; position: relative; }
-.ctDot {
-  display: flex; align-items: center; justify-content: center;
-  width: 24px; height: 24px; border-radius: 50%; z-index: 1; flex-shrink: 0;
-}
-.ctDotNeutral { background: #F0ECE4; color: var(--o-text); }
-.ctDotRed { background: var(--o-red-tint); color: var(--o-red); }
-.ctLine {
-  position: absolute;
-  left: 11px;
-  top: 24px;
-  bottom: -12px;
-  width: 2px;
-  background: #EAE1D3;
-}
-.ctText { display: flex; flex-direction: column; }
-.ctTitle { font-size: 0.84rem; font-weight: 700; color: var(--o-text); }
-.ctTitleRed { color: var(--o-red); }
-.ctDate { font-size: 0.74rem; color: var(--o-muted); font-variant-numeric: tabular-nums; }
-
-.cancelMeta {
-  margin-top: 10px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: var(--o-red-tint);
-  border: 1px solid #F6C8C2;
-}
-.cancelMetaRow { font-size: 0.8rem; color: #7A271A; }
-.cancelMetaRow + .cancelMetaRow { margin-top: 3px; }
-.cancelMetaRow b { font-weight: 700; }
-
-/* Price Breakdown Box */
-.breakdown {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  background: #FAF7F2;
-  border: 1px solid var(--o-border);
-}
-.brRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 0.82rem;
-  color: var(--o-muted);
-}
-.brRow span:last-child { color: var(--o-text); font-weight: 600; font-variant-numeric: tabular-nums; }
-.brDiscount span:last-child { color: var(--o-green); }
-.brDivider { height: 1px; background: var(--o-border); margin: 2px 0; }
-.brTotal { font-size: 0.92rem; }
-.brTotal span { color: var(--o-text) !important; font-weight: 700 !important; }
-.brTotal span:last-child { font-size: 1rem; }
 
 /* ---------- Skeletons ---------- */
 .skelCard {
@@ -1139,7 +976,6 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
-  .expandWrap { transition: none; }
 }
 
 /* ============================================================
@@ -1310,14 +1146,17 @@
   .dateOption:hover { background: var(--o-orange-tint); color: var(--o-orange); }
   .dateOptionActive { color: var(--o-orange); font-weight: 700; }
 
-  /* Desktop card expansions side-by-side */
-  .expandContent {
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 24px;
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
   }
-  .expandMain { flex: 1; min-width: 0; }
-  .expandSide { width: 300px; flex-shrink: 0; }
+
+  .btn {
+    width: auto;
+    flex: 0 0 auto;
+  }
 
   .toast {
     left: auto;

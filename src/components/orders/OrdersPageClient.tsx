@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import SafeImage from '@/components/ui/SafeImage';
 import {
   Package, Search, ChevronDown, Check, Copy, Clock, Truck,
@@ -44,12 +45,6 @@ function formatDate(dateStr?: string): string {
 
 function formatPrice(n: number): string {
   return `₹${Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}
-
-function shortenId(id: string): string {
-  if (!id) return '';
-  if (id.length <= 14) return id;
-  return `${id.slice(0, 6)}…${id.slice(-4)}`;
 }
 
 type Tone = 'amber' | 'blue' | 'green' | 'red' | 'grey';
@@ -96,6 +91,7 @@ const DATE_RANGES = [
 /* ----------------------------- component ----------------------------- */
 
 export default function OrdersPageClient({ showBackToAccount = false }: OrdersPageClientProps) {
+  const router = useRouter();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -106,7 +102,6 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
   const [dateMenuOpen, setDateMenuOpen] = useState(false);
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
   const [stuck, setStuck] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -121,27 +116,23 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const dateWrapRef = useRef<HTMLDivElement | null>(null);
 
-  const toggleExpanded = (id: string) => {
-    setExpandedOrders((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
   const showToast = (text: string, type: 'success' | 'error' = 'success') => {
     setToastMessage({ type, text });
     setTimeout(() => setToastMessage(null), 4000);
   };
 
-  const copyId = async (id: string) => {
+  const copyId = async (id: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
     try {
       await navigator.clipboard.writeText(id);
       setCopiedId(id);
-      setTimeout(() => setCopiedId((cur) => (cur === id ? null : cur)), 1600);
+      showToast(`Order ID #${id} copied!`, 'success');
+      setTimeout(() => setCopiedId((cur) => (cur === id ? null : cur)), 2000);
     } catch {
-      /* clipboard unavailable — no-op */
+      /* clipboard unavailable */
     }
   };
 
@@ -235,12 +226,15 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
     return () => document.removeEventListener('mousedown', handler);
   }, [dateMenuOpen]);
 
-  // Reset pagination whenever a filter changes
   const changeSearch = (v: string) => { setSearchQuery(v); setVisibleCount(PAGE_SIZE); };
   const changeStatus = (v: 'All' | 'Active' | 'Delivered' | 'Cancelled') => { setStatusFilter(v); setVisibleCount(PAGE_SIZE); };
   const changeDateRange = (v: string) => { setDateRange(v); setVisibleCount(PAGE_SIZE); };
 
-  const handleReorderClick = async (orderId: string, rawId?: string) => {
+  const handleReorderClick = async (orderId: string, rawId?: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
     const targetId = rawId || orderId;
     setReorderingId(targetId);
     try {
@@ -279,6 +273,19 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
     } finally {
       setCancelling(false);
     }
+  };
+
+  const handleCardClick = (orderTargetId: string) => (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (
+      target.closest('button') ||
+      target.closest('a') ||
+      target.closest(`.${styles.copyBtn}`) ||
+      target.closest(`.${styles.btn}`)
+    ) {
+      return;
+    }
+    router.push(`/orders/${orderTargetId}`);
   };
 
   /* ---------------- derived data ---------------- */
@@ -477,7 +484,7 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
                   <div className={styles.skel} style={{ width: 90, height: 14, marginLeft: 'auto' }} />
                 </div>
                 <div className={styles.skelMetaRow}>
-                  <div className={styles.skel} style={{ width: 110, height: 16 }} />
+                  <div className={styles.skel} style={{ width: 140, height: 16 }} />
                   <div className={styles.skel} style={{ width: 70, height: 18, marginLeft: 'auto' }} />
                 </div>
                 <div className={styles.skelProductRow}>
@@ -488,9 +495,8 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
                   </div>
                 </div>
                 <div className={styles.skelActionsRow}>
-                  <div className={styles.skel} style={{ width: 110, height: 44, borderRadius: 10 }} />
-                  <div className={styles.skel} style={{ width: 90, height: 44, borderRadius: 10 }} />
-                  <div className={styles.skel} style={{ width: 90, height: 44, borderRadius: 10 }} />
+                  <div className={styles.skel} style={{ width: '48%', height: 42, borderRadius: 10 }} />
+                  <div className={styles.skel} style={{ width: '48%', height: 42, borderRadius: 10 }} />
                 </div>
               </div>
             ))}
@@ -530,14 +536,13 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
             <div className={styles.list}>
               {visibleOrders.map((order) => {
                 const tone = statusTone(order.status);
-                const expanded = expandedOrders.has(order.id);
+                const orderTargetId = order.rawId || order.id;
                 const cancellable = isCancellable(order.rawStatus);
                 const isDelivered = order.status === 'Delivered';
                 const isCancelled = order.status === 'Cancelled';
                 const isReturned = order.status === 'Returned';
                 const isActive = order.status === 'Processing' || order.status === 'Shipped';
 
-                const doneCount = order.timeline.filter((t: any) => t.done).length;
                 const extraItems = order.items.length - 1;
 
                 // Footer status summary line
@@ -556,7 +561,12 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
                 }
 
                 return (
-                  <div key={order.id} className={styles.card}>
+                  <div
+                    key={order.id}
+                    className={styles.card}
+                    onClick={handleCardClick(orderTargetId)}
+                    title="Click to view order details"
+                  >
                     {/* Row 1: Status Badge on left, Date on right */}
                     <div className={styles.cardTopRow}>
                       <span className={`${styles.badge} ${toneBadge[tone]}`}>
@@ -566,21 +576,21 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
                       <span className={styles.headDate}>{order.date}</span>
                     </div>
 
-                    {/* Row 2: Shortened ID with copy icon on left, Total on right */}
+                    {/* Row 2: Full Order ID with copy icon on left, Total on right */}
                     <div className={styles.cardMetaRow}>
-                      <span className={styles.orderId}>
-                        <span className={styles.orderIdPrefix}>ID: </span>
-                        <span className={styles.orderIdValue}>{shortenId(String(order.id))}</span>
+                      <div className={styles.orderId}>
+                        <span className={styles.orderIdPrefix}>ID:</span>
+                        <span className={styles.orderIdValue}>{order.id}</span>
                         <button
                           type="button"
                           className={`${styles.copyBtn} ${copiedId === String(order.id) ? styles.copied : ''}`}
-                          onClick={() => copyId(String(order.id))}
+                          onClick={(e) => copyId(String(order.id), e)}
                           aria-label={`Copy order ID ${order.id}`}
-                          title="Copy order ID"
+                          title="Copy full order ID"
                         >
                           {copiedId === String(order.id) ? <Check size={13} /> : <Copy size={13} />}
                         </button>
-                      </span>
+                      </div>
 
                       <div className={styles.cardTotal}>
                         <span className={styles.cardTotalLabel}>TOTAL</span>
@@ -588,9 +598,13 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
                       </div>
                     </div>
 
-                    {/* Row 3: Product Row (Thumbnail on left, Title + Variant/Qty on right) */}
+                    {/* Row 3: Product Row (Thumbnail on left, Title + Variant/Qty on right) -> Links to Order Details */}
                     <div className={styles.cardBody}>
-                      <div className={styles.thumbStack}>
+                      <Link
+                        href={`/orders/${orderTargetId}`}
+                        className={styles.thumbLink}
+                        title="View order details"
+                      >
                         <div className={styles.thumb}>
                           <SafeImage
                             src={order.items[0]?.image || '/hero-products/dog_food.png'}
@@ -605,16 +619,13 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
                         {extraItems > 0 && (
                           <span className={styles.moreChip}>+{extraItems} more</span>
                         )}
-                      </div>
+                      </Link>
 
                       <div className={styles.bodyInfo}>
                         <Link
-                          href={order.items[0]?.productSlug
-                            ? `/product/${order.items[0].productSlug}${order.items[0].variantId ? `?variant=${order.items[0].variantId}` : ''}`
-                            : order.items[0]?.productId
-                              ? `/product/${order.items[0].productId}`
-                              : `/orders/${order.rawId || order.id}`}
+                          href={`/orders/${orderTargetId}`}
                           className={styles.itemName}
+                          title="View order details"
                         >
                           {order.items[0]?.name || 'Pet Product'}
                         </Link>
@@ -634,23 +645,30 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
                       </span>
                     </div>
 
-                    {/* Row 5: Action Buttons (Touch-friendly 44px min height, 1 filled orange max, wraps gracefully) */}
+                    {/* Row 5: Action Buttons (Touch-friendly 42-44px buttons in a balanced grid) */}
                     <div className={styles.cardFoot}>
                       <div className={styles.actions}>
                         {/* Active: Filled Orange Track (Primary) + Outlined Details + Tertiary Invoice */}
                         {isActive && (
                           <>
-                            <Link href={`/orders/${order.rawId || order.id}/tracking`} className={`${styles.btn} ${styles.btnPrimary}`}>
+                            <Link href={`/orders/${orderTargetId}/tracking`} className={`${styles.btn} ${styles.btnPrimary}`}>
                               <MapPin size={15} /> Track Order
                             </Link>
-                            <Link href={`/orders/${order.rawId || order.id}`} className={`${styles.btn} ${styles.btnSecondary}`}>
+                            <Link href={`/orders/${orderTargetId}`} className={`${styles.btn} ${styles.btnSecondary}`}>
                               <Eye size={15} /> Details
                             </Link>
-                            <Link href={`/orders/${order.rawId || order.id}/invoice`} className={`${styles.btn} ${styles.btnTertiary}`}>
+                            <Link href={`/orders/${orderTargetId}/invoice`} className={`${styles.btn} ${styles.btnTertiary}`}>
                               <FileText size={15} /> Invoice
                             </Link>
                             {cancellable && (
-                              <button type="button" className={`${styles.btn} ${styles.btnDanger}`} onClick={() => setCancelModalOrder(order)}>
+                              <button
+                                type="button"
+                                className={`${styles.btn} ${styles.btnDanger}`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setCancelModalOrder(order);
+                                }}
+                              >
                                 <XCircle size={15} /> Cancel
                               </button>
                             )}
@@ -663,17 +681,17 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
                             <button
                               type="button"
                               className={`${styles.btn} ${styles.btnPrimary}`}
-                              disabled={reorderingId === (order.rawId || order.id)}
-                              onClick={() => handleReorderClick(order.id, order.rawId)}
+                              disabled={reorderingId === orderTargetId}
+                              onClick={(e) => handleReorderClick(order.id, order.rawId, e)}
                             >
-                              {reorderingId === (order.rawId || order.id)
+                              {reorderingId === orderTargetId
                                 ? <><Loader2 size={15} className="animate-spin" /> Adding…</>
                                 : <><RefreshCw size={15} /> Reorder</>}
                             </button>
-                            <Link href={`/orders/${order.rawId || order.id}`} className={`${styles.btn} ${styles.btnSecondary}`}>
+                            <Link href={`/orders/${orderTargetId}`} className={`${styles.btn} ${styles.btnSecondary}`}>
                               <Eye size={15} /> Details
                             </Link>
-                            <Link href={`/orders/${order.rawId || order.id}/invoice`} className={`${styles.btn} ${styles.btnTertiary}`}>
+                            <Link href={`/orders/${orderTargetId}/invoice`} className={`${styles.btn} ${styles.btnTertiary}`}>
                               <FileText size={15} /> Invoice
                             </Link>
                             {order.items[0]?.productSlug && (
@@ -690,17 +708,17 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
                             <button
                               type="button"
                               className={`${styles.btn} ${styles.btnSecondary}`}
-                              disabled={reorderingId === (order.rawId || order.id)}
-                              onClick={() => handleReorderClick(order.id, order.rawId)}
+                              disabled={reorderingId === orderTargetId}
+                              onClick={(e) => handleReorderClick(order.id, order.rawId, e)}
                             >
-                              {reorderingId === (order.rawId || order.id)
+                              {reorderingId === orderTargetId
                                 ? <><Loader2 size={15} className="animate-spin" /> Adding…</>
                                 : <><RefreshCw size={15} /> Reorder</>}
                             </button>
-                            <Link href={`/orders/${order.rawId || order.id}`} className={`${styles.btn} ${styles.btnSecondary}`}>
+                            <Link href={`/orders/${orderTargetId}`} className={`${styles.btn} ${styles.btnSecondary}`}>
                               <Eye size={15} /> Details
                             </Link>
-                            <Link href={`/orders/${order.rawId || order.id}/invoice`} className={`${styles.btn} ${styles.btnTertiary}`}>
+                            <Link href={`/orders/${orderTargetId}/invoice`} className={`${styles.btn} ${styles.btnTertiary}`}>
                               <FileText size={15} /> Invoice
                             </Link>
                           </>
@@ -712,117 +730,21 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
                             <button
                               type="button"
                               className={`${styles.btn} ${styles.btnSecondary}`}
-                              disabled={reorderingId === (order.rawId || order.id)}
-                              onClick={() => handleReorderClick(order.id, order.rawId)}
+                              disabled={reorderingId === orderTargetId}
+                              onClick={(e) => handleReorderClick(order.id, order.rawId, e)}
                             >
-                              {reorderingId === (order.rawId || order.id)
+                              {reorderingId === orderTargetId
                                 ? <><Loader2 size={15} className="animate-spin" /> Adding…</>
                                 : <><RefreshCw size={15} /> Reorder</>}
                             </button>
-                            <Link href={`/orders/${order.rawId || order.id}`} className={`${styles.btn} ${styles.btnSecondary}`}>
+                            <Link href={`/orders/${orderTargetId}`} className={`${styles.btn} ${styles.btnSecondary}`}>
                               <Eye size={15} /> Details
+                            </Link>
+                            <Link href={`/orders/${orderTargetId}/invoice`} className={`${styles.btn} ${styles.btnTertiary}`}>
+                              <FileText size={15} /> Invoice
                             </Link>
                           </>
                         )}
-
-                        {/* Expand / Details Toggle Button */}
-                        <button
-                          type="button"
-                          className={styles.expandBtn}
-                          onClick={() => toggleExpanded(order.id)}
-                          aria-expanded={expanded}
-                          aria-label={expanded ? 'Collapse order breakdown' : 'Expand order breakdown'}
-                        >
-                          <span>{expanded ? 'Hide Breakdown' : 'Breakdown'}</span>
-                          <ChevronDown size={15} className={`${styles.expandChevron} ${expanded ? styles.expandChevronOpen : ''}`} />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Expanded Section (Smooth 200ms accordion) */}
-                    <div className={`${styles.expandWrap} ${expanded ? styles.expandWrapOpen : ''}`}>
-                      <div className={styles.expandInner}>
-                        <div className={styles.expandContent}>
-                          <div className={styles.expandMain}>
-                            {isCancelled ? (
-                              <>
-                                <h4 className={styles.expandHeading}>Order Timeline</h4>
-                                <div className={styles.cancelTimeline}>
-                                  <div className={styles.ctRow}>
-                                    <div className={`${styles.ctDot} ${styles.ctDotNeutral}`}><Check size={13} strokeWidth={3} /></div>
-                                    <div className={styles.ctLine} />
-                                    <div className={styles.ctText}>
-                                      <span className={styles.ctTitle}>Placed</span>
-                                      <span className={styles.ctDate}>{order.date}</span>
-                                    </div>
-                                  </div>
-                                  <div className={styles.ctRow}>
-                                    <div className={`${styles.ctDot} ${styles.ctDotRed}`}><X size={13} strokeWidth={3} /></div>
-                                    <div className={styles.ctText}>
-                                      <span className={`${styles.ctTitle} ${styles.ctTitleRed}`}>Cancelled</span>
-                                      <span className={styles.ctDate}>{order.cancelledAt}</span>
-                                    </div>
-                                  </div>
-                                </div>
-                                {(order.cancelReason || order.paymentStatus) && (
-                                  <div className={styles.cancelMeta}>
-                                    {order.cancelReason && (
-                                      <div className={styles.cancelMetaRow}>
-                                        <b>Reason:</b> {order.cancelReason === 'other' && order.cancelReasonOther
-                                          ? order.cancelReasonOther
-                                          : String(order.cancelReason).replace(/_/g, ' ')}
-                                      </div>
-                                    )}
-                                    <div className={styles.cancelMetaRow}>
-                                      <b>Refund:</b> {['REFUNDED', 'REFUND_INITIATED', 'PAID'].includes(order.paymentStatus)
-                                        ? 'Processed to original payment method'
-                                        : 'No payment was captured'}
-                                    </div>
-                                  </div>
-                                )}
-                              </>
-                            ) : (
-                              <>
-                                <h4 className={styles.expandHeading}>Delivery Progress</h4>
-                                <div className={styles.stepper}>
-                                  {order.timeline.map((t: any, idx: number) => {
-                                    const isDone = t.done;
-                                    const isCurrent = !isDelivered && idx === doneCount;
-                                    const connectorDone = idx < doneCount - 1;
-                                    return (
-                                      <div key={t.step} className={styles.step}>
-                                        {idx > 0 && (
-                                          <div className={`${styles.stepConnector} ${connectorDone || isDone ? styles.stepConnectorDone : ''}`}
-                                            style={{ left: '-50%' }} />
-                                        )}
-                                        <div className={`${styles.stepDot} ${isDone ? styles.stepDoneDot : ''} ${isCurrent ? `${styles.stepCurrentDot} ${styles.pulseRing}` : ''}`}>
-                                          {isDone ? <Check size={14} strokeWidth={3} /> : isCurrent ? <StatusIcon status={order.status} size={13} /> : <span style={{ width: 6, height: 6, borderRadius: 999, background: 'currentColor', display: 'block' }} />}
-                                        </div>
-                                        <span className={`${styles.stepLabel} ${!isDone && !isCurrent ? styles.stepLabelMuted : ''}`}>{t.step}</span>
-                                        {t.date && <span className={styles.stepDate}>{t.date}</span>}
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              </>
-                            )}
-                          </div>
-
-                          {/* Price breakdown */}
-                          <div className={styles.expandSide}>
-                            <h4 className={styles.expandHeading}>Price Breakdown</h4>
-                            <div className={styles.breakdown}>
-                              <div className={styles.brRow}><span>Subtotal</span><span>{formatPrice(order.subtotal)}</span></div>
-                              <div className={styles.brRow}><span>Delivery</span><span>{order.delivery > 0 ? formatPrice(order.delivery) : 'Free'}</span></div>
-                              <div className={styles.brRow}><span>Taxes &amp; Fees</span><span>{formatPrice(order.taxes)}</span></div>
-                              {order.discount > 0 && (
-                                <div className={`${styles.brRow} ${styles.brDiscount}`}><span>Discount</span><span>−{formatPrice(order.discount)}</span></div>
-                              )}
-                              <div className={styles.brDivider} />
-                              <div className={`${styles.brRow} ${styles.brTotal}`}><span>Total</span><span>{formatPrice(order.total)}</span></div>
-                            </div>
-                          </div>
-                        </div>
                       </div>
                     </div>
                   </div>
