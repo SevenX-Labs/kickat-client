@@ -997,6 +997,11 @@
   flex-direction: column;
   max-height: 85vh;
   box-sizing: border-box;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.filterSheet::-webkit-scrollbar {
+  display: none;
 }
 
 @keyframes slideUpSheet {
@@ -1086,6 +1091,11 @@
   flex-direction: column;
   gap: 18px;
   padding-bottom: 8px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.sheetBody::-webkit-scrollbar {
+  display: none;
 }
 
 .sheetSectionTitle {

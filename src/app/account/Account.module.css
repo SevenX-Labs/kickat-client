@@ -1628,6 +1628,11 @@ input:checked + .slider:before {
   max-height: 85vh;
   overflow-y: auto;
   box-sizing: border-box;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.filterSheetCard::-webkit-scrollbar {
+  display: none;
 }
 
 @keyframes slideUpSheet {
