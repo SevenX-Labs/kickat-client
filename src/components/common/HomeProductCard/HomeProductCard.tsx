@@ -51,17 +51,18 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
 
   const { addToCart } = useCart();
 
+  const productId = product?.id || '';
   const targetVariantId = product.variantId || product.selectedVariantId;
   const productHref = targetVariantId
-    ? `/product/${product.id}?variant=${targetVariantId}`
-    : `/product/${product.id}`;
+    ? `/product/${productId}?variant=${targetVariantId}`
+    : `/product/${productId}`;
   const rating = product.rating ?? 0;
   const reviewsCount = product.reviewsCount ?? 0;
   const isOutOfStock = typeof product.stock === 'number' && product.stock <= 0;
   const isVariable = product.type === 'VARIABLE';
   const hasExplicitVariant = Boolean(targetVariantId);
 
-  const isWishlisted = checkIsWishlisted(product.id, targetVariantId) || Boolean(product.isWishlisted);
+  const isWishlisted = checkIsWishlisted(productId, targetVariantId) || Boolean(product.isWishlisted);
 
   const discountPercent = useMemo(() => {
     if (product.originalPrice && product.originalPrice > product.price) {
@@ -77,7 +78,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
     e.preventDefault();
     e.stopPropagation();
     if (onRemoveFromWishlist) {
-      onRemoveFromWishlist(product.id);
+      onRemoveFromWishlist(productId);
       return;
     }
 
@@ -88,7 +89,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
     }
 
     await toggleWishlist(product, targetVariantId);
-  }, [onRemoveFromWishlist, product, targetVariantId, isAuthenticated, router, toggleWishlist]);
+  }, [onRemoveFromWishlist, productId, product, targetVariantId, isAuthenticated, router, toggleWishlist]);
 
   const handleAddToCart = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -100,7 +101,6 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
       return;
     }
 
-    // For variable products without pre-selected variant, open modal
     if (isVariable && !hasExplicitVariant) {
       setIsVariantModalOpen(true);
       return;
@@ -110,10 +110,9 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
 
     setIsAdding(true);
     try {
-      await addToCart(product.id, targetVariantId);
+      await addToCart(productId, targetVariantId);
       setIsAdded(true);
 
-      // Micro-feedback timeout
       setTimeout(() => {
         setIsAdded(false);
       }, 2500);
@@ -186,7 +185,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
     } finally {
       setIsAdding(false);
     }
-  }, [isAdded, isAdding, isOutOfStock, isVariable, hasExplicitVariant, product.id, targetVariantId, product.image, router, addToCart]);
+  }, [isAdded, isAdding, isOutOfStock, isVariable, hasExplicitVariant, productId, targetVariantId, product.image, router, addToCart]);
 
   const handleBuyNow = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -202,7 +201,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
 
     setIsBuyingNow(true);
     try {
-      await addToCart(product.id, targetVariantId, 1);
+      await addToCart(productId, targetVariantId, 1);
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('cart-item-added'));
       }
@@ -213,11 +212,12 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
     } finally {
       setIsBuyingNow(false);
     }
-  }, [isOutOfStock, isVariable, hasExplicitVariant, isBuyingNow, addToCart, product.id, targetVariantId, router]);
+  }, [isOutOfStock, isVariable, hasExplicitVariant, isBuyingNow, addToCart, productId, targetVariantId, router]);
 
   const handleCardClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
     if (
+      target.closest('a') ||
       target.closest('button') ||
       target.closest('input') ||
       target.closest('select') ||
@@ -227,12 +227,14 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
     ) {
       return;
     }
-    window.open(productHref, '_blank', 'noopener,noreferrer');
+    if (productId) {
+      window.open(productHref, '_blank', 'noopener,noreferrer');
+    }
   };
 
   return (
     <div className={styles.homeCard} onClick={handleCardClick}>
-      {/* Variant Selector Modal (if variable product has no pre-selected variant) */}
+      {/* Variant Selector Modal */}
       {isVariable && !hasExplicitVariant && (
         <VariantSelectorModal
           isOpen={isVariantModalOpen}
@@ -264,7 +266,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
             aria-label="Remove from wishlist"
             onClick={handleWishlistClick}
           >
-            <Trash2 size={16} strokeWidth={2} color="#C34A42" />
+            <Trash2 size={15} strokeWidth={2} color="#C34A42" />
           </button>
         ) : (
           <button 
@@ -274,7 +276,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
             onClick={handleWishlistClick}
           >
             <Heart
-              size={16}
+              size={15}
               className={isWishlisted ? styles.heartFilled : ''}
               color={isWishlisted ? '#F28C0F' : '#4A4238'}
               strokeWidth={2}
@@ -308,7 +310,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
           <h3 className={styles.cardTitle} title={product.name}>{product.name}</h3>
         </Link>
 
-        {/* Rating Row (rendered when valid ratings exist) */}
+        {/* Rating Row */}
         {reviewsCount > 0 && rating > 0 && (
           <div className={styles.cardRatingRow}>
             <div className={styles.starsGroup}>

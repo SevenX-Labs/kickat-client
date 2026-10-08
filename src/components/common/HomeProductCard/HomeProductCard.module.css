@@ -8,7 +8,7 @@
   flex-direction: column;
   background: #FFFFFF;
   border-radius: 16px;
-  padding: 16px;
+  padding: 14px;
   border: 1px solid #ECE3D5;
   box-shadow: 0 2px 8px -2px rgba(26, 20, 16, 0.05), 0 8px 20px -4px rgba(26, 20, 16, 0.07);
   transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1),
@@ -18,7 +18,7 @@
   position: relative;
   box-sizing: border-box;
   cursor: pointer;
-  height: 100%;
+  min-height: 100%;
 }
 
 .homeCard:hover {
@@ -31,7 +31,7 @@
 .cardImageArea {
   position: relative;
   width: 100%;
-  aspect-ratio: 1 / 0.88;
+  aspect-ratio: 1 / 0.85;
   background-color: #FAF7F2;
   border-radius: 12px;
   overflow: hidden;
@@ -58,9 +58,9 @@
 /* Badge Top-Left */
 .cardBadge {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  padding: 3px 9px;
+  top: 8px;
+  left: 8px;
+  padding: 3px 8px;
   border-radius: 9999px;
   background: #F28C0F;
   color: #FFFFFF;
@@ -78,12 +78,12 @@
 /* Wishlist Heart Button Top-Right */
 .cardWishlistBtn {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 8px;
+  right: 8px;
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(4px);
   border: 1px solid rgba(238, 231, 220, 0.9);
   display: flex;
@@ -131,7 +131,7 @@
 
 /* Content Area */
 .cardContent {
-  padding-top: 12px;
+  padding-top: 10px;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -141,11 +141,11 @@
 .brandRow {
   display: flex;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 
 .brandText {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: #8C827A;
   text-transform: uppercase;
@@ -160,16 +160,16 @@
 
 .cardTitle {
   font-family: var(--font-sans), Inter, system-ui, sans-serif;
-  font-size: 0.9375rem; /* 15px */
+  font-size: 0.92rem; /* 14.7px */
   font-weight: 700;
   color: #1A1410;
-  line-height: 1.35;
-  margin: 0 0 6px 0;
+  line-height: 1.3;
+  margin: 0 0 5px 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  height: 2.7em;
+  min-height: 2.55em;
   letter-spacing: -0.01em;
   transition: color 0.15s ease;
 }
@@ -183,7 +183,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .starsGroup {
@@ -193,7 +193,7 @@
 }
 
 .cardRatingScore {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 700;
   color: #1A1410;
   margin-left: 2px;
@@ -201,7 +201,7 @@
 }
 
 .cardReviewsCount {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 500;
   color: #78716C;
   font-variant-numeric: tabular-nums;
@@ -211,16 +211,16 @@
 .priceContainer {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   flex-wrap: wrap;
-  margin-bottom: 12px;
-  margin-top: auto;
+  margin-top: 4px;
+  margin-bottom: 10px;
 }
 
 .priceRowUpper {
   display: flex;
   align-items: baseline;
-  gap: 6px;
+  gap: 5px;
 }
 
 .cardPrice {
@@ -234,7 +234,7 @@
 }
 
 .originalPrice {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: #9CA3AF;
   text-decoration: line-through;
   font-weight: 500;
@@ -245,9 +245,9 @@
 .discountTag {
   background-color: #DCFCE7;
   color: #15803D;
-  font-size: 0.6875rem;
+  font-size: 0.65rem;
   font-weight: 700;
-  padding: 2px 7px;
+  padding: 2px 6px;
   border-radius: 9999px;
   border: 1px solid #BBF7D0;
   line-height: 1.2;
@@ -261,28 +261,30 @@
   align-items: center;
   gap: 8px;
   width: 100%;
-  margin-top: 4px;
+  margin-top: auto;
 }
 
 /* Primary "Buy Now" CTA */
 .buyNowBtn {
   flex: 1;
+  min-width: 0;
   height: 38px;
   border-radius: 10px;
   background: #F28C0F;
   color: #FFFFFF;
   font-family: inherit;
-  font-size: 0.825rem;
+  font-size: 0.8125rem;
   font-weight: 700;
   border: 1px solid #F28C0F;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 4px;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(242, 140, 15, 0.25);
   transition: all 0.18s ease;
   white-space: nowrap;
+  box-sizing: border-box;
 }
 
 .buyNowBtn:hover:not(:disabled) {
@@ -304,21 +306,23 @@
 /* Secondary "Add to Cart" CTA */
 .addToCartBtn {
   flex: 1;
+  min-width: 0;
   height: 38px;
   border-radius: 10px;
   background: #FFFFFF;
   color: #F28C0F;
   font-family: inherit;
-  font-size: 0.825rem;
+  font-size: 0.8125rem;
   font-weight: 700;
   border: 1.5px solid #F28C0F;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 4px;
   cursor: pointer;
   transition: all 0.18s ease;
   white-space: nowrap;
+  box-sizing: border-box;
 }
 
 .addToCartBtn:hover:not(:disabled) {
@@ -352,7 +356,7 @@
   background: #F3F4F6;
   color: #9CA3AF;
   font-family: inherit;
-  font-size: 0.825rem;
+  font-size: 0.8125rem;
   font-weight: 700;
   border: 1px solid #E5E7EB;
   display: flex;
@@ -377,7 +381,7 @@
 /* Responsive (Mobile & Tablet) */
 @media (max-width: 640px) {
   .homeCard {
-    padding: 12px;
+    padding: 10px;
     border-radius: 14px;
   }
 
@@ -387,15 +391,15 @@
   }
 
   .cardBadge {
-    top: 8px;
-    left: 8px;
-    padding: 2px 7px;
+    top: 6px;
+    left: 6px;
+    padding: 2px 6px;
     font-size: 0.6rem;
   }
 
   .cardWishlistBtn {
-    top: 8px;
-    right: 8px;
+    top: 6px;
+    right: 6px;
     width: 28px;
     height: 28px;
   }
@@ -405,39 +409,40 @@
   }
 
   .brandText {
-    font-size: 0.65rem;
+    font-size: 0.64rem;
   }
 
   .cardTitle {
-    font-size: 0.85rem;
-    height: 2.6em;
-    margin-bottom: 4px;
+    font-size: 0.84rem;
+    min-height: 2.5em;
+    margin-bottom: 3px;
   }
 
   .cardPrice {
-    font-size: 1.05rem;
+    font-size: 1rem;
   }
 
   .originalPrice {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
   }
 
   .discountTag {
-    font-size: 0.625rem;
-    padding: 1.5px 5px;
+    font-size: 0.6rem;
+    padding: 1px 4px;
   }
 
   /* Stack dual buttons full width on mobile with Buy Now on top */
   .cardActionsRow {
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
+    margin-top: 4px;
   }
 
   .buyNowBtn,
   .addToCartBtn {
     width: 100%;
     flex: none;
-    height: 36px;
-    font-size: 0.8rem;
+    height: 34px;
+    font-size: 0.78rem;
   }
 }
