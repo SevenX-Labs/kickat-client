@@ -550,12 +550,18 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
     if (['REFUNDED', 'REFUND_INITIATED'].includes(rawPayStatus)) {
       payStatusLabel = 'Refund Processed';
       payBadgeClass = styles.payBadgePurple;
+    } else if (rawPayStatus === 'PAID' || rawPayStatus === 'CAPTURED') {
+      payStatusLabel = 'Refund Pending';
+      payBadgeClass = styles.payBadgeAmber;
     } else if (payMethod.toLowerCase() === 'cod') {
       payStatusLabel = 'Cash on Delivery (Cancelled)';
       payBadgeClass = styles.payBadgeGrey;
+    } else if (rawPayStatus === 'PENDING' || rawPayStatus === 'FAILED' || rawPayStatus === 'UNPAID') {
+      payStatusLabel = 'Cancelled (Unpaid)';
+      payBadgeClass = styles.payBadgeGrey;
     } else {
-      payStatusLabel = 'Refund Pending';
-      payBadgeClass = styles.payBadgeAmber;
+      payStatusLabel = 'Cancelled';
+      payBadgeClass = styles.payBadgeGrey;
     }
   } else if (rawPayStatus === 'PENDING') {
     payStatusLabel = `Pending via ${payMethod}`;
