@@ -46,8 +46,11 @@ html, body {
   -webkit-overflow-scrolling: touch;
 }
 
-@media (max-width: 768px) {
-  body {
-    padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)) !important;
-  }
+/* Mobile footer & bottom-nav clearance handled natively in footer and individual page layouts */
+
+/* Hide Next.js dev tools floating indicators */
+nextjs-portal,
+[data-nextjs-dev-indicator],
+#next-dev-indicator {
+  display: none !important;
 }

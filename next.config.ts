@@ -1,58 +1,59 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  devIndicators: false,
   reactCompiler: true,
   compress: true,
   productionBrowserSourceMaps: false,
   experimental: {
-    optimizePackageImports: ['lucide-react', 'lenis'],
+    optimizePackageImports: ["lucide-react", "lenis"],
   },
   images: {
-    formats: ['image/avif', 'image/webp'],
+    formats: ["image/avif", "image/webp"],
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'mspqduxvrypexahkkxjz.supabase.co',
+        protocol: "https",
+        hostname: "mspqduxvrypexahkkxjz.supabase.co",
       },
       {
-        protocol: 'https',
-        hostname: '**.supabase.co',
+        protocol: "https",
+        hostname: "**.supabase.co",
       },
       {
-        protocol: 'https',
-        hostname: 'ap.kickat.in',
+        protocol: "https",
+        hostname: "ap.kickat.in",
       },
       {
-        protocol: 'https',
-        hostname: 'cdn.kickat.in',
+        protocol: "https",
+        hostname: "cdn.kickat.in",
       },
       {
-        protocol: 'https',
-        hostname: 'api.kickat.in',
+        protocol: "https",
+        hostname: "api.kickat.in",
       },
       {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
+        protocol: "https",
+        hostname: "images.unsplash.com",
       },
       {
-        protocol: 'https',
-        hostname: 'images.pexels.com',
+        protocol: "https",
+        hostname: "images.pexels.com",
       },
       {
-        protocol: 'https',
-        hostname: 'cdn.pixabay.com',
+        protocol: "https",
+        hostname: "cdn.pixabay.com",
       },
       {
-        protocol: 'https',
-        hostname: 'placehold.co',
+        protocol: "https",
+        hostname: "placehold.co",
       },
     ],
   },
   async redirects() {
     return [
       {
-        source: '/checkout/place-orderr',
-        destination: '/checkout/place-order',
+        source: "/checkout/place-orderr",
+        destination: "/checkout/place-order",
         permanent: true,
       },
     ];
