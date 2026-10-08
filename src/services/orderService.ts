@@ -293,6 +293,19 @@ export const orderService = {
       status?: string;
       estimatedDelivery?: string;
       history?: any[];
+      timeline?: any[];
+      // Real courier scan events (chronological) and the empty-state copy.
+      events?: Array<{
+        stage: string;
+        title: string;
+        rawStatus: string;
+        description: string | null;
+        location: string | null;
+        timestamp: string;
+        source: string;
+      }>;
+      hasTrackingEvents?: boolean;
+      trackingMessage?: string | null;
     }>(`/orders/${cleanId}/tracking`);
   },
 

@@ -61,12 +61,17 @@ function getTimelineIcon(stage: string, isCancelled: boolean) {
     case 'CANCELLED':
       return <XCircle size={14} strokeWidth={2.5} />;
     case 'RTO_INITIATED':
+    case 'RTO_DELIVERED':
       return <RotateCcw size={14} strokeWidth={2.5} />;
     default:
       return <Package size={14} strokeWidth={2.5} />;
   }
 }
 
+// The server builds the timeline from real courier scan events (or, before the
+// first scan, a status-only summary). This local fallback is only used if the
+// tracking call failed, and mirrors that summary: no invented hub names,
+// locations or timestamps.
 function getCustomerTimeline(order: any, tracking: any) {
   if (Array.isArray(tracking?.timeline) && tracking.timeline.length > 0) {
     return tracking.timeline;
@@ -75,6 +80,8 @@ function getCustomerTimeline(order: any, tracking: any) {
   const orderStatus = (order?.orderStatus || order?.status || 'PLACED').toUpperCase();
   const isCancelled = orderStatus === 'CANCELLED';
   const isRTO = orderStatus === 'RETURN_INITIATED' || orderStatus === 'RETURNED';
+  const isFinal = orderStatus === 'DELIVERED' || orderStatus === 'RETURNED';
+  const isCod = String(order?.paymentMethod || '').toUpperCase() === 'COD';
 
   const statusOrder = ['PLACED', 'PROCESSING', 'PACKED', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED'];
   const currentStatusIndex = statusOrder.indexOf(orderStatus);
@@ -82,22 +89,24 @@ function getCustomerTimeline(order: any, tracking: any) {
   const courier = tracking?.courierPartner || order?.courierPartner || null;
   const awb = tracking?.awbNumber || tracking?.trackingNumber || order?.trackingNumber || null;
 
+  const placed = {
+    stage: 'ORDER_PLACED',
+    title: 'Order Placed & Confirmed',
+    location: null,
+    timestamp: order?.createdAt,
+    isCompleted: true,
+    isCurrent: !isCancelled && !isRTO && currentStatusIndex <= 0,
+    description: isCod ? 'Order placed with Cash on Delivery.' : 'Order placed and payment verified.',
+  };
+
   if (isCancelled) {
     return [
-      {
-        stage: 'ORDER_PLACED',
-        title: 'Order Placed & Confirmed',
-        location: 'Online Platform',
-        timestamp: order?.createdAt,
-        isCompleted: true,
-        isCurrent: false,
-        description: 'Customer order placed and payment verified.',
-      },
+      { ...placed, isCurrent: false },
       {
         stage: 'CANCELLED',
         title: 'Order Cancelled',
-        location: 'Online Platform',
-        timestamp: order?.cancelledAt || order?.updatedAt || order?.createdAt,
+        location: null,
+        timestamp: order?.cancelledAt || null,
         isCompleted: true,
         isCurrent: true,
         description: order?.cancelReason ? `Reason: ${order.cancelReason}` : 'Order was cancelled.',
@@ -106,59 +115,51 @@ function getCustomerTimeline(order: any, tracking: any) {
   }
 
   return [
-    {
-      stage: 'ORDER_PLACED',
-      title: 'Order Placed & Confirmed',
-      location: 'Online Platform',
-      timestamp: order?.createdAt,
-      isCompleted: true,
-      isCurrent: currentStatusIndex <= 0,
-      description: 'Customer order placed and payment verified.',
-    },
+    placed,
     {
       stage: 'PACKED',
       title: 'Packed at Warehouse',
-      location: 'Kickat Central Hub, Mumbai',
-      timestamp: currentStatusIndex >= 2 ? (order?.updatedAt || order?.createdAt) : null,
+      location: null,
+      timestamp: null,
       isCompleted: currentStatusIndex >= 2 || isRTO,
       isCurrent: currentStatusIndex === 1 || currentStatusIndex === 2,
-      description: 'Items picked, verified, and safely packed.',
+      description: 'Items packed and ready to ship.',
     },
     {
       stage: 'SHIPPED',
       title: 'Handed Over to Courier',
-      location: 'Mumbai Logistics Hub',
-      timestamp: currentStatusIndex >= 3 ? (order?.updatedAt || order?.createdAt) : null,
+      location: null,
+      timestamp: null,
       isCompleted: currentStatusIndex >= 3 || isRTO,
       isCurrent: currentStatusIndex === 3,
-      description: courier && awb ? `Package picked up by ${courier} under AWB ${awb}.` : 'Package handed over to logistics carrier.',
+      description: courier && awb ? `Handed over to ${courier} under AWB ${awb}.` : 'Handed over to the courier.',
     },
     {
       stage: 'IN_TRANSIT',
-      title: 'In Transit to Destination Hub',
-      location: `${order?.address?.city || 'Destination'} Regional Sorting Facility`,
-      timestamp: currentStatusIndex >= 3 ? (order?.updatedAt || order?.createdAt) : null,
-      isCompleted: currentStatusIndex >= 3 || isRTO,
-      isCurrent: currentStatusIndex === 3,
-      description: 'Package in transit between logistics hubs.',
+      title: 'In Transit',
+      location: null,
+      timestamp: null,
+      isCompleted: currentStatusIndex >= 4 || isRTO,
+      isCurrent: false,
+      description: 'On the way with the courier.',
     },
     {
       stage: 'OUT_FOR_DELIVERY',
       title: 'Out for Delivery',
-      location: `${order?.address?.city || 'Local'} Delivery Center`,
-      timestamp: currentStatusIndex >= 4 ? (order?.updatedAt || order?.createdAt) : null,
+      location: null,
+      timestamp: null,
       isCompleted: currentStatusIndex >= 4,
       isCurrent: currentStatusIndex === 4,
-      description: 'Delivery executive assigned and out for delivery.',
+      description: 'Out for delivery.',
     },
     {
       stage: isRTO ? 'RTO_INITIATED' : 'DELIVERED',
       title: isRTO ? 'Return to Origin (RTO)' : 'Delivered to Recipient',
-      location: `${order?.address?.city || ''}, ${order?.address?.state || ''}`.trim() || 'Customer Address',
-      timestamp: (orderStatus === 'DELIVERED' || orderStatus === 'RETURNED') ? (order?.deliveryDate || order?.updatedAt) : null,
-      isCompleted: orderStatus === 'DELIVERED' || orderStatus === 'RETURNED',
-      isCurrent: orderStatus === 'DELIVERED' || orderStatus === 'RETURNED',
-      description: isRTO ? 'Shipment marked for Return to Origin.' : 'Package safely delivered to recipient address.',
+      location: null,
+      timestamp: isFinal ? order?.deliveryDate || null : null,
+      isCompleted: isFinal,
+      isCurrent: isFinal || orderStatus === 'RETURN_INITIATED',
+      description: isRTO ? 'Shipment marked for Return to Origin.' : 'Package delivered.',
     },
   ];
 }
@@ -823,7 +824,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
               <div className={styles.carrierAwbGroup}>
                 <div className={styles.carrierName}>
                   <Truck size={16} className={styles.carrierIcon} />
-                  <span>{tracking?.courierPartner || order.courierPartner || 'KickAt Express Logistics'}</span>
+                  <span>{tracking?.courierPartner || order.courierPartner || 'Courier not assigned yet'}</span>
                 </div>
                 <div className={styles.awbWrap}>
                   <span className={styles.awbLabel}>AWB:</span>
@@ -863,7 +864,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
                 <div className={styles.carrierGridText}>
                   <span className={styles.carrierGridLabel}>Current Location</span>
                   <span className={styles.carrierGridVal}>
-                    {tracking?.location || (isDelivered ? `${order.address?.city || ''}, ${order.address?.state || ''}`.trim() : 'Kickat Logistics Hub, Mumbai')}
+                    {tracking?.location || (isDelivered ? [order.address?.city, order.address?.state].filter(Boolean).join(', ') : '') || 'Not available yet'}
                   </span>
                 </div>
               </div>
@@ -906,6 +907,11 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
               )}
             </div>
           </div>
+
+          {/* Truthful empty state until the courier reports its first scan */}
+          {!isCancelled && !isDelivered && tracking && !tracking.hasTrackingEvents && tracking.trackingMessage && (
+            <p className={styles.timelineDescription}>{tracking.trackingMessage}</p>
+          )}
 
           {/* Vertical Timeline */}
           <div className={styles.timelineList}>
