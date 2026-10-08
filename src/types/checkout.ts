@@ -107,6 +107,22 @@ export interface PlaceOrderDto {
   applyExtraFee?: boolean;
 }
 
+/**
+ * Gateway order returned alongside a PENDING (unpaid) online order, so the
+ * Razorpay checkout can be opened without a second round-trip. Null when the
+ * backend could not prepare one — the client then falls back to
+ * POST /payments/create-order.
+ */
+export interface PlaceOrderPaymentInit {
+  paymentId: string;
+  razorpayOrderId?: string | null;
+  amount: number;
+  currency: string;
+  status: string;
+  paymentMethod: string;
+  key?: string;
+}
+
 export interface PlaceOrderResponse {
   success: boolean;
   message: string;
@@ -114,4 +130,10 @@ export interface PlaceOrderResponse {
   orderNumber: string;
   status: string;
   grandTotal: number;
+  /**
+   * True when the order is created hidden and still needs an online payment.
+   * The order does not exist for the customer until the payment is verified.
+   */
+  requiresPayment?: boolean;
+  payment?: PlaceOrderPaymentInit | null;
 }

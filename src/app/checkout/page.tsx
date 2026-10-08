@@ -470,6 +470,10 @@ export default function CheckoutPage() {
       let activeOrderId = pendingOrderId;
       let activeOrderNumber = pendingOrderNumber;
       let activeOrderRes: PlaceOrderResponse | null = null;
+      // The backend creates the order hidden (PENDING) and hands back the
+      // Razorpay order in the same response. Nothing about this order is
+      // visible to the customer until the payment is verified server-side.
+      let paymentRes: any = null;
 
       if (!activeOrderId) {
         setPaymentFlowState('creating_order');
@@ -478,32 +482,36 @@ export default function CheckoutPage() {
         activeOrderId = orderRes.orderId;
         activeOrderNumber = orderRes.orderNumber;
         activeOrderRes = orderRes;
+        paymentRes = orderRes.payment ?? null;
         setPendingOrderId(orderRes.orderId);
         setPendingOrderNumber(orderRes.orderNumber);
       }
 
       setPaymentStatusText('Initializing Razorpay gateway...');
-      let paymentRes: any = null;
 
-      try {
-        paymentRes = await paymentService.createPaymentOrder(
-          {
-            orderId: activeOrderId,
-            paymentMethod: methodLower,
-            upiId: cleanUpiId,
-          },
-          generateUUID()
-        );
-      } catch (createErr: any) {
-        console.warn('[Checkout] createPaymentOrder note, falling back to retryPayment:', createErr);
-        paymentRes = await paymentService.retryPayment(
-          {
-            orderId: activeOrderId,
-            paymentMethod: methodLower,
-            upiId: cleanUpiId,
-          },
-          generateUUID()
-        );
+      // Fallback for a backend that did not (or could not) prepare the
+      // gateway order inline, and for "try again" on an existing pending order.
+      if (!paymentRes?.razorpayOrderId) {
+        try {
+          paymentRes = await paymentService.createPaymentOrder(
+            {
+              orderId: activeOrderId,
+              paymentMethod: methodLower,
+              upiId: cleanUpiId,
+            },
+            generateUUID()
+          );
+        } catch (createErr: any) {
+          console.warn('[Checkout] createPaymentOrder note, falling back to retryPayment:', createErr);
+          paymentRes = await paymentService.retryPayment(
+            {
+              orderId: activeOrderId,
+              paymentMethod: methodLower,
+              upiId: cleanUpiId,
+            },
+            generateUUID()
+          );
+        }
       }
 
       if (!paymentRes || (!paymentRes.razorpayOrderId && !paymentRes.key)) {
@@ -549,15 +557,29 @@ export default function CheckoutPage() {
 
               if (verifyRes.success) {
                 setPaymentFlowState('success');
-                await refreshCart();
-                setPlacedOrder(activeOrderRes || {
+                setOrderError(null);
+                setFinalOrderedItems([...(cartItems || [])]);
+                setFinalSummary(checkoutData?.summary);
+                // The backend has now promoted the order to PLACED; the
+                // place-order response still carried the hidden PENDING
+                // status, so it is overridden here.
+                setPlacedOrder({
+                  ...(activeOrderRes || {}),
                   success: true,
                   message: 'Order placed successfully',
                   orderId: activeOrderId!,
                   orderNumber: activeOrderNumber || `ORD-${activeOrderId}`,
                   status: 'PLACED',
-                  grandTotal: paymentRes.amount || checkoutData?.summary?.grandTotal || 0,
+                  grandTotal:
+                    activeOrderRes?.grandTotal ||
+                    paymentRes.amount ||
+                    checkoutData?.summary?.grandTotal ||
+                    0,
+                  requiresPayment: false,
+                  payment: null,
                 });
+                // Cart is cleared server-side only on payment confirmation.
+                await refreshCart();
                 setPendingOrderId(null);
                 setPendingOrderNumber(null);
                 resolve(true);
@@ -574,10 +596,14 @@ export default function CheckoutPage() {
             }
           },
           modal: {
+            // Razorpay cancelled / "Yes, exit" / modal closed. No order is
+            // created or shown: the backend order stays hidden and unpaid, no
+            // stock is taken and no shipment exists. The customer stays on
+            // checkout with an inline retry.
             ondismiss: () => {
               setPaymentFlowState((current) => {
                 if (current === 'verifying' || current === 'success') return current;
-                setOrderError('Payment window was closed. You can retry paying anytime.');
+                setOrderError('Payment cancelled — your order was not placed. You can try again.');
                 return 'cancelled';
               });
               resolve(false);
@@ -590,7 +616,7 @@ export default function CheckoutPage() {
           console.error('[Razorpay] Payment failed event:', resp.error);
           const reason = resp.error?.description || resp.error?.reason || 'Payment failed';
           setPaymentFlowState('failed');
-          setOrderError(`Payment failed: ${reason}`);
+          setOrderError(`Payment failed — your order was not placed (${reason}). Please try again.`);
           resolve(false);
         });
         rzp.open();
@@ -605,6 +631,18 @@ export default function CheckoutPage() {
     } finally {
       setIsSubmittingOrder(false);
     }
+  };
+
+  /**
+   * "Try again" after a cancelled or failed Razorpay attempt. Re-opens the
+   * gateway for the same hidden pending order (pendingOrderId), so no second
+   * order is created.
+   */
+  const handleRetryPayment = async () => {
+    if (isSubmittingOrder) return;
+    setOrderError(null);
+    setPaymentFlowState('idle');
+    await handleTriggerOrder();
   };
 
   // Completion Animation trigger
@@ -1761,10 +1799,15 @@ export default function CheckoutPage() {
                         <span>Payment Notice</span>
                       </div>
                       <p style={{ margin: 0, lineHeight: 1.4 }}>{orderError}</p>
-                      {pendingOrderId && (
+                      {/* Retry re-opens Razorpay for the same hidden order.
+                          Deliberately NOT a link to an order page: an unpaid
+                          order is not visible to the customer. */}
+                      {(paymentFlowState === 'cancelled' || paymentFlowState === 'failed') && (
                         <div style={{ marginTop: '0.4rem' }}>
-                          <Link
-                            href={`/payments/retry?orderId=${pendingOrderId}`}
+                          <button
+                            type="button"
+                            onClick={handleRetryPayment}
+                            disabled={isSubmittingOrder}
                             style={{
                               display: 'inline-flex',
                               alignItems: 'center',
@@ -1772,14 +1815,17 @@ export default function CheckoutPage() {
                               padding: '7px 13px',
                               backgroundColor: '#DC2626',
                               color: '#FFFFFF',
+                              border: 'none',
                               borderRadius: '7px',
-                              textDecoration: 'none',
                               fontSize: '0.825rem',
                               fontWeight: 600,
+                              cursor: isSubmittingOrder ? 'not-allowed' : 'pointer',
+                              opacity: isSubmittingOrder ? 0.6 : 1,
                             }}
                           >
-                            <RotateCcw size={14} /> Retry Payment for Order #{pendingOrderNumber || pendingOrderId}
-                          </Link>
+                            <RotateCcw size={14} />{' '}
+                            {isSubmittingOrder ? 'Opening payment…' : 'Try again'}
+                          </button>
                         </div>
                       )}
                     </div>
