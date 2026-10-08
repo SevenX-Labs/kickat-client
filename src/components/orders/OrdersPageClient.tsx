@@ -1,12 +1,13 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import SafeImage from '@/components/ui/SafeImage';
 import {
   Package, Search, ChevronDown, Check, Copy, Clock, Truck,
-  CheckCircle2, XCircle, RotateCcw, MapPin, FileText, Eye, Filter,
+  CheckCircle2, XCircle, RotateCcw, MapPin, FileText, Eye,
   RefreshCw, Star, AlertCircle, Loader2, X, Calendar, SearchX,
+  Filter, ArrowLeft
 } from 'lucide-react';
 import { orderService } from '@/services/orderService';
 import styles from './OrdersPage.module.css';
@@ -47,7 +48,7 @@ function formatPrice(n: number): string {
 
 function shortenId(id: string): string {
   if (!id) return '';
-  if (id.length <= 12) return id;
+  if (id.length <= 14) return id;
   return `${id.slice(0, 6)}…${id.slice(-4)}`;
 }
 
@@ -103,11 +104,11 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
   const [statusFilter, setStatusFilter] = useState<'All' | 'Active' | 'Delivered' | 'Cancelled'>('All');
   const [dateRange, setDateRange] = useState('all');
   const [dateMenuOpen, setDateMenuOpen] = useState(false);
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
   const [stuck, setStuck] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
 
   const [reorderingId, setReorderingId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -234,7 +235,7 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
     return () => document.removeEventListener('mousedown', handler);
   }, [dateMenuOpen]);
 
-  // Reset pagination whenever a filter changes (kept out of an effect to avoid cascading renders)
+  // Reset pagination whenever a filter changes
   const changeSearch = (v: string) => { setSearchQuery(v); setVisibleCount(PAGE_SIZE); };
   const changeStatus = (v: 'All' | 'Active' | 'Delivered' | 'Cancelled') => { setStatusFilter(v); setVisibleCount(PAGE_SIZE); };
   const changeDateRange = (v: string) => { setDateRange(v); setVisibleCount(PAGE_SIZE); };
@@ -324,6 +325,7 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
   const hasMore = filteredOrders.length > visibleCount;
 
   const tabs: Array<'All' | 'Active' | 'Delivered' | 'Cancelled'> = ['All', 'Active', 'Delivered', 'Cancelled'];
+  const hasActiveFilter = statusFilter !== 'All' || dateRange !== 'all';
   const clearFilters = () => { setStatusFilter('All'); setSearchQuery(''); setDateRange('all'); setVisibleCount(PAGE_SIZE); };
 
   /* ---------------- render ---------------- */
@@ -334,7 +336,7 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
         {showBackToAccount && (
           <div className={styles.backRow}>
             <Link href="/account" className={styles.backLink}>
-              <ChevronDown size={16} style={{ transform: 'rotate(90deg)' }} />
+              <ArrowLeft size={16} />
               <span>Back to Account</span>
             </Link>
           </div>
@@ -343,7 +345,12 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
         {/* Header */}
         <header className={styles.header}>
           <div className={styles.titleBlock}>
-            <h1 className={styles.title}>My Orders</h1>
+            <div className={styles.titleRow}>
+              <h1 className={styles.title}>Orders</h1>
+              {!loading && orders.length > 0 && (
+                <span className={styles.orderCountBadge}>{orders.length}</span>
+              )}
+            </div>
             <p className={styles.subtitle}>
               {loading
                 ? 'Loading your purchases…'
@@ -352,6 +359,7 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
                   : `${orders.length} ${orders.length === 1 ? 'order' : 'orders'} placed with KickAt`}
             </p>
           </div>
+
           <div className={styles.searchFilterRow}>
             <div className={styles.searchBox}>
               <Search size={18} className={styles.searchIcon} />
@@ -371,13 +379,13 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
             </div>
             <button
               type="button"
-              className={`${styles.mobileFilterBtn} ${(statusFilter !== 'All' || dateRange !== 'all') ? styles.mobileFilterBtnActive : ''}`}
+              className={`${styles.mobileFilterBtn} ${hasActiveFilter ? styles.mobileFilterBtnActive : ''}`}
               onClick={() => setFilterSheetOpen(true)}
               aria-label="Filter orders"
               title="Filter Orders"
             >
               <Filter size={18} />
-              {(statusFilter !== 'All' || dateRange !== 'all') && <span className={styles.filterBadgeDot} />}
+              {hasActiveFilter && <span className={styles.filterBadgeDot} />}
             </button>
           </div>
         </header>
@@ -386,9 +394,9 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
         <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
 
         {/* Mobile active filter pills */}
-        {(statusFilter !== 'All' || dateRange !== 'all') && (
+        {hasActiveFilter && (
           <div className={styles.mobileActiveFilters}>
-            <span className={styles.mobileActiveLabel}>Filters:</span>
+            <span className={styles.mobileActiveLabel}>Active:</span>
             {statusFilter !== 'All' && (
               <span className={styles.mobileFilterChip}>
                 {statusFilter}
@@ -464,20 +472,25 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
           <div className={styles.list}>
             {[0, 1, 2].map((i) => (
               <div key={i} className={styles.skelCard}>
-                <div className={styles.skelRow}>
-                  <div className={styles.skel} style={{ width: 90, height: 24, borderRadius: 9999 }} />
-                  <div className={styles.skel} style={{ width: 120, height: 14, marginLeft: 'auto' }} />
+                <div className={styles.skelTopRow}>
+                  <div className={styles.skel} style={{ width: 88, height: 24, borderRadius: 9999 }} />
+                  <div className={styles.skel} style={{ width: 90, height: 14, marginLeft: 'auto' }} />
                 </div>
-                <div className={styles.skelRow}>
-                  <div className={styles.skel} style={{ width: 64, height: 64, borderRadius: 12 }} />
+                <div className={styles.skelMetaRow}>
+                  <div className={styles.skel} style={{ width: 110, height: 16 }} />
+                  <div className={styles.skel} style={{ width: 70, height: 18, marginLeft: 'auto' }} />
+                </div>
+                <div className={styles.skelProductRow}>
+                  <div className={styles.skel} style={{ width: 56, height: 56, borderRadius: 12, flexShrink: 0 }} />
                   <div style={{ flex: 1 }}>
-                    <div className={styles.skel} style={{ width: '60%', height: 16, marginBottom: 8 }} />
-                    <div className={styles.skel} style={{ width: '35%', height: 13 }} />
+                    <div className={styles.skel} style={{ width: '75%', height: 16, marginBottom: 8 }} />
+                    <div className={styles.skel} style={{ width: '40%', height: 13 }} />
                   </div>
                 </div>
-                <div className={styles.skelRow}>
-                  <div className={styles.skel} style={{ width: 200, height: 14 }} />
-                  <div className={styles.skel} style={{ width: 160, height: 36, borderRadius: 10, marginLeft: 'auto' }} />
+                <div className={styles.skelActionsRow}>
+                  <div className={styles.skel} style={{ width: 110, height: 44, borderRadius: 10 }} />
+                  <div className={styles.skel} style={{ width: 90, height: 44, borderRadius: 10 }} />
+                  <div className={styles.skel} style={{ width: 90, height: 44, borderRadius: 10 }} />
                 </div>
               </div>
             ))}
@@ -496,7 +509,7 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
             <div className={styles.stateIcon}><Package size={40} /></div>
             <h3 className={styles.stateTitle}>No orders yet</h3>
             <p className={styles.stateDesc}>When you place an order, it’ll show up here so you can track and manage it.</p>
-            <Link href="/shop" className={`${styles.btn} ${styles.btnPrimary}`} style={{ height: 44, padding: '0 22px' }}>
+            <Link href="/shop" className={`${styles.btn} ${styles.btnPrimary}`} style={{ height: 44, padding: '0 24px' }}>
               Start Shopping
             </Link>
           </div>
@@ -525,9 +538,9 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
                 const isActive = order.status === 'Processing' || order.status === 'Shipped';
 
                 const doneCount = order.timeline.filter((t: any) => t.done).length;
-                const extraItems = order.items.length - 2;
+                const extraItems = order.items.length - 1;
 
-                // Footer one-line status summary
+                // Footer status summary line
                 let summaryText = '';
                 if (isActive) {
                   summaryText = order.estimatedDelivery
@@ -544,56 +557,56 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
 
                 return (
                   <div key={order.id} className={styles.card}>
-                    {/* Header */}
-                    <div className={styles.cardHead}>
-                      <div className={styles.headLeft}>
-                        <span className={`${styles.badge} ${toneBadge[tone]}`}>
-                          <StatusIcon status={order.status} />
-                          {order.status}
-                        </span>
-                        <span className={styles.metaDot} />
-                        <span className={styles.headDate}>{order.date}</span>
-                        <span className={styles.metaDot} />
-                        <span className={styles.orderId}>
-                          <span className={styles.orderIdLabel}>#</span>
-                          {shortenId(String(order.id))}
-                          <button
-                            type="button"
-                            className={`${styles.copyBtn} ${copiedId === String(order.id) ? styles.copied : ''}`}
-                            onClick={() => copyId(String(order.id))}
-                            aria-label={`Copy order ID ${order.id}`}
-                            title="Copy order ID"
-                          >
-                            {copiedId === String(order.id) ? <Check size={13} /> : <Copy size={13} />}
-                          </button>
-                        </span>
-                      </div>
-                      <div className={styles.headRight}>
-                        <div className={styles.headTotal}>
-                          <span className={styles.headTotalLabel}>Total</span>
-                          <span className={styles.headTotalValue}>{formatPrice(order.total)}</span>
-                        </div>
+                    {/* Row 1: Status Badge on left, Date on right */}
+                    <div className={styles.cardTopRow}>
+                      <span className={`${styles.badge} ${toneBadge[tone]}`}>
+                        <StatusIcon status={order.status} size={13} />
+                        <span>{order.status}</span>
+                      </span>
+                      <span className={styles.headDate}>{order.date}</span>
+                    </div>
+
+                    {/* Row 2: Shortened ID with copy icon on left, Total on right */}
+                    <div className={styles.cardMetaRow}>
+                      <span className={styles.orderId}>
+                        <span className={styles.orderIdPrefix}>ID: </span>
+                        <span className={styles.orderIdValue}>{shortenId(String(order.id))}</span>
+                        <button
+                          type="button"
+                          className={`${styles.copyBtn} ${copiedId === String(order.id) ? styles.copied : ''}`}
+                          onClick={() => copyId(String(order.id))}
+                          aria-label={`Copy order ID ${order.id}`}
+                          title="Copy order ID"
+                        >
+                          {copiedId === String(order.id) ? <Check size={13} /> : <Copy size={13} />}
+                        </button>
+                      </span>
+
+                      <div className={styles.cardTotal}>
+                        <span className={styles.cardTotalLabel}>TOTAL</span>
+                        <span className={styles.cardTotalValue}>{formatPrice(order.total)}</span>
                       </div>
                     </div>
 
-                    {/* Body */}
+                    {/* Row 3: Product Row (Thumbnail on left, Title + Variant/Qty on right) */}
                     <div className={styles.cardBody}>
                       <div className={styles.thumbStack}>
-                        {order.items.slice(0, 2).map((item: any, idx: number) => (
-                          <div key={idx} className={styles.thumb}>
-                            <SafeImage
-                              src={item.image}
-                              productName={item.name}
-                              alt={item.name}
-                              width={64}
-                              height={64}
-                              className={styles.thumbImg}
-                              style={{ objectFit: 'contain' }}
-                            />
-                          </div>
-                        ))}
-                        {extraItems > 0 && <span className={styles.moreChip}>+{extraItems} more</span>}
+                        <div className={styles.thumb}>
+                          <SafeImage
+                            src={order.items[0]?.image || '/hero-products/dog_food.png'}
+                            productName={order.items[0]?.name}
+                            alt={order.items[0]?.name || 'Pet product'}
+                            width={56}
+                            height={56}
+                            className={styles.thumbImg}
+                            style={{ objectFit: 'contain' }}
+                          />
+                        </div>
+                        {extraItems > 0 && (
+                          <span className={styles.moreChip}>+{extraItems} more</span>
+                        )}
                       </div>
+
                       <div className={styles.bodyInfo}>
                         <Link
                           href={order.items[0]?.productSlug
@@ -603,28 +616,28 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
                               : `/orders/${order.rawId || order.id}`}
                           className={styles.itemName}
                         >
-                          {order.items[0]?.name || 'Order items'}
+                          {order.items[0]?.name || 'Pet Product'}
                         </Link>
                         <div className={styles.itemMeta}>
                           {order.items.length === 1
-                            ? `${order.items[0]?.variant} • Qty ${order.items[0]?.qty}`
-                            : `${order.items[0]?.variant} • Qty ${order.items[0]?.qty} · +${order.items.length - 1} other item${order.items.length - 1 > 1 ? 's' : ''}`}
+                            ? `${order.items[0]?.variant || 'Standard'} · Qty ${order.items[0]?.qty || 1}`
+                            : `${order.items[0]?.variant || 'Standard'} · Qty ${order.items[0]?.qty || 1} · +${order.items.length - 1} more`}
                         </div>
-                      </div>
-                      <div className={styles.bodyPrice}>
-                        {formatPrice((order.items[0]?.price || 0) * (order.items[0]?.qty || 1))}
-                        <small>item price</small>
                       </div>
                     </div>
 
-                    {/* Footer */}
-                    <div className={styles.cardFoot}>
+                    {/* Row 4: Status Summary line */}
+                    <div className={styles.statusSummaryRow}>
                       <span className={`${styles.summary} ${toneSummary[tone]}`}>
-                        <StatusIcon status={order.status} size={16} />
+                        <StatusIcon status={order.status} size={15} />
                         <span>{summaryText}</span>
                       </span>
+                    </div>
+
+                    {/* Row 5: Action Buttons (Touch-friendly 44px min height, 1 filled orange max, wraps gracefully) */}
+                    <div className={styles.cardFoot}>
                       <div className={styles.actions}>
-                        {/* Active: Track (primary) · Details · Invoice */}
+                        {/* Active: Filled Orange Track (Primary) + Outlined Details + Tertiary Invoice */}
                         {isActive && (
                           <>
                             <Link href={`/orders/${order.rawId || order.id}/tracking`} className={`${styles.btn} ${styles.btnPrimary}`}>
@@ -644,7 +657,7 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
                           </>
                         )}
 
-                        {/* Delivered: Reorder (primary) · Details · Invoice · Rate */}
+                        {/* Delivered: Filled Orange Reorder (Primary) + Outlined Details + Tertiary Invoice */}
                         {isDelivered && (
                           <>
                             <button
@@ -664,14 +677,14 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
                               <FileText size={15} /> Invoice
                             </Link>
                             {order.items[0]?.productSlug && (
-                              <Link href={`/product/${order.items[0].productSlug}#reviews`} className={styles.rateLink}>
-                                <Star size={14} /> Rate product
+                              <Link href={`/product/${order.items[0].productSlug}#reviews`} className={`${styles.btn} ${styles.btnTertiary}`}>
+                                <Star size={14} /> Review
                               </Link>
                             )}
                           </>
                         )}
 
-                        {/* Cancelled: Reorder (outlined) · Details */}
+                        {/* Cancelled: Outlined Reorder (Secondary) + Outlined Details + Tertiary Invoice */}
                         {isCancelled && (
                           <>
                             <button
@@ -687,10 +700,13 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
                             <Link href={`/orders/${order.rawId || order.id}`} className={`${styles.btn} ${styles.btnSecondary}`}>
                               <Eye size={15} /> Details
                             </Link>
+                            <Link href={`/orders/${order.rawId || order.id}/invoice`} className={`${styles.btn} ${styles.btnTertiary}`}>
+                              <FileText size={15} /> Invoice
+                            </Link>
                           </>
                         )}
 
-                        {/* Returned / other */}
+                        {/* Returned */}
                         {isReturned && (
                           <>
                             <button
@@ -709,27 +725,28 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
                           </>
                         )}
 
+                        {/* Expand / Details Toggle Button */}
                         <button
                           type="button"
                           className={styles.expandBtn}
                           onClick={() => toggleExpanded(order.id)}
                           aria-expanded={expanded}
-                          aria-label={expanded ? 'Collapse order details' : 'Expand order details'}
+                          aria-label={expanded ? 'Collapse order breakdown' : 'Expand order breakdown'}
                         >
-                          {expanded ? 'Less' : 'More'}
+                          <span>{expanded ? 'Hide Breakdown' : 'Breakdown'}</span>
                           <ChevronDown size={15} className={`${styles.expandChevron} ${expanded ? styles.expandChevronOpen : ''}`} />
                         </button>
                       </div>
                     </div>
 
-                    {/* Expanded */}
+                    {/* Expanded Section (Smooth 200ms accordion) */}
                     <div className={`${styles.expandWrap} ${expanded ? styles.expandWrapOpen : ''}`}>
                       <div className={styles.expandInner}>
                         <div className={styles.expandContent}>
                           <div className={styles.expandMain}>
                             {isCancelled ? (
                               <>
-                                <h4 className={styles.expandHeading}>Order timeline</h4>
+                                <h4 className={styles.expandHeading}>Order Timeline</h4>
                                 <div className={styles.cancelTimeline}>
                                   <div className={styles.ctRow}>
                                     <div className={`${styles.ctDot} ${styles.ctDotNeutral}`}><Check size={13} strokeWidth={3} /></div>
@@ -766,7 +783,7 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
                               </>
                             ) : (
                               <>
-                                <h4 className={styles.expandHeading}>Delivery progress</h4>
+                                <h4 className={styles.expandHeading}>Delivery Progress</h4>
                                 <div className={styles.stepper}>
                                   {order.timeline.map((t: any, idx: number) => {
                                     const isDone = t.done;
@@ -793,11 +810,11 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
 
                           {/* Price breakdown */}
                           <div className={styles.expandSide}>
-                            <h4 className={styles.expandHeading}>Price details</h4>
+                            <h4 className={styles.expandHeading}>Price Breakdown</h4>
                             <div className={styles.breakdown}>
                               <div className={styles.brRow}><span>Subtotal</span><span>{formatPrice(order.subtotal)}</span></div>
                               <div className={styles.brRow}><span>Delivery</span><span>{order.delivery > 0 ? formatPrice(order.delivery) : 'Free'}</span></div>
-                              <div className={styles.brRow}><span>Taxes &amp; fees</span><span>{formatPrice(order.taxes)}</span></div>
+                              <div className={styles.brRow}><span>Taxes &amp; Fees</span><span>{formatPrice(order.taxes)}</span></div>
                               {order.discount > 0 && (
                                 <div className={`${styles.brRow} ${styles.brDiscount}`}><span>Discount</span><span>−{formatPrice(order.discount)}</span></div>
                               )}
@@ -839,14 +856,14 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
             <div className={styles.sheetHeader}>
               <div className={styles.sheetHeaderLeft}>
                 <h2 className={styles.sheetTitle}>Filter Orders</h2>
-                {(statusFilter !== 'All' || dateRange !== 'all') && (
+                {hasActiveFilter && (
                   <span className={styles.sheetActiveBadge}>
                     {(statusFilter !== 'All' ? 1 : 0) + (dateRange !== 'all' ? 1 : 0)} active
                   </span>
                 )}
               </div>
               <div className={styles.sheetHeaderRight}>
-                {(statusFilter !== 'All' || dateRange !== 'all') && (
+                {hasActiveFilter && (
                   <button
                     type="button"
                     className={styles.sheetResetBtn}
@@ -951,7 +968,7 @@ export default function OrdersPageClient({ showBackToAccount = false }: OrdersPa
         </div>
       )}
 
-      {/* Cancel modal */}
+      {/* Cancel Modal */}
       {cancelModalOrder && (
         <div className={styles.modalBackdrop} onClick={() => setCancelModalOrder(null)} role="dialog" aria-modal="true" aria-label="Cancel order">
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
