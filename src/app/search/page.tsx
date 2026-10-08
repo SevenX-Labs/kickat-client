@@ -20,6 +20,7 @@ import {
   ShoppingBag,
 } from 'lucide-react';
 import { searchService } from '@/services/searchService';
+import { recommendationService } from '@/services/recommendationService';
 import { SearchProductItem, SearchSort } from '@/types/search';
 import { useAuth } from '@/context/AuthContext';
 import ProductCard from '@/components/common/ProductCard/ProductCard';

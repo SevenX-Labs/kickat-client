@@ -1,9 +1,12 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import { recommendationService } from '@/services/recommendationService';
 import { userService } from '@/services/userService';
 import { ProductRow } from '../ProductRow';
+import { mapBackendProductListToCards } from '@/types/product';
 import { CatalogProduct } from '@/data/categoryData';
+import { getAccessToken } from '@/services/api';
 
 export function RecentlyViewed() {
   const [products, setProducts] = useState<CatalogProduct[]>([]);
@@ -15,6 +18,20 @@ export function RecentlyViewed() {
     async function loadRecentlyViewed() {
       try {
         setIsLoading(true);
+        const token = getAccessToken();
+
+        // If authenticated, fetch from recommendation API /customer/products/recently-viewed
+        if (token) {
+          const res = await recommendationService.getRecentlyViewed(10);
+          if (isMounted && res && res.success && Array.isArray(res.products) && res.products.length > 0) {
+            const mapped = mapBackendProductListToCards(res.products) as unknown as CatalogProduct[];
+            setProducts(mapped);
+            setIsLoading(false);
+            return;
+          }
+        }
+
+        // Fallback to local user service storage
         const data = await userService.getRecentlyViewed();
         if (isMounted && data && Array.isArray(data) && data.length > 0) {
           const mapped: CatalogProduct[] = data.map((item) => ({
@@ -64,7 +81,7 @@ export function RecentlyViewed() {
   return (
     <ProductRow
       eyebrow="Recently Viewed"
-      title="Pick Up Where You Left Off"
+      title="Pick Up Where You Left"
       subtitle="Items you recently explored on KickAt."
       products={products}
       backgroundColor="white"

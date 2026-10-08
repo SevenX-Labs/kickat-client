@@ -13,6 +13,7 @@ import { ProductFAQ } from "./ProductFAQ";
 import { RelatedProducts } from "./RelatedProducts";
 import { ProductDetailSkeleton } from "./ProductDetailSkeleton";
 import { userService } from "@/services/userService";
+import { recommendationService } from "@/services/recommendationService";
 import styles from "./ProductDetail.module.css";
 
 export interface ProductVariant {
@@ -137,6 +138,7 @@ export function ProductDetail({ product, isLoading, initialVariantId }: ProductD
   // Track product view in background
   useEffect(() => {
     if (product?.id) {
+      recommendationService.recordView(product.id);
       userService.trackProductView(product.id, {
         name: product.name,
         price: product.price,

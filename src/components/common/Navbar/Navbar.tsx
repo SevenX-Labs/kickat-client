@@ -32,6 +32,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { CURRENCY_FORMATTER } from "@/utils/constants";
 import { usePublicSettings } from "@/hooks/usePublicSettings";
+import { recommendationService } from "@/services/recommendationService";
 
 const desktopNavLinks = [
   {
@@ -94,6 +95,7 @@ export function Navbar() {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
+      recommendationService.recordSearch(searchQuery.trim());
       router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
     } else {
       router.push("/search");

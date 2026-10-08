@@ -12,6 +12,7 @@ import { CatalogProduct } from '@/data/categoryData';
 
 // Dynamic code-splitting for below-the-fold components
 const WhyKickat = dynamic(() => import("@/components/common/WhyKickat").then(mod => mod.WhyKickat));
+const RecommendedProducts = dynamic(() => import("@/components/common/RecommendedProducts").then(mod => mod.RecommendedProducts));
 const RecentlyViewed = dynamic(() => import("@/components/common/RecentlyViewed").then(mod => mod.RecentlyViewed));
 const CustomerReviews = dynamic(() => import("@/components/common/CustomerReviews").then(mod => mod.CustomerReviews));
 const FAQ = dynamic(() => import("@/components/common/FAQ").then(mod => mod.FAQ));
@@ -76,6 +77,9 @@ export default function Home() {
 
         {/* 2. Shop by Category (Immediately after Hero) */}
         <ShopByCategory />
+
+        {/* 2.5 Suggested For You / Customer Recommendations Feed */}
+        <RecommendedProducts />
 
         {/* 3. Best Sellers (Live from GET /api/v1/products/best-sellers) */}
         {bestSellers.length > 0 && (
