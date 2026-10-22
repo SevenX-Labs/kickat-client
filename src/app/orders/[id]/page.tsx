@@ -600,14 +600,14 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
       payBadgeClass = styles.payBadgeGrey;
     }
   } else if (rawPayStatus === 'PENDING') {
-    payStatusLabel = `Pending via ${payMethod}`;
+    payStatusLabel = payMethod.toLowerCase() === 'cod' ? 'Cash on Delivery (Pending)' : `Pending via ${payMethod}`;
     payBadgeClass = styles.payBadgeAmber;
   } else if (rawPayStatus === 'FAILED') {
     payStatusLabel = 'Payment Failed';
     payBadgeClass = styles.payBadgeRed;
   } else if (payMethod.toLowerCase() === 'cod') {
-    payStatusLabel = 'Pay on Delivery (COD)';
-    payBadgeClass = styles.payBadgeGrey;
+    payStatusLabel = rawPayStatus === 'COMPLETED' ? 'Paid on Delivery (COD)' : 'Pay on Delivery (COD)';
+    payBadgeClass = rawPayStatus === 'COMPLETED' ? styles.payBadgeGreen : styles.payBadgeAmber;
   }
 
   return (
