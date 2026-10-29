@@ -633,6 +633,14 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
           </Link>
 
           <div className={styles.topBarActions}>
+            {/* Track Order — visible when shipped or out for delivery */}
+            {(isShipped || isOutForDelivery) && (
+              <Link href={`/orders/${order.id}/tracking`} className={styles.topBtnPrimary} aria-label="Track this order">
+                <Truck size={15} />
+                <span>Track Order</span>
+              </Link>
+            )}
+
             {/* Invoice Link */}
             <Link href={`/orders/${order.id}/invoice`} className={styles.topBtnSecondary} aria-label="View Invoice">
               <FileText size={15} />
@@ -861,6 +869,10 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
                 <span>{statusConfig.label}</span>
               </span>
             </div>
+            <Link href={`/orders/${order.id}/tracking`} className={styles.topBtnSecondary} style={{ minHeight: 36, padding: '0 12px', fontSize: '0.82rem' }}>
+              <ExternalLink size={13} />
+              <span>Full Tracking</span>
+            </Link>
           </div>
 
           {/* Shipment Meta Info Panel */}
