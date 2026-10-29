@@ -50,8 +50,7 @@ function GoogleCallbackContent() {
 
         const isProfileComplete = Boolean(
           user?.isProfileComplete ||
-          user?.profileCompleted ||
-          (user?.name && user.name.trim().length > 0 && (user?.email || user?.phone))
+          user?.profileCompleted
         );
 
         const targetRedirect = searchParams.get('redirect') || '/account';

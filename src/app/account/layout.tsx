@@ -11,16 +11,21 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
   const router = useRouter();
   const pathname = usePathname();
   const { user, setUser, isAuthenticated, isLoading } = useAuth();
-  const [userData, setUserData] = useState({
-    firstName: 'KickAt',
-    lastName: 'Member',
-    email: '',
-    phone: '',
-    memberSince: '2025',
-    totalOrders: 0,
-    points: 100,
-    tier: 'KickAt VIP',
-    currency: 'INR (₹)'
+  const [userData, setUserData] = useState(() => {
+    const nameParts = (user?.name || '').trim().split(' ');
+    const firstName = nameParts[0] || (user?.email ? user.email.split('@')[0] : (user?.phone ? `User_${user.phone.slice(-4)}` : 'KickAt'));
+    const lastName = nameParts.slice(1).join(' ') || 'Member';
+    return {
+      firstName,
+      lastName,
+      email: user?.email || 'Not provided',
+      phone: user?.phone ? (user.phone.startsWith('+91') ? user.phone : `+91 ${user.phone}`) : 'Not provided',
+      memberSince: '2025',
+      totalOrders: 0,
+      points: 100,
+      tier: 'KickAt VIP',
+      currency: 'INR (₹)'
+    };
   });
 
   const isRootAccountPage = pathname === '/account' || pathname === '/account/';

@@ -17,13 +17,18 @@ function AccountMainHubContent() {
   const searchParams = useSearchParams();
   const tab = searchParams.get('tab');
 
-  const [userData, setUserData] = useState({
-    firstName: "KickAt",
-    lastName: "Member",
-    email: "member@kickat.in",
-    phone: "Not provided",
-    tier: "Gold Paw VIP",
-    points: 1240,
+  const [userData, setUserData] = useState(() => {
+    const nameParts = (user?.name || '').trim().split(' ');
+    const firstName = nameParts[0] || (user?.email ? user.email.split('@')[0] : (user?.phone ? `User_${user.phone.slice(-4)}` : 'KickAt'));
+    const lastName = nameParts.slice(1).join(' ') || 'Member';
+    return {
+      firstName,
+      lastName,
+      email: user?.email || 'Not provided',
+      phone: user?.phone ? (user.phone.startsWith('+91') ? user.phone : `+91 ${user.phone}`) : 'Not provided',
+      tier: 'Gold Paw VIP',
+      points: 1240,
+    };
   });
 
   // Query parameter redirect handler for legacy query params

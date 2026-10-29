@@ -38,20 +38,43 @@ function ProfileDetailsContent() {
 
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
 
-  const [userData, setUserData] = useState({
-    firstName: "KickAt",
-    lastName: "Member",
-    email: "",
-    phone: "",
-    isEmailVerified: false,
-    isPhoneVerified: false,
-    gender: "Not specified",
-    dob: "Not specified",
-    memberSince: "2025",
-    totalOrders: 0,
-    points: 100,
-    tier: "KickAt VIP",
-    currency: "INR (₹)",
+  const [userData, setUserData] = useState(() => {
+    const nameParts = (user?.name || "").trim().split(" ");
+    const firstName =
+      nameParts[0] ||
+      (user?.email
+        ? user.email.split("@")[0]
+        : user?.phone
+        ? `User_${user.phone.slice(-4)}`
+        : "KickAt");
+    const lastName = nameParts.slice(1).join(" ") || "Member";
+    return {
+      firstName,
+      lastName,
+      email: user?.email || "",
+      phone: user?.phone
+        ? user.phone.startsWith("+91")
+          ? user.phone
+          : `+91 ${user.phone}`
+        : "",
+      isEmailVerified: Boolean(user?.isEmailVerified),
+      isPhoneVerified: Boolean(user?.isPhoneVerified),
+      gender: ((user as any)?.gender || (user as any)?.profile?.gender)
+        ? (((user as any)?.gender || (user as any)?.profile?.gender) === 'PREFER_NOT_TO_SAY'
+          ? 'Not specified'
+          : ((user as any)?.gender || (user as any)?.profile?.gender).charAt(0).toUpperCase() + ((user as any)?.gender || (user as any)?.profile?.gender).slice(1).toLowerCase())
+        : 'Not specified',
+      dob: ((user as any)?.dob || (user as any)?.profile?.dob)
+        ? new Date((user as any)?.dob || (user as any)?.profile?.dob).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+        : 'Not specified',
+      memberSince: (user as any)?.createdAt
+        ? new Date((user as any).createdAt).getFullYear().toString()
+        : '2025',
+      totalOrders: 0,
+      points: 100,
+      tier: "KickAt VIP",
+      currency: "INR (₹)",
+    };
   });
 
   // Pets State
@@ -200,11 +223,14 @@ function ProfileDetailsContent() {
   const openEditModal = () => {
     const rawDob = (user as any)?.dob || (user as any)?.profile?.dob;
     const formattedDobInput = rawDob ? new Date(rawDob).toISOString().split('T')[0] : "";
+    const cleanPhone = (!userData.phone || userData.phone === "Not provided")
+      ? ""
+      : userData.phone.replace(/^\+91\s?/, "").trim();
     setProfileForm({
       firstName: userData.firstName,
       lastName: userData.lastName,
       email: userData.email === "Not provided" ? "" : userData.email,
-      phone: userData.phone === "Not provided" ? "" : userData.phone.replace("+91 ", ""),
+      phone: cleanPhone,
       gender: (user as any)?.gender || (user as any)?.profile?.gender || "",
       dob: formattedDobInput,
     });
@@ -216,11 +242,22 @@ function ProfileDetailsContent() {
     setIsSaving(true);
     try {
       const fullName = `${profileForm.firstName.trim()} ${profileForm.lastName.trim()}`.trim();
-      let rawPhone = profileForm.phone.trim();
-      if (rawPhone && !rawPhone.startsWith('+91') && /^\d{10}$/.test(rawPhone)) {
-        rawPhone = `+91 ${rawPhone}`;
+      let rawPhone = profileForm.phone.trim().replace(/[\s-]/g, '');
+      if (rawPhone) {
+        const digits = rawPhone.replace(/\D/g, '');
+        if (digits.length === 10) {
+          rawPhone = `+91${digits}`;
+        } else if (digits.length === 12 && digits.startsWith('91')) {
+          rawPhone = `+${digits}`;
+        }
+        if (!/^(\+91)?[6-9]\d{9}$/.test(rawPhone)) {
+          alert("Please enter a valid 10-digit Indian mobile number starting with 6-9.");
+          setIsSaving(false);
+          return;
+        }
       }
-      await profileService.updateBasicProfile({
+
+      const res: any = await profileService.updateBasicProfile({
         name: fullName,
         email: profileForm.email.trim() || undefined,
         phone: rawPhone || undefined,
@@ -228,8 +265,26 @@ function ProfileDetailsContent() {
         dob: profileForm.dob || undefined,
       });
 
+      const updatedUser = res?.profile?.user || res?.user || res?.data || res;
+      if (updatedUser) {
+        setUser(updatedUser);
+        const nameParts = (updatedUser.name || fullName).trim().split(" ");
+        const firstName = nameParts[0] || "KickAt";
+        const lastName = nameParts.slice(1).join(" ") || "Member";
+        setUserData((prev) => ({
+          ...prev,
+          firstName,
+          lastName,
+          email: updatedUser.email || profileForm.email.trim() || prev.email,
+          phone: updatedUser.phone || rawPhone || prev.phone,
+          gender: profileForm.gender ? (profileForm.gender === 'PREFER_NOT_TO_SAY' ? 'Not specified' : profileForm.gender.charAt(0).toUpperCase() + profileForm.gender.slice(1).toLowerCase()) : prev.gender,
+          dob: profileForm.dob ? new Date(profileForm.dob).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : prev.dob,
+        }));
+      }
+
       showToast("Profile details updated successfully!");
       setIsEditProfileOpen(false);
+      router.refresh();
       await fetchFullProfile();
     } catch (err: any) {
       alert(err?.message || "Failed to update profile details");
@@ -336,15 +391,28 @@ function ProfileDetailsContent() {
     setResentSuccessMsg(null);
     setIsResending(false);
 
+    const targetPhone = user?.phone || userData.phone;
+    const targetEmail = user?.email || userData.email;
+
+    if (type === "PHONE" && (!targetPhone || targetPhone === "Not provided")) {
+      setOtpError("Please add a mobile number in profile details first.");
+      return;
+    }
+    if (type === "EMAIL" && (!targetEmail || targetEmail === "Not provided")) {
+      setOtpError("Please add an email address in profile details first.");
+      return;
+    }
+
     if (resendCooldown <= 0) {
-      setResendCooldown(60);
       try {
         if (type === "PHONE") {
-          await authService.sendUserMobileVerification(user?.phone || userData.phone);
+          await authService.sendUserMobileVerification(targetPhone);
         } else {
-          await authService.sendUserEmailVerification(user?.email || userData.email);
+          await authService.sendUserEmailVerification(targetEmail);
         }
+        setResendCooldown(60);
       } catch (err: any) {
+        setResendCooldown(0);
         setOtpError(err?.message || "Failed to send verification code. You can click Resend OTP to try again.");
       }
     }
@@ -1080,13 +1148,23 @@ function ProfileDetailsContent() {
             </div>
 
             <form onSubmit={handleVerifyOtp} className={styles.modalForm}>
-              <p style={{ fontSize: '0.88rem', color: '#4B5563', margin: '0 0 16px 0', lineHeight: 1.5 }}>
-                We sent a 6-digit verification code to{" "}
-                <strong style={{ color: '#111827' }}>
-                  {verifyModalType === "PHONE" ? user?.phone || userData.phone : user?.email || userData.email}
-                </strong>
-                . Enter the code below to complete verification.
-              </p>
+              {!otpError ? (
+                <p style={{ fontSize: '0.88rem', color: '#4B5563', margin: '0 0 16px 0', lineHeight: 1.5 }}>
+                  We sent a 6-digit verification code to{" "}
+                  <strong style={{ color: '#111827' }}>
+                    {verifyModalType === "PHONE" ? user?.phone || userData.phone : user?.email || userData.email}
+                  </strong>
+                  . Enter the code below to complete verification.
+                </p>
+              ) : (
+                <p style={{ fontSize: '0.88rem', color: '#4B5563', margin: '0 0 16px 0', lineHeight: 1.5 }}>
+                  Verification code could not be sent to{" "}
+                  <strong style={{ color: '#111827' }}>
+                    {verifyModalType === "PHONE" ? user?.phone || userData.phone : user?.email || userData.email}
+                  </strong>
+                  . Please check the error below or click Resend OTP to try again.
+                </p>
+              )}
 
               {resentSuccessMsg && !otpError && (
                 <div style={{

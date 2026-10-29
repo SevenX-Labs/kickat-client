@@ -37,6 +37,18 @@ export interface MessageResponse {
   message: string;
 }
 
+export function sanitizeIndianPhone(rawPhone?: string): string | undefined {
+  if (!rawPhone) return undefined;
+  const digits = rawPhone.replace(/\D/g, '');
+  if (digits.length === 10) {
+    return `+91${digits}`;
+  }
+  if (digits.length === 12 && digits.startsWith('91')) {
+    return `+${digits}`;
+  }
+  return rawPhone.replace(/[\s-]/g, '').trim();
+}
+
 let activeRefreshPromise: Promise<RefreshTokenResponse> | null = null;
 
 export const authService = {
@@ -44,7 +56,7 @@ export const authService = {
    * Request 6-digit Mobile OTP via SMS (POST /auth/otp/send)
    */
   async sendMobileOtp(phone: string): Promise<SendOtpResponse> {
-    const sanitizedPhone = phone.startsWith('+91') ? phone : `+91${phone.replace(/\D/g, '')}`;
+    const sanitizedPhone = sanitizeIndianPhone(phone) || phone;
     return api<SendOtpResponse>('/auth/otp/send', {
       method: 'POST',
       data: { phone: sanitizedPhone },
@@ -56,7 +68,7 @@ export const authService = {
    * Sets isPhoneVerified: true and issues tokens (refreshToken in HttpOnly cookie, accessToken in memory)
    */
   async verifyMobileOtp(phone: string, otp: string): Promise<AuthResponse> {
-    const sanitizedPhone = phone.startsWith('+91') ? phone : `+91${phone.replace(/\D/g, '')}`;
+    const sanitizedPhone = sanitizeIndianPhone(phone) || phone;
     const res = await api<AuthResponse>('/auth/otp/verify', {
       method: 'POST',
       data: { phone: sanitizedPhone, otp },
@@ -206,7 +218,8 @@ export const authService = {
    * Send Phone Verification OTP for logged in user (POST /users/mobile/send-verification)
    */
   async sendUserMobileVerification(phone?: string): Promise<SendOtpResponse> {
-    const data = phone ? { phone: phone.startsWith("+91") ? phone : `+91${phone.replace(/\D/g, "")}` } : {};
+    const sanitizedPhone = sanitizeIndianPhone(phone);
+    const data = sanitizedPhone ? { phone: sanitizedPhone } : {};
     return api<SendOtpResponse>("/users/mobile/send-verification", {
       method: "POST",
       data,
@@ -217,9 +230,10 @@ export const authService = {
    * Verify Phone OTP for logged in user (POST /users/mobile/verify)
    */
   async verifyUserMobile(otp: string, phone?: string): Promise<MessageResponse> {
+    const sanitizedPhone = sanitizeIndianPhone(phone);
     const data: Record<string, string> = { otp };
-    if (phone) {
-      data.phone = phone.startsWith("+91") ? phone : `+91${phone.replace(/\D/g, "")}`;
+    if (sanitizedPhone) {
+      data.phone = sanitizedPhone;
     }
     return api<MessageResponse>("/users/mobile/verify", {
       method: "POST",

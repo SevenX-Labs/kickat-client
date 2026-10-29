@@ -44,7 +44,7 @@ function GoogleCallbackContent() {
           const user = await loginWithToken(tokenParam);
           setLoggedInUser(user);
           setStatus('success');
-          const isProfileComplete = Boolean(user?.isProfileComplete || user?.profileCompleted || (user?.name && (user?.email || user?.phone)));
+          const isProfileComplete = Boolean(user?.isProfileComplete || user?.profileCompleted);
           const redirectTarget = (!isProfileComplete && isNewUser) ? "/onboarding" : (customRedirect || "/account");
           setTimeout(() => {
             router.push(redirectTarget);
@@ -67,11 +67,11 @@ function GoogleCallbackContent() {
           const res = await authService.googleAuth(codeParam, redirectUri);
           
           if (res.accessToken) {
-            setUser(res.user);
-            setLoggedInUser(res.user);
+            const user = await loginWithToken(res.accessToken, res.user);
+            setLoggedInUser(user || res.user);
             setStatus('success');
             
-            const isProfileComplete = Boolean(res.user?.isProfileComplete || res.user?.profileCompleted || (res.user?.name && (res.user?.email || res.user?.phone)));
+            const isProfileComplete = Boolean(res.user?.isProfileComplete || res.user?.profileCompleted);
             const redirectTarget = (!isProfileComplete && res.isNewUser) ? "/onboarding" : (customRedirect || "/account");
             setTimeout(() => {
               router.push(redirectTarget);
