@@ -26,7 +26,8 @@ function AccountMainHubContent() {
       lastName,
       email: user?.email || 'Not provided',
       phone: user?.phone ? (user.phone.startsWith('+91') ? user.phone : `+91 ${user.phone}`) : 'Not provided',
-      tier: 'Gold Paw VIP',
+      isVip: Boolean(user?.isVip || (user as any)?.profile?.isVip),
+      vipSince: user?.vipSince || (user as any)?.profile?.vipSince || null,
       points: 1240,
     };
   });
@@ -74,6 +75,8 @@ function AccountMainHubContent() {
             lastName,
             email: profileUser.email || 'Not provided',
             phone: profileUser.phone ? (profileUser.phone.startsWith('+91') ? profileUser.phone : `+91 ${profileUser.phone}`) : 'Not provided',
+            isVip: Boolean(profileUser.isVip || profileUser.profile?.isVip),
+            vipSince: profileUser.vipSince || profileUser.profile?.vipSince || null,
           }));
         }
       } catch (err: any) {
@@ -97,6 +100,8 @@ function AccountMainHubContent() {
         lastName,
         email: user.email || 'Not provided',
         phone: user.phone ? (user.phone.startsWith('+91') ? user.phone : `+91 ${user.phone}`) : 'Not provided',
+        isVip: Boolean(user.isVip || (user as any)?.profile?.isVip),
+        vipSince: user.vipSince || (user as any)?.profile?.vipSince || null,
       }));
     }
   }, [user]);
@@ -107,10 +112,12 @@ function AccountMainHubContent() {
             {/* Welcome Banner */}
             <div className={styles.dashboardWelcomeBanner}>
               <div className={styles.welcomeTextGroup}>
-                <div className={styles.welcomeVipBadge}>
-                  <Crown size={12} fill="#F99205" color="#F99205" />
-                  <span>{userData.tier}</span>
-                </div>
+                {userData.isVip && (
+                  <div className={styles.welcomeVipBadge} title={userData.vipSince ? `VIP Member since ${new Date(userData.vipSince).toLocaleDateString('en-IN')}` : 'VIP Member'}>
+                    <Crown size={12} fill="#F99205" color="#F99205" />
+                    <span>VIP Member</span>
+                  </div>
+                )}
                 <h1 className={styles.welcomeHeading}>Welcome back, {userData.firstName}!</h1>
                 <p className={styles.welcomeSubheading}>
                   Manage your personal details, view orders, update delivery addresses, and configure preferences.

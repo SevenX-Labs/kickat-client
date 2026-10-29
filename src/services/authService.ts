@@ -8,6 +8,8 @@ export interface AuthUser {
   name?: string | null;
   isEmailVerified?: boolean;
   isPhoneVerified?: boolean;
+  isVip?: boolean;
+  vipSince?: string | null;
   profileCompleted?: boolean;
   isProfileComplete?: boolean;
   isNewUser?: boolean;

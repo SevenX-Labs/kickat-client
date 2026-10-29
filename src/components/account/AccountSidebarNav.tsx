@@ -12,13 +12,15 @@ import styles from "./AccountSidebarNav.module.css";
 import { useAuth } from "@/context/AuthContext";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
-interface UserProps {
+export interface UserProps {
   firstName: string;
   lastName: string;
   email: string;
   totalOrders?: number;
   points?: number;
   tier?: string;
+  isVip?: boolean;
+  vipSince?: string | null;
   avatarUrl?: string;
   profileImage?: string;
   image?: string;
@@ -30,7 +32,7 @@ const defaultUser: UserProps = {
   email: "member@kickat.in",
   totalOrders: 0,
   points: 1240,
-  tier: "KickAt VIP"
+  isVip: false
 };
 
 export default function AccountSidebarNav({
@@ -180,10 +182,12 @@ export default function AccountSidebarNav({
               )}
             </div>
             <div className={styles.profileMeta}>
-              <div className={styles.vipBadgePill}>
-                <Crown size={11} fill="#F99205" color="#F99205" />
-                <span>{user.tier || "KickAt VIP"}</span>
-              </div>
+              {user.isVip && (
+                <div className={styles.vipBadgePill} title={user.vipSince ? `VIP Member since ${new Date(user.vipSince).toLocaleDateString('en-IN')}` : "VIP Customer"}>
+                  <Crown size={11} fill="#F99205" color="#F99205" />
+                  <span>VIP Customer</span>
+                </div>
+              )}
               <h2 className={styles.userName}>{user.firstName} {user.lastName}</h2>
               <span className={styles.userEmail}>{user.email}</span>
             </div>
@@ -192,7 +196,9 @@ export default function AccountSidebarNav({
           {/* Rewards Progress Strip */}
           <div className={styles.rewardsStrip}>
             <div className={styles.rewardsHeader}>
-              <span className={styles.rewardsTitle}>{user.points?.toLocaleString('en-IN') || 0} Paws · {user.tier || "KickAt VIP"}</span>
+              <span className={styles.rewardsTitle}>
+                {user.points?.toLocaleString('en-IN') || 0} Paws{user.isVip ? " · VIP Member" : ""}
+              </span>
             </div>
             <div className={styles.rewardsProgressBg}>
               <div className={styles.rewardsProgressFill} style={{ width: '80%' }} />

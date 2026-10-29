@@ -90,7 +90,7 @@ export function Navbar() {
   const [isCartBouncing, setIsCartBouncing] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const { logout, isAuthenticated, showSignOutModal } = useAuth();
+  const { logout, isAuthenticated, showSignOutModal, user } = useAuth();
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -295,8 +295,31 @@ export function Navbar() {
                           <User size={18} strokeWidth={2.2} />
                         </div>
                         <div className={styles.headerTextCol}>
-                          <span className={styles.greetingTitle}>My Account</span>
-                          <span className={styles.greetingSub}>Manage profile & orders</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span className={styles.greetingTitle}>
+                              {user?.name ? user.name.split(' ')[0] : 'My Account'}
+                            </span>
+                            {user?.isVip && (
+                              <span
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '3px',
+                                  background: '#FEF3C7',
+                                  color: '#92400E',
+                                  border: '1px solid #FCD34D',
+                                  borderRadius: '9999px',
+                                  padding: '1px 7px',
+                                  fontSize: '10px',
+                                  fontWeight: 800,
+                                }}
+                                title={user?.vipSince ? `VIP Member since ${new Date(user.vipSince).toLocaleDateString('en-IN')}` : 'VIP Customer'}
+                              >
+                                <Crown size={10} fill="#F59E0B" color="#D97706" /> VIP
+                              </span>
+                            )}
+                          </div>
+                          <span className={styles.greetingSub}>{user?.email || "Manage profile & orders"}</span>
                         </div>
                       </div>
                     </div>

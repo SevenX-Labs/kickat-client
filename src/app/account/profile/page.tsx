@@ -59,6 +59,8 @@ function ProfileDetailsContent() {
         : "",
       isEmailVerified: Boolean(user?.isEmailVerified),
       isPhoneVerified: Boolean(user?.isPhoneVerified),
+      isVip: Boolean(user?.isVip || (user as any)?.profile?.isVip),
+      vipSince: user?.vipSince || (user as any)?.profile?.vipSince || null,
       gender: ((user as any)?.gender || (user as any)?.profile?.gender)
         ? (((user as any)?.gender || (user as any)?.profile?.gender) === 'PREFER_NOT_TO_SAY'
           ? 'Not specified'
@@ -72,7 +74,6 @@ function ProfileDetailsContent() {
         : '2025',
       totalOrders: 0,
       points: 100,
-      tier: "KickAt VIP",
       currency: "INR (₹)",
     };
   });
@@ -127,6 +128,8 @@ function ProfileDetailsContent() {
           memberSince: profileUser.createdAt ? new Date(profileUser.createdAt).getFullYear().toString() : (prev.memberSince || '2025'),
           isEmailVerified: Boolean(profileUser.isEmailVerified),
           isPhoneVerified: Boolean(profileUser.isPhoneVerified),
+          isVip: Boolean(profileUser.isVip || profileUser.profile?.isVip),
+          vipSince: profileUser.vipSince || profileUser.profile?.vipSince || null,
         }));
 
         const petList = profileUser.pets || profileUser.petProfiles || res?.user?.pets || res?.pets || [];
@@ -175,6 +178,8 @@ function ProfileDetailsContent() {
         memberSince: (user as any).createdAt ? new Date((user as any).createdAt).getFullYear().toString() : (prev.memberSince || '2025'),
         isEmailVerified: Boolean(user.isEmailVerified),
         isPhoneVerified: Boolean(user.isPhoneVerified),
+        isVip: Boolean(user.isVip || (user as any)?.profile?.isVip),
+        vipSince: user.vipSince || (user as any)?.profile?.vipSince || null,
       }));
 
       if ((user as any).pets && Array.isArray((user as any).pets)) {
@@ -543,7 +548,30 @@ function ProfileDetailsContent() {
       <div className={styles.sectionBlockCard}>
         <div className={styles.sectionBlockHeader}>
           <div>
-            <h1 className={styles.blockTitle}>Profile Details</h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <h1 className={styles.blockTitle} style={{ margin: 0 }}>Profile Details</h1>
+              {userData.isVip && (
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '3px 10px',
+                    borderRadius: '9999px',
+                    fontSize: '11px',
+                    fontWeight: 800,
+                    background: 'linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)',
+                    color: '#92400E',
+                    border: '1px solid #FCD34D',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                  }}
+                  title={userData.vipSince ? `VIP Member since ${new Date(userData.vipSince).toLocaleDateString('en-IN')}` : 'VIP Customer'}
+                >
+                  <Crown size={12} fill="#F59E0B" color="#D97706" />
+                  <span>VIP Customer</span>
+                </span>
+              )}
+            </div>
             <p className={styles.blockSubtitle}>
               Manage your personal identity, contact preferences, and security settings.
             </p>
@@ -676,15 +704,20 @@ function ProfileDetailsContent() {
               </div>
             </div>
 
-            <div className={styles.infoFieldBox}>
-              <div className={styles.fieldIconWrap}>
-                <Crown size={18} />
+            {userData.isVip && (
+              <div className={styles.infoFieldBox} style={{ border: '1px solid #FCD34D', background: '#FEFCE8' }}>
+                <div className={styles.fieldIconWrap} style={{ background: '#FEF3C7', color: '#D97706' }}>
+                  <Crown size={18} fill="#F59E0B" color="#D97706" />
+                </div>
+                <div className={styles.fieldMeta}>
+                  <span className={styles.fieldLabel} style={{ color: '#B45309', fontWeight: 700 }}>Exclusive Membership</span>
+                  <span className={styles.fieldValue} style={{ color: '#92400E', fontWeight: 800 }}>
+                    VIP Customer
+                    {userData.vipSince ? ` · Active since ${new Date(userData.vipSince).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}` : ''}
+                  </span>
+                </div>
               </div>
-              <div className={styles.fieldMeta}>
-                <span className={styles.fieldLabel}>Membership Tier</span>
-                <span className={styles.fieldValue}>{userData.tier}</span>
-              </div>
-            </div>
+            )}
 
             <div className={styles.infoFieldBox}>
               <div className={styles.fieldIconWrap}>

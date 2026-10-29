@@ -20,10 +20,11 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
       lastName,
       email: user?.email || 'Not provided',
       phone: user?.phone ? (user.phone.startsWith('+91') ? user.phone : `+91 ${user.phone}`) : 'Not provided',
+      isVip: Boolean(user?.isVip || (user as any)?.profile?.isVip),
+      vipSince: user?.vipSince || (user as any)?.profile?.vipSince || null,
       memberSince: '2025',
       totalOrders: 0,
       points: 100,
-      tier: 'KickAt VIP',
       currency: 'INR (₹)'
     };
   });
@@ -56,6 +57,8 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
             lastName,
             email: profileUser.email || 'Not provided',
             phone: profileUser.phone ? (profileUser.phone.startsWith('+91') ? profileUser.phone : `+91 ${profileUser.phone}`) : 'Not provided',
+            isVip: Boolean(profileUser.isVip || profileUser.profile?.isVip),
+            vipSince: profileUser.vipSince || profileUser.profile?.vipSince || null,
           }));
         }
       } catch (err: any) {
@@ -81,6 +84,8 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
         lastName,
         email: user.email || 'Not provided',
         phone: user.phone ? (user.phone.startsWith('+91') ? user.phone : `+91 ${user.phone}`) : 'Not provided',
+        isVip: Boolean(user.isVip || (user as any)?.profile?.isVip),
+        vipSince: user.vipSince || (user as any)?.profile?.vipSince || null,
       }));
     }
   }, [user]);
