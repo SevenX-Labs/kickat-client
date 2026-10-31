@@ -88,55 +88,115 @@ export function ProductSpecsAndSizeGuide({ product, selectedVariant, productDeta
       ? (typeof selectedVariant?.shippingHeightCm === "number" && selectedVariant.shippingHeightCm > 0 ? selectedVariant.shippingHeightCm : null)
       : (typeof product.shippingHeightCm === "number" && product.shippingHeightCm > 0 ? product.shippingHeightCm : null);
 
-    specsList = [
-      { label: "Brand", value: product.brand || "KickAt" },
-      { label: "Category", value: product.mainCategory || "Pet Essentials" },
-      ...(product.petSpecies
-        ? [{ label: "Suitable For", value: `${product.petSpecies.charAt(0).toUpperCase()}${product.petSpecies.slice(1).toLowerCase()}s` }]
-        : [{ label: "Suitable For", value: "All Pets" }]),
-      ...(product.dietaryPreference
-        ? [{ label: "Dietary Type", value: product.dietaryPreference === "VEG" ? "Vegetarian" : "Non-Vegetarian" }]
-        : []),
-      ...(selectedVariant?.name
-        ? [{ label: "Selected Variety", value: selectedVariant.name }]
-        : []),
-      ...(activeWeightKg
-        ? [{ label: "Shipping Weight", value: `${activeWeightKg} kg` }]
-        : []),
-      ...(activeLengthCm
-        ? [{ label: "Package Length", value: `${activeLengthCm} cm` }]
-        : []),
-      ...(activeBreadthCm
-        ? [{ label: "Package Breadth (Width)", value: `${activeBreadthCm} cm` }]
-        : []),
-      ...(activeHeightCm
-        ? [{ label: "Package Height", value: `${activeHeightCm} cm` }]
-        : []),
-      ...(activeLengthCm && activeBreadthCm && activeHeightCm
-        ? [{ label: "Package Dimensions (L × B × H)", value: `${activeLengthCm} × ${activeBreadthCm} × ${activeHeightCm} cm` }]
-        : []),
-      { label: "Product Type", value: selectedVariant?.name ? "Pack Variant" : "Standard Pack" },
-      ...(manufacturing?.countryOfOrigin ? [{ label: "Country of Origin", value: manufacturing.countryOfOrigin }] : [{ label: "Country of Origin", value: "India" }]),
-      ...(manufacturing?.manufacturerName ? [{ label: "Manufacturer", value: manufacturing.manufacturerName }] : []),
-      ...(manufacturing?.manufacturerAddress ? [{ label: "Manufacturer Address", value: manufacturing.manufacturerAddress }] : []),
-      ...(manufacturing?.marketedBy ? [{ label: "Marketed By", value: manufacturing.marketedBy }] : []),
-      ...(manufacturing?.consumerCareEmail || manufacturing?.consumerCarePhone ? [{ label: "Consumer Care", value: [manufacturing.consumerCareEmail, manufacturing.consumerCarePhone].filter(Boolean).join(" | ") }] : []),
-      ...(manufacturing?.shelfLife ? [{ label: "Shelf Life", value: manufacturing.shelfLife }] : []),
-    ];
+    const specsListRaw: { label: string; value: string }[] = [];
 
+    specsListRaw.push({ label: "Brand", value: product.brand || "KickAt" });
+    specsListRaw.push({ label: "Category", value: product.mainCategory || "Pet Essentials" });
+
+    if (product.petSpecies) {
+      specsListRaw.push({
+        label: "Suitable For",
+        value: `${product.petSpecies.charAt(0).toUpperCase()}${product.petSpecies.slice(1).toLowerCase()}s`,
+      });
+    }
+
+    if (product.dietaryPreference) {
+      specsListRaw.push({
+        label: "Dietary Type",
+        value: product.dietaryPreference === "VEG" ? "Vegetarian" : "Non-Vegetarian",
+      });
+    }
+
+    if (selectedVariant?.name) {
+      specsListRaw.push({ label: "Selected Variety", value: selectedVariant.name });
+    }
+
+    // Weight: Prefer net product weight if specified, otherwise shipping weight (single clean line)
+    const netWeight = product.attributes?.weight ? String(product.attributes.weight).trim() : null;
+    if (netWeight) {
+      specsListRaw.push({ label: "Weight", value: netWeight });
+    } else if (activeWeightKg) {
+      specsListRaw.push({ label: "Weight", value: `${activeWeightKg} kg` });
+    }
+
+    // Dimensions: Single clean combined line (eliminates repetitive length, breadth, height lines)
+    if (activeLengthCm && activeBreadthCm && activeHeightCm) {
+      specsListRaw.push({
+        label: "Package Dimensions",
+        value: `${activeLengthCm} × ${activeBreadthCm} × ${activeHeightCm} cm`,
+      });
+    } else if (product.attributes?.dimensions) {
+      specsListRaw.push({
+        label: "Dimensions",
+        value: String(product.attributes.dimensions).trim(),
+      });
+    } else if (activeLengthCm || activeBreadthCm || activeHeightCm) {
+      const parts = [
+        activeLengthCm ? `L: ${activeLengthCm}cm` : null,
+        activeBreadthCm ? `W: ${activeBreadthCm}cm` : null,
+        activeHeightCm ? `H: ${activeHeightCm}cm` : null,
+      ].filter(Boolean);
+      specsListRaw.push({ label: "Dimensions", value: parts.join(" × ") });
+    }
+
+    // Country of Origin (single clean entry)
+    const originCountry =
+      product.attributes?.countryOfOrigin ||
+      manufacturing?.countryOfOrigin ||
+      "India";
+    specsListRaw.push({ label: "Country of Origin", value: String(originCountry).trim() });
+
+    // Life stage
+    if (product.attributes?.lifeStage) {
+      specsListRaw.push({ label: "Life Stage", value: String(product.attributes.lifeStage).trim() });
+    }
+
+    // Custom Attributes (excluding keys already handled)
     if (product.attributes && typeof product.attributes === "object") {
-      const excludedKeys = new Set(["ingredients", "feedingguide", "description", "highlights", "images", "media", "careinstructions", "sizeguide", "faqs", "safetybadges"]);
+      const excludedKeys = new Set([
+        "ingredients",
+        "feedingguide",
+        "description",
+        "highlights",
+        "images",
+        "media",
+        "careinstructions",
+        "sizeguide",
+        "faqs",
+        "safetybadges",
+        "weight",
+        "dimensions",
+        "countryoforigin",
+        "lifestage",
+      ]);
+
       Object.entries(product.attributes).forEach(([key, val]) => {
-        const lowerKey = key.toLowerCase();
+        const lowerKey = key.toLowerCase().replace(/[^a-z0-9]/g, "");
         if (!excludedKeys.has(lowerKey) && (typeof val === "string" || typeof val === "number")) {
           const strVal = String(val).trim();
           if (strVal.length > 0 && strVal.length < 60 && !strVal.toLowerCase().includes("ingredients") && !strVal.toLowerCase().includes("storage:")) {
             const formattedLabel = key.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase()).trim();
-            specsList.push({ label: formattedLabel, value: strVal });
+            specsListRaw.push({ label: formattedLabel, value: strVal });
           }
         }
       });
     }
+
+    if (manufacturing?.manufacturerName) {
+      specsListRaw.push({ label: "Manufacturer", value: manufacturing.manufacturerName });
+    }
+    if (manufacturing?.shelfLife) {
+      specsListRaw.push({ label: "Shelf Life", value: manufacturing.shelfLife });
+    }
+
+    // Strict deduplication by normalized label
+    const seenLabels = new Set<string>();
+    specsList = specsListRaw.filter((item) => {
+      const norm = item.label.toLowerCase().replace(/[^a-z0-9]/g, "");
+      if (seenLabels.has(norm)) return false;
+      seenLabels.add(norm);
+      return true;
+    });
   } else {
     specsList = [
       { label: "Brand", value: "KickAt" },
