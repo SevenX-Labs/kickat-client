@@ -587,10 +587,11 @@
   content: '';
   position: absolute;
   top: 100%;
-  left: -20px;
-  right: -20px;
-  height: 20px;
+  left: -24px;
+  right: -24px;
+  height: 26px;
   background: transparent;
+  z-index: 99;
 }
 
 .accountDropdown {
@@ -629,10 +630,20 @@
   z-index: 1;
 }
 
-.accountWrapper:hover .accountDropdown {
+.accountWrapper:hover .accountDropdown,
+.accountWrapper.accountWrapperOpen .accountDropdown,
+.accountDropdown.accountDropdownOpen,
+.accountWrapper:focus-within .accountDropdown {
   opacity: 1;
   visibility: visible;
   transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.iconBtnActive {
+  background-color: rgba(238, 140, 50, 0.12) !important;
+  color: #EE8C32 !important;
+  border-color: rgba(238, 140, 50, 0.3) !important;
 }
 
 .accountDropdownHeader {

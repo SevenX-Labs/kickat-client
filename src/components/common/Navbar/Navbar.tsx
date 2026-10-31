@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
@@ -91,6 +91,22 @@ export function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { logout, isAuthenticated, showSignOutModal, user } = useAuth();
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const accountRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (accountRef.current && !accountRef.current.contains(event.target as Node)) {
+        setIsAccountOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    setIsAccountOpen(false);
+  }, [pathname]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,10 +156,13 @@ export function Navbar() {
   const handleAccountClick = () => {
     if (!isAuthenticated) {
       router.push("/login");
+    } else {
+      setIsAccountOpen((prev) => !prev);
     }
   };
 
   const handleLogout = () => {
+    setIsAccountOpen(false);
     showSignOutModal();
   };
 
@@ -276,17 +295,25 @@ export function Navbar() {
               <Heart size={20} strokeWidth={1.5} />
             </Link>
 
-            <div className={styles.accountWrapper}>
+            <div
+              ref={accountRef}
+              className={`${styles.accountWrapper} ${isAccountOpen ? styles.accountWrapperOpen : ""}`}
+              onMouseEnter={() => setIsAccountOpen(true)}
+              onMouseLeave={() => setIsAccountOpen(false)}
+            >
               <button
+                type="button"
                 onClick={handleAccountClick}
-                className={styles.iconBtn}
+                className={`${styles.iconBtn} ${isAccountOpen ? styles.iconBtnActive : ""}`}
                 aria-label="Account"
                 title="Account"
+                aria-haspopup="true"
+                aria-expanded={isAccountOpen}
               >
                 <User size={20} strokeWidth={1.5} />
               </button>
 
-              <div className={styles.accountDropdown}>
+              <div className={`${styles.accountDropdown} ${isAccountOpen ? styles.accountDropdownOpen : ""}`}>
                 {isAuthenticated ? (
                   <>
                     <div className={styles.accountDropdownHeader}>
