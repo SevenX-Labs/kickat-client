@@ -1213,3 +1213,20 @@
     animation: none !important;
   }
 }
+
+.sideDrawerLogoutBtn {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #DC2626 !important;
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #EBE5DB;
+}
+
+.sideDrawerLogoutBtn:hover {
+  color: #B91C1C !important;
+  background: rgba(220, 38, 38, 0.05) !important;
+}

@@ -1,8 +1,13 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createPortal } from 'react-dom';
+import { CheckCircle2 } from 'lucide-react';
 import { getAccessToken, setAccessToken, setOnUnauthenticated } from '../services/api';
 import { authService, AuthUser, AuthResponse, SendOtpResponse } from '../services/authService';
+import { SignOutModal } from '@/components/common/SignOutModal/SignOutModal';
+import modalStyles from '@/components/common/SignOutModal/SignOutModal.module.css';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -24,9 +29,17 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const router = useRouter();
   const [user, setUser] = useState<AuthUser | null>(null);
   const [accessTokenState, setAccessTokenState] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isSignOutModalOpen, setIsSignOutModalOpen] = useState<boolean>(false);
+  const [logoutToast, setLogoutToast] = useState<string | null>(null);
+  const [mounted, setMounted] = useState<boolean>(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     // Register unauthenticated handler for automatic token refresh failures
@@ -155,6 +168,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   };
 
+  const showSignOutModal = () => {
+    setIsSignOutModalOpen(true);
+  };
+
+  const handleConfirmLogout = async () => {
+    try {
+      await logout();
+      setLogoutToast('Logged out successfully');
+      setTimeout(() => {
+        setLogoutToast(null);
+      }, 3500);
+
+      if (typeof window !== 'undefined') {
+        const path = window.location.pathname;
+        if (path.startsWith('/account') || path.startsWith('/orders')) {
+          router.push('/');
+        } else {
+          router.refresh();
+        }
+      }
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+  };
+
   const isAuthenticated = Boolean(accessTokenState && user);
 
   return (
@@ -172,11 +210,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loginWithToken,
         logout,
         logoutAll,
-        showSignOutModal: logout,
+        showSignOutModal,
         setUser,
       }}
     >
       {children}
+
+      {/* Global Confirmation Dialog for Logout */}
+      <SignOutModal
+        isOpen={isSignOutModalOpen}
+        onClose={() => setIsSignOutModalOpen(false)}
+        onConfirm={handleConfirmLogout}
+      />
+
+      {/* Global Logout Success Notification Toast */}
+      {logoutToast && mounted && createPortal(
+        <div className={modalStyles.logoutToast} role="status" aria-live="polite">
+          <CheckCircle2 size={19} strokeWidth={2.4} />
+          <span>{logoutToast}</span>
+        </div>,
+        document.body
+      )}
     </AuthContext.Provider>
   );
 };

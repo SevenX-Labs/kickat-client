@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 import styles from "./AccountSidebarNav.module.css";
 import { useAuth } from "@/context/AuthContext";
-import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 export interface UserProps {
   firstName: string;
@@ -43,14 +42,7 @@ export default function AccountSidebarNav({
   const pathname = usePathname();
   const { showSignOutModal } = useAuth();
   
-  const [isLogoutOpen, setIsLogoutOpen] = useState(false);
-
   const handleSignOut = () => {
-    setIsLogoutOpen(true);
-  };
-  
-  const confirmSignOut = () => {
-    setIsLogoutOpen(false);
     showSignOutModal();
   };
 
@@ -284,15 +276,7 @@ export default function AccountSidebarNav({
         </div>
       </div>
       
-      <ConfirmDialog 
-        isOpen={isLogoutOpen}
-        title="Sign Out"
-        message="Are you sure you want to sign out of your account?"
-        confirmText="Sign Out"
-        onConfirm={confirmSignOut}
-        onCancel={() => setIsLogoutOpen(false)}
-        isDanger={true}
-      />
+
     </nav>
   );
 }

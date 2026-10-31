@@ -22,7 +22,7 @@ import { useAuth } from '@/context/AuthContext';
 
 function PrivacyContent() {
   const router = useRouter();
-  const { logout, logoutAll } = useAuth();
+  const { logout, logoutAll, showSignOutModal } = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [isLogoutCurrentOpen, setIsLogoutCurrentOpen] = useState(false);
@@ -161,7 +161,7 @@ function PrivacyContent() {
                   <Button
                     variant="secondary"
                     size="sm"
-                    onClick={() => setIsLogoutCurrentOpen(true)}
+                    onClick={() => showSignOutModal()}
                     style={{ minHeight: '44px', minWidth: '95px' }}
                   >
                     Log out

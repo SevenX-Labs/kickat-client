@@ -497,6 +497,20 @@ export function Navbar() {
                     <span>{label}</span>
                   </Link>
                 ))}
+
+                {isAuthenticated && (
+                  <button
+                    type="button"
+                    className={`${styles.sideDrawerItem} ${styles.sideDrawerLogoutBtn}`}
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      showSignOutModal();
+                    }}
+                  >
+                    <LogOut size={18} className={styles.sideDrawerItemIcon} />
+                    <span>Logout</span>
+                  </button>
+                )}
               </div>
 
               <div className={styles.sideDrawerFooter}>
