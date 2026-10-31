@@ -66,7 +66,7 @@ export interface ReviewsResponse {
 
 export interface CreateReviewPayload {
   productId: string;
-  orderId: string;
+  orderId?: string;
   rating: number;
   comment: string;
   title?: string;
@@ -94,4 +94,19 @@ export interface GetReviewsParams {
   hasPhotos?: boolean;
   verifiedOnly?: boolean;
   sort?: 'newest' | 'helpful' | 'highest' | 'lowest' | 'NEWEST' | 'HELPFUL' | 'HIGHEST' | 'LOWEST';
+}
+
+export interface ReviewEligibilityResponse {
+  success: boolean;
+  canReview: boolean;
+  reason?: "NOT_DELIVERED" | "NOT_PURCHASED" | "ALREADY_REVIEWED";
+  message?: string;
+  orderId?: string;
+  orderNumber?: string;
+  existingReview?: {
+    id: string;
+    rating: number;
+    title?: string;
+    comment: string;
+  };
 }

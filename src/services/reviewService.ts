@@ -7,6 +7,7 @@ import {
   MarkHelpfulResponse,
   ReviewSummaryResponse,
   SingleReviewResponse,
+  ReviewEligibilityResponse,
 } from '@/types/review';
 
 export const reviewService = {
@@ -44,6 +45,16 @@ export const reviewService = {
    */
   async getReviewById(id: string): Promise<SingleReviewResponse> {
     return api<SingleReviewResponse>(`/reviews/${id}`, { method: 'GET' });
+  },
+
+  /**
+   * GET /api/v1/reviews/eligibility
+   * Check if current authenticated user has a delivered order eligible for review
+   */
+  async checkEligibility(productId: string): Promise<ReviewEligibilityResponse> {
+    return api<ReviewEligibilityResponse>(`/reviews/eligibility?productId=${productId}`, {
+      method: "GET",
+    });
   },
 
   /**

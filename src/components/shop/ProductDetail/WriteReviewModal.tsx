@@ -1,14 +1,26 @@
 "use client";
 
-import React, { useState, useRef, ChangeEvent, useEffect } from 'react';
-import { Star, X, CheckCircle2, Camera, Image as ImageIcon, Loader2, AlertCircle, ShoppingBag } from 'lucide-react';
-import Image from 'next/image';
-import styles from './WriteReviewModal.module.css';
-import { Product } from './ProductDetail';
-import { useAuth } from '@/context/AuthContext';
-import { reviewService } from '@/services/reviewService';
-import { ReviewItem } from '@/types/review';
-import { api } from '@/services/api';
+import React, { useState, useRef, ChangeEvent, useEffect } from "react";
+import Link from "next/link";
+import {
+  Star,
+  X,
+  CheckCircle2,
+  Camera,
+  Image as ImageIcon,
+  Loader2,
+  AlertCircle,
+  ShoppingBag,
+  Truck,
+  Trash2,
+  ShieldCheck,
+} from "lucide-react";
+import Image from "next/image";
+import styles from "./WriteReviewModal.module.css";
+import { Product } from "./ProductDetail";
+import { useAuth } from "@/context/AuthContext";
+import { reviewService } from "@/services/reviewService";
+import { ReviewItem, ReviewEligibilityResponse } from "@/types/review";
 
 interface WriteReviewModalProps {
   product: Product;
@@ -19,11 +31,11 @@ interface WriteReviewModalProps {
 }
 
 const RATING_LABELS: Record<number, string> = {
-  5: '5.0 - Excellent',
-  4: '4.0 - Good',
-  3: '3.0 - Average',
-  2: '2.0 - Poor',
-  1: '1.0 - Terrible',
+  5: "5.0 - Excellent",
+  4: "4.0 - Good",
+  3: "3.0 - Average",
+  2: "2.0 - Poor",
+  1: "1.0 - Terrible",
 };
 
 /**
@@ -32,10 +44,10 @@ const RATING_LABELS: Record<number, string> = {
 async function compressImageToWebP(file: File, maxSizeBytes: number = 2 * 1024 * 1024): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.onerror = () => reject(new Error("Failed to read file"));
     reader.onload = (e) => {
       const img = new window.Image();
-      img.onerror = () => reject(new Error('Failed to load image'));
+      img.onerror = () => reject(new Error("Failed to load image"));
       img.onload = () => {
         const MAX_DIMENSION = 1600;
         let width = img.width;
@@ -51,11 +63,11 @@ async function compressImageToWebP(file: File, maxSizeBytes: number = 2 * 1024 *
           }
         }
 
-        const canvas = document.createElement('canvas');
+        const canvas = document.createElement("canvas");
         canvas.width = width;
         canvas.height = height;
 
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext("2d");
         if (!ctx) {
           return resolve(e.target?.result as string);
         }
@@ -63,16 +75,16 @@ async function compressImageToWebP(file: File, maxSizeBytes: number = 2 * 1024 *
         ctx.drawImage(img, 0, 0, width, height);
 
         let quality = 0.85;
-        let dataUrl = canvas.toDataURL('image/webp', quality);
+        let dataUrl = canvas.toDataURL("image/webp", quality);
 
         const calculateByteSize = (url: string) => {
-          const base64Length = url.length - (url.indexOf(',') + 1);
+          const base64Length = url.length - (url.indexOf(",") + 1);
           return Math.round((base64Length * 3) / 4);
         };
 
         while (calculateByteSize(dataUrl) > maxSizeBytes && quality > 0.2) {
           quality -= 0.1;
-          dataUrl = canvas.toDataURL('image/webp', quality);
+          dataUrl = canvas.toDataURL("image/webp", quality);
         }
 
         resolve(dataUrl);
@@ -93,70 +105,75 @@ export function WriteReviewModal({
   const { isAuthenticated } = useAuth();
   const [rating, setRating] = useState<number>(5);
   const [hoverRating, setHoverRating] = useState<number>(0);
-  const [title, setTitle] = useState<string>('');
-  const [message, setMessage] = useState<string>('');
+  const [title, setTitle] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
   const [previewImages, setPreviewImages] = useState<string[]>([]);
-  const [orderId, setOrderId] = useState<string>(initialOrderId || '');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [isCompressing, setIsCompressing] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
-  const [checkingPurchaser, setCheckingPurchaser] = useState<boolean>(false);
+
+  // Verification state
+  const [checkingEligibility, setCheckingEligibility] = useState<boolean>(false);
+  const [eligibility, setEligibility] = useState<ReviewEligibilityResponse | null>(null);
 
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
-  // Sync initial orderId if provided
-  useEffect(() => {
-    if (initialOrderId) {
-      setOrderId(initialOrderId);
-    }
-  }, [initialOrderId]);
-
-  // If orderId is missing, check user orders for delivered item
+  // Check review eligibility on open
   useEffect(() => {
     if (!isOpen) return;
 
-    const checkDeliveredOrder = async () => {
-      if (!isAuthenticated) return;
-      if (initialOrderId) {
-        setOrderId(initialOrderId);
-        return;
-      }
+    if (!isAuthenticated) {
+      setEligibility({
+        success: true,
+        canReview: false,
+        reason: "NOT_PURCHASED",
+        message: "Please log in to write a review. Only verified purchasers can review this product.",
+      });
+      return;
+    }
 
+    const verifyPurchaser = async () => {
+      setCheckingEligibility(true);
+      setErrorMessage(null);
       try {
-        setCheckingPurchaser(true);
-        const res = await api<{ success: boolean; orders: Array<{ id: string; orderStatus: string; items: Array<{ productId: string }> }> }>('/orders');
-        if (res && res.orders) {
-          const deliveredMatch = res.orders.find(
-            (o) =>
-              (o.orderStatus === 'DELIVERED' || o.orderStatus === 'Delivered') &&
-              o.items?.some((it) => it.productId === product.id)
-          );
-          if (deliveredMatch) {
-            setOrderId(deliveredMatch.id);
-          }
+        const res = await reviewService.checkEligibility(product.id);
+        setEligibility(res);
+      } catch (err: unknown) {
+        console.warn("Could not verify review eligibility:", err);
+        if (initialOrderId) {
+          setEligibility({
+            success: true,
+            canReview: true,
+            orderId: initialOrderId,
+          });
+        } else {
+          setEligibility({
+            success: true,
+            canReview: false,
+            reason: "NOT_PURCHASED",
+            message: "Only verified purchasers who have ordered and received this product can write a review.",
+          });
         }
-      } catch (err) {
-        console.warn('Could not auto-fetch delivered orders:', err);
       } finally {
-        setCheckingPurchaser(false);
+        setCheckingEligibility(false);
       }
     };
 
-    checkDeliveredOrder();
-  }, [isOpen, initialOrderId, product.id, isAuthenticated]);
+    verifyPurchaser();
+  }, [isOpen, isAuthenticated, product.id, initialOrderId]);
 
   if (!isOpen) return null;
 
   const processAndAddFiles = async (files: FileList | File[]) => {
-    const validFiles = Array.from(files).filter((f) => f.type.startsWith('image/'));
+    const validFiles = Array.from(files).filter((f) => f.type.startsWith("image/"));
     if (validFiles.length === 0) return;
 
     if (previewImages.length + validFiles.length > 5) {
-      setErrorMessage('You can upload up to 5 photos per review.');
+      setErrorMessage("You can upload up to 5 photos per review.");
       return;
     }
 
@@ -168,8 +185,8 @@ export function WriteReviewModal({
       );
       setPreviewImages((prev) => [...prev, ...compressedWebpUrls].slice(0, 5));
     } catch (err) {
-      console.error('Image processing failed:', err);
-      setErrorMessage('Failed to process image. Please try another file.');
+      console.error("Image processing failed:", err);
+      setErrorMessage("Failed to process image. Please try another file.");
     } finally {
       setIsCompressing(false);
     }
@@ -182,7 +199,7 @@ export function WriteReviewModal({
     }
     const inputElement = e.target;
     setTimeout(() => {
-      if (inputElement) inputElement.value = '';
+      if (inputElement) inputElement.value = "";
     }, 0);
   };
 
@@ -202,15 +219,13 @@ export function WriteReviewModal({
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
-
-    const files = e.dataTransfer.files;
-    if (files && files.length > 0) {
-      processAndAddFiles(files);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      processAndAddFiles(e.dataTransfer.files);
     }
   };
 
-  const removeImage = (index: number) => {
-    setPreviewImages((prev) => prev.filter((_, i) => i !== index));
+  const removeImage = (indexToRemove: number) => {
+    setPreviewImages((prev) => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -219,24 +234,17 @@ export function WriteReviewModal({
 
     // Client-side validations
     if (!message || message.trim().length < 10) {
-      setErrorMessage('Please write at least 10 characters sharing your honest feedback.');
+      setErrorMessage("Please write at least 10 characters sharing your honest feedback.");
       return;
     }
 
     if (!isAuthenticated) {
-      setErrorMessage('Please log in to submit a verified purchase review.');
-      return;
-    }
-
-    const effectiveOrderId = orderId.trim();
-    if (!effectiveOrderId) {
-      setErrorMessage('Review submission requires a verified delivered order UUID. Please enter your Order ID.');
+      setErrorMessage("Please log in to submit a verified purchase review.");
       return;
     }
 
     setIsSubmitting(true);
 
-    // Filter valid HTTP/HTTPS URLs for photos payload
     const validPhotoUrls = previewImages.filter((img) =>
       /^https?:\/\//i.test(img)
     );
@@ -244,14 +252,14 @@ export function WriteReviewModal({
     try {
       const res = await reviewService.createReview({
         productId: product.id,
-        orderId: effectiveOrderId,
+        orderId: eligibility?.orderId || initialOrderId || undefined,
         rating,
         title: title.trim() || undefined,
         comment: message.trim(),
         photos: validPhotoUrls.length > 0 ? validPhotoUrls : undefined,
       });
 
-      setSuccessToast('Thank you for your feedback! Your review is now live.');
+      setSuccessToast("Thank you for your feedback! Your review is now live.");
       setIsSubmitted(true);
 
       if (onSubmitSuccess && res.review) {
@@ -264,7 +272,7 @@ export function WriteReviewModal({
         onClose();
       }, 1500);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to submit review. Please try again.';
+      const msg = err instanceof Error ? err.message : "Failed to submit review. Please try again.";
       setErrorMessage(msg);
     } finally {
       setIsSubmitting(false);
@@ -281,7 +289,7 @@ export function WriteReviewModal({
           <div>
             <h3 className={styles.modalTitle}>Write a Review</h3>
             <p className={styles.modalSubtitle}>
-              Share your experience with <strong className={styles.productNameHighlight}>{product.name || 'this product'}</strong>.
+              Share your experience with <strong className={styles.productNameHighlight}>{product.name || "this product"}</strong>.
             </p>
           </div>
           <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="Close modal">
@@ -293,38 +301,37 @@ export function WriteReviewModal({
         {successToast && (
           <div
             style={{
-              background: '#ECFDF5',
-              border: '1px solid #A7F3D0',
-              color: '#065F46',
-              padding: '0.75rem 1rem',
-              borderRadius: '12px',
-              fontSize: '0.85rem',
-              fontWeight: '600',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              animation: 'fadeIn 0.2s ease',
+              background: "#ECFDF5",
+              border: "1px solid #A7F3D0",
+              color: "#065F46",
+              padding: "0.75rem 1rem",
+              borderRadius: "12px",
+              fontSize: "0.825rem",
+              fontWeight: 600,
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
             }}
           >
-            <CheckCircle2 size={18} className="shrink-0 text-emerald-600" />
+            <CheckCircle2 size={16} />
             <span>{successToast}</span>
           </div>
         )}
 
-        {/* Error Alert */}
+        {/* Error Notification Alert */}
         {errorMessage && (
           <div
             style={{
-              background: '#FFF1F2',
-              border: '1px solid #FECDD3',
-              color: '#9F1239',
-              padding: '0.75rem 1rem',
-              borderRadius: '12px',
-              fontSize: '0.825rem',
-              fontWeight: '500',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
+              background: "#FFF1F2",
+              border: "1px solid #FECDD3",
+              color: "#BE123C",
+              padding: "0.75rem 1rem",
+              borderRadius: "12px",
+              fontSize: "0.825rem",
+              fontWeight: 600,
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
             }}
           >
             <AlertCircle size={16} className="shrink-0 text-rose-600" />
@@ -332,7 +339,111 @@ export function WriteReviewModal({
           </div>
         )}
 
-        {isSubmitted ? (
+        {/* Checking Eligibility Loader */}
+        {checkingEligibility && (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "2.5rem 1rem", gap: "0.75rem", textAlign: "center" }}>
+            <Loader2 size={32} className={styles.spinIcon} style={{ color: "#F99205" }} />
+            <p style={{ fontSize: "0.85rem", color: "#666055", fontWeight: 600, margin: 0 }}>
+              Verifying delivered purchase status...
+            </p>
+          </div>
+        )}
+
+        {/* Not Authenticated State */}
+        {!checkingEligibility && !isAuthenticated && (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "2rem 1rem", gap: "0.85rem", textAlign: "center" }}>
+            <div style={{ width: "56px", height: "56px", borderRadius: "50%", background: "#FFF7EE", display: "flex", alignItems: "center", justifyContent: "center", color: "#F99205" }}>
+              <ShoppingBag size={28} />
+            </div>
+            <h4 style={{ fontSize: "1.05rem", fontWeight: 800, color: "#1A1612", margin: 0 }}>
+              Sign In to Write a Review
+            </h4>
+            <p style={{ fontSize: "0.825rem", color: "#78746D", lineHeight: 1.5, margin: 0, maxWidth: "340px" }}>
+              Only verified purchasers who have ordered and received this item can write a review. Please sign in to verify your purchase.
+            </p>
+            <Link
+              href="/login"
+              style={{
+                marginTop: "0.5rem",
+                background: "#F99205",
+                color: "#ffffff",
+                padding: "0.65rem 1.5rem",
+                borderRadius: "12px",
+                fontSize: "0.85rem",
+                fontWeight: 700,
+                textDecoration: "none",
+              }}
+            >
+              Sign In / Register
+            </Link>
+          </div>
+        )}
+
+        {/* Authenticated but Not Eligible */}
+        {!checkingEligibility && isAuthenticated && eligibility && !eligibility.canReview && (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "2rem 1rem", gap: "0.85rem", textAlign: "center" }}>
+            <div
+              style={{
+                width: "56px",
+                height: "56px",
+                borderRadius: "50%",
+                background: eligibility.reason === "ALREADY_REVIEWED" ? "#E8F5E9" : "#FFF7EE",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: eligibility.reason === "ALREADY_REVIEWED" ? "#2E7D32" : "#F99205",
+              }}
+            >
+              {eligibility.reason === "ALREADY_REVIEWED" ? (
+                <CheckCircle2 size={28} />
+              ) : eligibility.reason === "NOT_DELIVERED" ? (
+                <Truck size={28} />
+              ) : (
+                <ShoppingBag size={28} />
+              )}
+            </div>
+
+            <h4 style={{ fontSize: "1.05rem", fontWeight: 800, color: "#1A1612", margin: 0 }}>
+              {eligibility.reason === "ALREADY_REVIEWED"
+                ? "Review Already Submitted"
+                : eligibility.reason === "NOT_DELIVERED"
+                ? "Order Not Delivered Yet"
+                : "Verified Purchase Required"}
+            </h4>
+
+            <p style={{ fontSize: "0.825rem", color: "#78746D", lineHeight: 1.5, margin: 0, maxWidth: "340px" }}>
+              {eligibility.message ||
+                "Only customers who have ordered and received this product can write a review."}
+            </p>
+
+            <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
+              <Link
+                href="/orders"
+                style={{
+                  background: "#F99205",
+                  color: "#ffffff",
+                  padding: "0.6rem 1.25rem",
+                  borderRadius: "12px",
+                  fontSize: "0.825rem",
+                  fontWeight: 700,
+                  textDecoration: "none",
+                }}
+              >
+                View My Orders
+              </Link>
+              <button
+                type="button"
+                onClick={onClose}
+                className={styles.cancelBtn}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Successfully Submitted View */}
+        {isSubmitted && (
           <div className={styles.successStateContainer}>
             <div className={styles.successBadgeCircle}>
               <CheckCircle2 size={40} className={styles.successIcon} />
@@ -342,8 +453,32 @@ export function WriteReviewModal({
               Thank you for sharing your genuine experience!
             </p>
           </div>
-        ) : (
+        )}
+
+        {/* Main Review Form (Shown only when Verified & Eligible) */}
+        {!checkingEligibility && isAuthenticated && eligibility?.canReview && !isSubmitted && (
           <form onSubmit={handleSubmit} className={styles.form}>
+            {/* Verified Buyer Badge Banner */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.6rem",
+                background: "#E8F5E9",
+                border: "1px solid #C8E6C9",
+                padding: "0.65rem 0.9rem",
+                borderRadius: "12px",
+                fontSize: "0.8rem",
+                color: "#2E7D32",
+                fontWeight: 600,
+              }}
+            >
+              <ShieldCheck size={18} className="shrink-0 text-emerald-600" />
+              <span>
+                Verified Purchase {eligibility.orderNumber ? `• Order #${eligibility.orderNumber}` : ""} (Delivered)
+              </span>
+            </div>
+
             {/* Star Rating Select */}
             <div className={styles.fieldGroup}>
               <div className={styles.labelRow}>
@@ -363,8 +498,8 @@ export function WriteReviewModal({
                   >
                     <Star
                       size={28}
-                      fill={starVal <= activeRating ? '#F99205' : 'transparent'}
-                      color={starVal <= activeRating ? '#F99205' : '#D1D5DB'}
+                      fill={starVal <= activeRating ? "#F99205" : "transparent"}
+                      color={starVal <= activeRating ? "#F99205" : "#D1D5DB"}
                       strokeWidth={1.5}
                     />
                   </button>
@@ -381,7 +516,7 @@ export function WriteReviewModal({
               <input
                 type="text"
                 className={styles.textarea}
-                style={{ minHeight: '44px', height: '44px', padding: '0.5rem 0.75rem' }}
+                style={{ minHeight: "44px", height: "44px", padding: "0.5rem 0.75rem" }}
                 placeholder="e.g., Best purchase for my pet this year!"
                 value={title}
                 maxLength={200}
@@ -395,8 +530,8 @@ export function WriteReviewModal({
                 <label className={styles.label}>Your Review *</label>
                 <span
                   style={{
-                    fontSize: '0.7rem',
-                    color: message.trim().length >= 10 ? '#2E7D32' : '#888276',
+                    fontSize: "0.7rem",
+                    color: message.trim().length >= 10 ? "#2E7D32" : "#888276",
                   }}
                 >
                   {message.trim().length}/10 min chars
@@ -412,37 +547,6 @@ export function WriteReviewModal({
               />
             </div>
 
-            {/* Delivered Order Verification Field */}
-            <div className={styles.fieldGroup}>
-              <div className={styles.labelRow}>
-                <label className={styles.label}>Delivered Order ID (UUID) *</label>
-                <span className={styles.optionalBadge}>Verified Purchase</span>
-              </div>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type="text"
-                  className={styles.textarea}
-                  style={{ minHeight: '44px', height: '44px', padding: '0.5rem 0.75rem' }}
-                  placeholder="Enter delivered order UUID"
-                  value={orderId}
-                  onChange={(e) => setOrderId(e.target.value)}
-                  required
-                />
-                {checkingPurchaser && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      right: '10px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                    }}
-                  >
-                    <Loader2 size={16} className={styles.spinIcon} />
-                  </div>
-                )}
-              </div>
-            </div>
-
             {/* Photo Upload Section */}
             <div className={styles.fieldGroup}>
               <div className={styles.labelRow}>
@@ -455,7 +559,7 @@ export function WriteReviewModal({
                 ref={galleryInputRef}
                 accept="image/*"
                 multiple
-                style={{ display: 'none' }}
+                style={{ display: "none" }}
                 onChange={handleImageUpload}
               />
               <input
@@ -463,12 +567,12 @@ export function WriteReviewModal({
                 ref={cameraInputRef}
                 accept="image/*"
                 capture="environment"
-                style={{ display: 'none' }}
+                style={{ display: "none" }}
                 onChange={handleImageUpload}
               />
 
               <div
-                className={`${styles.uploadOptionsContainer} ${isDragging ? styles.uploadDragging : ''}`}
+                className={`${styles.uploadOptionsContainer} ${isDragging ? styles.uploadDragging : ""}`}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
@@ -489,7 +593,7 @@ export function WriteReviewModal({
                     </div>
                     <div className={styles.optionTextGroup}>
                       <span className={styles.optionTitle}>
-                        {isCompressing ? 'Processing...' : 'Upload Photos'}
+                        {isCompressing ? "Processing..." : "Upload Photos"}
                       </span>
                       <span className={styles.optionSub}>Drag & drop or browse</span>
                     </div>
@@ -518,28 +622,23 @@ export function WriteReviewModal({
 
               {/* Uploaded Thumbnail Previews */}
               {previewImages.length > 0 && (
-                <div className={styles.thumbGrid}>
-                  {previewImages.map((src, index) => (
-                    <div key={index} className={styles.thumbItem}>
+                <div className={styles.thumbnailsRow}>
+                  {previewImages.map((src, idx) => (
+                    <div key={idx} className={styles.thumbnailWrap}>
                       <Image
                         src={src}
-                        alt={`Upload preview ${index + 1}`}
+                        alt={`Review preview ${idx + 1}`}
                         fill
-                        sizes="72px"
-                        className={styles.thumbImg}
-                        unoptimized
+                        className={styles.thumbnailImg}
+                        unoptimized={src.startsWith("data:")}
                       />
                       <button
                         type="button"
-                        className={styles.removeThumbBtn}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          removeImage(index);
-                        }}
-                        aria-label="Remove image"
+                        className={styles.removeThumbnailBtn}
+                        onClick={() => removeImage(idx)}
+                        aria-label="Remove photo"
                       >
-                        <X size={12} />
+                        <Trash2 size={12} />
                       </button>
                     </div>
                   ))}
@@ -547,20 +646,25 @@ export function WriteReviewModal({
               )}
             </div>
 
-            {/* Modal Action Buttons */}
-            <div className={styles.actions}>
-              <button type="button" onClick={onClose} className={styles.cancelBtn} disabled={isSubmitting}>
+            {/* Modal Actions */}
+            <div className={styles.modalActions}>
+              <button
+                type="button"
+                className={styles.cancelBtn}
+                onClick={onClose}
+                disabled={isSubmitting}
+              >
                 Cancel
               </button>
               <button
                 type="submit"
                 className={styles.submitBtn}
-                disabled={isSubmitting || isCompressing || message.trim().length < 10}
+                disabled={isSubmitting || message.trim().length < 10}
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 size={15} className={styles.spinIcon} />
-                    <span>Publishing...</span>
+                    <Loader2 size={16} className={styles.spinIcon} />
+                    <span>Submitting...</span>
                   </>
                 ) : (
                   <span>Submit Review</span>
