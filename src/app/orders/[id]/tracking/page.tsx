@@ -45,7 +45,8 @@ interface TrackingEvent {
   stage: string;
   description: string | null;
   location: string | null;
-  eventAt: string;
+  eventAt?: string;
+  timestamp?: string;
 }
 
 interface TrackingData {
@@ -550,16 +551,20 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ id: st
             </div>
 
             <div className={styles.eventsList}>
-              {displayEvents.map((ev, idx) => (
-                <div key={idx} className={styles.eventRow}>
-                  <div className={styles.eventTime}>
-                    <span className={styles.eventDate}>
-                      {new Date(ev.eventAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
-                    </span>
-                    <span className={styles.eventHour}>
-                      {new Date(ev.eventAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
-                    </span>
-                  </div>
+              {displayEvents.map((ev, idx) => {
+                const eventTime = ev.eventAt || ev.timestamp;
+                const d = eventTime ? new Date(eventTime) : null;
+                const isValid = d && !isNaN(d.getTime());
+                return (
+                  <div key={idx} className={styles.eventRow}>
+                    <div className={styles.eventTime}>
+                      <span className={styles.eventDate}>
+                        {isValid ? d.toLocaleDateString("en-IN", { day: "numeric", month: "short" }) : "Recent"}
+                      </span>
+                      <span className={styles.eventHour}>
+                        {isValid ? d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : ""}
+                      </span>
+                    </div>
                   <div className={styles.eventDivider}>
                     <div className={styles.eventDot} />
                     {idx < displayEvents.length - 1 && <div className={styles.eventLine} />}
@@ -574,8 +579,9 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ id: st
                     )}
                   </div>
                 </div>
-              ))}
-            </div>
+              );
+            })}
+          </div>
 
             {events.length > 4 && (
               <button

@@ -900,9 +900,14 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
                 </div>
               </div>
 
-              {(tracking?.trackingUrl || (order.trackingNumber && String(order.courierPartner || '').toLowerCase().includes('delhivery'))) && (
+              {(tracking?.trackingUrl || order.trackingNumber) && (
                 <a
-                  href={tracking?.trackingUrl || `https://www.delhivery.com/track/package/${order.trackingNumber}`}
+                  href={
+                    tracking?.trackingUrl ||
+                    (String(order.courierPartner || "").toLowerCase().includes("delhivery")
+                      ? `https://www.delhivery.com/track/package/${order.trackingNumber}`
+                      : `https://app.elite.ekartlogistics.in/track/${order.trackingNumber}`)
+                  }
                   target="_blank"
                   rel="noopener noreferrer"
                   className={styles.carrierPortalBtn}
