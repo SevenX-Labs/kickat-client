@@ -6,7 +6,6 @@ import Image from 'next/image';
 import styles from './ProductDetail.module.css';
 import { Product } from './ProductDetail';
 import { ReviewsDrawer } from './ReviewsDrawer';
-import { WriteReviewModal } from './WriteReviewModal';
 import { reviewService } from '@/services/reviewService';
 import { ReviewSummaryData, ReviewItem } from '@/types/review';
 
@@ -38,7 +37,6 @@ function formatRelativeTime(dateString: string): string {
 }
 
 export function ProductReviews({ product }: ProductReviewsProps) {
-  const [showReviewModal, setShowReviewModal] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [summary, setSummary] = useState<ReviewSummaryData | null>(null);
   const [liveReviews, setLiveReviews] = useState<ReviewItem[]>([]);
@@ -89,9 +87,6 @@ export function ProductReviews({ product }: ProductReviewsProps) {
   // Extract photos attached to customer reviews
   const customerPhotos = liveReviews.flatMap((r) => r.photos || []).filter(Boolean);
 
-  const handleReviewSubmitted = () => {
-    fetchSummaryAndReviews();
-  };
 
   const toggleHelpful = async (revId: string) => {
     try {
@@ -153,17 +148,9 @@ export function ProductReviews({ product }: ProductReviewsProps) {
           <div className={styles.emptyTextContent}>
             <h3 className={styles.emptyTitle}>No customer reviews yet</h3>
             <p className={styles.emptySubtitle}>
-              Have you tried {product.name || 'this product'}? Share your thoughts and help other pet parents make the right choice!
+              Reviews can be submitted by verified purchasers after their order has been delivered.
             </p>
           </div>
-          <button
-            type="button"
-            className={styles.writeFirstReviewBtn}
-            onClick={() => setShowReviewModal(true)}
-          >
-            <Edit3 size={16} />
-            <span>Write the First Review</span>
-          </button>
         </div>
       ) : (
         /* Top Ratings Overview Row */
@@ -206,17 +193,7 @@ export function ProductReviews({ product }: ProductReviewsProps) {
               ))}
             </div>
 
-            {/* Right: Write a Review Button */}
-            <div className={styles.writeReviewBtnCol}>
-              <button
-                type="button"
-                className={styles.writeReviewBtn}
-                onClick={() => setShowReviewModal(true)}
-              >
-                <Edit3 size={15} />
-                <span>Write a Review</span>
-              </button>
-            </div>
+
           </div>
 
           {/* Real Customer Photos Row if present */}
@@ -385,16 +362,8 @@ export function ProductReviews({ product }: ProductReviewsProps) {
         product={product}
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
-        onWriteReview={() => setShowReviewModal(true)}
       />
 
-      {/* Write Review Modal */}
-      <WriteReviewModal
-        product={product}
-        isOpen={showReviewModal}
-        onClose={() => setShowReviewModal(false)}
-        onSubmitSuccess={handleReviewSubmitted}
-      />
 
       {/* Photo Lightbox Preview */}
       {previewPhoto && (

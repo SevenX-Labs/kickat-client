@@ -21,7 +21,7 @@ interface ReviewsDrawerProps {
   product: Product;
   isOpen: boolean;
   onClose: () => void;
-  onWriteReview: () => void;
+  onWriteReview?: () => void;
 }
 
 function formatRelativeTime(dateString: string): string {
@@ -207,20 +207,9 @@ export function ReviewsDrawer({ product, isOpen, onClose, onWriteReview }: Revie
                 No customer reviews yet
               </h4>
               <p style={{ fontSize: '0.875rem', color: '#666055', lineHeight: 1.5, margin: 0, maxWidth: '320px' }}>
-                Be the first person to share your experience with {product.name || 'this item'}!
+                Reviews can be submitted by verified purchasers after their order has been delivered.
               </p>
-              <button
-                type="button"
-                className={styles.writeBtn}
-                onClick={() => {
-                  onClose();
-                  onWriteReview();
-                }}
-                style={{ marginTop: '0.5rem' }}
-              >
-                <Edit3 size={15} />
-                <span>Write a Review</span>
-              </button>
+
             </div>
           ) : (
             <>
@@ -244,17 +233,7 @@ export function ReviewsDrawer({ product, isOpen, onClose, onWriteReview }: Revie
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  className={styles.writeBtn}
-                  onClick={() => {
-                    onClose();
-                    onWriteReview();
-                  }}
-                >
-                  <Edit3 size={14} />
-                  <span>Write Review</span>
-                </button>
+
               </div>
 
               {/* Photo Gallery Strip if photos exist */}

@@ -159,10 +159,7 @@ export default function ReviewsPage({ params }: { params: Promise<{ id: string }
         <div>
           <div className={styles.listHeader}>
             <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>Showing {reviews.length} reviews</h2>
-            <button className={styles.writeBtn} onClick={() => setIsModalOpen(true)}>
-              <Edit3 size={16} style={{ display: 'inline', marginRight: '0.5rem', verticalAlign: 'middle' }} />
-              Write a Review
-            </button>
+
           </div>
 
           {isLoading ? (
