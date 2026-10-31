@@ -9,7 +9,6 @@ import { ProductInfo } from "./ProductInfo";
 import { ProductTabs } from "./ProductTabs";
 import { ProductSpecsAndSizeGuide } from "./ProductSpecsAndSizeGuide";
 import { ProductReviews } from "./ProductReviews";
-import { ProductFAQ } from "./ProductFAQ";
 import { RelatedProducts } from "./RelatedProducts";
 import { ProductDetailSkeleton } from "./ProductDetailSkeleton";
 import { userService } from "@/services/userService";
@@ -218,7 +217,7 @@ export function ProductDetail({ product, isLoading, initialVariantId }: ProductD
         </div>
       </section>
 
-      {/* 4. Product Details + Size Guide */}
+      {/* 4. Product Specifications & FAQs (Side-by-side) */}
       <section className={styles.sectionPadding}>
         <div className={styles.container}>
           <ProductSpecsAndSizeGuide product={product} selectedVariant={selectedVariant} />
@@ -229,13 +228,6 @@ export function ProductDetail({ product, isLoading, initialVariantId }: ProductD
       <section className={styles.sectionPadding}>
         <div className={styles.container}>
           <ProductReviews product={product} />
-        </div>
-      </section>
-
-      {/* 6. Frequently Asked Questions (FAQ) Section */}
-      <section className={styles.sectionPadding}>
-        <div className={styles.container}>
-          <ProductFAQ faqs={product.faqs} />
         </div>
       </section>
 

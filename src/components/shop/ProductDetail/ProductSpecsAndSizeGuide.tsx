@@ -1,10 +1,34 @@
 "use client";
 
-import { useState } from 'react';
-import { ArrowRight, Droplets, Waves, Sun, Dog, ShieldCheck, Check, X, Ruler, Sparkles, AlertCircle } from 'lucide-react';
-import styles from './ProductDetail.module.css';
-import { usePublicSettings } from '@/hooks/usePublicSettings';
-import { Product, ProductVariant } from './ProductDetail';
+import { useState } from "react";
+import { ShieldCheck, ChevronDown, HelpCircle, Sparkles } from "lucide-react";
+import styles from "./ProductDetail.module.css";
+import { usePublicSettings } from "@/hooks/usePublicSettings";
+import { Product, ProductVariant } from "./ProductDetail";
+
+export interface ProductFAQItem {
+  question: string;
+  answer: string;
+}
+
+const DEFAULT_PRODUCT_FAQS: ProductFAQItem[] = [
+  {
+    question: "Is this product genuine and safe for my pet?",
+    answer: "Yes, 100%. Every item on KickAt is guaranteed authentic, quality-checked, and crafted with pet-safe standards to ensure complete safety and comfort.",
+  },
+  {
+    question: "How long does delivery take?",
+    answer: "Standard delivery typically takes 2–5 business days depending on your location across India. Express courier tracking is provided with every order.",
+  },
+  {
+    question: "What is your return and exchange policy?",
+    answer: "We offer a 7-day hassle-free return and replacement policy for eligible items. If there is any defect or quality issue, contact our support team anytime.",
+  },
+  {
+    question: "How should I clean and maintain this item?",
+    answer: "Follow the care recommendations for best longevity. Keep in a clean, dry area and wipe or wash with gentle, pet-safe water or soap as needed.",
+  },
+];
 
 interface SpecsAndSizeGuideProps {
   product?: Product;
@@ -14,7 +38,33 @@ interface SpecsAndSizeGuideProps {
 
 export function ProductSpecsAndSizeGuide({ product, selectedVariant, productDetails }: SpecsAndSizeGuideProps) {
   const { manufacturing } = usePublicSettings();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+
+  // Parse real FAQs from product
+  let parsedFaqs: ProductFAQItem[] = [];
+  if (product?.faqs) {
+    if (Array.isArray(product.faqs)) {
+      parsedFaqs = product.faqs.filter(
+        (f) => f && typeof f.question === "string" && f.question.trim().length > 0
+      );
+    } else if (typeof product.faqs === "string") {
+      try {
+        const decoded = JSON.parse(product.faqs);
+        if (Array.isArray(decoded)) {
+          parsedFaqs = decoded.filter(
+            (f) => f && typeof f.question === "string" && f.question.trim().length > 0
+          );
+        }
+      } catch {}
+    }
+  }
+
+  const displayFaqs = parsedFaqs.length > 0 ? parsedFaqs : DEFAULT_PRODUCT_FAQS;
+
+  // Real care instructions from DB (only shown if genuine care instructions exist)
+  const careList = Array.isArray(product?.careInstructions)
+    ? product.careInstructions.filter((c) => typeof c === "string" && c.trim().length > 0)
+    : [];
 
   let specsList: { label: string; value: string }[] = [];
 
@@ -39,53 +89,49 @@ export function ProductSpecsAndSizeGuide({ product, selectedVariant, productDeta
       : (typeof product.shippingHeightCm === "number" && product.shippingHeightCm > 0 ? product.shippingHeightCm : null);
 
     specsList = [
-      { label: 'Brand', value: product.brand || 'KickAt' },
-      { label: 'Category', value: product.mainCategory || 'Pet Essentials' },
+      { label: "Brand", value: product.brand || "KickAt" },
+      { label: "Category", value: product.mainCategory || "Pet Essentials" },
       ...(product.petSpecies
-        ? [{ label: 'Suitable For', value: `${product.petSpecies.charAt(0).toUpperCase()}${product.petSpecies.slice(1).toLowerCase()}s` }]
-        : [{ label: 'Suitable For', value: 'All Pets' }]),
+        ? [{ label: "Suitable For", value: `${product.petSpecies.charAt(0).toUpperCase()}${product.petSpecies.slice(1).toLowerCase()}s` }]
+        : [{ label: "Suitable For", value: "All Pets" }]),
       ...(product.dietaryPreference
-        ? [{ label: 'Dietary Type', value: product.dietaryPreference === 'VEG' ? 'Vegetarian' : 'Non-Vegetarian' }]
+        ? [{ label: "Dietary Type", value: product.dietaryPreference === "VEG" ? "Vegetarian" : "Non-Vegetarian" }]
         : []),
       ...(selectedVariant?.name
-        ? [{ label: 'Selected Variant', value: selectedVariant.name }]
+        ? [{ label: "Selected Variety", value: selectedVariant.name }]
         : []),
       ...(activeWeightKg
-        ? [{ label: 'Shipping Weight', value: `${activeWeightKg} kg` }]
+        ? [{ label: "Shipping Weight", value: `${activeWeightKg} kg` }]
         : []),
       ...(activeLengthCm
-        ? [{ label: 'Package Length', value: `${activeLengthCm} cm` }]
+        ? [{ label: "Package Length", value: `${activeLengthCm} cm` }]
         : []),
       ...(activeBreadthCm
-        ? [{ label: 'Package Breadth (Width)', value: `${activeBreadthCm} cm` }]
+        ? [{ label: "Package Breadth (Width)", value: `${activeBreadthCm} cm` }]
         : []),
       ...(activeHeightCm
-        ? [{ label: 'Package Height', value: `${activeHeightCm} cm` }]
+        ? [{ label: "Package Height", value: `${activeHeightCm} cm` }]
         : []),
       ...(activeLengthCm && activeBreadthCm && activeHeightCm
-        ? [{ label: 'Package Dimensions (L × B × H)', value: `${activeLengthCm} × ${activeBreadthCm} × ${activeHeightCm} cm` }]
+        ? [{ label: "Package Dimensions (L × B × H)", value: `${activeLengthCm} × ${activeBreadthCm} × ${activeHeightCm} cm` }]
         : []),
-      ...(product.materials && product.materials.length < 50 && !product.materials.toLowerCase().includes('ingredients') && !product.materials.toLowerCase().includes('storage')
-        ? [{ label: 'Material', value: product.materials }]
-        : []),
-      { label: 'Product Type', value: product.type === 'VARIABLE' ? 'Multi-Variant Pack' : 'Standard Pack' },
-      { label: 'Availability', value: ((selectedVariant ? selectedVariant.stock : product.stock) ?? 100) > 0 ? 'In Stock' : 'Out of Stock' },
-      { label: 'Country of Origin', value: manufacturing?.countryOfOrigin || 'India' },
-      ...(manufacturing?.manufacturerName ? [{ label: 'Manufacturer', value: `${manufacturing.manufacturerName}${manufacturing.manufacturerAddress ? `, ${manufacturing.manufacturerAddress}` : ''}` }] : []),
-      ...(manufacturing?.marketedBy ? [{ label: 'Marketed By', value: manufacturing.marketedBy }] : []),
-      ...(manufacturing?.consumerCareEmail || manufacturing?.consumerCarePhone ? [{ label: 'Consumer Care', value: [manufacturing.consumerCareEmail, manufacturing.consumerCarePhone].filter(Boolean).join(' | ') }] : []),
-      ...(manufacturing?.shelfLife ? [{ label: 'Shelf Life', value: manufacturing.shelfLife }] : []),
+      { label: "Product Type", value: selectedVariant?.name ? "Pack Variant" : "Standard Pack" },
+      ...(manufacturing?.countryOfOrigin ? [{ label: "Country of Origin", value: manufacturing.countryOfOrigin }] : [{ label: "Country of Origin", value: "India" }]),
+      ...(manufacturing?.manufacturerName ? [{ label: "Manufacturer", value: manufacturing.manufacturerName }] : []),
+      ...(manufacturing?.manufacturerAddress ? [{ label: "Manufacturer Address", value: manufacturing.manufacturerAddress }] : []),
+      ...(manufacturing?.marketedBy ? [{ label: "Marketed By", value: manufacturing.marketedBy }] : []),
+      ...(manufacturing?.consumerCareEmail || manufacturing?.consumerCarePhone ? [{ label: "Consumer Care", value: [manufacturing.consumerCareEmail, manufacturing.consumerCarePhone].filter(Boolean).join(" | ") }] : []),
+      ...(manufacturing?.shelfLife ? [{ label: "Shelf Life", value: manufacturing.shelfLife }] : []),
     ];
 
-    if (product.attributes && typeof product.attributes === 'object') {
-      const excludedKeys = new Set(['ingredients', 'feedingguide', 'description', 'highlights', 'images', 'media', 'careinstructions', 'sizeguide', 'faqs']);
+    if (product.attributes && typeof product.attributes === "object") {
+      const excludedKeys = new Set(["ingredients", "feedingguide", "description", "highlights", "images", "media", "careinstructions", "sizeguide", "faqs", "safetybadges"]);
       Object.entries(product.attributes).forEach(([key, val]) => {
         const lowerKey = key.toLowerCase();
-        if (!excludedKeys.has(lowerKey) && (typeof val === 'string' || typeof val === 'number')) {
+        if (!excludedKeys.has(lowerKey) && (typeof val === "string" || typeof val === "number")) {
           const strVal = String(val).trim();
-          // Filter out long text or text containing instructions/ingredients
-          if (strVal.length > 0 && strVal.length < 60 && !strVal.toLowerCase().includes('ingredients') && !strVal.toLowerCase().includes('storage:')) {
-            const formattedLabel = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
+          if (strVal.length > 0 && strVal.length < 60 && !strVal.toLowerCase().includes("ingredients") && !strVal.toLowerCase().includes("storage:")) {
+            const formattedLabel = key.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase()).trim();
             specsList.push({ label: formattedLabel, value: strVal });
           }
         }
@@ -93,16 +139,12 @@ export function ProductSpecsAndSizeGuide({ product, selectedVariant, productDeta
     }
   } else {
     specsList = [
-      { label: 'Brand', value: 'KickAt' },
-      { label: 'Material', value: 'Pet-Safe Material' },
-      { label: 'Suitable For', value: 'All Pets' },
-      { label: 'Country of Origin', value: 'India' },
+      { label: "Brand", value: "KickAt" },
+      { label: "Material", value: "Pet-Safe Material" },
+      { label: "Suitable For", value: "All Pets" },
+      { label: "Country of Origin", value: "India" },
     ];
   }
-
-  // Variant size cards if variants exist
-  const variants = product?.variants || [];
-  const hasVariants = variants.length > 0;
 
   return (
     <div className={styles.specsSizeSectionGrid}>
@@ -126,127 +168,60 @@ export function ProductSpecsAndSizeGuide({ product, selectedVariant, productDeta
         </div>
       </div>
 
-      {/* Right Column: Size Guide & Care Instructions */}
-      <div className={styles.sizeGuideCard}>
-        <div className={styles.sizeGuideHeader}>
-          <div className={styles.sizeGuideHeaderTitleGroup}>
-            <h3 className={styles.sizeGuideTitle}>Size &amp; Storage Guide</h3>
-            <span className={styles.sizeGuideSubtitle}>Recommended for optimal freshness and comfort.</span>
-          </div>
+      {/* Right Column: Frequently Asked Questions (Replaces Dummy Size Guide) */}
+      <div className={styles.specsCard}>
+        <div className={styles.specsCardHeader}>
+          <h3 className={styles.specsCardTitle}>Frequently Asked Questions</h3>
+          <span className={styles.specsVerifiedBadge}>
+            <HelpCircle size={14} color="#2E7D32" />
+            <span>Support &amp; FAQ</span>
+          </span>
         </div>
 
-        {/* Variant Size Pills / Cards */}
-        {hasVariants ? (
-          <div className={styles.variantGuideBlock}>
-            <span className={styles.variantGuideLabel}>Available Options:</span>
-            <div className={styles.variantPillsList}>
-              {variants.map((v) => (
-                <div key={v.id} className={styles.variantGuidePill}>
-                  <span className={styles.variantGuideName}>{v.name}</span>
-                  <span className={styles.variantGuidePrice}>
-                    ₹{(v.discountPrice && v.discountPrice > 0 ? v.discountPrice : v.price).toLocaleString()}
-                  </span>
+        <div className={styles.faqAccordionContainer}>
+          {displayFaqs.map((faq, idx) => {
+            const isOpen = openFaqIndex === idx;
+            return (
+              <div
+                key={idx}
+                className={`${styles.faqAccordionItem} ${isOpen ? styles.faqItemOpen : ""}`}
+              >
+                <button
+                  type="button"
+                  className={styles.faqQuestionBtn}
+                  onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                >
+                  <span className={styles.faqQuestionText}>{faq.question}</span>
+                  <ChevronDown
+                    size={17}
+                    className={`${styles.faqChevron} ${isOpen ? styles.faqChevronRotate : ""}`}
+                  />
+                </button>
+                {isOpen && (
+                  <div className={styles.faqAnswerContent}>
+                    <p className={styles.faqAnswerText}>{faq.answer}</p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Real Care Instructions from Admin (only shown if entered) */}
+        {careList.length > 0 && (
+          <div className={styles.careSection}>
+            <h4 className={styles.careTitle}>Storage &amp; Care Recommendations</h4>
+            <div className={styles.careItemsRow}>
+              {careList.map((instruction, idx) => (
+                <div key={idx} className={styles.careItem}>
+                  <Sparkles size={15} className={styles.careIcon} />
+                  <span>{instruction}</span>
                 </div>
               ))}
             </div>
           </div>
-        ) : (
-          <div className={styles.sizeCardsRow}>
-            <div className={styles.sizeCardTile}>
-              <span className={styles.sizeCardLetter}>S</span>
-              <span className={styles.sizeCardWeight}>Small Pets (&lt;5 kg)</span>
-              <div className={styles.sizeCardDogIconWrap}>
-                <Dog size={22} className={styles.dogIconDefault} />
-              </div>
-            </div>
-            <div className={`${styles.sizeCardTile} ${styles.sizeCardActive}`}>
-              <span className={styles.sizeCardLetter}>M</span>
-              <span className={styles.sizeCardWeight}>Medium (5–15 kg)</span>
-              <div className={styles.sizeCardDogIconWrap}>
-                <Dog size={22} className={styles.dogIconActive} />
-              </div>
-            </div>
-            <div className={styles.sizeCardTile}>
-              <span className={styles.sizeCardLetter}>L</span>
-              <span className={styles.sizeCardWeight}>Large (15–30 kg)</span>
-              <div className={styles.sizeCardDogIconWrap}>
-                <Dog size={22} className={styles.dogIconDefault} />
-              </div>
-            </div>
-          </div>
         )}
-
-        <button
-          type="button"
-          className={styles.viewDetailedSizeGuideLink}
-          onClick={() => setIsModalOpen(true)}
-        >
-          <Ruler size={14} />
-          <span>Need help choosing? View sizing tips</span>
-          <ArrowRight size={14} />
-        </button>
-
-        {/* Storage & Care Instructions */}
-        <div className={styles.careSection}>
-          <h4 className={styles.careTitle}>Storage &amp; Care Recommendations</h4>
-          <div className={styles.careItemsRow}>
-            <div className={styles.careItem}>
-              <Sun size={17} className={styles.careIcon} />
-              <span>Keep away from direct heat</span>
-            </div>
-            <div className={styles.careItem}>
-              <Droplets size={17} className={styles.careIcon} />
-              <span>Store in a cool, dry place</span>
-            </div>
-            <div className={styles.careItem}>
-              <Sparkles size={17} className={styles.careIcon} />
-              <span>Reseal pack after opening</span>
-            </div>
-          </div>
-        </div>
       </div>
-
-      {/* Sizing Dialogue Modal */}
-      {isModalOpen && (
-        <div className={styles.sizeModalBackdrop} onClick={() => setIsModalOpen(false)}>
-          <div className={styles.sizeModalCard} onClick={(e) => e.stopPropagation()}>
-            <button
-              type="button"
-              className={styles.sizeModalCloseBtn}
-              onClick={() => setIsModalOpen(false)}
-              aria-label="Close modal"
-            >
-              <X size={18} />
-            </button>
-
-            <div className={styles.sizeModalHeader}>
-              <h3 className={styles.sizeModalTitle}>Pet Sizing &amp; Portion Guidance</h3>
-              <p className={styles.sizeModalSubtitle}>
-                Select the right portion or size based on your pet&apos;s breed and weight.
-              </p>
-            </div>
-
-            <div className={styles.modalTipsList}>
-              <div className={styles.modalTipItem}>
-                <strong>Puppies &amp; Small Breeds:</strong> Recommended daily portion: 50g–120g split across 2–3 meals.
-              </div>
-              <div className={styles.modalTipItem}>
-                <strong>Adult Dogs (Medium):</strong> Recommended daily portion: 150g–250g split across 2 meals.
-              </div>
-              <div className={styles.modalTipItem}>
-                <strong>Adult Dogs (Large / Active):</strong> Recommended daily portion: 300g–450g daily.
-              </div>
-            </div>
-
-            <div className={styles.careSection}>
-              <h4 className={styles.careTitle}>Feeding Advice</h4>
-              <p style={{ fontSize: '0.825rem', color: '#524D45', lineHeight: 1.5, margin: 0 }}>
-                Transition gradually over 7 days when introducing new food or treats. Mix 25% new food with 75% current food on days 1–2, increasing gradually.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
