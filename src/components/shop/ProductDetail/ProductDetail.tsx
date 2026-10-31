@@ -7,7 +7,7 @@ import { ArrowLeft, ChevronRight } from "lucide-react";
 import { ProductGallery } from "./ProductGallery";
 import { ProductInfo } from "./ProductInfo";
 import { ProductTabs } from "./ProductTabs";
-import { ProductSpecsAndSizeGuide } from "./ProductSpecsAndSizeGuide";
+import { ProductFAQ } from "./ProductFAQ";
 import { ProductReviews } from "./ProductReviews";
 import { RelatedProducts } from "./RelatedProducts";
 import { ProductDetailSkeleton } from "./ProductDetailSkeleton";
@@ -210,28 +210,28 @@ export function ProductDetail({ product, isLoading, initialVariantId }: ProductD
         </div>
       </section>
 
-      {/* 3. Tabbed Content Section (Details & Highlights, Ingredients, Feeding, Safety, Shipping) */}
+      {/* 2. Tabbed Content Section (Details, Safety, Specifications, Compliance) */}
       <section className={styles.sectionPadding}>
         <div className={styles.container}>
           <ProductTabs product={product} selectedVariant={selectedVariant} />
         </div>
       </section>
 
-      {/* 4. Product Specifications & FAQs (Side-by-side) */}
-      <section className={styles.sectionPadding}>
-        <div className={styles.container}>
-          <ProductSpecsAndSizeGuide product={product} selectedVariant={selectedVariant} />
-        </div>
-      </section>
-
-      {/* 5. Customer Reviews Section */}
+      {/* 3. Customer Reviews Section */}
       <section className={styles.sectionPadding}>
         <div className={styles.container}>
           <ProductReviews product={product} />
         </div>
       </section>
 
-      {/* 7. "You may also like" Section */}
+      {/* 4. Frequently Asked Questions Section */}
+      <section className={styles.sectionPadding}>
+        <div className={styles.container}>
+          <ProductFAQ faqs={product.faqs} careInstructions={product.careInstructions} />
+        </div>
+      </section>
+
+      {/* 5. "You may also like" Section */}
       <section className={styles.sectionPadding}>
         <div className={styles.container}>
           <RelatedProducts currentProduct={product} />

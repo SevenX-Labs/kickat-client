@@ -1329,6 +1329,29 @@
   border-radius: 20px;
 }
 
+.specsTabCard {
+  background: #FAFAF8;
+  border: 1px solid #EBE5DB;
+  border-radius: 16px;
+  padding: 1.5rem 1.75rem;
+}
+
+.specsTabGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0 3rem;
+}
+
+@media (max-width: 768px) {
+  .specsTabCard {
+    padding: 1rem 1.25rem;
+  }
+  .specsTabGrid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
 .specsTable {
   display: flex;
   flex-direction: column;

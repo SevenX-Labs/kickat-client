@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, HelpCircle, Sparkles } from "lucide-react";
 import styles from "./ProductDetail.module.css";
 
 export interface ProductFAQItem {
@@ -10,31 +10,57 @@ export interface ProductFAQItem {
 }
 
 interface ProductFAQProps {
-  faqs?: ProductFAQItem[];
+  faqs?: Array<{ question: string; answer: string }> | string | null;
+  careInstructions?: string[] | null;
 }
 
 const DEFAULT_FAQS: ProductFAQItem[] = [
   {
-    question: "Is this product safe and non-toxic for pets?",
-    answer: "Absolutely. All KickAt products are crafted with premium pet-safe materials, non-toxic, and tested thoroughly to ensure complete safety and comfort for your pet."
+    question: "Is this product safe and genuine for my pet?",
+    answer: "Yes, 100%. Every item on KickAt is guaranteed authentic, quality-inspected, and crafted with pet-safe materials to ensure complete safety and comfort for your furry friend."
   },
   {
-    question: "How do I clean and care for this product?",
-    answer: "Simply follow the care instructions listed on this page. Most items can be easily cleaned with mild pet-safe soap and warm water or air-dried."
+    question: "How long does shipping and delivery take?",
+    answer: "Orders are dispatched within 24 hours. Standard delivery typically takes 2–5 business days depending on your location across India. Real-time tracking is provided for every order."
   },
   {
     question: "What is your return and exchange policy?",
-    answer: "We offer a 7-day hassle-free return and replacement policy for eligible items. If there is any sizing or quality issue, contact our support team anytime."
+    answer: "We offer a 7-day hassle-free return and replacement policy for eligible items. If there is any defect or damage during transit, reach out to our support team for quick assistance."
   },
   {
-    question: "When can I expect delivery?",
-    answer: "Standard delivery typically takes 2-5 business days depending on your location across India. Express shipping is also available during checkout."
+    question: "How do I clean and care for this product?",
+    answer: "Follow the care instructions listed on this page. Most items can be easily cleaned with mild pet-safe soap and warm water or air-dried to maintain durability."
   }
 ];
 
-export function ProductFAQ({ faqs }: ProductFAQProps) {
-  const displayFaqs = (faqs && Array.isArray(faqs) && faqs.length > 0) ? faqs : DEFAULT_FAQS;
+export function ProductFAQ({ faqs, careInstructions }: ProductFAQProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+  // Parse real FAQs safely from product
+  let parsedFaqs: ProductFAQItem[] = [];
+  if (faqs) {
+    if (Array.isArray(faqs)) {
+      parsedFaqs = faqs.filter(
+        (f) => f && typeof f.question === "string" && f.question.trim().length > 0
+      );
+    } else if (typeof faqs === "string") {
+      try {
+        const decoded = JSON.parse(faqs);
+        if (Array.isArray(decoded)) {
+          parsedFaqs = decoded.filter(
+            (f) => f && typeof f.question === "string" && f.question.trim().length > 0
+          );
+        }
+      } catch {}
+    }
+  }
+
+  const displayFaqs = parsedFaqs.length > 0 ? parsedFaqs : DEFAULT_FAQS;
+
+  // Real care instructions from DB (only shown if entered)
+  const careList = Array.isArray(careInstructions)
+    ? careInstructions.filter((c) => typeof c === "string" && c.trim().length > 0)
+    : [];
 
   const toggleAccordion = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -42,7 +68,20 @@ export function ProductFAQ({ faqs }: ProductFAQProps) {
 
   return (
     <div className={styles.faqMainWrapper}>
-      <h2 className={styles.faqSectionHeaderTitle}>Frequently Asked Questions</h2>
+      <div className={styles.specsCardHeader} style={{ marginBottom: "1.25rem" }}>
+        <div>
+          <h2 className={styles.faqSectionHeaderTitle} style={{ margin: 0 }}>
+            Frequently Asked Questions
+          </h2>
+          <p style={{ margin: "0.25rem 0 0 0", fontSize: "0.875rem", color: "#78746D" }}>
+            Answers about pet safety, delivery, returns, and care recommendations
+          </p>
+        </div>
+        <span className={styles.specsVerifiedBadge}>
+          <HelpCircle size={14} color="#2E7D32" />
+          <span>Support &amp; FAQ</span>
+        </span>
+      </div>
 
       <div className={styles.faqAccordionContainer}>
         {displayFaqs.map((faq, idx) => {
@@ -69,6 +108,21 @@ export function ProductFAQ({ faqs }: ProductFAQProps) {
           );
         })}
       </div>
+
+      {/* Real Care Instructions from Admin (if available) */}
+      {careList.length > 0 && (
+        <div className={styles.careSection} style={{ marginTop: "1.75rem" }}>
+          <h4 className={styles.careTitle}>Storage &amp; Care Recommendations</h4>
+          <div className={styles.careItemsRow}>
+            {careList.map((instruction, idx) => (
+              <div key={idx} className={styles.careItem}>
+                <Sparkles size={15} className={styles.careIcon} />
+                <span>{instruction}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
