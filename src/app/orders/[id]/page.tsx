@@ -904,9 +904,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
                 <a
                   href={
                     tracking?.trackingUrl ||
-                    (String(order.courierPartner || "").toLowerCase().includes("delhivery")
-                      ? `https://www.delhivery.com/track/package/${order.trackingNumber}`
-                      : `https://app.elite.ekartlogistics.in/track/${order.trackingNumber}`)
+                    `https://app.elite.ekartlogistics.in/track/${encodeURIComponent(order.trackingNumber || "")}`
                   }
                   target="_blank"
                   rel="noopener noreferrer"
