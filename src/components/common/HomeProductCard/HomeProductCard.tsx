@@ -190,7 +190,7 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
     }
   }, [isAdded, isAdding, isOutOfStock, isVariable, hasExplicitVariant, productId, targetVariantId, product.image, router, addToCart]);
 
-  const handleBuyNow = useCallback(async (e: React.MouseEvent) => {
+  const handleBuyNow = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (isOutOfStock) return;
@@ -200,22 +200,9 @@ function HomeProductCardComponent({ product, onRemoveFromWishlist }: HomeProduct
       return;
     }
 
-    if (isBuyingNow) return;
-
-    setIsBuyingNow(true);
-    try {
-      await addToCart(productId, targetVariantId, 1);
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('cart-item-added'));
-      }
-      router.push('/checkout/place-order');
-    } catch (err) {
-      console.warn("Buy now error:", err);
-      router.push('/checkout/place-order');
-    } finally {
-      setIsBuyingNow(false);
-    }
-  }, [isOutOfStock, isVariable, hasExplicitVariant, isBuyingNow, addToCart, productId, targetVariantId, router]);
+    const targetUrl = `/checkout/place-order?buyNow=1&productId=${productId}${targetVariantId ? `&variantId=${targetVariantId}` : ''}&qty=1`;
+    router.push(targetUrl);
+  }, [isOutOfStock, isVariable, hasExplicitVariant, productId, targetVariantId, router]);
 
   const handleCardClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;

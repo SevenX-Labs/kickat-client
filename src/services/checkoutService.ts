@@ -8,13 +8,27 @@ import {
   PlaceOrderResponse,
 } from '@/types/checkout';
 
+export interface GetCheckoutParams {
+  buyNowProductId?: string;
+  buyNowVariantId?: string;
+  buyNowQuantity?: number;
+}
+
 export const checkoutService = {
   /**
    * GET /checkout
-   * Retrieve checkout session with active cart, computed totals & saved addresses
+   * Retrieve checkout session with active cart or direct buy-now item, computed totals & saved addresses
    */
-  async getCheckout(): Promise<CheckoutResponse> {
-    return api<CheckoutResponse>('checkout');
+  async getCheckout(params?: GetCheckoutParams): Promise<CheckoutResponse> {
+    let url = 'checkout';
+    if (params && params.buyNowProductId) {
+      const search = new URLSearchParams();
+      search.append('buyNowProductId', params.buyNowProductId);
+      if (params.buyNowVariantId) search.append('buyNowVariantId', params.buyNowVariantId);
+      if (params.buyNowQuantity) search.append('buyNowQuantity', String(params.buyNowQuantity));
+      url += `?${search.toString()}`;
+    }
+    return api<CheckoutResponse>(url);
   },
 
   /**

@@ -50,7 +50,7 @@ export function VariantSelectorModal({
   onAddToCartSuccess,
 }: VariantSelectorModalProps) {
   const router = useRouter();
-  const { addToCart, buyNow } = useCart();
+  const { addToCart } = useCart();
   const { isAuthenticated } = useAuth();
 
   const [variants, setVariants] = useState<BackendProductVariant[]>(product.variants || []);
@@ -186,9 +186,11 @@ export function VariantSelectorModal({
       return;
     }
 
+    const targetUrl = `/checkout/place-order?buyNow=1&productId=${product.id}&variantId=${selectedVariant.id}&qty=${quantity}`;
+
     if (!isAuthenticated) {
       onClose();
-      router.push(`/login?redirect=${encodeURIComponent('/checkout/place-order')}`);
+      router.push(`/login?redirect=${encodeURIComponent(targetUrl)}`);
       return;
     }
 
@@ -196,9 +198,8 @@ export function VariantSelectorModal({
     setErrorMsg(null);
 
     try {
-      await buyNow(product.id, selectedVariant.id, quantity);
       onClose();
-      router.push('/checkout/place-order');
+      router.push(targetUrl);
     } catch (err: any) {
       console.error("Buy now error:", err);
       setErrorMsg(err?.message || "Failed to proceed to checkout. Please try again.");

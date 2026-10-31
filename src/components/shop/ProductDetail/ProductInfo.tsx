@@ -329,23 +329,16 @@ export function ProductInfo({ product, selectedVariant, onSelectVariant }: Produ
       return;
     }
     if (isBuyingNow || isAdding || isOutOfStock) return;
+
+    const targetUrl = `/checkout/place-order?buyNow=1&productId=${product.id}${selectedVariant?.id ? `&variantId=${selectedVariant.id}` : ""}&qty=${quantity}`;
+
     if (!isAuthenticated) {
-      router.push(`/login?redirect=${encodeURIComponent("/checkout/place-order")}`);
+      router.push(`/login?redirect=${encodeURIComponent(targetUrl)}`);
       return;
     }
     setIsBuyingNow(true);
     try {
-      const existingItem = items.find(
-        (it) => it.productId === product.id && (selectedVariant?.id ? it.variantId === selectedVariant.id : !it.variantId)
-      );
-      if (existingItem) {
-        if (existingItem.quantity !== quantity) {
-          await updateQuantity(existingItem.id, quantity);
-        }
-      } else {
-        await addToCart(product.id, selectedVariant?.id, quantity);
-      }
-      router.push("/checkout/place-order");
+      router.push(targetUrl);
     } catch (err: any) {
       console.error("Error with Buy Now:", err);
       alert(err?.message || "Could not proceed to checkout. Please try again.");

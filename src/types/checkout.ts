@@ -46,8 +46,29 @@ export interface CheckoutAddress {
   updatedAt?: string;
 }
 
+export interface BuyNowItemDto {
+  productId: string;
+  variantId?: string;
+  quantity: number;
+}
+
+export interface BuyNowSessionItem {
+  productId: string;
+  variantId?: string | null;
+  quantity: number;
+  title: string;
+  variantName?: string | null;
+  sku?: string | null;
+  image?: string | null;
+  price: number;
+  originalPrice?: number | null;
+  itemTotal: number;
+}
+
 export interface CheckoutResponse {
   success: boolean;
+  isBuyNow?: boolean;
+  buyNowItem?: BuyNowSessionItem;
   summary: CheckoutSummary;
   addresses: CheckoutAddress[];
   paymentMethods: string[];
@@ -105,6 +126,7 @@ export interface PlaceOrderDto {
   bankCode?: string;
   expectedTotal?: number;
   applyExtraFee?: boolean;
+  buyNowItem?: BuyNowItemDto;
 }
 
 /**

@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, Suspense } from 'react';
 import Image from 'next/image';
 import SafeImage from '@/components/ui/SafeImage';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Check,
   Truck,
@@ -79,9 +79,15 @@ function generateUUID(): string {
   });
 }
 
-export default function CheckoutPage() {
+function CheckoutPageContent() {
   const { settings: publicSettings, delivery: publicDelivery, payment: publicPayment } = usePublicSettings();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isBuyNowParam = searchParams.get("buyNow") === "1";
+  const buyNowProductId = searchParams.get("productId") || undefined;
+  const buyNowVariantId = searchParams.get("variantId") || undefined;
+  const buyNowQty = searchParams.get("qty") ? parseInt(searchParams.get("qty")!, 10) : 1;
+
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { items: cartItems, refreshCart, isLoading: cartLoading } = useCart();
 
@@ -173,6 +179,46 @@ export default function CheckoutPage() {
     }
   }, [user]);
 
+  const isBuyNowSession = Boolean(
+    checkoutData?.isBuyNow || (isBuyNowParam && buyNowProductId)
+  );
+
+  const buyNowItemForDisplay = useMemo(() => {
+    if (!checkoutData?.buyNowItem) return null;
+    const b = checkoutData.buyNowItem;
+    return {
+      id: b.variantId || b.productId,
+      productId: b.productId,
+      variantId: b.variantId || null,
+      quantity: b.quantity,
+      product: {
+        id: b.productId,
+        name: b.title,
+        price: b.originalPrice || b.price,
+        discountPrice: b.price,
+        images: b.image ? [b.image] : [],
+        imageUrl: b.image || undefined,
+      },
+      variant: b.variantName
+        ? {
+            id: b.variantId || undefined,
+            name: b.variantName,
+            price: b.originalPrice || b.price,
+            discountPrice: b.price,
+            images: b.image ? [b.image] : [],
+            imageUrl: b.image || undefined,
+          }
+        : undefined,
+    } as any;
+  }, [checkoutData?.buyNowItem]);
+
+  const activeItems = useMemo(() => {
+    if (isBuyNowSession && buyNowItemForDisplay) {
+      return [buyNowItemForDisplay];
+    }
+    return cartItems || [];
+  }, [isBuyNowSession, buyNowItemForDisplay, cartItems]);
+
   // 1. Load Checkout Session
   const loadCheckoutSession = useCallback(async () => {
     if (!isAuthenticated && !authLoading) {
@@ -183,7 +229,15 @@ export default function CheckoutPage() {
     try {
       setIsCheckoutLoading(true);
       setCheckoutError(null);
-      const res = await checkoutService.getCheckout();
+      const res = await checkoutService.getCheckout(
+        isBuyNowParam && buyNowProductId
+          ? {
+              buyNowProductId,
+              buyNowVariantId,
+              buyNowQuantity: buyNowQty,
+            }
+          : undefined,
+      );
       setCheckoutData(res);
 
       const addrs = res.addresses || [];
@@ -202,7 +256,7 @@ export default function CheckoutPage() {
     } finally {
       setIsCheckoutLoading(false);
     }
-  }, [isAuthenticated, authLoading]);
+  }, [isAuthenticated, authLoading, isBuyNowParam, buyNowProductId, buyNowVariantId, buyNowQty]);
 
   useEffect(() => {
     if (!authLoading) {
@@ -442,6 +496,15 @@ export default function CheckoutPage() {
         paymentMethod: selectedPaymentMethod,
         deliveryInstructions: deliveryInstructions.trim() || undefined,
         upiId: cleanUpiId,
+        ...(isBuyNowSession && (checkoutData?.buyNowItem?.productId || buyNowProductId)
+          ? {
+              buyNowItem: {
+                productId: (checkoutData?.buyNowItem?.productId || buyNowProductId)!,
+                variantId: checkoutData?.buyNowItem?.variantId || buyNowVariantId || undefined,
+                quantity: checkoutData?.buyNowItem?.quantity || buyNowQty || 1,
+              },
+            }
+          : {}),
       };
 
       if (selectedPaymentMethod === 'COD') {
@@ -452,10 +515,12 @@ export default function CheckoutPage() {
         } catch (codErr) {
           console.warn('[Checkout] COD confirmation note:', codErr);
         }
-        setFinalOrderedItems([...(cartItems || [])]);
+        setFinalOrderedItems([...(activeItems || [])]);
         setFinalSummary(checkoutData?.summary);
         setPlacedOrder(res);
-        await refreshCart();
+        if (!isBuyNowSession) {
+          await refreshCart();
+        }
         return true;
       }
 
@@ -561,7 +626,7 @@ export default function CheckoutPage() {
               if (verifyRes.success) {
                 setPaymentFlowState('success');
                 setOrderError(null);
-                setFinalOrderedItems([...(cartItems || [])]);
+                setFinalOrderedItems([...(activeItems || [])]);
                 setFinalSummary(checkoutData?.summary);
                 // The backend has now promoted the order to PLACED; the
                 // place-order response still carried the hidden PENDING
@@ -581,8 +646,10 @@ export default function CheckoutPage() {
                   requiresPayment: false,
                   payment: null,
                 });
-                // Cart is cleared server-side only on payment confirmation.
-                await refreshCart();
+                // Cart is cleared server-side only on payment confirmation if standard cart checkout.
+                if (!isBuyNowSession) {
+                  await refreshCart();
+                }
                 setPendingOrderId(null);
                 setPendingOrderNumber(null);
                 resolve(true);
@@ -727,11 +794,11 @@ export default function CheckoutPage() {
   }
 
   // ----------------------------------------------------
-  // RENDER: Empty Cart
+  // RENDER: Empty Cart / Session
   // ----------------------------------------------------
   const hasNoItems =
     (!checkoutData && !cartLoading) ||
-    (checkoutData?.summary?.itemCount === 0 && (!cartItems || cartItems.length === 0));
+    (checkoutData?.summary?.itemCount === 0 && (!activeItems || activeItems.length === 0));
 
   if (hasNoItems && !placedOrder) {
     return (
@@ -740,10 +807,12 @@ export default function CheckoutPage() {
           <div style={{ maxWidth: '540px', margin: '4rem auto', textAlign: 'center', background: '#fff', padding: '3.5rem 2rem', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
             <ShoppingBag size={52} color="#F99205" style={{ margin: '0 auto 1.5rem auto' }} />
             <h2 style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '0.75rem', color: '#1A1816' }}>
-              Your Cart is Empty
+              {isBuyNowSession ? 'No Product Selected' : 'Your Cart is Empty'}
             </h2>
             <p style={{ color: '#666', marginBottom: '2rem', lineHeight: 1.6 }}>
-              There are currently no items ready for checkout. Explore our premium pet catalog and add your favorites!
+              {isBuyNowSession
+                ? 'The product you are trying to buy is not available or has expired. Please select a product from our catalog.'
+                : 'There are currently no items ready for checkout. Explore our premium pet catalog and add your favorites!'}
             </p>
             <Link
               href="/shop"
@@ -773,7 +842,7 @@ export default function CheckoutPage() {
     }).format(new Date());
 
     const summarySource = finalSummary || checkoutData?.summary;
-    const itemsSource = finalOrderedItems.length > 0 ? finalOrderedItems : (cartItems || []);
+    const itemsSource = finalOrderedItems.length > 0 ? finalOrderedItems : (activeItems || []);
     const receiptSubtotal = summarySource?.subtotal ?? (itemsSource.reduce((acc: number, item: any) => {
       const p = item.variant?.discountPrice ?? item.variant?.price ?? item.product?.discountPrice ?? item.product?.price ?? 0;
       return acc + (p * item.quantity);
@@ -1190,10 +1259,10 @@ export default function CheckoutPage() {
   const taxForTotal = isTaxInclusive ? 0 : gstAmount;
   const grandTotal = summary?.grandTotal ?? 0;
   const effectiveGrandTotal = (grandTotal > 0 ? grandTotal : (subtotal + deliveryFee + taxForTotal + extraFeeAmount)) + activeCodFee;
-  const totalItemsCount = summary?.itemCount ?? cartItems?.reduce((acc, i) => acc + i.quantity, 0) ?? 0;
+  const totalItemsCount = summary?.itemCount ?? activeItems?.reduce((acc, i) => acc + i.quantity, 0) ?? 0;
 
-  const displayedItems = isItemsExpanded ? (cartItems || []) : (cartItems || []).slice(0, 2);
-  const hiddenItemsCount = Math.max(0, (cartItems || []).length - 2);
+  const displayedItems = isItemsExpanded ? (activeItems || []) : (activeItems || []).slice(0, 2);
+  const hiddenItemsCount = Math.max(0, (activeItems || []).length - 2);
 
   const selectedAddr = savedAddresses.find((a) => a.id === selectedAddressId);
 
@@ -1204,7 +1273,11 @@ export default function CheckoutPage() {
         <div className={styles.headerRow}>
           <div className={styles.checkoutHeader}>
             <h1 className={styles.title}>
-              <Link href="/cart" className={styles.titleIcon} title="Back to Cart">
+              <Link
+                href={isBuyNowSession ? '/shop' : '/cart'}
+                className={styles.titleIcon}
+                title={isBuyNowSession ? 'Back to Shop' : 'Back to Cart'}
+              >
                 <ChevronLeft size={24} />
               </Link>
               Secure Checkout
@@ -2201,5 +2274,19 @@ export default function CheckoutPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense
+      fallback={
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+          <Loader2 size={36} className="animate-spin" color="#F99205" />
+        </div>
+      }
+    >
+      <CheckoutPageContent />
+    </Suspense>
   );
 }
