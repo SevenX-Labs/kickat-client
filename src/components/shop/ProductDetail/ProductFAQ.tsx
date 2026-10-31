@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, HelpCircle, Sparkles } from "lucide-react";
+import { ChevronDown, HelpCircle } from "lucide-react";
 import styles from "./ProductDetail.module.css";
 
 export interface ProductFAQItem {
@@ -11,7 +11,6 @@ export interface ProductFAQItem {
 
 interface ProductFAQProps {
   faqs?: Array<{ question: string; answer: string }> | string | null;
-  careInstructions?: string[] | null;
 }
 
 const DEFAULT_FAQS: ProductFAQItem[] = [
@@ -33,7 +32,7 @@ const DEFAULT_FAQS: ProductFAQItem[] = [
   }
 ];
 
-export function ProductFAQ({ faqs, careInstructions }: ProductFAQProps) {
+export function ProductFAQ({ faqs }: ProductFAQProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   // Parse real FAQs safely from product
@@ -57,11 +56,6 @@ export function ProductFAQ({ faqs, careInstructions }: ProductFAQProps) {
 
   const displayFaqs = parsedFaqs.length > 0 ? parsedFaqs : DEFAULT_FAQS;
 
-  // Real care instructions from DB (only shown if entered)
-  const careList = Array.isArray(careInstructions)
-    ? careInstructions.filter((c) => typeof c === "string" && c.trim().length > 0)
-    : [];
-
   const toggleAccordion = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
   };
@@ -74,7 +68,7 @@ export function ProductFAQ({ faqs, careInstructions }: ProductFAQProps) {
             Frequently Asked Questions
           </h2>
           <p style={{ margin: "0.25rem 0 0 0", fontSize: "0.875rem", color: "#78746D" }}>
-            Answers about pet safety, delivery, returns, and care recommendations
+            Answers about pet safety, delivery, and returns
           </p>
         </div>
         <span className={styles.specsVerifiedBadge}>
@@ -108,21 +102,6 @@ export function ProductFAQ({ faqs, careInstructions }: ProductFAQProps) {
           );
         })}
       </div>
-
-      {/* Real Care Instructions from Admin (if available) */}
-      {careList.length > 0 && (
-        <div className={styles.careSection} style={{ marginTop: "1.75rem" }}>
-          <h4 className={styles.careTitle}>Storage &amp; Care Recommendations</h4>
-          <div className={styles.careItemsRow}>
-            {careList.map((instruction, idx) => (
-              <div key={idx} className={styles.careItem}>
-                <Sparkles size={15} className={styles.careIcon} />
-                <span>{instruction}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

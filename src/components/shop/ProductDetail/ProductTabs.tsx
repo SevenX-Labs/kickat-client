@@ -398,6 +398,11 @@ export function ProductTabs({ product, selectedVariant }: ProductTabsProps) {
     specsListRaw.push({ label: "Shelf Life", value: manufacturing.shelfLife });
   }
 
+  // Real care instructions from DB
+  const careList = Array.isArray(product?.careInstructions)
+    ? product.careInstructions.filter((c) => typeof c === "string" && c.trim().length > 0)
+    : [];
+
   // Deduplicate by normalized label
   const seenLabels = new Set<string>();
   const specsList = specsListRaw.filter((item) => {
@@ -667,16 +672,57 @@ export function ProductTabs({ product, selectedVariant }: ProductTabsProps) {
               </span>
             </div>
 
-            <div className={styles.specsTabCard}>
-              <div className={styles.specsTabGrid}>
-                {specsList.map((item, idx) => (
-                  <div key={idx} className={styles.specsTableRow}>
-                    <span className={styles.specsLabel}>{item.label}</span>
-                    <span className={styles.specsValue}>{item.value}</span>
+            {careList.length > 0 ? (
+              <div className={styles.specsAndCareGrid}>
+                {/* Left Column: Specifications Table Card */}
+                <div className={styles.specsTabCard}>
+                  <h4 className={styles.specsCardSubheading}>Item Specifications</h4>
+                  <div className={styles.specsTable}>
+                    {specsList.map((item, idx) => (
+                      <div key={idx} className={styles.specsTableRow}>
+                        <span className={styles.specsLabel}>{item.label}</span>
+                        <span className={styles.specsValue}>{item.value}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
+
+                {/* Right Column: Storage & Care Recommendations Card */}
+                <div className={styles.careRecommendationsCard}>
+                  <div className={styles.careCardHeader}>
+                    <div className={styles.careIconBadge}>
+                      <Sparkles size={18} color="#F99205" />
+                    </div>
+                    <div>
+                      <h4 className={styles.careCardTitle}>Storage &amp; Care Recommendations</h4>
+                      <p className={styles.careCardSubtitle}>Helpful maintenance tips for maximum longevity</p>
+                    </div>
+                  </div>
+
+                  <div className={styles.careListVertical}>
+                    {careList.map((instruction, idx) => (
+                      <div key={idx} className={styles.careListRow}>
+                        <div className={styles.careBulletDot}>
+                          <CheckCircle2 size={15} color="#2E7D32" />
+                        </div>
+                        <span className={styles.careInstructionText}>{instruction}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className={styles.specsTabCard}>
+                <div className={styles.specsTabGrid}>
+                  {specsList.map((item, idx) => (
+                    <div key={idx} className={styles.specsTableRow}>
+                      <span className={styles.specsLabel}>{item.label}</span>
+                      <span className={styles.specsValue}>{item.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         );
 

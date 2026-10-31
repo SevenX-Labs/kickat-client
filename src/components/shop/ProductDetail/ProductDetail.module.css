@@ -1329,6 +1329,99 @@
   border-radius: 20px;
 }
 
+.specsAndCareGrid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 1.75rem;
+  align-items: flex-start;
+}
+
+@media (max-width: 900px) {
+  .specsAndCareGrid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+}
+
+.specsCardSubheading {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1A1612;
+  margin: 0 0 0.85rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #F3ECE1;
+}
+
+.careRecommendationsCard {
+  background: #FFFDF9;
+  border: 1px solid #F0E6D8;
+  border-radius: 16px;
+  padding: 1.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  box-shadow: 0 2px 12px rgba(249, 146, 5, 0.04);
+}
+
+.careCardHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.careIconBadge {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #FFF3E0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.careCardTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1A1612;
+  margin: 0;
+}
+
+.careCardSubtitle {
+  font-size: 0.8rem;
+  color: #78746D;
+  margin: 0.2rem 0 0 0;
+}
+
+.careListVertical {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.careListRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  background: #ffffff;
+  border: 1px solid #EFE8DC;
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+}
+
+.careBulletDot {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.careInstructionText {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #38322A;
+  font-weight: 500;
+}
+
 .specsTabCard {
   background: #FAFAF8;
   border: 1px solid #EBE5DB;
@@ -1343,7 +1436,100 @@
 }
 
 @media (max-width: 768px) {
-  .specsTabCard {
+  .specsAndCareGrid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 1.75rem;
+  align-items: flex-start;
+}
+
+@media (max-width: 900px) {
+  .specsAndCareGrid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+}
+
+.specsCardSubheading {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1A1612;
+  margin: 0 0 0.85rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #F3ECE1;
+}
+
+.careRecommendationsCard {
+  background: #FFFDF9;
+  border: 1px solid #F0E6D8;
+  border-radius: 16px;
+  padding: 1.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  box-shadow: 0 2px 12px rgba(249, 146, 5, 0.04);
+}
+
+.careCardHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.careIconBadge {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #FFF3E0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.careCardTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1A1612;
+  margin: 0;
+}
+
+.careCardSubtitle {
+  font-size: 0.8rem;
+  color: #78746D;
+  margin: 0.2rem 0 0 0;
+}
+
+.careListVertical {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.careListRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  background: #ffffff;
+  border: 1px solid #EFE8DC;
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+}
+
+.careBulletDot {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.careInstructionText {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #38322A;
+  font-weight: 500;
+}
+
+.specsTabCard {
     padding: 1rem 1.25rem;
   }
   .specsTabGrid {

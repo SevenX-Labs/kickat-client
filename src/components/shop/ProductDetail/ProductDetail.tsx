@@ -227,7 +227,7 @@ export function ProductDetail({ product, isLoading, initialVariantId }: ProductD
       {/* 4. Frequently Asked Questions Section */}
       <section className={styles.sectionPadding}>
         <div className={styles.container}>
-          <ProductFAQ faqs={product.faqs} careInstructions={product.careInstructions} />
+          <ProductFAQ faqs={product.faqs} />
         </div>
       </section>
 
