@@ -27,6 +27,49 @@ interface ProductTabsProps {
   selectedVariant?: ProductVariant | null;
 }
 
+function parseMaterialsContent(raw?: string | null): { leadText: string; bullets: string[] } {
+  if (!raw || !raw.trim()) return { leadText: "", bullets: [] };
+  const str = raw.trim();
+
+  const lines = str.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  const bulletRegex = /^[-*•–—]\s+|\d+[\.\)]\s+/;
+
+  if (lines.length > 1) {
+    const leadLines: string[] = [];
+    const bullets: string[] = [];
+    let bulletStarted = false;
+
+    for (const line of lines) {
+      if (bulletRegex.test(line)) {
+        bulletStarted = true;
+        bullets.push(line.replace(bulletRegex, "").trim());
+      } else if (bulletStarted) {
+        bullets.push(line);
+      } else {
+        leadLines.push(line);
+      }
+    }
+    return { leadText: leadLines.join("\n\n"), bullets };
+  }
+
+  // Single line starting with bullet marker
+  if (/^[-*•–—]\s+/.test(str)) {
+    const parts = str.split(/(?:^|\s+)[-*•–—]\s+/).map((p) => p.trim()).filter(Boolean);
+    return { leadText: "", bullets: parts };
+  }
+
+  // Single line containing inline bullet markers like " - " or " • "
+  if (/\s+[-*•–—]\s+/.test(str)) {
+    const firstBulletIdx = str.search(/\s+[-*•–—]\s+/);
+    const lead = str.substring(0, firstBulletIdx).trim();
+    const rest = str.substring(firstBulletIdx).trim();
+    const parts = rest.split(/(?:^|\s+)[-*•–—]\s+/).map((p) => p.trim()).filter(Boolean);
+    return { leadText: lead, bullets: parts };
+  }
+
+  return { leadText: str, bullets: [] };
+}
+
 export function ProductTabs({ product, selectedVariant }: ProductTabsProps) {
   const { manufacturing } = usePublicSettings();
   const tabsNavRef = useRef<HTMLDivElement>(null);
@@ -93,13 +136,43 @@ export function ProductTabs({ product, selectedVariant }: ProductTabsProps) {
     tabs.push({ id: 'feeding', label: 'Feeding & Usage Guide', icon: <BookOpen size={15} /> });
   }
 
-  if (product.materials) {
+  if (product.materials || (product.attributes?.safetyBadges && Array.isArray(product.attributes.safetyBadges) && product.attributes.safetyBadges.length > 0)) {
     tabs.push({ id: 'materials', label: 'Materials & Safety', icon: <ShieldCheck size={15} /> });
   }
 
   tabs.push({ id: 'shipping', label: 'Shipping & Returns', icon: <Truck size={15} /> });
   if (manufacturing && (manufacturing.manufacturerName || manufacturing.marketedBy || manufacturing.manufacturerAddress)) {
     tabs.push({ id: 'manufacturing', label: 'Manufacturing & Compliance', icon: <Building2 size={15} /> });
+  }
+
+  // Parse materials content & safety badges
+  const parsedMaterials = parseMaterialsContent(product.materials);
+
+  const rawSafetyBadges = product.attributes?.safetyBadges;
+  let safetyBadges: string[] = [];
+  if (Array.isArray(rawSafetyBadges) && rawSafetyBadges.length > 0) {
+    safetyBadges = rawSafetyBadges
+      .map((b: any) => (typeof b === "string" ? b.trim() : ""))
+      .filter(Boolean);
+  } else if (product.materials) {
+    const lower = product.materials.toLowerCase();
+    const detected: string[] = [];
+    if (lower.includes("bpa") || lower.includes("phthalate")) {
+      detected.push("BPA & Phthalate Free");
+    }
+    if (lower.includes("non-toxic") || lower.includes("nontoxic") || lower.includes("non toxic")) {
+      detected.push("Non-Toxic Compounds");
+    }
+    if (lower.includes("lab quality") || lower.includes("tested") || lower.includes("lab tested")) {
+      detected.push("Lab Quality Tested");
+    }
+    if (lower.includes("food-grade") || lower.includes("food grade")) {
+      detected.push("100% Food-Grade");
+    }
+    if (lower.includes("hypoallergenic")) {
+      detected.push("Hypoallergenic");
+    }
+    safetyBadges = detected;
   }
 
   // Scroll detection for mobile indicators
@@ -322,24 +395,40 @@ export function ProductTabs({ product, selectedVariant }: ProductTabsProps) {
         return (
           <div className={styles.tabContentBlock}>
             <h3 className={styles.tabSectionHeading}>Pet-Safe Materials &amp; Standards</h3>
-            <p className={styles.tabTextContent}>
-              {product.materials ||
-                '100% pet-safe, non-toxic, and hypoallergenic materials. Rigorously tested to withstand daily wear while protecting your companion’s skin, paws, and health.'}
-            </p>
-            <div className={styles.safetyBadgesRow}>
-              <div className={styles.safetyPill}>
-                <CheckCircle2 size={15} color="#2E7D32" />
-                <span>BPA &amp; Phthalate Free</span>
+
+            {parsedMaterials.leadText && (
+              <p className={styles.tabTextContent}>{parsedMaterials.leadText}</p>
+            )}
+
+            {parsedMaterials.bullets.length > 0 && (
+              <ul className={styles.materialsBulletList}>
+                {parsedMaterials.bullets.map((bullet, idx) => (
+                  <li key={idx} className={styles.materialsBulletItem}>
+                    <span className={styles.materialsBulletIcon}>
+                      <CheckCircle2 size={16} />
+                    </span>
+                    <span className={styles.materialsBulletText}>{bullet}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {!parsedMaterials.leadText && parsedMaterials.bullets.length === 0 && (
+              <p className={styles.tabTextContent}>
+                100% pet-safe, non-toxic, and hypoallergenic materials. Rigorously tested to withstand daily wear while protecting your companion’s skin, paws, and health.
+              </p>
+            )}
+
+            {safetyBadges.length > 0 && (
+              <div className={styles.safetyBadgesRow}>
+                {safetyBadges.map((badge, idx) => (
+                  <div key={idx} className={styles.safetyPill}>
+                    <CheckCircle2 size={15} color="#2E7D32" />
+                    <span>{badge}</span>
+                  </div>
+                ))}
               </div>
-              <div className={styles.safetyPill}>
-                <CheckCircle2 size={15} color="#2E7D32" />
-                <span>Non-Toxic Compounds</span>
-              </div>
-              <div className={styles.safetyPill}>
-                <CheckCircle2 size={15} color="#2E7D32" />
-                <span>Lab Quality Tested</span>
-              </div>
-            </div>
+            )}
           </div>
         );
 
