@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { categoryService } from '@/services/categoryService';
 import { Category, CategoryProductsQuery } from '@/types/category';
-import { productService, enrichProductsWithVariants } from '@/services/productService';
+import { enrichProductsWithVariants } from '@/services/productService';
 import { mapBackendProductListToCards } from '@/types/product';
 import { Skeleton } from '@/components/ui/Skeleton';
 import styles from './CategoryListing.module.css';
@@ -122,12 +122,24 @@ export function CategoryListing({ categorySlug, subcategorySlug }: CategoryListi
         } else {
           // If no direct category match, check if categorySlug exists in tree
           if (treeRes.success) {
-            const matched = treeRes.categories.find(
+            let matched = treeRes.categories.find(
               (c) => c.slug.toLowerCase() === categorySlug.toLowerCase() ||
                      c.slug.toLowerCase() === targetSlug.toLowerCase() ||
                      (c.slug === 'dog' && (categorySlug === 'dogs' || targetSlug === 'dogs')) ||
                      (c.slug === 'cat' && (categorySlug === 'cats' || targetSlug === 'cats'))
             );
+            if (!matched) {
+              for (const rootCat of treeRes.categories) {
+                const childMatch = (rootCat.children || []).find(
+                  (child) => child.slug.toLowerCase() === targetSlug.toLowerCase() || child.id === targetSlug
+                );
+                if (childMatch) {
+                  matched = childMatch;
+                  setParentCategory(rootCat);
+                  break;
+                }
+              }
+            }
             if (matched) {
               setCategory(matched);
               setNotFound(false);
@@ -194,33 +206,14 @@ export function CategoryListing({ categorySlug, subcategorySlug }: CategoryListi
         }
       });
 
-      if (res && res.success && Array.isArray(res.products) && res.products.length > 0) {
+      if (res && res.success && Array.isArray(res.products)) {
         rawProducts = res.products;
         totalCount = res.meta?.total ?? rawProducts.length;
         totalPagesCount = res.meta?.totalPages ?? Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
       } else {
-        // Fallback: Query general products by pet species
-        let speciesParam: string | undefined = undefined;
-        const normCat = (parentCategory?.slug || categorySlug || '').toLowerCase();
-        if (normCat.includes('dog')) speciesParam = 'dog';
-        else if (normCat.includes('cat')) speciesParam = 'cat';
-        else if (normCat.includes('fish')) speciesParam = 'fish';
-        else if (normCat.includes('bird')) speciesParam = 'bird';
-
-        const fallbackRes = await productService.getProducts({
-          page: currentPage,
-          limit: ITEMS_PER_PAGE,
-          sort: apiSort,
-          petSpecies: speciesParam,
-          priceMax: maxPrice < 6000 ? maxPrice : undefined,
-          inStock: inStockOnly || undefined,
-        }).catch(() => null);
-
-        if (fallbackRes && fallbackRes.success && Array.isArray(fallbackRes.products)) {
-          rawProducts = fallbackRes.products;
-          totalCount = fallbackRes.meta?.total ?? rawProducts.length;
-          totalPagesCount = fallbackRes.meta?.totalPages ?? Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
-        }
+        rawProducts = [];
+        totalCount = 0;
+        totalPagesCount = 1;
       }
 
       await enrichProductsWithVariants(rawProducts);
@@ -263,7 +256,12 @@ export function CategoryListing({ categorySlug, subcategorySlug }: CategoryListi
 
   const handleSubcategoryClick = (subSlug: string) => {
     const parentSlug = parentCategory?.slug || category?.slug || categorySlug;
-    router.push(`/category/${parentSlug}/${subSlug}`);
+    const basePath = typeof window !== 'undefined' && window.location.pathname.startsWith('/categories') ? '/categories' : '/category';
+    if (subSlug === subcategorySlug) {
+      router.push(`${basePath}/${parentSlug}`);
+    } else {
+      router.push(`${basePath}/${parentSlug}/${subSlug}`);
+    }
   };
 
   const activeFilterCount =

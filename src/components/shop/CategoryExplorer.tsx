@@ -172,19 +172,22 @@ export function CategoryExplorer({
       }
 
       if (!res || !res.success) {
-        let speciesParam: string | undefined = undefined;
-        const normMain = selectedMainCat.toLowerCase();
-        if (normMain === 'dogs' || normMain === 'dog') speciesParam = 'dog';
-        else if (normMain === 'cats' || normMain === 'cat') speciesParam = 'cat';
-        else if (normMain === 'fish') speciesParam = 'fish';
-        else if (normMain === 'birds' || normMain === 'bird') speciesParam = 'bird';
+        // Only fallback to petSpecies if NO specific subcategory is selected (all category view)
+        if (selectedSubCat === 'all') {
+          let speciesParam: string | undefined = undefined;
+          const normMain = selectedMainCat.toLowerCase();
+          if (normMain === 'dogs' || normMain === 'dog') speciesParam = 'dog';
+          else if (normMain === 'cats' || normMain === 'cat') speciesParam = 'cat';
+          else if (normMain === 'fish') speciesParam = 'fish';
+          else if (normMain === 'birds' || normMain === 'bird') speciesParam = 'bird';
 
-        res = await productService.getProducts({
-          page: currentPage,
-          limit: ITEMS_PER_PAGE,
-          sort: apiSort,
-          petSpecies: speciesParam,
-        });
+          res = await productService.getProducts({
+            page: currentPage,
+            limit: ITEMS_PER_PAGE,
+            sort: apiSort,
+            petSpecies: speciesParam,
+          }).catch(() => null);
+        }
       }
 
       if (res && res.success && Array.isArray(res.products)) {
